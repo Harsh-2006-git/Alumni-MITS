@@ -86,8 +86,8 @@ export default function AlumniAuth({ setIsAuthenticated }) {
 
     try {
       const endpoint = isLogin
-        ? "http://localhost:3001/auth/login-alumni"
-        : "http://localhost:3001/auth/register-alumni";
+        ? "https://alumni-mits-l45r.onrender.com/auth/login-alumni"
+        : "https://alumni-mits-l45r.onrender.com/auth/register-alumni";
 
       const payload = isLogin
         ? { email: formData.email, password: formData.password }

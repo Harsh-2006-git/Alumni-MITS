@@ -25,7 +25,7 @@ interface Props {
   setIsAuthenticated: (value: boolean) => void;
 }
 
-const API_URL = "http://localhost:3001/auth";
+const API_URL = "https://alumni-mits-l45r.onrender.com/auth";
 
 export default function LoginPage({ setIsAuthenticated }: Props) {
   const navigate = useNavigate();
