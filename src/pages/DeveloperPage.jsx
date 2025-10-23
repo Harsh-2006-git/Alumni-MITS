@@ -22,11 +22,7 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function DeveloperPage() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
-
+export default function DeveloperPage({ isDarkMode, toggleTheme }) {
   // Internships data
   const internships = [
     {

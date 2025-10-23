@@ -52,17 +52,14 @@ const SkillAnalysisPopup = ({ job, isOpen, onClose, isDarkMode }) => {
 
       console.log("Sending skill analysis request:", payload);
 
-      const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/alumni/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch("http://localhost:3001/alumni/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
       // Check if response is OK
       if (!response.ok) {

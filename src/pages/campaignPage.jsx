@@ -29,8 +29,7 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function CampaignPage() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+export default function CampaignPage({ isDarkMode, toggleTheme }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
@@ -59,8 +58,6 @@ export default function CampaignPage() {
     contact: "",
   });
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
-
   useEffect(() => {
     fetchCampaigns();
     checkAuthentication();
@@ -85,7 +82,7 @@ export default function CampaignPage() {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/campaign/get-approve-campaign"
+        "http://localhost:3001/campaign/get-approve-campaign"
       );
       const data = await response.json();
       if (response.ok) {
@@ -181,7 +178,7 @@ export default function CampaignPage() {
       });
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/campaign/create-campaign",
+        "http://localhost:3001/campaign/create-campaign",
         {
           method: "POST",
           headers: {

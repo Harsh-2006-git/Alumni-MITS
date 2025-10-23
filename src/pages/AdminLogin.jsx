@@ -16,12 +16,16 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-const API_URL = "https://alumni-mits-l45r.onrender.com/auth";
+const API_URL = "http://localhost:3001/auth";
 
-export default function AdminLoginPage({ setIsAuthenticated }) {
+export default function AdminLoginPage({
+  setIsAuthenticated,
+  isDarkMode,
+  toggleTheme,
+}) {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+
   const [showPassword, setShowPassword] = useState(false);
   const [credentials, setCredentials] = useState({
     username: "",
@@ -83,10 +87,6 @@ export default function AdminLoginPage({ setIsAuthenticated }) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
   };
 
   return (

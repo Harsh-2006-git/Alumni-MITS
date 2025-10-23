@@ -1,0 +1,16 @@
+{
+  "name": "MITS Alumni - Connect & Grow",
+  "short_name": "MITS Alumni",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#003366",
+  "description": "Official alumni network of Madhav Institute of Technology and Science (MITS) Gwalior.",
+  "icons": [
+    {
+      "src": "/assets/images/mits-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

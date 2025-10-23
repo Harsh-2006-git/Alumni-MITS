@@ -130,7 +130,7 @@ export default function AlumniProfilePage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
 
-  const API_BASE_URL = "https://alumni-mits-l45r.onrender.com";
+  const API_BASE_URL = "http://localhost:3001";
 
   useEffect(() => {
     fetchUserData();

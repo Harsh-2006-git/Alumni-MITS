@@ -21,12 +21,16 @@ import {
   Clock,
 } from "lucide-react";
 
-export default function AlumniAuth({ setIsAuthenticated }) {
+export default function AlumniAuth({
+  setIsAuthenticated,
+  isDarkMode,
+  toggleTheme,
+}) {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+
   const [isMobile, setIsMobile] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -67,10 +71,6 @@ export default function AlumniAuth({ setIsAuthenticated }) {
     setShowMessage(false);
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   const closeMessage = () => {
     setShowMessage(false);
     setError("");
@@ -86,8 +86,8 @@ export default function AlumniAuth({ setIsAuthenticated }) {
 
     try {
       const endpoint = isLogin
-        ? "https://alumni-mits-l45r.onrender.com/auth/login-alumni"
-        : "https://alumni-mits-l45r.onrender.com/auth/register-alumni";
+        ? "http://localhost:3001/auth/login-alumni"
+        : "http://localhost:3001/auth/register-alumni";
 
       const payload = isLogin
         ? { email: formData.email, password: formData.password }
@@ -141,7 +141,7 @@ export default function AlumniAuth({ setIsAuthenticated }) {
       } else {
         // Registration successful
         setSuccessMessage(
-          "Registration successful! Your account is under verification. You can now login."
+          "Registration successful! Your account is under verification."
         );
         setShowMessage(true);
 

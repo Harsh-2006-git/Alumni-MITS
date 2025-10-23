@@ -580,7 +580,7 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
   );
 };
 
-// Enhanced Hero Section - Centered Aligned
+// Enhanced Hero Section
 const HeroSection = ({
   isDarkMode,
   onPostJob,
@@ -605,9 +605,9 @@ const HeroSection = ({
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-8 sm:py-12 relative z-10">
-        <div className="flex flex-col items-center justify-center text-center">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
           {/* Text Content */}
-          <div className="max-w-3xl">
+          <div className="flex-1 text-center lg:text-left">
             <div
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-4 
               bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
@@ -617,23 +617,23 @@ const HeroSection = ({
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-              Find Your{" "}
-              <span className="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+              Find Your
+              <span className="block bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
                 Dream Job
               </span>
             </h1>
 
             <p
-              className={`text-base sm:text-lg mb-6 leading-relaxed max-w-2xl mx-auto ${
+              className={`text-base sm:text-lg mb-6 leading-relaxed ${
                 isDarkMode ? "text-gray-300" : "text-gray-600"
               }`}
             >
               Discover opportunities from top companies and take your career to
-              the next level.
+              the next level. Real jobs, real companies, real opportunities.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <button
                 onClick={onPostJob}
                 className="group px-6 py-3 rounded-lg font-semibold text-white shadow-lg hover:shadow-xl 
@@ -666,11 +666,49 @@ const HeroSection = ({
               </button>
             </div>
           </div>
+
+          {/* Visual Content */}
+          <div className="flex-1 flex justify-center lg:justify-end">
+            <div className="relative w-full max-w-md">
+              {/* Main Illustration */}
+              <div className="relative z-10">
+                <div
+                  className={`w-64 h-64 rounded-3xl ${
+                    isDarkMode ? "bg-slate-800" : "bg-white"
+                  } shadow-2xl flex items-center justify-center p-8`}
+                >
+                  <div className="text-center">
+                    <div
+                      className="w-16 h-16 mx-auto mb-4 rounded-2xl 
+                      bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center shadow-lg"
+                    >
+                      <Briefcase className="w-8 h-8 text-white" />
+                    </div>
+                    <h3
+                      className={`text-lg font-bold mb-2 ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      Your Career
+                    </h3>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      Start your journey today
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 // Main Component
 export default function JobListingPage({ isDarkMode, toggleTheme }) {
   const [bookmarkedJobs, setBookmarkedJobs] = useState(new Set());

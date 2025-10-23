@@ -35,10 +35,17 @@ import { useNavigate } from "react-router-dom";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+interface HomePageProps {
+  isDarkMode: boolean;
+  toggleTheme: () => void;
+}
 
-export default function AlumniHomePage() {
+export default function AlumniHomePage({
+  isDarkMode,
+  toggleTheme,
+}: HomePageProps) {
   const navigate = useNavigate();
-  const [isDarkMode, setIsDarkMode] = useState(true);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -48,7 +55,6 @@ export default function AlumniHomePage() {
     userId: string;
   }>(null);
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
 
@@ -100,50 +106,69 @@ export default function AlumniHomePage() {
       {/* Header / Navbar */}
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       {/* Hero Section */}
-      <section className="w-full min-h-[80vh] px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-12 relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      {/* Hero Section */}
+      <section
+        className={`w-full min-h-[80vh] px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-12 relative overflow-hidden transition-colors duration-500 ${
+          isDarkMode
+            ? "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
+            : "bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-50"
+        }`}
+      >
         {/* Background Image with Overlay */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${
+            isDarkMode ? "opacity-20" : "opacity-30"
+          }`}
           style={{ backgroundImage: "url(/assets/images/bg.png)" }}
         ></div>
 
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-transparent to-slate-900/80"></div>
-
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-20 left-10 w-64 sm:w-96 h-64 sm:h-96 bg-blue-500/20 rounded-full filter blur-3xl animate-blob"></div>
-          <div
-            className="absolute top-40 right-10 sm:right-20 w-64 sm:w-96 h-64 sm:h-96 bg-purple-500/20 rounded-full filter blur-3xl animate-blob"
-            style={{ animationDelay: "2s" }}
-          ></div>
-          <div
-            className="absolute bottom-20 left-1/3 w-64 sm:w-96 h-64 sm:h-96 bg-cyan-500/20 rounded-full filter blur-3xl animate-blob"
-            style={{ animationDelay: "4s" }}
-          ></div>
-        </div>
-
-        {/* Decorative Dots - Hidden on mobile */}
-        <div className="absolute top-10 right-4 sm:right-10 flex flex-col gap-2 sm:gap-3 opacity-30">
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full"></div>
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full"></div>
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full"></div>
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full"></div>
-        </div>
+        {/* Dark/Light Overlay */}
+        <div
+          className={`absolute inset-0 transition-colors duration-500 ${
+            isDarkMode
+              ? "bg-gradient-to-b from-slate-900/50 via-transparent to-slate-900/80"
+              : "bg-gradient-to-b from-white/30 via-transparent to-blue-50/50"
+          }`}
+        ></div>
 
         <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center h-full">
           {/* Left Content */}
           <div className="space-y-5 sm:space-y-6">
             {/* Welcome Badge */}
-            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-blue-500/10 backdrop-blur-sm border border-blue-500/30">
-              <span className="text-xs sm:text-sm font-medium text-blue-300 tracking-wide">
+            <div
+              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm border transition-all duration-500 ${
+                isDarkMode
+                  ? "bg-blue-500/10 border-blue-500/30"
+                  : "bg-white/60 border-blue-300 shadow-lg"
+              }`}
+            >
+              <span
+                className={`text-xs sm:text-sm font-medium tracking-wide transition-colors duration-500 ${
+                  isDarkMode ? "text-blue-300" : "text-blue-700"
+                }`}
+              >
                 Welcome to Your Alumni Network
               </span>
+              {/* Decorative Elements */}
+              <div
+                className={`absolute -top-6 -right-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 ${
+                  isDarkMode ? "bg-blue-500/20" : "bg-blue-400/40"
+                }`}
+              ></div>
+              <div
+                className={`absolute -bottom-6 -left-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 ${
+                  isDarkMode ? "bg-purple-500/20" : "bg-purple-400/40"
+                }`}
+              ></div>
             </div>
 
             {/* Logo and Title */}
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-white rounded-xl sm:rounded-2xl p-2 shadow-2xl flex-shrink-0">
+              <div
+                className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl p-2 shadow-2xl flex-shrink-0 transition-colors duration-500 ${
+                  isDarkMode ? "bg-white" : "bg-white"
+                }`}
+              >
                 <img
                   src="/assets/images/mits-logo.png"
                   alt="MITS Logo"
@@ -151,7 +176,9 @@ export default function AlumniHomePage() {
                 />
               </div>
               <h1
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-black text-white tracking-tight"
+                className={`text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-black tracking-tight transition-colors duration-500 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
                 style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
               >
                 MITS
@@ -159,7 +186,13 @@ export default function AlumniHomePage() {
             </div>
 
             {/* Description */}
-            <p className="text-sm sm:text-base md:text-lg text-gray-300 leading-relaxed max-w-xl font-light">
+            <p
+              className={`text-sm sm:text-base md:text-lg leading-relaxed max-w-xl transition-colors duration-500 ${
+                isDarkMode
+                  ? "text-gray-300 font-light"
+                  : "text-gray-800 font-normal"
+              }`}
+            >
               Join our thriving community of 5000+ alumni across the globe,
               where connections become opportunities and memories turn into
               lifelong bonds.
@@ -167,7 +200,14 @@ export default function AlumniHomePage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
-              <button className="group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 bg-blue-600 hover:bg-blue-700 text-white shadow-xl hover:shadow-2xl hover:scale-105 text-sm w-full sm:w-auto">
+              <button
+                onClick={() => navigate("/alumni")}
+                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 text-sm w-full sm:w-auto ${
+                  isDarkMode
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -183,7 +223,14 @@ export default function AlumniHomePage() {
                 </svg>
                 Explore Network
               </button>
-              <button className="px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 hover:border-slate-600 backdrop-blur-sm shadow-lg hover:scale-105 text-sm w-full sm:w-auto">
+              <button
+                onClick={() => navigate("/event")}
+                className={`px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 text-sm w-full sm:w-auto ${
+                  isDarkMode
+                    ? "bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 hover:border-slate-600"
+                    : "bg-white/70 hover:bg-white text-gray-900 border border-gray-300 hover:border-gray-400"
+                }`}
+              >
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -235,7 +282,13 @@ export default function AlumniHomePage() {
               ].map((stat, idx) => (
                 <div
                   key={idx}
-                  className={`p-4 rounded-xl border transition-all hover:scale-105 hover:shadow-xl ${stat.glow} bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20`}
+                  className={`p-4 rounded-xl border transition-all duration-500 hover:scale-105 hover:shadow-xl ${
+                    stat.glow
+                  } ${
+                    isDarkMode
+                      ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                      : "bg-white/70 border-gray-200 shadow-lg"
+                  }`}
                 >
                   <div
                     className={`w-9 h-9 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-3 shadow-lg animate-pulse`}
@@ -306,7 +359,11 @@ export default function AlumniHomePage() {
                   >
                     {stat.value}
                   </p>
-                  <p className="text-xs text-gray-400 font-medium">
+                  <p
+                    className={`text-xs font-medium transition-colors duration-500 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
                     {stat.label}
                   </p>
                 </div>
@@ -325,12 +382,14 @@ export default function AlumniHomePage() {
               />
 
               {/* Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+              <div
+                className={`absolute inset-0 transition-colors duration-500 ${
+                  isDarkMode
+                    ? "bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"
+                    : "bg-gradient-to-t from-white/40 via-transparent to-transparent"
+                }`}
+              ></div>
             </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute -top-6 -right-6 w-28 h-28 bg-blue-500/20 rounded-full filter blur-2xl"></div>
-            <div className="absolute -bottom-6 -left-6 w-28 h-28 bg-purple-500/20 rounded-full filter blur-2xl"></div>
           </div>
 
           {/* Mobile Image (Visible only on mobile) */}
@@ -341,27 +400,16 @@ export default function AlumniHomePage() {
                 alt="MITS Campus"
                 className="w-full h-[250px] sm:h-[300px] object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"></div>
+              <div
+                className={`absolute inset-0 transition-colors duration-500 ${
+                  isDarkMode
+                    ? "bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"
+                    : "bg-gradient-to-t from-white/40 via-transparent to-transparent"
+                }`}
+              ></div>
             </div>
           </div>
         </div>
-
-        <style>{`
-    @keyframes blob {
-      0%, 100% {
-        transform: translate(0, 0) scale(1);
-      }
-      33% {
-        transform: translate(30px, -50px) scale(1.1);
-      }
-      66% {
-        transform: translate(-20px, 20px) scale(0.9);
-      }
-    }
-    .animate-blob {
-      animation: blob 7s infinite;
-    }
-  `}</style>
       </section>
 
       {/* Testimonial Section */}

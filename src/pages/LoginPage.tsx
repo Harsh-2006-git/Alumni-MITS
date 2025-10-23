@@ -23,15 +23,21 @@ import { useNavigate } from "react-router-dom";
 
 interface Props {
   setIsAuthenticated: (value: boolean) => void;
+  isDarkMode: boolean;
+  toggleTheme: () => void;
 }
 
-const API_URL = "https://alumni-mits-l45r.onrender.com/auth";
+const API_URL = "http://localhost:3001/auth";
 
-export default function LoginPage({ setIsAuthenticated }: Props) {
+export default function LoginPage({
+  setIsAuthenticated,
+  isDarkMode,
+  toggleTheme,
+}: Props) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+
   const [isMobile, setIsMobile] = useState(false);
 
   const handleAuthError = (errorType: string) => {
@@ -250,10 +256,6 @@ export default function LoginPage({ setIsAuthenticated }: Props) {
       setIsAuthenticated(true);
       window.location.href = "/";
     }
-  };
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
   };
 
   return (

@@ -22,8 +22,7 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function AlumniDirectory() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] =
     useState("All Departments");
@@ -41,9 +40,7 @@ export default function AlumniDirectory() {
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
-        const response = await fetch(
-          "https://alumni-mits-l45r.onrender.com/alumni/all-alumni"
-        );
+        const response = await fetch("http://localhost:3001/alumni/all-alumni");
         const result = await response.json();
         if (result.success) {
           setAlumniData(result.data);
@@ -58,8 +55,6 @@ export default function AlumniDirectory() {
 
     fetchAlumni();
   }, []);
-
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   // Extract unique departments and locations
   const departments = [

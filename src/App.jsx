@@ -25,6 +25,11 @@ import MyActivityPage from "./pages/ActivityPage";
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
 
   // Check auth on app load
   useEffect(() => {
@@ -68,121 +73,206 @@ export default function App() {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? <HomePage /> : <Navigate to="/login" replace />
-          }
-        />
+    <div className={isDarkMode ? "dark" : "light"}>
+      <Router>
+        {/* REMOVED Header from here since it's in individual pages */}
 
-        {/* Student Login */}
-        <Route
-          path="/login"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/" replace />
-            ) : (
-              <LoginPage setIsAuthenticated={setIsAuthenticated} />
-            )
-          }
-        />
-        {/* Alumni Login */}
-        <Route
-          path="/login-alumni"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/" replace />
-            ) : (
-              <AlumniAuth setIsAuthenticated={setIsAuthenticated} />
-            )
-          }
-        />
-        {/* Admin Login */}
-        <Route
-          path="/login-admin"
-          element={(() => {
-            const authData = localStorage.getItem("auth");
-            const parsedAuth = authData ? JSON.parse(authData) : null;
-            const userType = parsedAuth?.userType;
+        <Routes>
+          <Route
+            path="/"
+            element={
+              isAuthenticated ? (
+                <HomePage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
 
-            return isAuthenticated && userType === "admin" ? (
-              <Navigate to="/admin" replace />
-            ) : (
-              <AdminLoginPage setIsAuthenticated={setIsAuthenticated} />
-            );
-          })()}
-        />
-        {/* Admin Dashboard (protected - admin only) */}
-        <Route
-          path="/admin"
-          element={(() => {
-            const authData = localStorage.getItem("auth");
-            const parsedAuth = authData ? JSON.parse(authData) : null;
-            const userType = parsedAuth?.userType;
+          {/* Student Login */}
+          <Route
+            path="/login"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/" replace />
+              ) : (
+                <LoginPage
+                  setIsAuthenticated={setIsAuthenticated}
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
+                />
+              )
+            }
+          />
 
-            return isAuthenticated && userType === "admin" ? (
-              <AdminDashboard setIsAuthenticated={setIsAuthenticated} />
-            ) : (
-              <Navigate to="/login-admin" replace />
-            );
-          })()}
-        />
-        {/* Profile (protected, student or alumni) */}
-        <Route
-          path="/profile"
-          element={
-            isAuthenticated ? (
-              (() => {
-                const authData = localStorage.getItem("auth");
-                const parsedAuth = authData ? JSON.parse(authData) : null;
-                const userType = parsedAuth?.userType;
+          {/* Alumni Login */}
+          <Route
+            path="/login-alumni"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/" replace />
+              ) : (
+                <AlumniAuth
+                  setIsAuthenticated={setIsAuthenticated}
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
+                />
+              )
+            }
+          />
 
-                // Redirect admin to admin dashboard
-                if (userType === "admin") {
-                  return <Navigate to="/admin" replace />;
-                }
+          {/* Admin Login */}
+          <Route
+            path="/login-admin"
+            element={(() => {
+              const authData = localStorage.getItem("auth");
+              const parsedAuth = authData ? JSON.parse(authData) : null;
+              const userType = parsedAuth?.userType;
 
-                return userType === "alumni" ? (
-                  <ProfileAlumni />
-                ) : (
-                  <ProfilePage />
-                );
-              })()
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        {/* Other pages */}
-        <Route path="/developer" element={<DeveloperPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/job" element={<JobPage />} />
-        <Route path="/alumni" element={<AlumniPage />} />
-        <Route path="/event" element={<EventPage />} />
-        <Route path="/campaign" element={<CampaignPage />} />
-        <Route path="/opensource" element={<OpenSourcePage />} />
-        {/* Chat (protected) */}
-        <Route
-          path="/chat"
-          element={
-            isAuthenticated ? <Chatpage /> : <Navigate to="/login" replace />
-          }
-        />
-        <Route
-          path="/activity"
-          element={
-            isAuthenticated ? (
-              <MyActivityPage />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
+              return isAuthenticated && userType === "admin" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <AdminLoginPage
+                  setIsAuthenticated={setIsAuthenticated}
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
+                />
+              );
+            })()}
+          />
+
+          {/* Admin Dashboard */}
+          <Route
+            path="/admin"
+            element={(() => {
+              const authData = localStorage.getItem("auth");
+              const parsedAuth = authData ? JSON.parse(authData) : null;
+              const userType = parsedAuth?.userType;
+
+              return isAuthenticated && userType === "admin" ? (
+                <AdminDashboard
+                  setIsAuthenticated={setIsAuthenticated}
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
+                />
+              ) : (
+                <Navigate to="/login-admin" replace />
+              );
+            })()}
+          />
+
+          {/* Profile */}
+          <Route
+            path="/profile"
+            element={
+              isAuthenticated ? (
+                (() => {
+                  const authData = localStorage.getItem("auth");
+                  const parsedAuth = authData ? JSON.parse(authData) : null;
+                  const userType = parsedAuth?.userType;
+
+                  if (userType === "admin") {
+                    return <Navigate to="/admin" replace />;
+                  }
+
+                  return userType === "alumni" ? (
+                    <ProfileAlumni
+                      isDarkMode={isDarkMode}
+                      toggleTheme={toggleTheme}
+                    />
+                  ) : (
+                    <ProfilePage
+                      isDarkMode={isDarkMode}
+                      toggleTheme={toggleTheme}
+                    />
+                  );
+                })()
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          {/* Other pages */}
+          <Route
+            path="/developer"
+            element={
+              <DeveloperPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+              />
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <AboutPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            }
+          />
+          <Route
+            path="/job"
+            element={
+              <JobPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            }
+          />
+          <Route
+            path="/alumni"
+            element={
+              <AlumniPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            }
+          />
+          <Route
+            path="/event"
+            element={
+              <EventPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            }
+          />
+          <Route
+            path="/campaign"
+            element={
+              <CampaignPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            }
+          />
+          <Route
+            path="/opensource"
+            element={
+              <OpenSourcePage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+              />
+            }
+          />
+
+          {/* Chat */}
+          <Route
+            path="/chat"
+            element={
+              isAuthenticated ? (
+                <Chatpage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          <Route
+            path="/activity"
+            element={
+              isAuthenticated ? (
+                <MyActivityPage
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }

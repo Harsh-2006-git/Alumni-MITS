@@ -24,11 +24,8 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function AboutPage() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+export default function AboutPage({ isDarkMode, toggleTheme }) {
   const [activeSection, setActiveSection] = useState("history");
-
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   const sections = {
     history: {

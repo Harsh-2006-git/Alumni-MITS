@@ -331,8 +331,7 @@ function AddEventModal({ isDarkMode, onClose, onSubmit, submitting }) {
   );
 }
 
-export default function AlumniEventsPage() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -343,8 +342,6 @@ export default function AlumniEventsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [registering, setRegistering] = useState(null);
-
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
   useEffect(() => {
     fetchEvents();
@@ -361,7 +358,7 @@ export default function AlumniEventsPage() {
       const authData = localStorage.getItem("auth");
       const token = authData ? JSON.parse(authData).accessToken : null;
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/upcoming-event",
+        "http://localhost:3001/event/upcoming-event",
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
@@ -369,74 +366,9 @@ export default function AlumniEventsPage() {
       const data = await response.json();
       if (data.events) {
         setEvents(data.events);
-      } else {
-        setEvents([
-          {
-            id: 1,
-            title: "Tech Conference 2024",
-            description:
-              "Annual technology conference featuring the latest innovations in software development and AI.",
-            date: "2024-03-15",
-            location: "Convention Center, Bangalore",
-            price: 0,
-            organizer: "Alumni Association",
-            category: "tech",
-            type: "in-person",
-            maxAttendees: 200,
-            image:
-              "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop",
-          },
-          {
-            id: 2,
-            title: "Virtual Career Fair",
-            description:
-              "Connect with top companies and explore job opportunities in our virtual career fair.",
-            date: "2024-03-20",
-            location: "Online",
-            price: 0,
-            organizer: "Career Services",
-            category: "educational",
-            type: "virtual",
-            maxAttendees: 500,
-            image:
-              "https://images.unsplash.com/photo-1551836026-d5c8c2d6da0a?w=800&h=400&fit=crop",
-          },
-          {
-            id: 3,
-            title: "Cultural Fest 2024",
-            description:
-              "Celebrate diversity and cultural heritage with performances, food, and activities.",
-            date: "2024-04-10",
-            location: "College Campus",
-            price: 100,
-            organizer: "Cultural Committee",
-            category: "cultural",
-            type: "in-person",
-            maxAttendees: 300,
-            image:
-              "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=400&fit=crop",
-          },
-        ]);
       }
     } catch (error) {
       console.error("Error fetching events:", error);
-      setEvents([
-        {
-          id: 1,
-          title: "Tech Conference 2024",
-          description:
-            "Annual technology conference featuring the latest innovations.",
-          date: "2024-03-15",
-          location: "Convention Center, Bangalore",
-          price: 0,
-          organizer: "Alumni Association",
-          category: "tech",
-          type: "in-person",
-          maxAttendees: 200,
-          image:
-            "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop",
-        },
-      ]);
     } finally {
       setLoading(false);
     }
@@ -451,24 +383,21 @@ export default function AlumniEventsPage() {
         showMessage("error", "Please login to create an event");
         return;
       }
-      const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/add-event",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("http://localhost:3001/event/add-event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
       const data = await response.json();
       if (response.ok) {
         await fetchEvents();
         setShowAddModal(false);
         showMessage(
           "success",
-          "Event created successfully! 🎉 Your event is now live and visible to all alumni."
+          "Event created successfully! 🎉 Your event is now under varification."
         );
       } else {
         showMessage(
@@ -496,17 +425,14 @@ export default function AlumniEventsPage() {
         showMessage("error", "Please login to register for this event");
         return;
       }
-      const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/registration",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ eventId }),
-        }
-      );
+      const response = await fetch("http://localhost:3001/event/registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ eventId }),
+      });
       const data = await response.json();
       if (response.ok) {
         showMessage(

@@ -19,10 +19,7 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-const ProjectHub = () => {
-  // Theme state
-  const [isDarkMode, setIsDarkMode] = useState(true);
-
+export default function ProjectHub({ isDarkMode, toggleTheme }) {
   // Modal states
   const [showModal, setShowModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -115,6 +112,7 @@ const ProjectHub = () => {
     "Startup Idea",
     "Hackathon Project",
   ];
+
   const techOptions = [
     "React",
     "Node.js",
@@ -133,10 +131,10 @@ const ProjectHub = () => {
   ];
 
   // Functions
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
-
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value, type } = e.target;
+    const checked = e.target.checked;
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -149,10 +147,17 @@ const ProjectHub = () => {
         ...prev,
         [field]: [...prev[field], value.trim()],
       }));
+
+      // Clear the appropriate input field
+      const inputFieldMap = {
+        techStack: "tech",
+        roles: "role",
+        tags: "tag",
+      };
+
       setCurrentInput((prev) => ({
         ...prev,
-        [field === "techStack" ? "tech" : field === "roles" ? "role" : "tag"]:
-          "",
+        [inputFieldMap[field]]: "",
       }));
     }
   };
@@ -173,6 +178,7 @@ const ProjectHub = () => {
         ? parseInt(formData.contributorsNeeded)
         : null,
     };
+
     setProjects([...projects, newProject]);
     setShowModal(false);
     resetForm();
@@ -211,6 +217,12 @@ const ProjectHub = () => {
       filterCategory === "All" || project.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
+
+  // View project details
+  const viewProjectDetails = (project) => {
+    setSelectedProject(project);
+    setShowDetailModal(true);
+  };
 
   return (
     <div
@@ -1401,6 +1413,4 @@ const ProjectHub = () => {
       <Footer isDarkMode={isDarkMode} />
     </div>
   );
-};
-
-export default ProjectHub;
+}
