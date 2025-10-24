@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { Moon, Sun, User, LogOut, Menu, X, Activity } from "lucide-react";
+import {
+  Moon,
+  Sun,
+  User,
+  LogOut,
+  Menu,
+  X,
+  Activity,
+  MessageCircle,
+} from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -10,6 +19,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [auth, setAuth] = useState(null);
   const dropdownRef = useRef(null);
+  const refreshIntervalRef = useRef(null);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
@@ -33,6 +43,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
     } catch (err) {
       console.error("Token refresh error:", err);
       return null;
+    }
+  };
+
+  const setupTokenRefresh = (authData) => {
+    // Clear any existing interval
+    if (refreshIntervalRef.current) {
+      clearInterval(refreshIntervalRef.current);
+    }
+
+    if (authData?.refreshToken) {
+      // Refresh token every 55 minutes (3300000 ms)
+      const refreshTime = 55 * 60 * 1000;
+
+      refreshIntervalRef.current = setInterval(async () => {
+        console.log("Auto-refreshing token...");
+        const newAccessToken = await refreshAccessToken(authData.refreshToken);
+
+        if (newAccessToken) {
+          const updatedAuth = {
+            ...authData,
+            accessToken: newAccessToken,
+            expiry: Date.now() + 60 * 60 * 1000, // 1 hour expiry
+          };
+
+          localStorage.setItem("auth", JSON.stringify(updatedAuth));
+          setAuth(updatedAuth);
+          console.log("Token auto-refreshed successfully");
+        } else {
+          // If refresh fails, logout user
+          handleLogout();
+          clearInterval(refreshIntervalRef.current);
+        }
+      }, refreshTime);
     }
   };
 
@@ -62,7 +105,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
           const newAccessToken = await refreshAccessToken(parsed.refreshToken);
           if (newAccessToken) {
             parsed.accessToken = newAccessToken;
-            parsed.expiry = Date.now() + 1000 * 60 * 15;
+            parsed.expiry = Date.now() + 60 * 60 * 1000; // 1 hour expiry
             localStorage.setItem("auth", JSON.stringify(parsed));
             setAuth(parsed);
           } else {
@@ -76,6 +119,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
       } else {
         setAuth(parsed);
       }
+
+      // Setup auto refresh for the token
+      setupTokenRefresh(parsed);
     };
 
     loadAuth();
@@ -87,17 +133,29 @@ export default function Header({ isDarkMode, toggleTheme }) {
     };
     window.addEventListener("storage", handleStorageChange);
 
-    return () => window.removeEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      if (refreshIntervalRef.current) {
+        clearInterval(refreshIntervalRef.current);
+      }
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("auth");
     setAuth(null);
     setShowProfileMenu(false);
+    if (refreshIntervalRef.current) {
+      clearInterval(refreshIntervalRef.current);
+    }
   };
 
   const handleSignIn = () => {
     window.location.href = "/login";
+  };
+
+  const handleMessages = () => {
+    navigate("/chat");
   };
 
   useEffect(() => {
@@ -233,7 +291,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
             </a>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-lg transition-all duration-300 ${
@@ -248,6 +306,36 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <Moon className="w-5 h-5" />
               )}
             </button>
+
+            {/* Messages Button - Only for authenticated users */}
+            {auth && (
+              <>
+                {/* Desktop Messages Button */}
+                <button
+                  onClick={handleMessages}
+                  className={`hidden md:flex items-center gap-2 p-2 rounded-lg transition-all duration-300 ${
+                    isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
+                      : "bg-blue-100 hover:bg-blue-200 text-blue-600"
+                  }`}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  <span className="text-sm font-medium">Messages</span>
+                </button>
+
+                {/* Mobile Messages Button */}
+                <button
+                  onClick={handleMessages}
+                  className={`md:hidden p-2 rounded-lg transition-all duration-300 ${
+                    isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
+                      : "bg-blue-100 hover:bg-blue-200 text-blue-600"
+                  }`}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                </button>
+              </>
+            )}
 
             {auth ? (
               <div className="relative" ref={dropdownRef}>
@@ -345,6 +433,17 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       >
                         <Activity className="w-4 h-4" />
                         My Activity
+                      </a>
+                      <a
+                        onClick={handleMessages}
+                        className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer md:hidden ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                        }`}
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Messages
                       </a>
 
                       <button

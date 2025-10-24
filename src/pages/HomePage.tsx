@@ -1523,27 +1523,6 @@ export default function AlumniHomePage({
           </span>
         </a>
       </div>
-
-      {/* Floating Connect Button */}
-      <button
-        onClick={() => navigate("/chat")}
-        className={`
-    fixed bottom-6 right-6 z-50 flex items-center justify-center
-    rounded-full p-3 shadow-lg transition-transform hover:scale-110
-    ${
-      isDarkMode
-        ? "bg-gradient-to-r from-purple-700 via-pink-600 to-orange-600 text-white shadow-purple-500/50"
-        : "bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 text-white shadow-pink-300/50"
-    }
-  `}
-        title="Connect with Alumni"
-      >
-        {/* On small screens show only icon, on larger show text + icon */}
-        <span className="hidden sm:flex items-center gap-2 font-semibold text-sm">
-          Connect with Alumni 💬
-        </span>
-        <span className="sm:hidden text-xl">💬</span>
-      </button>
     </div>
   );
 }

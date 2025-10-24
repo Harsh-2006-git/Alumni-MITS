@@ -124,7 +124,7 @@ export default function LoginPage({
         userPhone: userPhone || "",
         userId: userIdParam || "",
         userType: "student",
-        expiry: Date.now() + 1000 * 60 * 15,
+        expiry: Date.now() + 1000 * 60 * 60,
       };
       console.log("✅ Access Token:", accessToken);
       console.log("🔄 Refresh Token:", refreshToken);

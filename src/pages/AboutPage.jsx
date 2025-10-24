@@ -122,16 +122,19 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
             name: "Shrimant Jyotiraditya M. Scindia",
             role: "Chancellor",
             category: "University Administration",
+            image: "/assets/images/scindia.png",
           },
           {
             name: "Prof. K. K. Aggarwal",
             role: "Pro-Chancellor",
             category: "University Administration",
+            image: "/assets/images/kkaggarwal.png",
           },
           {
             name: "Dr. Rajindra Kumar Pandit",
             role: "Vice-Chancellor",
             category: "University Administration",
+            image: "/assets/images/rk.jpg",
           },
         ],
         deans: [
@@ -354,11 +357,19 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                   }`}
                 >
                   <div
-                    className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${
-                      isDarkMode ? "bg-amber-500/20" : "bg-amber-100"
+                    className={`w-30 h-30 mx-auto rounded-full flex items-center justify-center mb-4 overflow-hidden border-2 ${
+                      isDarkMode ? "border-amber-500/20" : "border-amber-200"
                     }`}
                   >
-                    <UserCheck className="w-10 h-10 text-amber-400" />
+                    {member.image ? (
+                      <img
+                        src={member.image}
+                        alt={member.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <UserCheck className="w-10 h-10 text-amber-400" />
+                    )}
                   </div>
                   <h5 className="font-bold text-lg text-amber-400 mb-2">
                     {member.name}
@@ -416,7 +427,6 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       );
     }
   };
-
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${

@@ -81,11 +81,7 @@ export default function App() {
           <Route
             path="/"
             element={
-              isAuthenticated ? (
-                <HomePage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              <HomePage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
             }
           />
 

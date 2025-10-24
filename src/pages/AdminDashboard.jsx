@@ -709,7 +709,14 @@ const BulkRegister = ({ onError, onSuccess }) => {
   };
 
   const downloadSample = () => {
-    const sample = `name,email,phone,branch\nJohn Doe,john@example.com,1234567890,Computer Science`;
+    const sample = `name,email,phone,branch,batchYear,location,linkedinUrl
+Harsh Manmode,24it10ha60@mitsgwl.ac.in,9876543210,Computer Science,2020-2024,New York,https://linkedin.com/in/harshmanmode
+Jane Smith,jane.smith@example.com,9876543211,Electronics Engineering,2021-2025,Delhi,https://linkedin.com/in/janesmith
+Raj Kumar,raj.kumar@example.com,9876543212,Mechanical Engineering,2019-2023,Bangalore,
+Priya Singh,priya.singh@example.com,9876543213,Civil Engineering,2022-2026,Mumbai,https://linkedin.com/in/priyasingh
+Amit Sharma,amit.sharma@example.com,9876543214,Information Technology,2020-2024,Hyderabad,
+Neha Verma,neha.verma@example.com,9876543215,Electrical Engineering,2021-2025,Pune,https://linkedin.com/in/nehaverma`;
+
     const blob = new Blob([sample], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

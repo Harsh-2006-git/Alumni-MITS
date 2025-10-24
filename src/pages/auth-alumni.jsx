@@ -124,8 +124,9 @@ export default function AlumniAuth({
           userPhone: data.user?.phone || formData.phone || "",
           userId: data.user?.id?.toString() || "",
           userType: "alumni",
-          expiry: Date.now() + 1000 * 60 * 15,
+          expiry: Date.now() + 1000 * 60 * 60,
         };
+        console.log;
 
         console.log("Storing auth data:", userData);
         localStorage.setItem("auth", JSON.stringify(userData));
@@ -137,7 +138,7 @@ export default function AlumniAuth({
         setTimeout(() => {
           setIsAuthenticated(true);
           navigate("/");
-        }, 1500);
+        }, 100);
       } else {
         // Registration successful
         setSuccessMessage(
@@ -154,7 +155,7 @@ export default function AlumniAuth({
             password: "",
             phone: "",
           });
-        }, 2000);
+        }, 200);
       }
     } catch (err) {
       // Proper error handling
