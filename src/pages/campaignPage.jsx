@@ -9,6 +9,7 @@ import {
   DollarSign,
   Target,
   Users,
+  Sparkles,
   TrendingUp,
   Clock,
   CheckCircle,
@@ -284,81 +285,148 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 text-center">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent leading-tight">
-          Empower Dreams, Fund Innovation
-        </h2>
-        <p
-          className={`text-base sm:text-lg md:text-xl mb-6 sm:mb-8 ${
-            isDarkMode ? "text-gray-300" : "text-gray-700"
-          }`}
-        >
-          Support groundbreaking projects from MITS students, alumni, and
-          faculty
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-10 sm:mb-12">
-          {isAuthenticated ? (
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
-            >
-              <Plus className="w-5 h-5" /> Create Campaign
-            </button>
-          ) : (
-            <button
-              onClick={() =>
-                showMessage("Please login to create a campaign", "error")
-              }
-              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
-            >
-              <Plus className="w-5 h-5" /> Login to Create
-            </button>
-          )}
-          <button
-            className={`px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95 ${
-              isDarkMode
-                ? "bg-slate-800 text-cyan-300 border border-cyan-500/30"
-                : "bg-white text-blue-600 border border-blue-300 shadow-lg"
+      <section className="text-center py-12 sm:py-16 lg:py-8 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
+              Campaigns
+            </h1>
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+          </div>
+          <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
+            Empower Dreams, Fund Innovation
+          </p>
+          <p
+            className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
+              isDarkMode ? "text-gray-300" : "text-gray-700"
             }`}
           >
-            Browse All
-          </button>
-        </div>
+            Support groundbreaking projects from MITS students, alumni, and
+            faculty
+          </p>
+          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-4xl mx-auto">
-          {[
-            {
-              icon: Target,
-              number: campaigns.length,
-              label: "Active Campaigns",
-            },
-            { icon: Users, number: "500+", label: "Supporters" },
-            { icon: DollarSign, number: "₹2.5M+", label: "Raised" },
-            { icon: TrendingUp, number: "95%", label: "Success Rate" },
-          ].map((stat, i) => (
-            <div
-              key={i}
-              className={`p-4 sm:p-6 rounded-2xl border-2 shadow-lg transition-all hover:scale-105 ${
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-10">
+            {isAuthenticated ? (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
+              >
+                <Plus className="w-5 h-5" /> Create Campaign
+              </button>
+            ) : (
+              <button
+                onClick={() =>
+                  showMessage("Please login to create a campaign", "error")
+                }
+                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
+              >
+                <Plus className="w-5 h-5" /> Login to Create
+              </button>
+            )}
+            <button
+              className={`px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95 ${
                 isDarkMode
-                  ? "bg-slate-900/50 border-cyan-500/20"
-                  : "bg-white border-blue-200"
+                  ? "bg-slate-800 text-cyan-300 border border-cyan-500/30"
+                  : "bg-white text-blue-600 border border-blue-300 shadow-lg"
               }`}
             >
-              <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 text-cyan-400" />
-              <div className="text-xl sm:text-2xl font-bold text-cyan-400">
-                {stat.number}
+              Browse All
+            </button>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
+            <div
+              className={`p-3 sm:p-4 rounded-xl border-2 transition-all hover:scale-105 ${
+                isDarkMode
+                  ? "bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-400/40"
+                  : "bg-gradient-to-br from-purple-100 to-pink-100 border-purple-300"
+              }`}
+            >
+              <div className="flex items-center justify-center mb-2">
+                <Target className="w-6 h-6 sm:w-7 sm:h-7 text-purple-400" />
               </div>
-              <div
+              <h3 className="text-lg sm:text-xl font-bold text-purple-400 mb-1">
+                {campaigns.length}
+              </h3>
+              <p
                 className={`text-xs sm:text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
-                {stat.label}
-              </div>
+                Active Campaigns
+              </p>
             </div>
-          ))}
+
+            <div
+              className={`p-3 sm:p-4 rounded-xl border-2 transition-all hover:scale-105 ${
+                isDarkMode
+                  ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border-cyan-400/40"
+                  : "bg-gradient-to-br from-cyan-100 to-blue-100 border-cyan-300"
+              }`}
+            >
+              <div className="flex items-center justify-center mb-2">
+                <Users className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-cyan-400 mb-1">
+                500+
+              </h3>
+              <p
+                className={`text-xs sm:text-sm ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Supporters
+              </p>
+            </div>
+
+            <div
+              className={`p-3 sm:p-4 rounded-xl border-2 transition-all hover:scale-105 ${
+                isDarkMode
+                  ? "bg-gradient-to-br from-emerald-500/20 to-green-500/20 border-emerald-400/40"
+                  : "bg-gradient-to-br from-emerald-100 to-green-100 border-emerald-300"
+              }`}
+            >
+              <div className="flex items-center justify-center mb-2">
+                <DollarSign className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-emerald-400 mb-1">
+                ₹2.5M+
+              </h3>
+              <p
+                className={`text-xs sm:text-sm ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Raised
+              </p>
+            </div>
+
+            <div
+              className={`p-3 sm:p-4 rounded-xl border-2 transition-all hover:scale-105 ${
+                isDarkMode
+                  ? "bg-gradient-to-br from-orange-500/20 to-red-500/20 border-orange-400/40"
+                  : "bg-gradient-to-br from-orange-100 to-red-100 border-orange-300"
+              }`}
+            >
+              <div className="flex items-center justify-center mb-2">
+                <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-orange-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-orange-400 mb-1">
+                95%
+              </h3>
+              <p
+                className={`text-xs sm:text-sm ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Success Rate
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

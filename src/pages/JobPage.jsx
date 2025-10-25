@@ -6,6 +6,7 @@ import {
   Clock,
   Users,
   Calendar,
+  Sparkles,
   Building2,
   ExternalLink,
   BookmarkPlus,
@@ -589,86 +590,55 @@ const HeroSection = ({
   jobCount,
 }) => {
   return (
-    <div
-      className={`relative overflow-hidden border-b ${
-        isDarkMode ? "border-slate-700" : "border-gray-200"
-      }`}
-    >
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        ></div>
-      </div>
+    <section className="text-center py-12 sm:py-16 lg:py-8 px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
+            Jobs
+          </h1>
+          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+        </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-8 sm:py-12 relative z-10">
-        <div className="flex flex-col items-center justify-center text-center">
-          {/* Text Content */}
-          <div className="max-w-3xl">
-            <div
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-4 
-              bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg"
-            >
-              <Star className="w-4 h-4" />
-              <span>{jobCount}+ Jobs Available</span>
-            </div>
+        <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
+          Find Your Dream Job
+        </p>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 leading-tight">
-              Find Your{" "}
-              <span className="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                Dream Job
-              </span>
-            </h1>
+        <p
+          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
+            isDarkMode ? "text-gray-300" : "text-gray-700"
+          }`}
+        >
+          Discover opportunities from top companies and take your career to the
+          next level
+        </p>
 
-            <p
-              className={`text-base sm:text-lg mb-6 leading-relaxed max-w-2xl mx-auto ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              Discover opportunities from top companies and take your career to
-              the next level.
-            </p>
+        <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={onPostJob}
-                className="group px-6 py-3 rounded-lg font-semibold text-white shadow-lg hover:shadow-xl 
-                  transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3
-                  bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-              >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                Post a Job
-              </button>
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+          <button
+            onClick={onPostJob}
+            className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
+          >
+            <Plus className="w-5 h-5" /> Post a Job
+          </button>
 
-              <button
-                onClick={onRefreshJobs}
-                disabled={loading}
-                className={`group px-6 py-3 rounded-lg font-semibold transition-all duration-300 
-                  transform hover:scale-105 flex items-center justify-center gap-3 border-2
-                  ${
-                    isDarkMode
-                      ? "border-slate-600 hover:border-slate-500 text-white hover:bg-slate-800"
-                      : "border-gray-300 hover:border-gray-400 text-gray-900 hover:bg-gray-50"
-                  }`}
-              >
-                <RefreshCw
-                  className={`w-5 h-5 ${
-                    loading
-                      ? "animate-spin"
-                      : "group-hover:rotate-180 transition-transform"
-                  }`}
-                />
-                {loading ? "Refreshing..." : "Refresh Jobs"}
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={onRefreshJobs}
+            disabled={loading}
+            className={`flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95 ${
+              isDarkMode
+                ? "bg-slate-800 text-cyan-300 border border-cyan-500/30"
+                : "bg-white text-blue-600 border border-blue-300 shadow-lg"
+            }`}
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Refreshing..." : "Refresh Jobs"}
+          </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 // Main Component

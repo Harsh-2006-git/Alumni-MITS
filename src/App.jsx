@@ -25,7 +25,7 @@ import MyActivityPage from "./pages/ActivityPage";
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);

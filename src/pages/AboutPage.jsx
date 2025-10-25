@@ -457,16 +457,16 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       </section>
 
       {/* Navigation Tabs */}
-      <section className="container mx-auto px-6 pb-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-4">
+      <section className="container mx-auto px-4 sm:px-6 pb-8">
+        <div className="max-w-5xl mx-auto w-[95%]">
+          <div className="flex overflow-x-auto scrollbar-hide gap-2 sm:gap-4 pb-2">
             {Object.entries(sections).map(([key, section]) => {
               const Icon = section.icon;
               return (
                 <button
                   key={key}
                   onClick={() => setActiveSection(key)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-full font-semibold transition-all text-sm sm:text-base flex-shrink-0 ${
                     activeSection === key
                       ? isDarkMode
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg scale-105`
@@ -476,15 +476,14 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                       : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  {section.title}
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="whitespace-nowrap">{section.title}</span>
                 </button>
               );
             })}
           </div>
         </div>
       </section>
-
       {/* Content Section */}
       <section className="container mx-auto px-6 pb-16">
         <div className="max-w-5xl mx-auto">

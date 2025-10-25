@@ -401,42 +401,34 @@ export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      <section className="container mx-auto px-10 lg:px-16 py-12">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-10 w-72 h-72 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-          <div
-            className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
-            style={{ animationDelay: "1s" }}
-          ></div>
-        </div>
-
+      <section className="container mx-auto px-10 lg:px-16 py-0">
         <div className="relative z-10">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 border border-white/20 shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 transition-all duration-300">
-              <Sparkles className="w-4 h-4 text-white drop-shadow" />
-              <span className="text-sm font-semibold text-white tracking-wide">
-                Alumni Directory
-              </span>
-            </div>
+          <section className="text-center py-6 sm:py-8 lg:py-6 px-4 sm:px-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+                <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
+                  Alumni Directory
+                </h1>
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+              </div>
 
-            <h1
-              className={`text-4xl md:text-5xl font-bold mb-4 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Connect with our{" "}
-              <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
-                growing community
-              </span>
-            </h1>
-            <p
-              className={`text-lg ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              of {totalAlumni}+ alumni across {citiesCount} cities
-            </p>
-          </div>
+              <div className="mb-2 sm:mb-3">
+                <p className="text-lg sm:text-xl lg:text-2xl bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold block lg:inline">
+                  Connect with our growing community
+                </p>
+                <p
+                  className={`text-sm sm:text-base lg:text-xl block lg:inline lg:ml-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  of {totalAlumni}+ alumni across {citiesCount} cities
+                </p>
+              </div>
+
+              <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full"></div>
+            </div>
+          </section>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[

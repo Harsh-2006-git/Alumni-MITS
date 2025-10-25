@@ -529,57 +529,37 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         message={message.text}
         onClose={() => setMessage({ type: "", text: "" })}
       />
-      <section className="w-full px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl pt-6 pb-4 relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 left-4 sm:left-10 w-48 h-48 sm:w-64 sm:h-64 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-          <div
-            className="absolute top-20 right-4 sm:right-20 w-56 h-56 sm:w-80 sm:h-80 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"
-            style={{ animationDelay: "1s" }}
-          ></div>
-        </div>
-        <div className="text-center max-w-4xl mx-auto relative z-10">
-          <div className="mb-3 inline-block">
-            <div
-              className={`inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 rounded-full border ${
-                isDarkMode
-                  ? "bg-gradient-to-r from-purple-900/50 to-pink-900/50 border-purple-700"
-                  : "bg-gradient-to-r from-purple-100 to-pink-100 border-purple-300"
-              }`}
-            >
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400 animate-pulse" />
-              <span
-                className={`text-xs sm:text-sm font-medium ${
-                  isDarkMode ? "text-purple-300" : "text-purple-700"
-                }`}
-              >
-                Alumni Events
-              </span>
-            </div>
+      <section className="text-center py-12 sm:py-16 lg:py-8 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
+              Events
+            </h1>
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
           </div>
-          <h1
-            className={`text-2xl sm:text-4xl md:text-5xl font-bold mb-3 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
-            Discover Amazing{" "}
-            <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
-              Alumni Events
-            </span>
-          </h1>
+
+          <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
+            Discover Amazing Alumni Events
+          </p>
+
           <p
-            className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-sm sm:text-base lg:text-xl mb-4 sm:mb-6 ${
+              isDarkMode ? "text-gray-300" : "text-gray-700"
             }`}
           >
             Connect, learn, and grow with our vibrant alumni community
           </p>
-          <div className="flex justify-center mb-6 sm:mb-8">
+
+          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
+
+          {/* Action Button */}
+          <div className="flex justify-center">
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-6 py-3 sm:px-8 sm:py-4 rounded-xl font-semibold bg-gradient-to-r from-purple-600 to-red-500 text-white transition-all hover:shadow-2xl hover:scale-105 flex items-center gap-2 sm:gap-3 text-base sm:text-lg shadow-lg"
+              className="flex items-center justify-center gap-2 px-6 sm:px-8 lg:px-10 py-3 sm:py-3.5 lg:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95 text-sm lg:text-base"
             >
-              <Plus className="w-4 h-4 sm:w-6 sm:h-6" />
-              Create New Event
+              <Plus className="w-4 h-4 lg:w-5 lg:h-5" /> Create New Event
             </button>
           </div>
         </div>
