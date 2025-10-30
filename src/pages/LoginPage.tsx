@@ -550,8 +550,8 @@ export default function LoginPage({
                   className={`w-full rounded-xl px-6 py-4 flex items-center justify-center gap-3 transition-all duration-300 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed group ${
                     isDarkMode
                       ? "bg-white text-gray-900 hover:bg-gray-100"
-                      : "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                  } shadow-xl hover:shadow-2xl hover:scale-[1.02]`}
+                      : "bg-white text-gray-900 hover:bg-gray-50"
+                  } shadow-[0_0_20px_rgba(0,0,0,0.15)] hover:shadow-[0_0_30px_rgba(0,0,0,0.25)] hover:scale-[1.02]`}
                 >
                   {isLoading ? (
                     <>

@@ -249,7 +249,7 @@ export default function AlumniHomePage({
             </div>
 
             {/* Stats Section */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-3 sm:pt-4">
+            <div className="grid grid-cols-4 gap-2 sm:gap-4 pt-3 sm:pt-4">
               {[
                 {
                   label: "Alumni",
@@ -282,7 +282,7 @@ export default function AlumniHomePage({
               ].map((stat, idx) => (
                 <div
                   key={idx}
-                  className={`p-4 rounded-xl border transition-all duration-500 hover:scale-105 hover:shadow-xl ${
+                  className={`p-2 sm:p-4 rounded-xl border transition-all duration-500 hover:scale-105 hover:shadow-xl ${
                     stat.glow
                   } ${
                     isDarkMode
@@ -291,11 +291,11 @@ export default function AlumniHomePage({
                   }`}
                 >
                   <div
-                    className={`w-9 h-9 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-3 shadow-lg animate-pulse`}
+                    className={`w-6 h-6 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-1 sm:mb-3 shadow-lg animate-pulse`}
                   >
                     {stat.icon === "users" && (
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="w-3 h-3 sm:w-5 sm:h-5 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -310,7 +310,7 @@ export default function AlumniHomePage({
                     )}
                     {stat.icon === "briefcase" && (
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="w-3 h-3 sm:w-5 sm:h-5 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -325,7 +325,7 @@ export default function AlumniHomePage({
                     )}
                     {stat.icon === "calendar" && (
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="w-3 h-3 sm:w-5 sm:h-5 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -340,7 +340,7 @@ export default function AlumniHomePage({
                     )}
                     {stat.icon === "award" && (
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="w-3 h-3 sm:w-5 sm:h-5 text-white"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -355,12 +355,12 @@ export default function AlumniHomePage({
                     )}
                   </div>
                   <p
-                    className={`text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                    className={`text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
                   >
                     {stat.value}
                   </p>
                   <p
-                    className={`text-xs font-medium transition-colors duration-500 ${
+                    className={`text-[10px] sm:text-xs font-medium transition-colors duration-500 ${
                       isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                   >

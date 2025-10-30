@@ -372,25 +372,6 @@ export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
     };
   }, [showMap, alumniData, isDarkMode]);
 
-  if (loading) {
-    return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${
-          isDarkMode
-            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
-            : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
-        }`}
-      >
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className={isDarkMode ? "text-white" : "text-gray-900"}>
-            Loading Alumni...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${
@@ -430,309 +411,327 @@ export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
             </div>
           </section>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {[
-              {
-                label: "Total Alumni",
-                value: totalAlumni,
-                icon: Users,
-                color: "from-blue-500 to-cyan-500",
-              },
-              {
-                label: "Currently Employed",
-                value: employedCount,
-                icon: Briefcase,
-                color: "from-purple-500 to-pink-500",
-              },
-              {
-                label: "Different Companies",
-                value: companiesCount,
-                icon: Building2,
-                color: "from-green-500 to-emerald-500",
-              },
-              {
-                label: "Cities",
-                value: citiesCount,
-                icon: MapPin,
-                color: "from-orange-500 to-red-500",
-              },
-            ].map((stat, idx) => (
-              <div
-                key={idx}
-                className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                    : "bg-white border-blue-200 shadow-lg"
-                }`}
-              >
-                <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}
-                >
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-32">
+              <div className="text-center">
+                <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <p
-                  className={`text-3xl font-bold mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                  className={
+                    isDarkMode ? "text-white text-lg" : "text-gray-900 text-lg"
+                  }
                 >
-                  {stat.value}
-                </p>
-                <p
-                  className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
-                  {stat.label}
+                  Loading Alumni Data...
                 </p>
               </div>
-            ))}
-          </div>
-
-          <div
-            className={`rounded-2xl border p-6 mb-6 ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
-          >
-            <div className="flex flex-col md:flex-row gap-4 mb-4">
-              <div className="flex-1 relative">
-                <Search
-                  className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-                    isDarkMode ? "text-gray-400" : "text-gray-500"
-                  }`}
-                />
-                <input
-                  type="text"
-                  placeholder="Search alumni by name..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-colors ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:border-purple-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
-                />
-              </div>
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`px-6 py-3 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 ${
-                  isDarkMode
-                    ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
-                    : "border-purple-500 text-purple-600 hover:bg-purple-50"
-                }`}
-              >
-                <Filter className="w-5 h-5" />
-                Filters
-              </button>
-              <button
-                onClick={() => setShowMap(!showMap)}
-                className={`px-6 py-3 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 ${
-                  showMap
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-transparent"
-                    : isDarkMode
-                    ? "border-pink-600 text-pink-400 hover:bg-pink-900/30"
-                    : "border-pink-500 text-pink-600 hover:bg-pink-50"
-                }`}
-              >
-                <MapIcon className="w-5 h-5" />
-                {showMap ? "Hide Map" : "Show Map"}
-              </button>
             </div>
-
-            {showFilters && (
-              <div
-                className="grid md:grid-cols-2 gap-4 pt-4 border-t"
-                style={{
-                  borderColor: isDarkMode
-                    ? "rgba(59, 130, 246, 0.2)"
-                    : "rgba(203, 213, 225, 1)",
-                }}
-              >
-                <select
-                  value={selectedDepartment}
-                  onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className={`px-4 py-3 rounded-xl border transition-colors ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white"
-                      : "bg-white border-gray-300 text-gray-900"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
-                >
-                  {departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  className={`px-4 py-3 rounded-xl border transition-colors ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white"
-                      : "bg-white border-gray-300 text-gray-900"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
-                >
-                  {locations.map((location) => (
-                    <option key={location} value={location}>
-                      {location}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div
-              className="flex justify-between items-center mt-4 pt-4 border-t"
-              style={{
-                borderColor: isDarkMode
-                  ? "rgba(59, 130, 246, 0.2)"
-                  : "rgba(203, 213, 225, 1)",
-              }}
-            >
-              <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                Showing{" "}
-                <span className="font-bold text-purple-500">
-                  {filteredAlumni.length}
-                </span>{" "}
-                of {totalAlumni} alumni
-              </p>
-            </div>
-          </div>
-
-          {/* MAP SECTION - THIS IS THE NEW CODE */}
-          {showMap && (
-            <div
-              className={`rounded-2xl border p-4 mb-6 ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200 shadow-lg"
-              }`}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h2
-                  className={`text-xl font-bold ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
-                >
-                  Alumni Distribution Map
-                </h2>
-                <MapPin className="w-6 h-6 text-purple-500" />
-              </div>
-              <div
-                ref={mapRef}
-                style={{ height: "500px", borderRadius: "12px" }}
-                className="w-full"
-              ></div>
-            </div>
-          )}
-
-          {filteredAlumni.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {filteredAlumni.map((alumni) => (
-                <div
-                  key={alumni.id}
-                  className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl cursor-pointer ${
-                    isDarkMode
-                      ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                      : "bg-white border-blue-200 shadow-lg"
-                  }`}
-                  onClick={() => openModal(alumni)}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={
-                          alumni.profilePhoto ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            alumni.name
-                          )}&background=random`
-                        }
-                        alt={alumni.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div>
-                        <h3
-                          className={`font-bold text-lg ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {alumni.name}
-                        </h3>
-                        {alumni.isVerified && (
-                          <span className="inline-flex items-center gap-1 text-xs text-blue-500">
-                            <Shield className="w-3 h-3" />
-                            Verified
-                          </span>
-                        )}
-                      </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {[
+                  {
+                    label: "Total Alumni",
+                    value: totalAlumni,
+                    icon: Users,
+                    color: "from-blue-500 to-cyan-500",
+                  },
+                  {
+                    label: "Currently Employed",
+                    value: employedCount,
+                    icon: Briefcase,
+                    color: "from-purple-500 to-pink-500",
+                  },
+                  {
+                    label: "Different Companies",
+                    value: companiesCount,
+                    icon: Building2,
+                    color: "from-green-500 to-emerald-500",
+                  },
+                  {
+                    label: "Cities",
+                    value: citiesCount,
+                    icon: MapPin,
+                    color: "from-orange-500 to-red-500",
+                  },
+                ].map((stat, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl ${
+                      isDarkMode
+                        ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                        : "bg-white border-blue-200 shadow-lg"
+                    }`}
+                  >
+                    <div
+                      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}
+                    >
+                      <stat.icon className="w-6 h-6 text-white" />
                     </div>
-                  </div>
-
-                  <div className="space-y-2 mb-4">
+                    <p
+                      className={`text-3xl font-bold mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                    >
+                      {stat.value}
+                    </p>
                     <p
                       className={`text-sm ${
                         isDarkMode ? "text-gray-400" : "text-gray-600"
                       }`}
                     >
-                      {alumni.profile?.branch || alumni.branch || "N/A"}
+                      {stat.label}
                     </p>
-                    {getCurrentCompany(alumni) !== "Not Currently Employed" && (
-                      <div className="flex items-center gap-2">
-                        <Building2
-                          className={`w-4 h-4 ${
-                            isDarkMode ? "text-gray-500" : "text-gray-400"
-                          }`}
-                        />
-                        <span
-                          className={`text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          {getCurrentDesignation(alumni)} at{" "}
-                          {getCurrentCompany(alumni)}
-                        </span>
-                      </div>
-                    )}
-                    {alumni.profile?.location && (
-                      <div className="flex items-center gap-2">
-                        <MapPin
-                          className={`w-4 h-4 ${
-                            isDarkMode ? "text-gray-500" : "text-gray-400"
-                          }`}
-                        />
-                        <span
-                          className={`text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          {alumni.profile.location}
-                        </span>
-                      </div>
-                    )}
                   </div>
+                ))}
+              </div>
 
-                  <button className="w-full px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
-                    View Full Profile
+              <div
+                className={`rounded-2xl border p-6 mb-6 ${
+                  isDarkMode
+                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                    : "bg-white border-blue-200 shadow-lg"
+                }`}
+              >
+                <div className="flex flex-col md:flex-row gap-4 mb-4">
+                  <div className="flex-1 relative">
+                    <Search
+                      className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
+                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Search alumni by name..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-colors ${
+                        isDarkMode
+                          ? "bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:border-purple-500"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500"
+                      } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`px-6 py-3 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 ${
+                      isDarkMode
+                        ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
+                        : "border-purple-500 text-purple-600 hover:bg-purple-50"
+                    }`}
+                  >
+                    <Filter className="w-5 h-5" />
+                    Filters
+                  </button>
+                  <button
+                    onClick={() => setShowMap(!showMap)}
+                    className={`px-6 py-3 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 ${
+                      showMap
+                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white border-transparent"
+                        : isDarkMode
+                        ? "border-pink-600 text-pink-400 hover:bg-pink-900/30"
+                        : "border-pink-500 text-pink-600 hover:bg-pink-50"
+                    }`}
+                  >
+                    <MapIcon className="w-5 h-5" />
+                    {showMap ? "Hide Map" : "Show Map"}
                   </button>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              className={`text-center py-20 ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
-            >
-              <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
-              <p className="text-xl font-semibold mb-2">No alumni found</p>
-              <p className="text-sm">
-                Try adjusting your filters to see more results
-              </p>
-            </div>
+
+                {showFilters && (
+                  <div
+                    className="grid md:grid-cols-2 gap-4 pt-4 border-t"
+                    style={{
+                      borderColor: isDarkMode
+                        ? "rgba(59, 130, 246, 0.2)"
+                        : "rgba(203, 213, 225, 1)",
+                    }}
+                  >
+                    <select
+                      value={selectedDepartment}
+                      onChange={(e) => setSelectedDepartment(e.target.value)}
+                      className={`px-4 py-3 rounded-xl border transition-colors ${
+                        isDarkMode
+                          ? "bg-slate-800 border-slate-700 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                      } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                    >
+                      {departments.map((dept) => (
+                        <option key={dept} value={dept}>
+                          {dept}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={selectedLocation}
+                      onChange={(e) => setSelectedLocation(e.target.value)}
+                      className={`px-4 py-3 rounded-xl border transition-colors ${
+                        isDarkMode
+                          ? "bg-slate-800 border-slate-700 text-white"
+                          : "bg-white border-gray-300 text-gray-900"
+                      } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                    >
+                      {locations.map((location) => (
+                        <option key={location} value={location}>
+                          {location}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div
+                  className="flex justify-between items-center mt-4 pt-4 border-t"
+                  style={{
+                    borderColor: isDarkMode
+                      ? "rgba(59, 130, 246, 0.2)"
+                      : "rgba(203, 213, 225, 1)",
+                  }}
+                >
+                  <p
+                    className={`text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    Showing{" "}
+                    <span className="font-bold text-purple-500">
+                      {filteredAlumni.length}
+                    </span>{" "}
+                    of {totalAlumni} alumni
+                  </p>
+                </div>
+              </div>
+
+              {/* MAP SECTION */}
+              {showMap && (
+                <div
+                  className={`rounded-2xl border p-4 mb-6 ${
+                    isDarkMode
+                      ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                      : "bg-white border-blue-200 shadow-lg"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h2
+                      className={`text-xl font-bold ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      Alumni Distribution Map
+                    </h2>
+                    <MapPin className="w-6 h-6 text-purple-500" />
+                  </div>
+                  <div
+                    ref={mapRef}
+                    style={{ height: "500px", borderRadius: "12px" }}
+                    className="w-full"
+                  ></div>
+                </div>
+              )}
+
+              {filteredAlumni.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {filteredAlumni.map((alumni) => (
+                    <div
+                      key={alumni.id}
+                      className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl cursor-pointer ${
+                        isDarkMode
+                          ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                          : "bg-white border-blue-200 shadow-lg"
+                      }`}
+                      onClick={() => openModal(alumni)}
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={
+                              alumni.profilePhoto ||
+                              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                alumni.name
+                              )}&background=random`
+                            }
+                            alt={alumni.name}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          <div>
+                            <h3
+                              className={`font-bold text-lg ${
+                                isDarkMode ? "text-white" : "text-gray-900"
+                              }`}
+                            >
+                              {alumni.name}
+                            </h3>
+                            {alumni.isVerified && (
+                              <span className="inline-flex items-center gap-1 text-xs text-blue-500">
+                                <Shield className="w-3 h-3" />
+                                Verified
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <p
+                          className={`text-sm ${
+                            isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
+                        >
+                          {alumni.profile?.branch || alumni.branch || "N/A"}
+                        </p>
+                        {getCurrentCompany(alumni) !==
+                          "Not Currently Employed" && (
+                          <div className="flex items-center gap-2">
+                            <Building2
+                              className={`w-4 h-4 ${
+                                isDarkMode ? "text-gray-500" : "text-gray-400"
+                              }`}
+                            />
+                            <span
+                              className={`text-sm ${
+                                isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              {getCurrentDesignation(alumni)} at{" "}
+                              {getCurrentCompany(alumni)}
+                            </span>
+                          </div>
+                        )}
+                        {alumni.profile?.location && (
+                          <div className="flex items-center gap-2">
+                            <MapPin
+                              className={`w-4 h-4 ${
+                                isDarkMode ? "text-gray-500" : "text-gray-400"
+                              }`}
+                            />
+                            <span
+                              className={`text-sm ${
+                                isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
+                            >
+                              {alumni.profile.location}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <button className="w-full px-5 py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
+                        View Full Profile
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  className={`text-center py-20 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-xl font-semibold mb-2">No alumni found</p>
+                  <p className="text-sm">
+                    Try adjusting your filters to see more results
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>

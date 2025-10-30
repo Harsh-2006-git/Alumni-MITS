@@ -424,7 +424,7 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
       <Footer isDarkMode={isDarkMode} />
 
       {/* Custom CSS for shine animation */}
-      <style jsx>{`
+      <style>{`
         @keyframes shine {
           0% {
             transform: translateX(-100%) skewX(-12deg);
