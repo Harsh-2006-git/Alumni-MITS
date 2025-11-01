@@ -519,6 +519,127 @@ export default function AlumniHomePage({
           </div>
         </div>
       </div>
+      {/* Campus Glimpse Video Section */}
+      <section className="container mx-auto px-10 lg:px-16 py-12">
+        <div className="text-center mb-8">
+          <h2
+            className={`text-2xl md:text-3xl font-bold mb-3 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
+            A Glimpse of Our Campus
+          </h2>
+          <p
+            className={`text-base ${
+              isDarkMode ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
+            Take an aerial tour of our beautiful campus and facilities
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          {/* Left - Text Content */}
+          <div className="space-y-4">
+            <p
+              className={`text-base leading-relaxed hidden md:block ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Experience the breathtaking beauty of our 250-acre campus from a
+              bird's eye view. Our state-of-the-art facilities, lush green
+              spaces, and modern infrastructure create an inspiring environment
+              for learning and innovation.
+            </p>
+            <p
+              className={`text-base leading-relaxed hidden md:block ${
+                isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Since 1957, MITS has been a beacon of academic excellence,
+              fostering generations of brilliant minds who have gone on to make
+              significant contributions across the globe.
+            </p>
+            <div className="flex flex-wrap gap-2 sm:gap-3 pt-2 justify-center md:justify-start">
+              <div
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${
+                  isDarkMode
+                    ? "bg-blue-900/30 text-blue-300 border border-blue-700/50"
+                    : "bg-blue-100 text-blue-700 border border-blue-200"
+                }`}
+              >
+                <span className="text-[10px] sm:text-sm font-medium whitespace-nowrap">
+                  250+ Acres
+                </span>
+              </div>
+              <div
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${
+                  isDarkMode
+                    ? "bg-purple-900/30 text-purple-300 border border-purple-700/50"
+                    : "bg-purple-100 text-purple-700 border border-purple-200"
+                }`}
+              >
+                <span className="text-[10px] sm:text-sm font-medium whitespace-nowrap">
+                  67+ Years
+                </span>
+              </div>
+              <div
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${
+                  isDarkMode
+                    ? "bg-green-900/30 text-green-300 border border-green-700/50"
+                    : "bg-green-100 text-green-700 border border-green-200"
+                }`}
+              >
+                <span className="text-[10px] sm:text-sm font-medium whitespace-nowrap">
+                  World-Class
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right - Video */}
+          <div>
+            <div
+              className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
+                isDarkMode
+                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
+                  : "bg-white border-blue-200 shadow-lg"
+              }`}
+            >
+              <div
+                className="relative w-full"
+                style={{ paddingBottom: "56.25%" }}
+              >
+                <video
+                  className="absolute top-0 left-0 w-full h-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  onLoadedMetadata={(e) => {
+                    const video = e.target as HTMLVideoElement;
+                    video.play().catch(() => {
+                      // Auto-play was prevented, user interaction needed
+                    });
+                  }}
+                  onEnded={(e) => {
+                    const video = e.target as HTMLVideoElement;
+                    video.currentTime = 0;
+                    video.play();
+                  }}
+                >
+                  <source src="/assets/video.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none`}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Professional Journey Section */}
       <section className="container mx-auto px-10 lg:px-16 py-12">

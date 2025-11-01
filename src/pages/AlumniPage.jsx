@@ -93,8 +93,8 @@ export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
   });
 
   const totalAlumni = alumniData.length;
-  const employedCount = alumniData.filter((a) =>
-    a.profile?.experience?.some((exp) => exp.current)
+  const employedCount = alumniData.filter(
+    (a) => a.profile?.experience && a.profile.experience.length > 0
   ).length;
   const companiesCount = [
     ...new Set(
@@ -107,6 +107,29 @@ export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
     ...new Set(alumniData.map((a) => a.profile?.location)),
   ].filter(Boolean).length;
 
+  const getCurrentCompany = (alumni) => {
+    const currentExp = alumni.profile?.experience?.find((exp) => exp.current);
+    if (currentExp) return currentExp.company;
+
+    const experiences = alumni.profile?.experience || [];
+    if (experiences.length > 0) {
+      return experiences[0].company || "Not Currently Employed";
+    }
+    return "Not Currently Employed";
+  };
+
+  const getCurrentDesignation = (alumni) => {
+    const currentExp = alumni.profile?.experience?.find((exp) => exp.current);
+    if (currentExp) return currentExp.designation;
+
+    const experiences = alumni.profile?.experience || [];
+    if (experiences.length > 0) {
+      return experiences[0].designation || "";
+    }
+    return "";
+  };
+
+  // Missing functions - Add these
   const openModal = (alumni) => {
     setSelectedAlumni(alumni);
     setShowModal(true);
@@ -115,16 +138,6 @@ export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
   const closeModal = () => {
     setShowModal(false);
     setSelectedAlumni(null);
-  };
-
-  const getCurrentCompany = (alumni) => {
-    const currentExp = alumni.profile?.experience?.find((exp) => exp.current);
-    return currentExp?.company || "Not Currently Employed";
-  };
-
-  const getCurrentDesignation = (alumni) => {
-    const currentExp = alumni.profile?.experience?.find((exp) => exp.current);
-    return currentExp?.designation || "";
   };
 
   // City coordinates for India (Latitude, Longitude)
@@ -435,7 +448,7 @@ export default function AlumniDirectory({ isDarkMode, toggleTheme }) {
                     color: "from-blue-500 to-cyan-500",
                   },
                   {
-                    label: "Currently Employed",
+                    label: "Alumni with Experience",
                     value: employedCount,
                     icon: Briefcase,
                     color: "from-purple-500 to-pink-500",
