@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -114,17 +115,42 @@ export default function AlumniHomePage({
             : "bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-50"
         }`}
       >
-        {/* Background Image with Overlay */}
+        {/* Animated Background Shapes - Parallax Layer 1 */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            className={`absolute top-20 -left-20 w-72 h-72 rounded-full filter blur-3xl animate-blob opacity-20 ${
+              isDarkMode ? "bg-blue-500" : "bg-blue-400"
+            }`}
+            style={{ animationDelay: "0s" }}
+          ></div>
+          <div
+            className={`absolute top-40 -right-20 w-96 h-96 rounded-full filter blur-3xl animate-blob animation-delay-2000 opacity-20 ${
+              isDarkMode ? "bg-purple-500" : "bg-purple-400"
+            }`}
+            style={{ animationDelay: "2s" }}
+          ></div>
+          <div
+            className={`absolute -bottom-20 left-40 w-80 h-80 rounded-full filter blur-3xl animate-blob animation-delay-4000 opacity-20 ${
+              isDarkMode ? "bg-pink-500" : "bg-pink-400"
+            }`}
+            style={{ animationDelay: "2s" }}
+          ></div>
+        </div>
+
+        {/* Background Image with Parallax - Layer 2 */}
         <div
           className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${
             isDarkMode ? "opacity-20" : "opacity-30"
           }`}
-          style={{ backgroundImage: "url(/assets/images/bg.png)" }}
+          style={{
+            backgroundImage: "url(/assets/images/bg.png)",
+            transform: "translateZ(0) scale(1.1)",
+          }}
         ></div>
 
-        {/* Dark/Light Overlay */}
+        {/* Dark/Light Overlay with Animation */}
         <div
-          className={`absolute inset-0 transition-colors duration-500 ${
+          className={`absolute inset-0 transition-all duration-500 animate-fade-in ${
             isDarkMode
               ? "bg-gradient-to-b from-slate-900/50 via-transparent to-slate-900/80"
               : "bg-gradient-to-b from-white/30 via-transparent to-blue-50/50"
@@ -133,14 +159,15 @@ export default function AlumniHomePage({
 
         <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center h-full">
           {/* Left Content */}
-          <div className="space-y-5 sm:space-y-6">
-            {/* Welcome Badge */}
+          <div className="space-y-5 sm:space-y-6 animate-slide-up">
+            {/* Welcome Badge with Pulse Animation */}
             <div
-              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm border transition-all duration-500 ${
+              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm border transition-all duration-500 animate-fade-in-delay relative ${
                 isDarkMode
                   ? "bg-blue-500/10 border-blue-500/30"
                   : "bg-white/60 border-blue-300 shadow-lg"
               }`}
+              style={{ animationDelay: "0.2s" }}
             >
               <span
                 className={`text-xs sm:text-sm font-medium tracking-wide transition-colors duration-500 ${
@@ -149,23 +176,27 @@ export default function AlumniHomePage({
               >
                 Welcome to Your Alumni Network
               </span>
-              {/* Decorative Elements */}
+              {/* Decorative Elements with Animation */}
               <div
-                className={`absolute -top-6 -right-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 ${
+                className={`absolute -top-6 -right-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 animate-pulse-slow ${
                   isDarkMode ? "bg-blue-500/20" : "bg-blue-400/40"
                 }`}
               ></div>
               <div
-                className={`absolute -bottom-6 -left-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 ${
+                className={`absolute -bottom-6 -left-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 animate-pulse-slow ${
                   isDarkMode ? "bg-purple-500/20" : "bg-purple-400/40"
                 }`}
+                style={{ animationDelay: "1s" }}
               ></div>
             </div>
 
-            {/* Logo and Title */}
-            <div className="flex items-center gap-3 sm:gap-4">
+            {/* Logo and Title with Scale Animation */}
+            <div
+              className="flex items-center gap-3 sm:gap-4 animate-fade-in-delay"
+              style={{ animationDelay: "0.4s" }}
+            >
               <div
-                className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl p-2 shadow-2xl flex-shrink-0 transition-colors duration-500 ${
+                className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl p-2 shadow-2xl flex-shrink-0 transition-all duration-500 hover:scale-110 hover:rotate-3 ${
                   isDarkMode ? "bg-white" : "bg-white"
                 }`}
               >
@@ -176,7 +207,7 @@ export default function AlumniHomePage({
                 />
               </div>
               <h1
-                className={`text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-black tracking-tight transition-colors duration-500 ${
+                className={`text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-black tracking-tight transition-colors duration-500 animate-text-shimmer ${
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
                 style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
@@ -185,31 +216,36 @@ export default function AlumniHomePage({
               </h1>
             </div>
 
-            {/* Description */}
+            {/* Description with Fade In */}
             <p
-              className={`text-sm sm:text-base md:text-lg leading-relaxed max-w-xl transition-colors duration-500 ${
+              className={`text-sm sm:text-base md:text-lg leading-relaxed max-w-xl transition-colors duration-500 animate-fade-in-delay ${
                 isDarkMode
                   ? "text-gray-300 font-light"
                   : "text-gray-800 font-normal"
               }`}
+              style={{ animationDelay: "0.6s" }}
             >
               Join our thriving community of 5000+ alumni across the globe,
               where connections become opportunities and memories turn into
               lifelong bonds.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
+            {/* CTA Buttons with Stagger Animation */}
+            <div
+              className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2 animate-fade-in-delay"
+              style={{ animationDelay: "0.8s" }}
+            >
               <button
                 onClick={() => navigate("/alumni")}
-                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 text-sm w-full sm:w-auto ${
+                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 hover:-translate-y-1 text-sm w-full sm:w-auto relative overflow-hidden ${
                   isDarkMode
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
                 }`}
               >
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                 <svg
-                  className="w-4 h-4"
+                  className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -225,14 +261,15 @@ export default function AlumniHomePage({
               </button>
               <button
                 onClick={() => navigate("/event")}
-                className={`px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 text-sm w-full sm:w-auto ${
+                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 hover:-translate-y-1 text-sm w-full sm:w-auto relative overflow-hidden ${
                   isDarkMode
                     ? "bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 hover:border-slate-600"
                     : "bg-white/70 hover:bg-white text-gray-900 border border-gray-300 hover:border-gray-400"
                 }`}
               >
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                 <svg
-                  className="w-4 h-4"
+                  className="w-4 h-4 group-hover:scale-110 transition-transform duration-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -248,8 +285,11 @@ export default function AlumniHomePage({
               </button>
             </div>
 
-            {/* Stats Section */}
-            <div className="grid grid-cols-4 gap-2 sm:gap-4 pt-3 sm:pt-4">
+            {/* Stats Section with Stagger Animation */}
+            <div
+              className="grid grid-cols-4 gap-2 sm:gap-4 pt-3 sm:pt-4"
+              style={{ animationDelay: "1s" }}
+            >
               {[
                 {
                   label: "Alumni",
@@ -257,6 +297,7 @@ export default function AlumniHomePage({
                   color: "from-blue-500 to-cyan-500",
                   glow: "shadow-blue-500/50",
                   icon: "users",
+                  delay: "0s",
                 },
                 {
                   label: "Companies",
@@ -264,6 +305,7 @@ export default function AlumniHomePage({
                   color: "from-purple-500 to-pink-500",
                   glow: "shadow-purple-500/50",
                   icon: "briefcase",
+                  delay: "0.1s",
                 },
                 {
                   label: "Events",
@@ -271,6 +313,7 @@ export default function AlumniHomePage({
                   color: "from-green-500 to-emerald-500",
                   glow: "shadow-green-500/50",
                   icon: "calendar",
+                  delay: "0.2s",
                 },
                 {
                   label: "Awards",
@@ -278,20 +321,23 @@ export default function AlumniHomePage({
                   color: "from-orange-500 to-red-500",
                   glow: "shadow-orange-500/50",
                   icon: "award",
+                  delay: "0.3s",
                 },
               ].map((stat, idx) => (
                 <div
                   key={idx}
-                  className={`p-2 sm:p-4 rounded-xl border transition-all duration-500 hover:scale-105 hover:shadow-xl ${
+                  className={`p-2 sm:p-4 rounded-xl border transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-xl ${
                     stat.glow
-                  } ${
+                  } animate-fade-in-up ${
                     isDarkMode
                       ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                       : "bg-white/70 border-gray-200 shadow-lg"
                   }`}
+                  style={{ animationDelay: `${1 + idx * 0.1}s` }}
                 >
                   <div
-                    className={`w-6 h-6 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-1 sm:mb-3 shadow-lg animate-pulse`}
+                    className={`w-6 h-6 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-1 sm:mb-3 shadow-lg animate-bounce-slow`}
+                    style={{ animationDelay: stat.delay }}
                   >
                     {stat.icon === "users" && (
                       <svg
@@ -371,14 +417,17 @@ export default function AlumniHomePage({
             </div>
           </div>
 
-          {/* Right Content - Image Card (Hidden on mobile, shown on lg+) */}
-          <div className="relative hidden lg:block">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+          {/* Right Content - Image Card with Parallax (Hidden on mobile, shown on lg+) */}
+          <div
+            className="relative hidden lg:block animate-fade-in-delay"
+            style={{ animationDelay: "0.5s" }}
+          >
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-all duration-500 hover:shadow-blue-500/20">
               {/* Campus Image */}
               <img
                 src="/assets/images/bg.png"
                 alt="MITS Campus"
-                className="w-full h-[400px] object-cover"
+                className="w-full h-[400px] object-cover transition-transform duration-700 hover:scale-110"
               />
 
               {/* Gradient Overlay */}
@@ -389,11 +438,25 @@ export default function AlumniHomePage({
                     : "bg-gradient-to-t from-white/40 via-transparent to-transparent"
                 }`}
               ></div>
+
+              {/* Floating Badge */}
+              <div
+                className={`absolute top-4 right-4 px-4 py-2 rounded-full backdrop-blur-md ${
+                  isDarkMode
+                    ? "bg-blue-500/50 text-white-200 border border-blue-400/30"
+                    : "bg-white/80 text-blue-700 border border-blue-200"
+                } font-semibold text-sm animate-float shadow-lg`}
+              >
+                🎓 Campus Life
+              </div>
             </div>
           </div>
 
           {/* Mobile Image (Visible only on mobile) */}
-          <div className="relative lg:hidden mt-6">
+          <div
+            className="relative lg:hidden mt-6 animate-fade-in-delay"
+            style={{ animationDelay: "1s" }}
+          >
             <div className="relative rounded-xl overflow-hidden shadow-2xl">
               <img
                 src="/assets/images/bg.png"
@@ -410,6 +473,126 @@ export default function AlumniHomePage({
             </div>
           </div>
         </div>
+
+        {/* Add custom styles */}
+        <style>{`
+    @keyframes blob {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(30px, -50px) scale(1.1);
+      }
+      66% {
+        transform: translate(-20px, 20px) scale(0.9);
+      }
+    }
+
+    @keyframes slideLoader {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100vw);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes bounceSlow {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    @keyframes pulseSlow {
+      0%, 100% {
+        opacity: 0.3;
+      }
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    .animate-blob {
+      animation: blob 7s infinite;
+    }
+
+    .animate-slide-loader {
+      animation: slideLoader 2s ease-in-out;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    .animate-fade-in-delay {
+      opacity: 0;
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+
+    .animate-slide-up {
+      animation: slideUp 1s ease-out;
+    }
+
+    .animate-fade-in-up {
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .animate-float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .animate-bounce-slow {
+      animation: bounceSlow 2s ease-in-out infinite;
+    }
+
+    .animate-pulse-slow {
+      animation: pulseSlow 3s ease-in-out infinite;
+    }
+  `}</style>
       </section>
 
       {/* Testimonial Section */}
@@ -641,24 +824,36 @@ export default function AlumniHomePage({
         </div>
       </section>
 
-      {/* Professional Journey Section */}
-      <section className="container mx-auto px-10 lg:px-16 py-12">
+      {/* Professional Journey Section with Parallax */}
+      <motion.section
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-10 lg:px-16 py-12"
+      >
         <div className="text-center mb-12">
-          <h2
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className={`text-3xl md:text-4xl font-bold mb-4 ${
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
             Empower Your Professional Journey
-          </h2>
-          <p
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             className={`text-lg ${
               isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
             Discover powerful tools and resources designed to accelerate your
             career growth
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -691,15 +886,22 @@ export default function AlumniHomePage({
                 "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
             },
           ].map((item, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl ${
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, delay: idx * 0.2 }}
+              whileHover={{ scale: 1.05, y: -10 }}
+              className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${
                 isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200 shadow-lg"
               }`}
             >
-              <div className="relative h-40 rounded-xl mb-4 overflow-hidden">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                className="relative h-40 rounded-xl mb-4 overflow-hidden"
+              >
                 <img
                   src={item.image}
                   alt={item.title}
@@ -708,7 +910,7 @@ export default function AlumniHomePage({
                 <div
                   className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-20`}
                 ></div>
-              </div>
+              </motion.div>
               <div
                 className={`w-14 h-14 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 shadow-lg -mt-12 relative z-10 mx-auto`}
               >
@@ -728,7 +930,9 @@ export default function AlumniHomePage({
               >
                 {item.description}
               </p>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05, x: 5 }}
+                whileTap={{ scale: 0.95 }}
                 className={`text-sm font-semibold mx-auto block ${
                   isDarkMode
                     ? "text-blue-400 hover:text-blue-300"
@@ -736,29 +940,41 @@ export default function AlumniHomePage({
                 }`}
               >
                 Learn More →
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      {/* Explore Network Section */}
-      <section className="container mx-auto px-10 lg:px-16 py-12">
+      {/* Explore Network Section with Parallax */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true, margin: "-100px" }}
+        className="container mx-auto px-10 lg:px-16 py-12"
+      >
         <div className="text-center mb-12">
-          <h2
+          <motion.h2
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6 }}
             className={`text-3xl md:text-4xl font-bold mb-4 ${
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
             Explore Our Network
-          </h2>
-          <p
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className={`text-lg ${
               isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
             Connect with our vibrant community members
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -797,16 +1013,27 @@ export default function AlumniHomePage({
                 "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
             },
           ].map((alumni, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl ${
+              initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              whileHover={{
+                scale: 1.05,
+                y: -5,
+                transition: { type: "spring", stiffness: 300 },
+              }}
+              className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${
                 isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200 shadow-lg"
               }`}
             >
               <div className="flex items-start gap-4 mb-4">
-                <div className="relative">
+                <motion.div
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  className="relative"
+                >
                   <img
                     src={alumni.image}
                     alt={alumni.name}
@@ -815,7 +1042,7 @@ export default function AlumniHomePage({
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
                     <span className="text-xs text-white">✓</span>
                   </div>
-                </div>
+                </motion.div>
                 <div className="flex-1">
                   <h3
                     className={`font-bold text-lg ${
@@ -895,8 +1122,12 @@ export default function AlumniHomePage({
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {alumni.skills.map((skill, i) => (
-                  <span
+                  <motion.span
                     key={i}
+                    initial={{ opacity: 0, scale: 0 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.5 + i * 0.1 }}
+                    whileHover={{ scale: 1.1 }}
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       isDarkMode
                         ? "bg-blue-900/30 text-blue-300 border border-blue-700/50"
@@ -904,43 +1135,66 @@ export default function AlumniHomePage({
                     }`}
                   >
                     {skill}
-                  </span>
+                  </motion.span>
                 ))}
               </div>
 
-              <button className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2"
+              >
                 View Profile
                 <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ))}
         </div>
 
         <div className="text-center">
-          <button className="px-8 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2 mx-auto">
+          <motion.button
+            whileHover={{
+              scale: 1.05,
+              y: -2,
+            }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-2xl transition-all flex items-center gap-2 mx-auto"
+          >
             <Users className="w-5 h-5" />
             View All Alumni
-          </button>
+          </motion.button>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Job Opportunities Section */}
-      <section className="container mx-auto px-10 lg:px-16 py-12">
+      {/* Job Opportunities Section with Parallax */}
+      <motion.section
+        initial={{ opacity: 0, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-10 lg:px-16 py-12"
+      >
         <div className="text-center mb-12">
-          <h2
+          <motion.h2
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
             className={`text-3xl md:text-4xl font-bold mb-4 ${
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
             Latest Opportunities
-          </h2>
-          <p
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className={`text-lg ${
               isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
             Exclusive positions from top companies in your network
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
@@ -985,16 +1239,30 @@ export default function AlumniHomePage({
                 "https://m.sakshipost.com/sites/default/files/styles/storypage_main/public/article_images/2022/04/23/TCS-1650701831.jpg?itok=2xEZbDuD",
             },
           ].map((job, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl ${
+              initial={{ opacity: 0, y: 60 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 100,
+                delay: idx * 0.15,
+              }}
+              whileHover={{
+                scale: 1.03,
+                y: -8,
+                transition: { type: "spring", stiffness: 400 },
+              }}
+              className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${
                 isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200 shadow-lg"
               }`}
             >
               <div className="flex items-start gap-4 mb-4">
-                <img
+                <motion.img
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
                   src={job.image}
                   alt={job.company}
                   className="w-12 h-12 rounded-lg object-cover border-2 border-blue-500"
@@ -1078,8 +1346,12 @@ export default function AlumniHomePage({
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {job.skills.map((skill, i) => (
-                  <span
+                  <motion.span
                     key={i}
+                    whileHover={{
+                      scale: 1.2,
+                      y: -2,
+                    }}
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
                       isDarkMode
                         ? "bg-purple-900/30 text-purple-300 border border-purple-700/50"
@@ -1087,7 +1359,7 @@ export default function AlumniHomePage({
                     }`}
                   >
                     {skill}
-                  </span>
+                  </motion.span>
                 ))}
               </div>
 
@@ -1111,39 +1383,62 @@ export default function AlumniHomePage({
                 </span>
               </div>
 
-              <button className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2"
+              >
                 View Details
                 <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ))}
         </div>
 
         <div className="text-center">
-          <button className="px-8 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-2xl hover:scale-105 transition-all flex items-center gap-2 mx-auto">
+          <motion.button
+            whileHover={{
+              scale: 1.05,
+              y: -2,
+            }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-2xl transition-all flex items-center gap-2 mx-auto"
+          >
             <Briefcase className="w-5 h-5" />
             Explore All Opportunities
-          </button>
+          </motion.button>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Upcoming Events Section */}
-      <section className="container mx-auto px-4 py-12">
+      {/* Upcoming Events Section with Parallax */}
+      <motion.section
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-4 py-12"
+      >
         <div className="text-center mb-12">
-          <h2
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
             className={`text-3xl md:text-4xl font-bold mb-4 ${
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
             Upcoming Events
-          </h2>
-          <p
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className={`text-lg ${
               isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
             Join exciting events and connect with your community
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -1191,15 +1486,30 @@ export default function AlumniHomePage({
                 "https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
             },
           ].map((event, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className={`rounded-2xl border overflow-hidden transition-all hover:scale-105 hover:shadow-2xl ${
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 100,
+                delay: idx * 0.2,
+              }}
+              whileHover={{
+                scale: 1.05,
+                y: -10,
+                rotateY: 5,
+              }}
+              className={`rounded-2xl border overflow-hidden transition-all hover:shadow-2xl ${
                 isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200 shadow-lg"
               }`}
             >
-              <div className="relative h-48 overflow-hidden">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                className="relative h-48 overflow-hidden"
+              >
                 <img
                   src={event.image}
                   alt={event.title}
@@ -1228,7 +1538,7 @@ export default function AlumniHomePage({
                     {event.status}
                   </span>
                 </div>
-              </div>
+              </motion.div>
 
               <div className="p-6">
                 <h3
@@ -1315,44 +1625,70 @@ export default function AlumniHomePage({
                   </span>
                 </div>
 
-                <button className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white flex items-center justify-center gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white flex items-center justify-center gap-2"
+                >
                   <Calendar className="w-4 h-4" />
                   Register Now
-                </button>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      {/* Active Campaigns Section */}
-      <section className="container mx-auto px-10 lg:px-16 py-12">
+      {/* Active Campaigns Section with Parallax */}
+      <motion.section
+        initial={{ opacity: 0, y: 80 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-10 lg:px-16 py-12"
+      >
         <div className="text-center mb-12">
-          <h2
+          <motion.h2
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
             className={`text-3xl md:text-4xl font-bold mb-4 ${
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
             Active Campaigns
-          </h2>
-          <p
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
             className={`text-lg ${
               isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
             Support meaningful initiatives in your community
-          </p>
+          </motion.p>
         </div>
 
         <div className="max-w-md mx-auto">
-          <div
-            className={`p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl ${
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            whileHover={{
+              scale: 1.02,
+              y: -5,
+            }}
+            className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${
               isDarkMode
                 ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                 : "bg-white border-blue-200 shadow-lg"
             }`}
           >
-            <div className="relative h-48 rounded-xl overflow-hidden mb-4">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative h-48 rounded-xl overflow-hidden mb-4"
+            >
               <img
                 src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
                 alt="Green Campus Initiative"
@@ -1369,7 +1705,7 @@ export default function AlumniHomePage({
                   Active
                 </span>
               </div>
-            </div>
+            </motion.div>
 
             <h3
               className={`font-bold text-xl mb-2 ${
@@ -1406,10 +1742,12 @@ export default function AlumniHomePage({
                 </span>
               </div>
               <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
-                <div
+                <motion.div
+                  initial={{ width: 0 }}
+                  whileInView={{ width: "55.3%" }}
+                  transition={{ duration: 1.5, delay: 0.5 }}
                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                  style={{ width: "55.3%" }}
-                ></div>
+                ></motion.div>
               </div>
             </div>
 
@@ -1447,7 +1785,8 @@ export default function AlumniHomePage({
             </div>
 
             <div className="flex items-center gap-3 mb-4">
-              <img
+              <motion.img
+                whileHover={{ scale: 1.1, rotate: 5 }}
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
                 alt="Gaurav Tiwari"
                 className="w-10 h-10 rounded-full object-cover border-2 border-purple-500"
@@ -1486,43 +1825,74 @@ export default function AlumniHomePage({
               </div>
             </div>
 
-            <button className="w-full px-4 py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full px-4 py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2"
+            >
               <Heart className="w-5 h-5" />
               Support Campaign
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Latest Updates Section */}
-      <section className="container mx-auto px-10 lg:px-16 py-12">
+      {/* Latest Updates Section with Parallax */}
+      <motion.section
+        initial={{ opacity: 0, x: -100 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-10 lg:px-16 py-12"
+      >
         <div className="text-center mb-12">
-          <h2
+          <motion.h2
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
             className={`text-3xl md:text-4xl font-bold mb-4 ${
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
             Latest Updates & Insights
-          </h2>
-          <p
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
             className={`text-lg ${
               isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
           >
             Stay informed with the latest news, stories, and achievements from
             our community
-          </p>
+          </motion.p>
         </div>
 
         <div className="max-w-md mx-auto">
-          <div
-            className={`rounded-2xl border overflow-hidden transition-all hover:scale-105 hover:shadow-2xl ${
+          <motion.div
+            initial={{ opacity: 0, y: 60 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 80,
+              damping: 15,
+            }}
+            whileHover={{
+              scale: 1.03,
+              y: -8,
+              rotateX: 2,
+            }}
+            className={`rounded-2xl border overflow-hidden transition-all hover:shadow-2xl ${
               isDarkMode
                 ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                 : "bg-white border-blue-200 shadow-lg"
             }`}
           >
-            <div className="relative h-48 overflow-hidden">
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              className="relative h-48 overflow-hidden"
+            >
               <img
                 src="https://images.unsplash.com/photo-1417733403748-83bbc7c05140?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
                 alt="The Power of Consistency"
@@ -1534,11 +1904,17 @@ export default function AlumniHomePage({
                   General
                 </span>
               </div>
-            </div>
+            </motion.div>
 
             <div className="p-6">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">☀️</span>
+                <motion.span
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-2xl"
+                >
+                  ☀️
+                </motion.span>
                 <h3
                   className={`font-bold text-xl ${
                     isDarkMode ? "text-white" : "text-gray-900"
@@ -1620,14 +1996,18 @@ export default function AlumniHomePage({
                 </div>
               </div>
 
-              <button className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2"
+              >
                 Read More
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </motion.button>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Footer */}
       <Footer isDarkMode={isDarkMode} />
