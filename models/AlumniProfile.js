@@ -29,6 +29,11 @@ const AlumniProfile = sequelize.define(
     github: { type: DataTypes.STRING, allowNull: true },
     twitter: { type: DataTypes.STRING, allowNull: true },
     portfolio: { type: DataTypes.STRING, allowNull: true },
+    batch: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      // Example: "2024-2028"
+    },
 
     // Multiple education entries
     education: {

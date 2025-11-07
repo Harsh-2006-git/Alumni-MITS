@@ -5,47 +5,185 @@ dotenv.config();
 
 class EmailService {
   constructor() {
+    // Validate required environment variables
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+      throw new Error(
+        "Email service configuration missing: GMAIL_USER and GMAIL_APP_PASSWORD are required"
+      );
+    }
+
     this.transporter = nodemailer.createTransport({
-      service: "gmail",
+      // Primary configuration
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // Use TLS
+      requireTLS: true,
       auth: {
-        user: process.env.GMAIL_USER || "harshmanmode79@gmail.com",
-        pass: process.env.GMAIL_APP_PASSWORD || "dqmh ltkr zedo oafp",
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+      // Connection settings to prevent timeouts
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      socketTimeout: 60000, // 60 seconds
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000, // 30 seconds
+      dnsTimeout: 30000, // 30 seconds
+      dns: {
+        servers: ["8.8.8.8", "1.1.1.1", "8.8.4.4"],
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     });
+
+    // Verify connection on startup
+    this.verifyConnection();
+  }
+
+  async verifyConnection() {
+    try {
+      await this.transporter.verify();
+      console.log("✅ Email server connection verified and ready");
+      return true;
+    } catch (error) {
+      console.error("❌ Email server connection failed:", error.message);
+      return false;
+    }
+  }
+
+  async testEmailService() {
+    try {
+      console.log("🧪 Testing email configuration...");
+      console.log("📧 Using email:", process.env.GMAIL_USER);
+
+      // First verify connection
+      const isConnected = await this.verifyConnection();
+      if (!isConnected) {
+        throw new Error("Cannot establish connection to email server");
+      }
+
+      // Send test email to yourself
+      const testResult = await this.transporter.sendMail({
+        from: `"MITS Test" <${process.env.GMAIL_USER}>`,
+        to: process.env.GMAIL_USER,
+        subject: "✅ MITS Portal - Email Service Test",
+        text: "This is a test email from your MITS Alumni Portal application. If you received this, your email service is working correctly!",
+        html: `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #1565c0;">✅ MITS Portal - Email Service Test</h2>
+            <p>This is a test email from your MITS Alumni Portal application.</p>
+            <p>If you received this, your email service is working correctly!</p>
+            <hr>
+            <p><small>Sent at: ${new Date().toString()}</small></p>
+          </div>
+        `,
+      });
+
+      console.log("✅ Test email sent successfully:", testResult.messageId);
+      return { success: true, messageId: testResult.messageId };
+    } catch (error) {
+      console.error("❌ Email test failed:", error.message);
+      return { success: false, error: error.message };
+    }
+  }
+
+  isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 
   async sendWelcomeEmail(user) {
     try {
-      const subject =
-        user.userType === "alumni"
-          ? "🎓 Welcome to MITS Alumni Portal!"
-          : "🎉 Welcome to MITS Student Portal!";
+      // Validate input
+      if (!user || !user.email) {
+        throw new Error("User object with email is required");
+      }
+
+      if (!this.isValidEmail(user.email)) {
+        throw new Error(`Invalid email format: ${user.email}`);
+      }
+
+      // Determine subject based on verification status
+      const isVerified = user.isVerified || user.isVerified === undefined;
+      const userTypeText = user.userType === "alumni" ? "Alumni" : "Student";
+
+      const subject = isVerified
+        ? `🎓 Welcome to MITS ${userTypeText} Portal - Your Account is Ready!`
+        : `⏳ MITS ${userTypeText} Portal - Account Under Verification`;
 
       const mailOptions = {
-        from: `"MITS Alumni Portal" <${
-          process.env.GMAIL_USER || "harshmanmode79@gmail.com"
-        }>`,
+        from: `"MITS ${userTypeText} Portal" <${process.env.GMAIL_USER}>`,
         to: user.email,
         subject: subject,
         html: this.generateWelcomeTemplate(user),
         text: this.generateWelcomeText(user),
+        // Add delivery options
+        priority: "high",
+        headers: {
+          "X-Priority": "1",
+          "X-MSMail-Priority": "High",
+          Importance: "high",
+        },
       };
 
+      console.log(`🔄 Attempting to send welcome email to ${user.email}...`);
+      console.log(
+        `📝 Status: ${isVerified ? "Verified" : "Under Verification"}`
+      );
+
       const result = await this.transporter.sendMail(mailOptions);
-      console.log(`✅ Welcome email sent to ${user.email} (${user.userType})`);
-      return { success: true, messageId: result.messageId };
+
+      console.log(
+        `✅ Welcome email sent to ${user.email} (${user.userType}) - Status: ${
+          isVerified ? "Verified" : "Pending"
+        } - Message ID: ${result.messageId}`
+      );
+      return {
+        success: true,
+        messageId: result.messageId,
+        response: result.response,
+      };
     } catch (error) {
       console.error(
         `❌ Failed to send welcome email to ${user.email}:`,
         error.message
       );
-      return { success: false, error: error.message };
+
+      // Enhanced error handling with specific suggestions
+      let errorDetails = error.message;
+
+      if (error.code === "EAUTH") {
+        errorDetails =
+          "Authentication failed - Please check your Gmail credentials and app password";
+      } else if (error.code === "ECONNECTION") {
+        errorDetails =
+          "Connection failed - Please check your internet connection and SMTP settings";
+      } else if (error.code === "ETIMEDOUT") {
+        errorDetails =
+          "Connection timed out - Please try again or check firewall settings";
+      } else if (error.code === "ESOCKET") {
+        errorDetails =
+          "Socket error - Network issue or port 587 might be blocked";
+      } else if (error.code === "EMESSAGE") {
+        errorDetails =
+          "Message rejected - Please check email content and recipient address";
+      }
+
+      return {
+        success: false,
+        error: errorDetails,
+        code: error.code,
+        originalError: error.message,
+      };
     }
   }
 
   generateWelcomeTemplate(user) {
     const isAlumni = user.userType === "alumni";
     const userTypeText = isAlumni ? "Alumni" : "Student";
+    const isVerified = user.isVerified || user.isVerified === undefined;
 
     // Generate features based on user type
     const features = isAlumni
@@ -207,6 +345,83 @@ class EmailService {
             margin-bottom: 25px;
         }
         
+        /* Status Banner */
+        .status-banner {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .status-verified {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            color: #ef6c00;
+            border: 2px solid #ff9800;
+        }
+        
+        /* Credentials Section */
+        .credentials-section {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1f5fe 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 2px solid #7e57c2;
+        }
+        
+        .credentials-title {
+            font-size: 20px;
+            color: #5e35b1;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .credential-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #7e57c2;
+        }
+        
+        .credential-label {
+            font-weight: 700;
+            color: #1565c0;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .credential-value {
+            color: #455a64;
+            font-size: 15px;
+            display: block;
+            font-weight: 500;
+            word-break: break-all;
+        }
+        
+        .password-warning {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #ffcdd2;
+        }
+        
         .cta-button {
             display: inline-block;
             background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
@@ -221,7 +436,13 @@ class EmailService {
             transition: transform 0.2s, box-shadow 0.2s;
         }
         
-        .cta-button:hover {
+        .cta-button:disabled {
+            background: #9e9e9e;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .cta-button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(13, 71, 161, 0.45);
         }
@@ -277,7 +498,7 @@ class EmailService {
             font-weight: 700;
             color: #1565c0;
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -288,11 +509,25 @@ class EmailService {
             font-size: 15px;
             display: block;
             font-weight: 500;
+            word-break: break-all;
         }
         
-        .status-pending {
-            color: #f57c00;
+        .status-value {
             font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        
+        .status-verified-badge {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .status-pending-badge {
+            background: #ff9800;
+            color: white;
         }
         
         /* Features Section */
@@ -316,8 +551,8 @@ class EmailService {
             border-radius: 10px;
             border-left: 4px solid #1565c0;
             display: flex;
-            align-items: center;
-            gap: 12px;
+            align-items: flex-start;
+            gap: 15px;
             transition: all 0.3s ease;
         }
         
@@ -330,8 +565,8 @@ class EmailService {
             width: 24px;
             height: 24px;
             flex-shrink: 0;
-            color: #1565c0;
             font-size: 20px;
+            margin-top: 2px;
         }
         
         .feature-text {
@@ -339,6 +574,31 @@ class EmailService {
             font-size: 14px;
             line-height: 1.6;
             font-weight: 500;
+            flex: 1;
+        }
+        
+        /* Verification Info Section */
+        .verification-info {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 2px solid #ffa000;
+        }
+        
+        .verification-title {
+            font-size: 16px;
+            color: #ef6c00;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .verification-text {
+            color: #5d4037;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 8px;
         }
         
         /* Help Section */
@@ -447,14 +707,26 @@ class EmailService {
             
             .feature-item {
                 padding: 14px 15px;
-                gap: 10px;
+                gap: 12px;
             }
             
             .feature-icon {
                 width: 20px;
                 height: 20px;
                 font-size: 18px;
-                margin-right: 17px;
+                margin-right: 15px;
+            }
+            
+            .credentials-section {
+                padding: 20px 15px;
+            }
+            
+            .verification-info {
+                padding: 18px 15px;
+            }
+            
+            .verification-text {
+                font-size: 12px;
             }
         }
         
@@ -474,6 +746,11 @@ class EmailService {
             .details-section {
                 padding: 20px 12px;
             }
+            
+            .feature-item {
+                padding: 12px 10px;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -484,11 +761,23 @@ class EmailService {
             <div class="logo-container">
                 <img src="https://web.mitsgwalior.in/images/mits-logo.png" alt="MITS Logo" class="logo">
             </div>
+            <div class="college-name">Madhav Institute of Technology & Science</div>
             <div class="welcome-title">Welcome to MITS ${userTypeText} Portal</div>
         </div>
         
         <!-- Main Content -->
         <div class="content">
+            <!-- Status Banner -->
+            <div class="status-banner ${
+              isVerified ? "status-verified" : "status-pending"
+            }">
+                ${
+                  isVerified
+                    ? "✅ Your Account is Verified & Active!"
+                    : "⏳ Your Account is Under Verification"
+                }
+            </div>
+            
             <!-- Welcome Message -->
             <div class="welcome-section">
                 <div class="greeting">
@@ -496,14 +785,78 @@ class EmailService {
                     <span class="user-badge">${userTypeText}</span>
                 </div>
                 <div class="welcome-text">
-                    We're thrilled to welcome you to the MITS ${userTypeText} community. 
+                    ${
+                      isVerified
+                        ? `We're thrilled to welcome you to the MITS ${userTypeText} community. Your account has been verified and is ready to use!`
+                        : `Thank you for registering with the MITS ${userTypeText} Portal. Your account is currently under verification.`
+                    }
                 </div>
-                <a href="${
-                  process.env.FRONTEND_URL || "https://alumni-mits.vercel.app"
-                }" class="cta-button">
-                    Explore Your Dashboard
+            </div>
+
+            <!-- Credentials Section -->
+            ${
+              user.temporaryPassword
+                ? `
+            <div class="credentials-section">
+                <div class="credentials-title">🔐 Your Login Credentials</div>
+                
+                <div class="credential-item">
+                    <div class="credential-label">Email Address</div>
+                    <div class="credential-value">${user.email}</div>
+                </div>
+                
+                <div class="credential-item">
+                    <div class="credential-label">Temporary Password</div>
+                    <div class="credential-value">${user.temporaryPassword}</div>
+                </div>
+                
+                <div class="password-warning">
+                    ⚠️ Please change your password after first login for security
+                </div>
+            </div>
+            `
+                : ""
+            }
+            
+            <!-- Login CTA -->
+            <div style="text-align: center;">
+                <a href="https://alumni-mits.vercel.app" 
+                   class="cta-button" 
+                   ${
+                     !isVerified
+                       ? 'style="background: #9e9e9e; cursor: not-allowed; box-shadow: none;" onclick="return false;"'
+                       : ""
+                   }>
+                    ${
+                      isVerified
+                        ? "🚀 Login to Your Account"
+                        : "⏳ Account Under Verification"
+                    }
                 </a>
             </div>
+            
+            <!-- Verification Info for Non-Verified Users -->
+            ${
+              !isVerified
+                ? `
+            <div class="verification-info">
+                <div class="verification-title">📋 Verification Process</div>
+                <div class="verification-text">
+                    • Your account details are being reviewed by our team
+                </div>
+                <div class="verification-text">
+                    • This process usually takes 24-48 hours
+                </div>
+                <div class="verification-text">
+                    • You'll receive another email once verified
+                </div>
+                <div class="verification-text">
+                    • Contact support if you have any questions
+                </div>
+            </div>
+            `
+                : ""
+            }
             
             <!-- Account Details -->
             <div class="details-section">
@@ -538,15 +891,58 @@ class EmailService {
                 }
                 
                 ${
-                  isAlumni && !user.isVerified
+                  user.batchYear
                     ? `
                 <div class="detail-item">
-                    <div class="detail-label">Status</div>
-                    <div class="detail-value status-pending">Under Verification</div>
+                    <div class="detail-label">Batch Year</div>
+                    <div class="detail-value">${user.batchYear}</div>
                 </div>
                 `
                     : ""
                 }
+                
+                ${
+                  user.location
+                    ? `
+                <div class="detail-item">
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">${user.location}</div>
+                </div>
+                `
+                    : ""
+                }
+                
+                ${
+                  user.linkedinUrl
+                    ? `
+                <div class="detail-item">
+                    <div class="detail-label">LinkedIn Profile</div>
+                    <div class="detail-value">
+                        <a href="${user.linkedinUrl}" target="_blank" style="color: #1565c0; text-decoration: none;">
+                            ${user.linkedinUrl}
+                        </a>
+                    </div>
+                </div>
+                `
+                    : ""
+                }
+                
+                <div class="detail-item">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">
+                        <span class="status-value ${
+                          isVerified
+                            ? "status-verified-badge"
+                            : "status-pending-badge"
+                        }">
+                            ${
+                              isVerified
+                                ? "Verified & Active"
+                                : "Under Verification"
+                            }
+                        </span>
+                    </div>
+                </div>
                 
                 <div class="detail-item">
                     <div class="detail-label">Registration Date</div>
@@ -589,9 +985,9 @@ class EmailService {
         
         <!-- Footer -->
         <div class="footer">
-            <div class="footer-text">MITS Alumni Association</div>
+            <div class="footer-text">MITS ${userTypeText} Association</div>
             <div class="footer-text">Madhav Institute of Technology & Science, Gwalior</div>
-            <div class="footer-text">© ${new Date().getFullYear()} MITS Alumni Portal</div>
+            <div class="footer-text">© ${new Date().getFullYear()} MITS ${userTypeText} Portal</div>
             <div class="footer-text">This is an automated message</div>
         </div>
     </div>
@@ -603,51 +999,106 @@ class EmailService {
   generateWelcomeText(user) {
     const isAlumni = user.userType === "alumni";
     const userTypeText = isAlumni ? "Alumni" : "Student";
+    const isVerified = user.isVerified || user.isVerified === undefined;
 
     return `
-WELCOME TO MITS ${userTypeText.toUpperCase()} PORTAL
-===========================================
+${
+  isVerified
+    ? "WELCOME TO MITS " + userTypeText.toUpperCase() + " PORTAL"
+    : "MITS " +
+      userTypeText.toUpperCase() +
+      " PORTAL - ACCOUNT UNDER VERIFICATION"
+}
+${"=".repeat(60)}
 
 Dear ${user.name || userTypeText},
 
-We're thrilled to welcome you to the MITS ${userTypeText} community. 
-Your journey with us is just beginning, and we're excited to see you 
-connect, grow, and succeed with your fellow MITSians.
+${
+  isVerified
+    ? `We're thrilled to welcome you to the MITS ${userTypeText} community. Your account has been verified and is ready to use!`
+    : `Thank you for registering with the MITS ${userTypeText} Portal. Your account is currently under verification.`
+}
 
-YOUR ACCOUNT DETAILS:
----------------------
-Name: ${user.name || "Not provided"}
-
+${
+  user.temporaryPassword
+    ? `
+🔐 YOUR LOGIN CREDENTIALS:
+${"-".repeat(30)}
 Email: ${user.email}
+Temporary Password: ${user.temporaryPassword}
 
+⚠️ SECURITY NOTE: Please change your password after first login for security.
+`
+    : ""
+}
+
+${
+  isVerified
+    ? `
+🚀 GET STARTED:
+${"-".repeat(30)}
+Login URL: ${process.env.FRONTEND_URL || "https://alumni-mits.vercel.app"}
+`
+    : `
+📋 VERIFICATION PROCESS:
+${"-".repeat(30)}
+• Your account details are being reviewed by our team
+• This process usually takes 24-48 hours
+• You'll receive another email once verified
+• Contact support if you have any questions
+`
+}
+
+📋 YOUR ACCOUNT DETAILS:
+${"-".repeat(30)}
+Name: ${user.name || "Not provided"}
+Email: ${user.email}
 User Type: ${userTypeText}
-
 ${user.branch ? `Branch: ${user.branch}\n` : ""}\
-${isAlumni && !user.isVerified ? "Status: Under Verification\n" : ""}\
+${user.batchYear ? `Batch Year: ${user.batchYear}\n` : ""}\
+${user.location ? `Location: ${user.location}\n` : ""}\
+${user.linkedinUrl ? `LinkedIn: ${user.linkedinUrl}\n` : ""}\
+Status: ${isVerified ? "Verified & Active" : "Under Verification"}
 Registration Date: ${new Date().toLocaleDateString("en-IN", {
       day: "numeric",
       month: "long",
       year: "numeric",
     })}
 
-GET STARTED:
-------------
-Access your dashboard: ${
-      process.env.FRONTEND_URL || "https://alumni-mits.vercel.app"
-    }
+🌟 WHAT YOU CAN DO:
+${"-".repeat(30)}
+${
+  isAlumni
+    ? `• Connect with students and fellow alumni
+• Share job opportunities and career guidance  
+• Participate in alumni events and mentorship
+• Access exclusive alumni resources and networks`
+    : `• Connect with alumni for career guidance
+• Access learning resources and study materials
+• Find internship and job opportunities
+• Participate in campus events and workshops`
+}
 
-NEED HELP?
-----------
+❓ NEED HELP?
+${"-".repeat(30)}
 Contact our support team: support@mitsgwalior.in
 
 Best regards,
 
-MITS Alumni Association
+MITS ${userTypeText} Association
 Madhav Institute of Technology & Science
 Gwalior
-===========================================
+${"=".repeat(60)}
 This is an automated message
     `;
+  }
+
+  // Utility method to close the transporter
+  async close() {
+    if (this.transporter) {
+      this.transporter.close();
+      console.log("📧 Email transporter closed");
+    }
   }
 }
 

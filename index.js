@@ -9,6 +9,9 @@ import JobRoute from "./routes/JobRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import campaignRoutes from "./routes/campaignRoutes.js";
 import ProjectRoute from "./routes/projectRoutes.js";
+import JobScheduler from "./services/jobScheduler.js";
+import autoJobRoutes from "./routes/autoJobRoutes.js";
+
 import helmet from "helmet";
 import cors from "cors";
 import path from "path";
@@ -51,7 +54,7 @@ app.use(
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("hello");
+  res.send("Alumni MITS Backed is running...");
 });
 app.use("/auth", authRoute);
 app.use("/message", messageRoute);
@@ -60,6 +63,25 @@ app.use("/job", JobRoute);
 app.use("/event", eventRoutes);
 app.use("/campaign", campaignRoutes);
 app.use("/project", ProjectRoute);
+// Start the automated scheduler
+JobScheduler.start();
+
+// Routes
+app.use("/api/jobs", JobRoute);
+app.use("/api/auto-jobs", autoJobRoutes); // For manual triggers
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received, shutting down gracefully...");
+  JobScheduler.stop();
+  process.exit(0);
+});
+
+process.on("SIGINT", () => {
+  console.log("SIGINT received, shutting down gracefully...");
+  JobScheduler.stop();
+  process.exit(0);
+});
 
 // Error handling middleware (should be last)
 app.use(errorHandler);

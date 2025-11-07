@@ -1,7 +1,6 @@
 import Event from "../models/event.js";
 import EventRegistration from "../models/eventRegistration.js";
 
-
 export const addEvent = async (req, res) => {
   try {
     const { email, userType } = req.user; // assuming your token contains { email: "..." }
@@ -62,14 +61,26 @@ export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;
     const { email, userType } = req.user;
-
+    const eventId = id;
     const event = await Event.findByPk(id);
-    const eventRegistration = await EventRegistration.findAll({where: eventId=id})
+
+    // Fixed: Remove the assignment in the where clause
+    const eventRegistrations = await EventRegistration.findAll({
+      where: { eventId: id }, // Use object notation instead of assignment
+    });
 
     if (!event) {
       return res.status(404).json({
         success: false,
         message: "Event not found",
+      });
+    }
+
+    // Fixed: You need to destroy each registration individually
+    // or use bulk destroy since findAll returns an array
+    if (eventRegistrations.length > 0) {
+      await EventRegistration.destroy({
+        where: { eventId: id },
       });
     }
 
@@ -107,7 +118,7 @@ export const getallEvents = async (req, res) => {
 
     if (!upcomingEvents || upcomingEvents.length === 0) {
       return res
-        .status(404)
+        .status(200)
         .json({ message: "No upcoming scheduled events found" });
     }
 
@@ -141,7 +152,7 @@ export const getUpcomingEvents = async (req, res) => {
 
     if (!upcomingEvents || upcomingEvents.length === 0) {
       return res
-        .status(404)
+        .status(200)
         .json({ message: "No upcoming scheduled events found" });
     }
 
@@ -167,8 +178,7 @@ export const getmyevents = async (req, res) => {
     const upcomingEvents = await Event.findAll({
       where: {
         organizerEmail: email,
-        userType: userType,
-        isScheduled: true, // ✅ Only approved/scheduled events
+        userType: userType, // ✅ Only approved/scheduled events
         date: {
           [Op.gt]: today, // ✅ Future events only
         },
@@ -178,7 +188,7 @@ export const getmyevents = async (req, res) => {
 
     if (!upcomingEvents || upcomingEvents.length === 0) {
       return res
-        .status(404)
+        .status(200)
         .json({ message: "No upcoming scheduled events found" });
     }
 
@@ -309,14 +319,14 @@ export const updateEvent = async (req, res) => {
   }
 };
 
+import EmailService from "../services/EmailService.js"; // Import the EmailService
 
 // Register for an event
 export const registerForEvent = async (req, res) => {
   try {
     const { eventId } = req.body;
-    const { email, userType, name } = req.user; // Get from JWT token
+    const { email, userType, name, id: userId } = req.user;
 
-    // Validate required fields
     if (!eventId) {
       return res.status(400).json({
         success: false,
@@ -324,7 +334,6 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
-    // Check if event exists
     const event = await Event.findByPk(eventId);
     if (!event) {
       return res.status(404).json({
@@ -333,7 +342,6 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
-    // Check if event is scheduled
     if (!event.isScheduled) {
       return res.status(400).json({
         success: false,
@@ -341,12 +349,8 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
-    // Check if user is already registered for this event
     const existingRegistration = await EventRegistration.findOne({
-      where: {
-        eventId,
-        userEmail: email,
-      },
+      where: { eventId, userEmail: email },
     });
 
     if (existingRegistration) {
@@ -356,7 +360,6 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
-    // Check if event has reached maximum attendees
     const currentRegistrations = await EventRegistration.count({
       where: { eventId },
     });
@@ -374,8 +377,33 @@ export const registerForEvent = async (req, res) => {
       userEmail: email,
       userName: name,
       userType,
-      registrationDate: new Date(), // Current date
+      registrationDate: new Date(),
     });
+
+    // Send confirmation email with QR code
+    try {
+      const emailService = new EmailService();
+
+      const eventRegistrationData = {
+        email: email,
+        name: name,
+        userType: userType,
+        userId: userId,
+        eventName: event.title,
+        eventDate: event.date,
+        eventTime: event.eventTime,
+        eventLocation: event.location || "Online",
+        eventDescription: event.description,
+        registrationId: registration.id,
+        registrationDate: registration.registrationDate,
+        eventId: eventId,
+      };
+
+      await emailService.sendEventRegistrationEmail(eventRegistrationData);
+      console.log(`✅ Event registration email with QR code sent to ${email}`);
+    } catch (emailError) {
+      console.error("❌ Failed to send event registration email:", emailError);
+    }
 
     res.status(201).json({
       success: true,

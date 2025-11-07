@@ -61,7 +61,7 @@ const Job = sequelize.define(
       defaultValue: false,
     },
     userType: {
-      type: DataTypes.ENUM("Alumni", "Company", "Admin"),
+      type: DataTypes.ENUM("Alumni", "Company", "Admin", "Auto"),
       defaultValue: "Alumni",
     },
     email: {
@@ -89,9 +89,39 @@ const Job = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    source: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "Source platform (internshala, remoteok, wellfound)",
+    },
+    sourceId: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true,
+      comment: "Unique ID from source platform",
+    },
+    sourceUrl: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: "URL of the original job posting",
+    },
+    isAutoPosted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      comment: "Whether job was automatically scraped",
+    },
+    applyLink: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: "Direct application link",
+    },
     status: {
-      type: DataTypes.ENUM("active", "closed", "draft"),
+      type: DataTypes.ENUM("active", "closed", "expired", "expiring_soon"),
       defaultValue: "active",
+    },
+    lastChecked: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {

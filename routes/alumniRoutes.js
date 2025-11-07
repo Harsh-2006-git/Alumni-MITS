@@ -12,6 +12,7 @@ import {
   getAllAlumni2,
   getUnverifiedAlumni,
   verifyAlumniStatus,
+  getLinkedInProfileByUrl,
   deleteAlumni,
 } from "../controller/AlumniController.js";
 import multer from "multer";
@@ -57,5 +58,7 @@ router.post(
   uploadResume
 );
 router.post("/analyze", authenticateAlumni, analyzeSkillsMatch);
+
+router.get("/profile", getLinkedInProfileByUrl);
 
 export default router;

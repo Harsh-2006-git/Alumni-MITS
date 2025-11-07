@@ -692,22 +692,61 @@ export const uploadResume = async (req, res) => {
 };
 import axios from "axios";
 
-const GEMINI_API_KEY = "AIzaSyAodiW_Fc3DSrgglP3Phi7s-aA8IhCZ76A";
+// ✅ Use environment variable for API key
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
 
+// ✅ Rate limiting setup
+let requestCount = 0;
+let lastResetTime = Date.now();
+const MAX_REQUESTS_PER_MINUTE = 10;
+
+const checkRateLimit = () => {
+  const now = Date.now();
+  if (now - lastResetTime > 60000) {
+    // 1 minute passed
+    requestCount = 0;
+    lastResetTime = now;
+  }
+
+  if (requestCount >= MAX_REQUESTS_PER_MINUTE) {
+    throw new Error("Rate limit exceeded. Please try again in a moment.");
+  }
+
+  requestCount++;
+};
+
 /**
- * Analyze skills match using Gemini API only — with realistic scoring and strict JSON response
+ * Analyze skills match with rate limiting and better error handling
  */
 export const analyzeSkillsMatch = async (req, res) => {
   try {
     const { jobSkills, jobTitle } = req.body;
     const { id, userType } = req.user || {};
 
+    // ✅ Validate environment variable
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Gemini API key not configured",
+      });
+    }
+
     // ✅ Validate input
     if (!Array.isArray(jobSkills) || jobSkills.length === 0) {
       return res.status(400).json({
         success: false,
         message: "jobSkills array is required and cannot be empty",
+      });
+    }
+
+    // ✅ Check rate limit
+    try {
+      checkRateLimit();
+    } catch (rateLimitError) {
+      return res.status(429).json({
+        success: false,
+        message: rateLimitError.message,
       });
     }
 
@@ -763,7 +802,7 @@ Respond strictly in this JSON format:
 }
 `;
 
-    // ✅ Call Gemini API
+    // ✅ Call Gemini API with better error handling
     const response = await axios.post(
       GEMINI_API_URL,
       {
@@ -773,7 +812,12 @@ Respond strictly in this JSON format:
           maxOutputTokens: 2048,
         },
       },
-      { timeout: 20000 }
+      {
+        timeout: 30000,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
 
     // ✅ Extract Gemini raw text
@@ -819,9 +863,225 @@ Respond strictly in this JSON format:
     });
   } catch (error) {
     console.error("❌ Gemini API Error:", error.message);
+
+    // ✅ Handle specific error types
+    if (error.response?.status === 429) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many requests. Please wait a moment and try again.",
+        retryAfter: "60 seconds",
+      });
+    }
+
+    if (error.code === "ECONNABORTED") {
+      return res.status(408).json({
+        success: false,
+        message: "Request timeout. Please try again.",
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "Failed to get analysis from Gemini API",
+      error: error.message,
+    });
+  }
+};
+
+import https from "https";
+import puppeteer from "puppeteer";
+export const getLinkedInProfileByUrl = async (req, res) => {
+  let browser;
+  try {
+    const { url } = req.query;
+
+    // Validate URL parameter
+    if (!url) {
+      return res.status(400).json({
+        message: "URL parameter is required",
+        example: "?url=https://www.linkedin.com/in/harsh-manmode-2a0b91325",
+      });
+    }
+
+    // Validate LinkedIn URL
+    if (!url.includes("linkedin.com/in/")) {
+      return res.status(400).json({
+        message: "Invalid LinkedIn profile URL",
+        example: "?url=https://www.linkedin.com/in/username",
+      });
+    }
+
+    // Launch puppeteer browser
+    browser = await puppeteer.launch({
+      headless: "new",
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-accelerated-2d-canvas",
+        "--disable-gpu",
+        "--window-size=1920x1080",
+      ],
+    });
+
+    const page = await browser.newPage();
+
+    // Set user agent to mimic real browser
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    );
+
+    // Set viewport
+    await page.setViewport({ width: 1920, height: 1080 });
+
+    // Navigate to LinkedIn profile
+    await page.goto(url, {
+      waitUntil: "networkidle2",
+      timeout: 30000,
+    });
+
+    // Wait a bit for dynamic content
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    // Extract profile data
+    const profileData = await page.evaluate(() => {
+      const data = {
+        name: null,
+        headline: null,
+        location: null,
+        about: null,
+        profileImage: null,
+        connections: null,
+        experience: [],
+        education: [],
+        skills: [],
+      };
+
+      // Extract name
+      const nameElement = document.querySelector(
+        "h1.text-heading-xlarge, h1.top-card-layout__title"
+      );
+      if (nameElement) data.name = nameElement.innerText.trim();
+
+      // Extract headline
+      const headlineElement = document.querySelector(
+        ".text-body-medium.break-words, .top-card-layout__headline"
+      );
+      if (headlineElement) data.headline = headlineElement.innerText.trim();
+
+      // Extract location
+      const locationElement = document.querySelector(
+        ".text-body-small.inline.t-black--light.break-words, .top-card__subline-item"
+      );
+      if (locationElement) data.location = locationElement.innerText.trim();
+
+      // Extract about
+      const aboutElement = document.querySelector(
+        '#about ~ .display-flex .inline-show-more-text span[aria-hidden="true"]'
+      );
+      if (aboutElement) data.about = aboutElement.innerText.trim();
+
+      // Extract profile image
+      const imageElement = document.querySelector(
+        "img.pv-top-card-profile-picture__image, img.profile-photo-edit__preview"
+      );
+      if (imageElement) data.profileImage = imageElement.src;
+
+      // Extract connections
+      const connectionsElement = document.querySelector(
+        ".pv-top-card--list-bullet li"
+      );
+      if (connectionsElement) {
+        const text = connectionsElement.innerText;
+        const match = text.match(/(\d+[\+]?)\s+connection/i);
+        if (match) data.connections = match[1];
+      }
+
+      // Extract experience
+      const experienceSection = document.querySelector("#experience");
+      if (experienceSection) {
+        const experienceItems =
+          experienceSection.parentElement.querySelectorAll(
+            "ul li.artdeco-list__item"
+          );
+        experienceItems.forEach((item, index) => {
+          if (index < 5) {
+            const position = item.querySelector(
+              '.mr1.t-bold span[aria-hidden="true"]'
+            );
+            const company = item.querySelector(
+              '.t-14.t-normal span[aria-hidden="true"]'
+            );
+            if (position && company) {
+              data.experience.push({
+                position: position.innerText.trim(),
+                company: company.innerText.trim(),
+              });
+            }
+          }
+        });
+      }
+
+      // Extract education
+      const educationSection = document.querySelector("#education");
+      if (educationSection) {
+        const educationItems = educationSection.parentElement.querySelectorAll(
+          "ul li.artdeco-list__item"
+        );
+        educationItems.forEach((item, index) => {
+          if (index < 3) {
+            const school = item.querySelector(
+              '.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]'
+            );
+            const degree = item.querySelector(
+              '.t-14.t-normal span[aria-hidden="true"]'
+            );
+            if (school) {
+              data.education.push({
+                school: school.innerText.trim(),
+                degree: degree ? degree.innerText.trim() : null,
+              });
+            }
+          }
+        });
+      }
+
+      // Extract skills
+      const skillsSection = document.querySelector("#skills");
+      if (skillsSection) {
+        const skillItems = skillsSection.parentElement.querySelectorAll(
+          "ul li.artdeco-list__item"
+        );
+        skillItems.forEach((item, index) => {
+          if (index < 10) {
+            const skill = item.querySelector(
+              '.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]'
+            );
+            if (skill) {
+              data.skills.push(skill.innerText.trim());
+            }
+          }
+        });
+      }
+
+      return data;
+    });
+
+    await browser.close();
+
+    return res.status(200).json({
+      success: true,
+      url,
+      data: profileData,
+    });
+  } catch (error) {
+    if (browser) await browser.close();
+
+    console.error("LinkedIn scraper error:", error);
+    return res.status(500).json({
+      success: false,
+      message:
+        "Failed to scrape profile. LinkedIn may require login or the profile is private.",
       error: error.message,
     });
   }
