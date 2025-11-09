@@ -261,7 +261,16 @@ export default function Header({ isDarkMode, toggleTheme }) {
             >
               Campaign
             </a>
-
+            <a
+              onClick={() => navigate("/mentor")}
+              className={`text-sm font-medium transition-colors cursor-pointer ${
+                isDarkMode
+                  ? "text-gray-300 hover:bg-gray-800"
+                  : "text-gray-700 hover:bg-blue-50"
+              }`}
+            >
+              Mentorship
+            </a>
             <a
               onClick={() => navigate("/about")}
               className={`text-sm font-medium transition-colors cursor-pointer ${
@@ -569,6 +578,16 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 }`}
               >
                 Campaign
+              </a>
+              <a
+                onClick={() => navigate("/mentor")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                  isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                }`}
+              >
+                Mentorship
               </a>
 
               <a

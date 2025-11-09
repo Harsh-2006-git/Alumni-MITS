@@ -110,7 +110,7 @@ interface FormData {
 }
 
 export default function AlumniProfilePage() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");

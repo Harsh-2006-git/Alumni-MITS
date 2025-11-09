@@ -36,6 +36,7 @@ import {
   User,
   GraduationCap,
 } from "lucide-react";
+
 import Header from "../components/header";
 import Footer from "../components/footer";
 import SkillAnalysisPopup from "../components/SkillAnalysisPopup";
@@ -751,39 +752,9 @@ export default function JobListingPage({ isDarkMode, toggleTheme }) {
   };
 
   // Apply for job
-  const applyForJob = async (jobId) => {
-    try {
-      const authData = localStorage.getItem("auth");
-      const token = authData ? JSON.parse(authData).accessToken : null;
-
-      if (!token) {
-        showToast("Please login to apply for jobs", "error");
-        return;
-      }
-
-      const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/job/apply",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ jobId }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        showToast("Application submitted successfully!", "success");
-      } else {
-        showToast(data.message || "Failed to submit application", "error");
-      }
-    } catch (error) {
-      console.error("Error applying for job:", error);
-      showToast("Error submitting application. Please try again.", "error");
-    }
+  const applyForJob = (jobId) => {
+    // Redirect directly to Internshala internships page
+    window.open("https://internshala.com/internships", "_blank");
   };
 
   useEffect(() => {

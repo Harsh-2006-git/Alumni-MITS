@@ -30,6 +30,7 @@ import {
   ArrowRight,
   Building,
 } from "lucide-react";
+
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -55,6 +56,31 @@ export default function AlumniHomePage({
     userEmail: string;
     userId: string;
   }>(null);
+  const testimonialRef = useRef(null);
+  const [isTestimonialVisible, setIsTestimonialVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsTestimonialVisible(true);
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (testimonialRef.current) {
+      observer.observe(testimonialRef.current);
+    }
+
+    return () => {
+      if (testimonialRef.current) {
+        observer.unobserve(testimonialRef.current);
+      }
+    };
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
@@ -595,113 +621,257 @@ export default function AlumniHomePage({
   `}</style>
       </section>
 
-      {/* Testimonial Section */}
       <section
-        className={`w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8 md:py-12 ${
+        ref={testimonialRef}
+        className={`w-full px-4 sm:px-6 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 relative overflow-hidden ${
           isDarkMode
             ? "bg-gradient-to-r from-slate-900/50 to-blue-900/50"
-            : "bg-gradient-to-r from-slate-50 to-blue-50"
+            : "bg-white"
         }`}
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid lg:grid-cols-[300px_1fr] md:grid-cols-[250px_1fr] gap-6 md:gap-8 items-center">
-            {/* Left - Image */}
-            <div className="flex justify-center lg:justify-start">
-              <div className="relative">
+            {/* Left - Image with Animation */}
+            <div
+              className={`flex justify-center lg:justify-start transition-all duration-1000 ${
+                isTestimonialVisible
+                  ? "translate-x-0 opacity-100"
+                  : "-translate-x-20 opacity-0"
+              }`}
+            >
+              <div className="relative group">
+                {/* Animated Glow Ring */}
                 <div
-                  className={`absolute inset-0 rounded-2xl blur-xl ${
+                  className={`absolute inset-0 rounded-2xl blur-xl transition-all duration-500 group-hover:blur-2xl ${
                     isDarkMode ? "bg-blue-500/20" : "bg-blue-400/30"
-                  }`}
+                  } ${isTestimonialVisible ? "animate-pulse-slow" : ""}`}
                 ></div>
+
+                {/* Rotating Border Effect */}
+                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-0 group-hover:opacity-50 blur transition-opacity duration-500 animate-spin-slow"></div>
+
+                {/* Image */}
                 <img
                   src="/assets/images/rk.jpg"
                   alt="Dr. R.K. Pandit"
-                  className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-2xl object-cover border-4 border-blue-500/30 shadow-2xl"
+                  className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-2xl object-cover border-4 border-blue-500/30 shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:border-blue-500/50"
                 />
+
+                {/* Corner Accent */}
+                <div
+                  className={`absolute -top-2 -right-2 w-8 h-8 rounded-lg ${
+                    isDarkMode ? "bg-blue-500" : "bg-blue-600"
+                  } opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center`}
+                >
+                  <span className="text-white text-xs">✦</span>
+                </div>
               </div>
             </div>
 
-            {/* Right - Quote */}
-            <div className="space-y-3 text-center lg:text-left">
+            {/* Right - Quote with Animation */}
+            <div
+              className={`space-y-3 text-center lg:text-left transition-all duration-1000 delay-300 ${
+                isTestimonialVisible
+                  ? "translate-x-0 opacity-100"
+                  : "translate-x-20 opacity-0"
+              }`}
+            >
+              {/* Opening Quote Mark */}
               <div
-                className={`text-4xl ${
+                className={`text-4xl md:text-5xl lg:text-6xl transition-all duration-700 ${
                   isDarkMode ? "text-purple-400/40" : "text-purple-300/60"
+                } ${
+                  isTestimonialVisible
+                    ? "scale-100 rotate-0"
+                    : "scale-0 -rotate-12"
                 }`}
+                style={{ transitionDelay: "500ms" }}
               >
                 ❝
               </div>
+
+              {/* Quote Text */}
               <blockquote
-                className={`text-base sm:text-lg md:text-xl lg:text-2xl font-serif italic leading-relaxed ${
+                className={`text-base sm:text-lg md:text-xl lg:text-2xl font-serif italic leading-relaxed relative ${
                   isDarkMode ? "text-gray-200" : "text-gray-800"
                 }`}
               >
-                The alumni spread all over the world have been our ambassadors
-                of goodwill, successfully carrying out a radiant image of
-                institute.
+                {/* Animated Highlight Bar */}
+                <div
+                  className={`absolute left-0 top-0 w-1 h-0 ${
+                    isDarkMode ? "bg-blue-500" : "bg-blue-600"
+                  } transition-all duration-1000 ${
+                    isTestimonialVisible ? "h-full" : "h-0"
+                  }`}
+                  style={{ transitionDelay: "700ms" }}
+                ></div>
+
+                <span className="pl-4 block">
+                  The alumni spread all over the world have been our ambassadors
+                  of goodwill, successfully carrying out a radiant image of
+                  institute.
+                </span>
               </blockquote>
-              <div className="pt-3">
+
+              {/* Author Info */}
+              <div
+                className={`pt-3 transition-all duration-700 ${
+                  isTestimonialVisible
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-4 opacity-0"
+                }`}
+                style={{ transitionDelay: "900ms" }}
+              >
+                {/* Decorative Line */}
+                <div
+                  className={`w-16 h-0.5 mb-3 mx-auto lg:mx-0 ${
+                    isDarkMode
+                      ? "bg-gradient-to-r from-blue-500 to-purple-500"
+                      : "bg-gradient-to-r from-blue-600 to-purple-600"
+                  }`}
+                ></div>
+
                 <h3
-                  className={`text-lg sm:text-xl md:text-2xl font-bold ${
+                  className={`text-lg sm:text-xl md:text-2xl font-bold transition-colors duration-500 ${
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
                   Dr. R.K. Pandit
                 </h3>
                 <p
-                  className={`text-sm md:text-base ${
+                  className={`text-sm md:text-base transition-colors duration-500 ${
                     isDarkMode ? "text-gray-400" : "text-gray-600"
                   }`}
                 >
                   Vice Chancellor MITS-DU Gwalior
                 </p>
               </div>
+
+              {/* Closing Quote Mark */}
+              <div
+                className={`text-4xl md:text-5xl lg:text-6xl text-right transition-all duration-700 ${
+                  isDarkMode ? "text-purple-400/40" : "text-purple-300/60"
+                } ${
+                  isTestimonialVisible
+                    ? "scale-100 rotate-0"
+                    : "scale-0 rotate-12"
+                }`}
+                style={{ transitionDelay: "1100ms" }}
+              >
+                ❞
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Decorative Divider */}
+      {/* Decorative Divider with Animation */}
       <div className="w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
+            {/* Left Line */}
             <div
-              className={`flex-1 h-px ${
+              className={`flex-1 h-px relative overflow-hidden ${
                 isDarkMode
                   ? "bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
                   : "bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"
-              }`}
-            ></div>
-            <div
-              className={`flex gap-2 ${
-                isDarkMode ? "opacity-30" : "opacity-40"
               }`}
             >
+              {/* Animated Shimmer Effect */}
               <div
-                className={`w-2 h-2 rounded-full ${
-                  isDarkMode ? "bg-blue-400" : "bg-blue-500"
-                }`}
-              ></div>
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  isDarkMode ? "bg-purple-400" : "bg-purple-500"
-                }`}
-              ></div>
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  isDarkMode ? "bg-blue-400" : "bg-blue-500"
-                }`}
+                className={`absolute inset-0 ${
+                  isDarkMode
+                    ? "bg-gradient-to-r from-transparent via-blue-400 to-transparent"
+                    : "bg-gradient-to-r from-transparent via-blue-500 to-transparent"
+                } opacity-50 animate-shimmer`}
+                style={{ width: "50%" }}
               ></div>
             </div>
+
+            {/* Center Dot with Animation */}
             <div
-              className={`flex-1 h-px ${
+              className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                isDarkMode ? "bg-purple-400/40" : "bg-purple-500/50"
+              } ${isTestimonialVisible ? "scale-100" : "scale-0"}`}
+              style={{
+                animation: isTestimonialVisible
+                  ? "bounce-gentle 2s ease-in-out infinite"
+                  : "none",
+              }}
+            ></div>
+
+            {/* Right Line */}
+            <div
+              className={`flex-1 h-px relative overflow-hidden ${
                 isDarkMode
                   ? "bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
                   : "bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"
               }`}
-            ></div>
+            >
+              {/* Animated Shimmer Effect */}
+              <div
+                className={`absolute inset-0 ${
+                  isDarkMode
+                    ? "bg-gradient-to-r from-transparent via-blue-400 to-transparent"
+                    : "bg-gradient-to-r from-transparent via-blue-500 to-transparent"
+                } opacity-50 animate-shimmer`}
+                style={{ width: "50%", animationDelay: "1s" }}
+              ></div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Add these CSS animations to your global styles or in a <style> tag */}
+      <style>{`
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 0.2;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+  
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }
+  
+  @keyframes bounce-gentle {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 8s linear infinite;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+`}</style>
       {/* Campus Glimpse Video Section */}
       <section className="container mx-auto px-10 lg:px-16 py-12">
         <div className="text-center mb-8">

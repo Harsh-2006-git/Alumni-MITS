@@ -21,6 +21,7 @@ import AdminLoginPage from "./pages/AdminLogin";
 import CampaignPage from "./pages/campaignPage";
 import OpenSourcePage from "./pages/OpenSource";
 import MyActivityPage from "./pages/ActivityPage";
+import MentorPage from "./pages/Mentor";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -172,15 +173,9 @@ export default function App() {
                   }
 
                   return userType === "alumni" ? (
-                    <ProfileAlumni
-                      isDarkMode={isDarkMode}
-                      toggleTheme={toggleTheme}
-                    />
+                    <ProfileAlumni />
                   ) : (
-                    <ProfilePage
-                      isDarkMode={isDarkMode}
-                      toggleTheme={toggleTheme}
-                    />
+                    <ProfilePage />
                   );
                 })()
               ) : (
@@ -203,6 +198,12 @@ export default function App() {
             path="/about"
             element={
               <AboutPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            }
+          />
+          <Route
+            path="/mentor"
+            element={
+              <MentorPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
             }
           />
           <Route
