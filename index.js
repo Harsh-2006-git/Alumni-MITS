@@ -11,6 +11,7 @@ import campaignRoutes from "./routes/campaignRoutes.js";
 import ProjectRoute from "./routes/projectRoutes.js";
 import JobScheduler from "./services/jobScheduler.js";
 import autoJobRoutes from "./routes/autoJobRoutes.js";
+import MentorRoutes from "./routes/mentorRoutes.js";
 
 import helmet from "helmet";
 import cors from "cors";
@@ -63,6 +64,7 @@ app.use("/job", JobRoute);
 app.use("/event", eventRoutes);
 app.use("/campaign", campaignRoutes);
 app.use("/project", ProjectRoute);
+app.use("/mentor", MentorRoutes);
 // Start the automated scheduler
 JobScheduler.start();
 
