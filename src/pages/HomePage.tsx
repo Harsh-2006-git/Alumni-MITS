@@ -34,6 +34,7 @@ import {
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { ScrollingAlumni } from "./DistinguishAlumni";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -103,6 +104,90 @@ export default function AlumniHomePage({
     // Example: redirect to login page
     window.location.href = "/login";
   };
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  const features = [
+    {
+      icon: "https://almashines.s3-ap-southeast-1.amazonaws.com/appdata/images/buildings.svg",
+      title: "10+ Countries",
+      description:
+        "Complete your alumni profile to stay connected with opportunities that match your interests.",
+    },
+    {
+      icon: "https://almashines.s3-ap-southeast-1.amazonaws.com/appdata/images/graduated.svg",
+      title: "25+ Interest Groups",
+      description:
+        "Connect with alumni in your interest groups to grow your professional and social network.",
+    },
+    {
+      icon: "https://almashines.s3-ap-southeast-1.amazonaws.com/appdata/images/Alumni-directory.svg",
+      title: "5000+ Members",
+      description:
+        "Explore complete alumni directory & connect with alumni with your interests & domain.",
+    },
+    {
+      icon: "https://almashines.s3-ap-southeast-1.amazonaws.com/appdata/images/portraits.svg",
+      title: "Your Alumni Profile",
+      description:
+        "Stay connected. Update your alumni profile to get matched with relevant opportunities.",
+    },
+  ];
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer || window.innerWidth >= 768) return;
+
+    let animationId: number;
+    const scrollSpeed = 2.5; // Slower for smoother motion
+
+    const autoScroll = () => {
+      if (!scrollContainer) return;
+
+      const maxScroll = scrollContainer.scrollWidth / 2;
+
+      // Smooth continuous scroll
+      scrollContainer.scrollLeft += scrollSpeed;
+
+      // Reset seamlessly when reaching halfway point
+      if (scrollContainer.scrollLeft >= maxScroll) {
+        scrollContainer.scrollLeft = 0;
+      }
+
+      animationId = requestAnimationFrame(autoScroll);
+    };
+
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      setIsScrolling(true);
+      animationId = requestAnimationFrame(autoScroll);
+    }, 100);
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, []);
+
+  // Close dropdown if click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Close dropdown if click outside
   useEffect(() => {
@@ -620,258 +705,125 @@ export default function AlumniHomePage({
     }
   `}</style>
       </section>
-
-      <section
-        ref={testimonialRef}
-        className={`w-full px-4 sm:px-6 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 relative overflow-hidden ${
-          isDarkMode
-            ? "bg-gradient-to-r from-slate-900/50 to-blue-900/50"
-            : "bg-white"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-[300px_1fr] md:grid-cols-[250px_1fr] gap-6 md:gap-8 items-center">
-            {/* Left - Image with Animation */}
-            <div
-              className={`flex justify-center lg:justify-start transition-all duration-1000 ${
-                isTestimonialVisible
-                  ? "translate-x-0 opacity-100"
-                  : "-translate-x-20 opacity-0"
+      {/* Features Section - Same as Video Section */}
+      {/* Features Section - Same as Video Section */}
+      <section className="w-full px-4 sm:px-6 md:px-12 lg:px-16 py-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8">
+            <h2
+              className={`text-2xl md:text-3xl font-bold mb-3 ${
+                isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              <div className="relative group">
-                {/* Animated Glow Ring */}
-                <div
-                  className={`absolute inset-0 rounded-2xl blur-xl transition-all duration-500 group-hover:blur-2xl ${
-                    isDarkMode ? "bg-blue-500/20" : "bg-blue-400/30"
-                  } ${isTestimonialVisible ? "animate-pulse-slow" : ""}`}
-                ></div>
+              Our Global Network
+            </h2>
+            <p
+              className={`text-base ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Connect with alumni worldwide and explore endless opportunities
+            </p>
+          </div>
 
-                {/* Rotating Border Effect */}
-                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 opacity-0 group-hover:opacity-50 blur transition-opacity duration-500 animate-spin-slow"></div>
+          {/* Desktop Grid - BIG - Full Width */}
+          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
+                  isDarkMode
+                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
+                    : "bg-white border-blue-200 shadow-lg"
+                }`}
+              >
+                <div className="p-8">
+                  <div className="flex justify-center mb-6">
+                    <div className="w-32 h-32 flex items-center justify-center rounded-full p-6">
+                      <img
+                        src={feature.icon}
+                        alt={feature.title}
+                        className={`w-20 h-20 object-contain ${
+                          isDarkMode ? "filter invert brightness-0" : ""
+                        }`}
+                      />
+                    </div>
+                  </div>
 
-                {/* Image */}
-                <img
-                  src="/assets/images/rk.jpg"
-                  alt="Dr. R.K. Pandit"
-                  className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 rounded-2xl object-cover border-4 border-blue-500/30 shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:border-blue-500/50"
-                />
+                  <h3
+                    className={`text-xl font-bold text-center mb-4 leading-tight ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {feature.title}
+                  </h3>
 
-                {/* Corner Accent */}
-                <div
-                  className={`absolute -top-2 -right-2 w-8 h-8 rounded-lg ${
-                    isDarkMode ? "bg-blue-500" : "bg-blue-600"
-                  } opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center`}
-                >
-                  <span className="text-white text-xs">✦</span>
+                  <p
+                    className={`text-sm text-center leading-relaxed ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  >
+                    {feature.description}
+                  </p>
                 </div>
               </div>
-            </div>
+            ))}
+          </div>
 
-            {/* Right - Quote with Animation */}
-            <div
-              className={`space-y-3 text-center lg:text-left transition-all duration-1000 delay-300 ${
-                isTestimonialVisible
-                  ? "translate-x-0 opacity-100"
-                  : "translate-x-20 opacity-0"
-              }`}
-            >
-              {/* Opening Quote Mark */}
+          {/* Mobile Horizontal Auto-scroll - SMALL */}
+          <div
+            ref={scrollContainerRef}
+            className="md:hidden flex overflow-x-hidden space-x-4 pb-4"
+            style={{
+              scrollBehavior: "auto",
+              WebkitOverflowScrolling: "touch",
+            }}
+          >
+            {/* Triple the content for truly seamless loop */}
+            {[...features, ...features, ...features].map((feature, index) => (
               <div
-                className={`text-4xl md:text-5xl lg:text-6xl transition-all duration-700 ${
-                  isDarkMode ? "text-purple-400/40" : "text-purple-300/60"
-                } ${
-                  isTestimonialVisible
-                    ? "scale-100 rotate-0"
-                    : "scale-0 -rotate-12"
+                key={index}
+                className={`flex-shrink-0 w-64 rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
+                  isDarkMode
+                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
+                    : "bg-white border-blue-200 shadow-lg"
                 }`}
-                style={{ transitionDelay: "500ms" }}
               >
-                ❝
+                <div className="p-4">
+                  <div className="flex justify-center mb-3">
+                    <div className="w-16 h-16 flex items-center justify-center rounded-full p-2">
+                      <img
+                        src={feature.icon}
+                        alt={feature.title}
+                        className={`w-10 h-10 object-contain ${
+                          isDarkMode ? "filter invert brightness-0" : ""
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  <h3
+                    className={`text-sm font-bold text-center mb-2 leading-tight ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    {feature.title}
+                  </h3>
+
+                  <p
+                    className={`text-xs text-center leading-relaxed ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  >
+                    {feature.description}
+                  </p>
+                </div>
               </div>
-
-              {/* Quote Text */}
-              <blockquote
-                className={`text-base sm:text-lg md:text-xl lg:text-2xl font-serif italic leading-relaxed relative ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
-              >
-                {/* Animated Highlight Bar */}
-                <div
-                  className={`absolute left-0 top-0 w-1 h-0 ${
-                    isDarkMode ? "bg-blue-500" : "bg-blue-600"
-                  } transition-all duration-1000 ${
-                    isTestimonialVisible ? "h-full" : "h-0"
-                  }`}
-                  style={{ transitionDelay: "700ms" }}
-                ></div>
-
-                <span className="pl-4 block">
-                  The alumni spread all over the world have been our ambassadors
-                  of goodwill, successfully carrying out a radiant image of
-                  institute.
-                </span>
-              </blockquote>
-
-              {/* Author Info */}
-              <div
-                className={`pt-3 transition-all duration-700 ${
-                  isTestimonialVisible
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-4 opacity-0"
-                }`}
-                style={{ transitionDelay: "900ms" }}
-              >
-                {/* Decorative Line */}
-                <div
-                  className={`w-16 h-0.5 mb-3 mx-auto lg:mx-0 ${
-                    isDarkMode
-                      ? "bg-gradient-to-r from-blue-500 to-purple-500"
-                      : "bg-gradient-to-r from-blue-600 to-purple-600"
-                  }`}
-                ></div>
-
-                <h3
-                  className={`text-lg sm:text-xl md:text-2xl font-bold transition-colors duration-500 ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
-                >
-                  Dr. R.K. Pandit
-                </h3>
-                <p
-                  className={`text-sm md:text-base transition-colors duration-500 ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
-                  Vice Chancellor MITS-DU Gwalior
-                </p>
-              </div>
-
-              {/* Closing Quote Mark */}
-              <div
-                className={`text-4xl md:text-5xl lg:text-6xl text-right transition-all duration-700 ${
-                  isDarkMode ? "text-purple-400/40" : "text-purple-300/60"
-                } ${
-                  isTestimonialVisible
-                    ? "scale-100 rotate-0"
-                    : "scale-0 rotate-12"
-                }`}
-                style={{ transitionDelay: "1100ms" }}
-              >
-                ❞
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
-
-      {/* Decorative Divider with Animation */}
-      <div className="w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
-            {/* Left Line */}
-            <div
-              className={`flex-1 h-px relative overflow-hidden ${
-                isDarkMode
-                  ? "bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
-                  : "bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"
-              }`}
-            >
-              {/* Animated Shimmer Effect */}
-              <div
-                className={`absolute inset-0 ${
-                  isDarkMode
-                    ? "bg-gradient-to-r from-transparent via-blue-400 to-transparent"
-                    : "bg-gradient-to-r from-transparent via-blue-500 to-transparent"
-                } opacity-50 animate-shimmer`}
-                style={{ width: "50%" }}
-              ></div>
-            </div>
-
-            {/* Center Dot with Animation */}
-            <div
-              className={`w-2 h-2 rounded-full transition-all duration-500 ${
-                isDarkMode ? "bg-purple-400/40" : "bg-purple-500/50"
-              } ${isTestimonialVisible ? "scale-100" : "scale-0"}`}
-              style={{
-                animation: isTestimonialVisible
-                  ? "bounce-gentle 2s ease-in-out infinite"
-                  : "none",
-              }}
-            ></div>
-
-            {/* Right Line */}
-            <div
-              className={`flex-1 h-px relative overflow-hidden ${
-                isDarkMode
-                  ? "bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"
-                  : "bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"
-              }`}
-            >
-              {/* Animated Shimmer Effect */}
-              <div
-                className={`absolute inset-0 ${
-                  isDarkMode
-                    ? "bg-gradient-to-r from-transparent via-blue-400 to-transparent"
-                    : "bg-gradient-to-r from-transparent via-blue-500 to-transparent"
-                } opacity-50 animate-shimmer`}
-                style={{ width: "50%", animationDelay: "1s" }}
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Add these CSS animations to your global styles or in a <style> tag */}
-      <style>{`
-  @keyframes pulse-slow {
-    0%, 100% {
-      opacity: 0.2;
-    }
-    50% {
-      opacity: 0.3;
-    }
-  }
-  
-  @keyframes spin-slow {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(200%);
-    }
-  }
-  
-  @keyframes bounce-gentle {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-4px);
-    }
-  }
-  
-  .animate-pulse-slow {
-    animation: pulse-slow 4s ease-in-out infinite;
-  }
-  
-  .animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
-  }
-  
-  .animate-shimmer {
-    animation: shimmer 3s ease-in-out infinite;
-  }
-`}</style>
+      <ScrollingAlumni isDarkMode={isDarkMode} />
       {/* Campus Glimpse Video Section */}
       <section className="container mx-auto px-10 lg:px-16 py-12">
         <div className="text-center mb-8">

@@ -119,7 +119,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     mentor_notes: "",
   });
 
-  const API_BASE = "https://alumni-mits-l45r.onrender.com/mentor";
+  const API_BASE = "http://localhost:3001/mentor";
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");
@@ -145,7 +145,19 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE}/all`);
-      setMentors(response.data.data);
+
+      // Transform data to convert Decimal objects
+      const transformedMentors = response.data.data.map((mentor) => ({
+        ...mentor,
+        fees:
+          mentor.fees &&
+          typeof mentor.fees === "object" &&
+          mentor.fees.$numberDecimal
+            ? parseFloat(mentor.fees.$numberDecimal)
+            : mentor.fees,
+      }));
+
+      setMentors(transformedMentors);
     } catch (error) {
       console.error("Error loading mentors:", error);
       showNotification("Failed to load mentors. Please try again.", "error");

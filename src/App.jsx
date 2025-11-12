@@ -22,6 +22,9 @@ import CampaignPage from "./pages/campaignPage";
 import OpenSourcePage from "./pages/OpenSource";
 import MyActivityPage from "./pages/ActivityPage";
 import MentorPage from "./pages/Mentor";
+import DistinguishedPage from "./pages/DistinguishAlumni";
+import ALumniMapPage from "./pages/AlumniMap";
+import BatchmatesPage from "./pages/Alumni-Batchmates";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -32,34 +35,43 @@ export default function App() {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Check auth on app load
+  // Check auth on app load and listen for storage changes
   useEffect(() => {
-    const authData = localStorage.getItem("auth");
+    const checkAuth = () => {
+      const authData = localStorage.getItem("auth");
 
-    if (authData) {
-      try {
-        const parsedAuth = JSON.parse(authData);
+      if (authData) {
+        try {
+          const parsedAuth = JSON.parse(authData);
 
-        if (
-          parsedAuth.accessToken &&
-          parsedAuth.expiry &&
-          Date.now() < parsedAuth.expiry
-        ) {
-          setIsAuthenticated(true);
-        } else {
+          if (
+            parsedAuth.accessToken &&
+            parsedAuth.expiry &&
+            Date.now() < parsedAuth.expiry
+          ) {
+            setIsAuthenticated(true);
+          } else {
+            localStorage.removeItem("auth");
+            setIsAuthenticated(false);
+          }
+        } catch (error) {
+          console.error("Error parsing auth data:", error);
           localStorage.removeItem("auth");
           setIsAuthenticated(false);
         }
-      } catch (error) {
-        console.error("Error parsing auth data:", error);
-        localStorage.removeItem("auth");
+      } else {
         setIsAuthenticated(false);
       }
-    } else {
-      setIsAuthenticated(false);
-    }
+    };
 
+    checkAuth();
     setIsLoading(false);
+
+    // Listen for storage changes (login/logout from other tabs/pages)
+    const handleStorageChange = () => checkAuth();
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   if (isLoading) {
@@ -76,13 +88,16 @@ export default function App() {
   return (
     <div className={isDarkMode ? "dark" : "light"}>
       <Router>
-        {/* REMOVED Header from here since it's in individual pages */}
-
         <Routes>
           <Route
             path="/"
             element={
-              <HomePage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              <HomePage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
             }
           />
 
@@ -184,50 +199,116 @@ export default function App() {
             }
           />
 
-          {/* Other pages */}
+          {/* Other pages - Pass authentication props */}
           <Route
             path="/developer"
             element={
               <DeveloperPage
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
               />
             }
           />
           <Route
             path="/about"
             element={
-              <AboutPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              <AboutPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/distinguished-alumni"
+            element={
+              <DistinguishedPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/alumni-map"
+            element={
+              <ALumniMapPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+
+          <Route
+            path="/batchmates"
+            element={
+              <BatchmatesPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
             }
           />
           <Route
             path="/mentor"
             element={
-              <MentorPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              <MentorPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
             }
           />
           <Route
             path="/job"
             element={
-              <JobPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              <JobPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
             }
           />
           <Route
             path="/alumni"
             element={
-              <AlumniPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              <AlumniPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
             }
           />
           <Route
             path="/event"
             element={
-              <EventPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              <EventPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
             }
           />
           <Route
             path="/campaign"
             element={
-              <CampaignPage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+              <CampaignPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
             }
           />
           <Route
@@ -236,6 +317,8 @@ export default function App() {
               <OpenSourcePage
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
               />
             }
           />
@@ -245,7 +328,12 @@ export default function App() {
             path="/chat"
             element={
               isAuthenticated ? (
-                <Chatpage isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+                <Chatpage
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
+                  isAuthenticated={isAuthenticated}
+                  setIsAuthenticated={setIsAuthenticated}
+                />
               ) : (
                 <Navigate to="/login" replace />
               )
@@ -259,6 +347,8 @@ export default function App() {
                 <MyActivityPage
                   isDarkMode={isDarkMode}
                   toggleTheme={toggleTheme}
+                  isAuthenticated={isAuthenticated}
+                  setIsAuthenticated={setIsAuthenticated}
                 />
               ) : (
                 <Navigate to="/login" replace />

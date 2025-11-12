@@ -8,6 +8,7 @@ import {
   X,
   Activity,
   MessageCircle,
+  ChevronDown,
 } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -17,24 +18,26 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showAlumniDropdown, setShowAlumniDropdown] = useState(false);
   const [auth, setAuth] = useState(null);
   const dropdownRef = useRef(null);
+  const alumniDropdownRef = useRef(null);
   const refreshIntervalRef = useRef(null);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
+  const toggleAlumniDropdown = () => {
+    setShowAlumniDropdown(!showAlumniDropdown);
+  };
 
   const refreshAccessToken = async (refreshToken) => {
     console.log("Refreshing token:", refreshToken);
     try {
-      const res = await fetch(
-        "https://alumni-mits-l45r.onrender.com/auth/refresh",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-        }
-      );
+      const res = await fetch("http://localhost:3001/auth/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refreshToken }),
+      });
 
       if (!res.ok) throw new Error("Failed to refresh token");
 
@@ -158,10 +161,19 @@ export default function Header({ isDarkMode, toggleTheme }) {
     navigate("/chat");
   };
 
+  // Handle click outside for both dropdowns
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowProfileMenu(false);
+      }
+      // Only close alumni dropdown on desktop, not mobile
+      if (
+        alumniDropdownRef.current &&
+        !alumniDropdownRef.current.contains(event.target) &&
+        window.innerWidth >= 768
+      ) {
+        setShowAlumniDropdown(false);
       }
     };
 
@@ -170,6 +182,38 @@ export default function Header({ isDarkMode, toggleTheme }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Alumni dropdown options with their navigation handlers
+  const alumniOptions = [
+    {
+      label: "Distinguished Alumni",
+      path: "/distinguished-alumni",
+    },
+    {
+      label: "Alumni Directory",
+      path: "/alumni",
+    },
+    {
+      label: "Alumni Map",
+      path: "/alumni-map",
+    },
+    {
+      label: "Your BatchMates",
+      path: "/batchmates",
+    },
+  ];
+
+  const handleAlumniOptionClick = (path) => {
+    navigate(path);
+    setShowAlumniDropdown(false);
+    setIsMenuOpen(false);
+  };
+
+  // Navigation handlers for main nav items
+  const handleNavClick = (path) => {
+    navigate(path);
+    setIsMenuOpen(false);
+  };
 
   return (
     <header
@@ -182,7 +226,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
       <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
         <div className="flex items-center justify-between h-16">
           <div
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-3 cursor-pointer flex-shrink-0"
             onClick={() => navigate("/")}
           >
             <img
@@ -210,83 +254,132 @@ export default function Header({ isDarkMode, toggleTheme }) {
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-6">
-            <a
-              onClick={() => navigate("/")}
-              className={`text-sm font-medium transition-colors cursor-pointer ${
+          <nav className="hidden md:flex items-center justify-center flex-1 mx-4 gap-1 lg:gap-2 xl:gap-3">
+            <button
+              onClick={() => handleNavClick("/")}
+              className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
                 isDarkMode
-                  ? "text-white hover:text-indigo-400"
-                  : "text-gray-700 hover:text-blue-600"
+                  ? "text-white hover:text-indigo-400 hover:bg-gray-800"
+                  : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               Home
-            </a>
-            <a
-              onClick={() => navigate("/alumni")}
-              className={`text-sm font-medium transition-colors cursor-pointer ${
-                isDarkMode
-                  ? "text-gray-300 hover:text-indigo-400"
-                  : "text-gray-600 hover:text-blue-600"
-              }`}
+            </button>
+
+            {/* Alumni Dropdown for Desktop */}
+            <div
+              className="relative"
+              ref={alumniDropdownRef}
+              onMouseEnter={() => setShowAlumniDropdown(true)}
+              onMouseLeave={() => setShowAlumniDropdown(false)}
             >
-              Alumni
-            </a>
-            <a
-              onClick={() => navigate("/event")}
-              className={`text-sm font-medium transition-colors cursor-pointer ${
+              {/* Invisible click box for better hover area */}
+              <div className="absolute -inset-2 z-10 cursor-pointer" />
+
+              <button
+                className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
+                  isDarkMode
+                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                } ${
+                  showAlumniDropdown
+                    ? isDarkMode
+                      ? "text-indigo-400 bg-gray-800"
+                      : "text-blue-600 bg-blue-50"
+                    : ""
+                }`}
+              >
+                Alumni
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    showAlumniDropdown ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {showAlumniDropdown && (
+                <div
+                  className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-blue-200"
+                  }`}
+                >
+                  <div className="py-1">
+                    {alumniOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAlumniOptionClick(option.path)}
+                        className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => handleNavClick("/event")}
+              className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
                 isDarkMode
-                  ? "text-gray-300 hover:text-indigo-400"
-                  : "text-gray-600 hover:text-blue-600"
+                  ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                  : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               Events
-            </a>
-            <a
-              onClick={() => navigate("/job")}
-              className={`text-sm font-medium transition-colors cursor-pointer ${
+            </button>
+            <button
+              onClick={() => handleNavClick("/job")}
+              className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
                 isDarkMode
-                  ? "text-gray-300 hover:text-indigo-400"
-                  : "text-gray-600 hover:text-blue-600"
+                  ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                  : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               Jobs
-            </a>
-            <a
-              onClick={() => navigate("/campaign")}
-              className={`text-sm font-medium transition-colors cursor-pointer ${
+            </button>
+            <button
+              onClick={() => handleNavClick("/campaign")}
+              className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
                 isDarkMode
-                  ? "text-gray-300 hover:bg-gray-800"
-                  : "text-gray-700 hover:bg-blue-50"
+                  ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                  : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               Campaign
-            </a>
-            <a
-              onClick={() => navigate("/mentor")}
-              className={`text-sm font-medium transition-colors cursor-pointer ${
+            </button>
+            <button
+              onClick={() => handleNavClick("/mentor")}
+              className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
                 isDarkMode
-                  ? "text-gray-300 hover:bg-gray-800"
-                  : "text-gray-700 hover:bg-blue-50"
+                  ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                  : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               Mentorship
-            </a>
-            <a
-              onClick={() => navigate("/about")}
-              className={`text-sm font-medium transition-colors cursor-pointer ${
+            </button>
+            <button
+              onClick={() => handleNavClick("/about")}
+              className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
                 isDarkMode
-                  ? "text-gray-300 hover:text-indigo-400"
-                  : "text-gray-600 hover:text-blue-600"
+                  ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                  : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
               }`}
             >
               About
-            </a>
-            <a
-              onClick={() => navigate("/developer")}
-              className={`relative inline-block text-sm font-semibold tracking-wide transition-all duration-300 cursor-pointer ${
+            </button>
+            <button
+              onClick={() => handleNavClick("/developer")}
+              className={`relative inline-block text-sm font-semibold tracking-wide transition-all duration-300 cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
                 isDarkMode
-                  ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 hover:from-indigo-400 hover:via-pink-400 hover:to-orange-400"
-                  : "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-500"
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 hover:from-indigo-400 hover:via-pink-400 hover:to-orange-400 hover:bg-gray-800"
+                  : "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-500 hover:bg-blue-50"
               }`}
             >
               Developer
@@ -297,10 +390,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                     : "bg-gradient-to-r from-purple-600 to-orange-500"
                 } group-hover:w-full`}
               ></span>
-            </a>
+            </button>
           </nav>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-lg transition-all duration-300 ${
@@ -421,8 +514,8 @@ export default function Header({ isDarkMode, toggleTheme }) {
                     </div>
 
                     <div className="flex flex-col py-2">
-                      <a
-                        onClick={() => navigate("/profile")}
+                      <button
+                        onClick={() => handleNavClick("/profile")}
                         className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer ${
                           isDarkMode
                             ? "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -431,9 +524,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       >
                         <User className="w-4 h-4" />
                         My Profile
-                      </a>
-                      <a
-                        onClick={() => navigate("/activity")}
+                      </button>
+                      <button
+                        onClick={() => handleNavClick("/activity")}
                         className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer ${
                           isDarkMode
                             ? "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -442,8 +535,8 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       >
                         <Activity className="w-4 h-4" />
                         My Activity
-                      </a>
-                      <a
+                      </button>
+                      <button
                         onClick={handleMessages}
                         className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer md:hidden ${
                           isDarkMode
@@ -453,7 +546,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       >
                         <MessageCircle className="w-4 h-4" />
                         Messages
-                      </a>
+                      </button>
 
                       <button
                         onClick={handleLogout}
@@ -529,79 +622,114 @@ export default function Header({ isDarkMode, toggleTheme }) {
             }`}
           >
             <nav className="flex flex-col gap-2">
-              <a
-                onClick={() => navigate("/")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer ${
+              <button
+                onClick={() => handleNavClick("/")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium cursor-pointer text-left ${
                   isDarkMode
                     ? "text-white bg-gray-800"
                     : "text-blue-600 bg-blue-50"
                 }`}
               >
                 Home
-              </a>
-              <a
-                onClick={() => navigate("/alumni")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  isDarkMode
-                    ? "text-gray-300 hover:bg-gray-800"
-                    : "text-gray-700 hover:bg-blue-50"
-                }`}
-              >
-                Alumni
-              </a>
-              <a
-                onClick={() => navigate("/event")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              </button>
+
+              {/* Alumni Dropdown for Mobile */}
+              <div className="flex flex-col" ref={alumniDropdownRef}>
+                <button
+                  onClick={() => {
+                    setShowAlumniDropdown((prev) => !prev);
+                  }}
+                  className={`flex items-center justify-between px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left ${
+                    isDarkMode
+                      ? "text-gray-300 hover:bg-gray-800"
+                      : "text-gray-700 hover:bg-blue-50"
+                  } ${
+                    showAlumniDropdown
+                      ? isDarkMode
+                        ? "bg-gray-800"
+                        : "bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  <span>Alumni</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showAlumniDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showAlumniDropdown && (
+                  <div className="ml-4 mt-1 flex flex-col gap-1">
+                    {alumniOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAlumniOptionClick(option.path)}
+                        className={`px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer text-left ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-800"
+                            : "text-gray-600 hover:bg-blue-50"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => handleNavClick("/event")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left ${
                   isDarkMode
                     ? "text-gray-300 hover:bg-gray-800"
                     : "text-gray-700 hover:bg-blue-50"
                 }`}
               >
                 Events
-              </a>
-              <a
-                onClick={() => navigate("/job")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              </button>
+              <button
+                onClick={() => handleNavClick("/job")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left ${
                   isDarkMode
                     ? "text-gray-300 hover:bg-gray-800"
                     : "text-gray-700 hover:bg-blue-50"
                 }`}
               >
                 Jobs
-              </a>
-              <a
-                onClick={() => navigate("/campaign")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              </button>
+              <button
+                onClick={() => handleNavClick("/campaign")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left ${
                   isDarkMode
                     ? "text-gray-300 hover:bg-gray-800"
                     : "text-gray-700 hover:bg-blue-50"
                 }`}
               >
                 Campaign
-              </a>
-              <a
-                onClick={() => navigate("/mentor")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              </button>
+              <button
+                onClick={() => handleNavClick("/mentor")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left ${
                   isDarkMode
                     ? "text-gray-300 hover:bg-gray-800"
                     : "text-gray-700 hover:bg-blue-50"
                 }`}
               >
                 Mentorship
-              </a>
-
-              <a
-                onClick={() => navigate("/about")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+              </button>
+              <button
+                onClick={() => handleNavClick("/about")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left ${
                   isDarkMode
                     ? "text-gray-300 hover:bg-gray-800"
                     : "text-gray-700 hover:bg-blue-50"
                 }`}
               >
                 About
-              </a>
-              <a
-                onClick={() => navigate("/developer")}
+              </button>
+              <button
+                onClick={() => handleNavClick("/developer")}
                 className={`relative w-full text-left px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 overflow-hidden group cursor-pointer ${
                   isDarkMode
                     ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 hover:from-pink-500/20 hover:via-purple-500/20 hover:to-indigo-500/20"
@@ -624,7 +752,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       : "bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500"
                   }`}
                 ></span>
-              </a>
+              </button>
             </nav>
           </div>
         )}
