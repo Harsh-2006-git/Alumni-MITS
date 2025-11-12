@@ -707,18 +707,18 @@ export default function AlumniHomePage({
       </section>
       {/* Features Section - Same as Video Section */}
       {/* Features Section - Same as Video Section */}
-      <section className="w-full px-4 sm:px-6 md:px-12 lg:px-16 py-12">
+      <section className="hidden md:block w-full px-6 md:px-10 lg:px-14 py-10">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h2
-              className={`text-2xl md:text-3xl font-bold mb-3 ${
+              className={`text-xl md:text-2xl font-bold mb-2 ${
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
               Our Global Network
             </h2>
             <p
-              className={`text-base ${
+              className={`text-sm ${
                 isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
             >
@@ -726,24 +726,24 @@ export default function AlumniHomePage({
             </p>
           </div>
 
-          {/* Desktop Grid - BIG - Full Width */}
-          <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
+          {/* Desktop Grid Only */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
+                className={`rounded-xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
                   isDarkMode
                     ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
                     : "bg-white border-blue-200 shadow-lg"
                 }`}
               >
-                <div className="p-8">
-                  <div className="flex justify-center mb-6">
-                    <div className="w-32 h-32 flex items-center justify-center rounded-full p-6">
+                <div className="p-6">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-24 h-24 flex items-center justify-center rounded-full p-4">
                       <img
                         src={feature.icon}
                         alt={feature.title}
-                        className={`w-20 h-20 object-contain ${
+                        className={`w-14 h-14 object-contain ${
                           isDarkMode ? "filter invert brightness-0" : ""
                         }`}
                       />
@@ -751,7 +751,7 @@ export default function AlumniHomePage({
                   </div>
 
                   <h3
-                    className={`text-xl font-bold text-center mb-4 leading-tight ${
+                    className={`text-lg font-semibold text-center mb-3 leading-snug ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
@@ -769,60 +769,9 @@ export default function AlumniHomePage({
               </div>
             ))}
           </div>
-
-          {/* Mobile Horizontal Auto-scroll - SMALL */}
-          <div
-            ref={scrollContainerRef}
-            className="md:hidden flex overflow-x-hidden space-x-4 pb-4"
-            style={{
-              scrollBehavior: "auto",
-              WebkitOverflowScrolling: "touch",
-            }}
-          >
-            {/* Triple the content for truly seamless loop */}
-            {[...features, ...features, ...features].map((feature, index) => (
-              <div
-                key={index}
-                className={`flex-shrink-0 w-64 rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
-                    : "bg-white border-blue-200 shadow-lg"
-                }`}
-              >
-                <div className="p-4">
-                  <div className="flex justify-center mb-3">
-                    <div className="w-16 h-16 flex items-center justify-center rounded-full p-2">
-                      <img
-                        src={feature.icon}
-                        alt={feature.title}
-                        className={`w-10 h-10 object-contain ${
-                          isDarkMode ? "filter invert brightness-0" : ""
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  <h3
-                    className={`text-sm font-bold text-center mb-2 leading-tight ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    {feature.title}
-                  </h3>
-
-                  <p
-                    className={`text-xs text-center leading-relaxed ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
-                    }`}
-                  >
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
+
       <ScrollingAlumni isDarkMode={isDarkMode} />
       {/* Campus Glimpse Video Section */}
       <section className="container mx-auto px-10 lg:px-16 py-12">
