@@ -139,7 +139,7 @@ export default function AlumniHomePage({
     if (!scrollContainer || window.innerWidth >= 768) return;
 
     let animationId: number;
-    const scrollSpeed = 2.5; // Slower for smoother motion
+    const scrollSpeed = 1; // Slower for smoother motion
 
     const autoScroll = () => {
       if (!scrollContainer) return;

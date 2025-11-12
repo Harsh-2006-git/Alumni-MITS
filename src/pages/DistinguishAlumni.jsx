@@ -371,7 +371,7 @@ export function ScrollingAlumni({ isDarkMode }) {
           }
         }
         .animate-scroll {
-          animation: scroll 60s linear infinite;
+          animation: scroll 120s linear infinite;
           display: flex;
           width: max-content;
         }
@@ -380,7 +380,7 @@ export function ScrollingAlumni({ isDarkMode }) {
         }
         @media (max-width: 768px) {
           .animate-scroll {
-            animation: scroll 40s linear infinite;
+            animation: scroll 90s linear infinite;
           }
         }
       `}</style>
