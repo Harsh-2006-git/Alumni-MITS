@@ -391,7 +391,7 @@ export default function AlumniMap({
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  Alumni Distribution Map
+                  Alumni Map
                 </h2>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">

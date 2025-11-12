@@ -485,7 +485,7 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
-            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-3xl sm:text-3xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight">
               Distinguished Alumni
             </h1>
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
