@@ -684,7 +684,9 @@ export default function JobListingPage({ isDarkMode, toggleTheme }) {
   const fetchJobs = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3001/job/all-jobs");
+      const response = await fetch(
+        "https://alumni-mits-l45r.onrender.com/job/all-jobs"
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -722,14 +724,17 @@ export default function JobListingPage({ isDarkMode, toggleTheme }) {
         return;
       }
 
-      const response = await fetch("http://localhost:3001/job/create-job", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(jobData),
-      });
+      const response = await fetch(
+        "https://alumni-mits-l45r.onrender.com/job/create-job",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(jobData),
+        }
+      );
 
       const data = await response.json();
 

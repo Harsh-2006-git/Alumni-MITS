@@ -331,12 +331,15 @@ const AlumniManagement = ({ onError, onSuccess }) => {
       if (!token) throw new Error("Authentication token not found");
 
       const [verifiedResponse, nonVerifiedResponse] = await Promise.all([
-        fetch("http://localhost:3001/alumni/all-alumni", {
+        fetch("https://alumni-mits-l45r.onrender.com/alumni/all-alumni", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:3001/alumni/all-nonvarified-alumni", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
+        fetch(
+          "https://alumni-mits-l45r.onrender.com/alumni/all-nonvarified-alumni",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        ),
       ]);
 
       if (!verifiedResponse.ok || !nonVerifiedResponse.ok) {
@@ -363,7 +366,7 @@ const AlumniManagement = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `http://localhost:3001/alumni/${alumniId}/verify`,
+        `https://alumni-mits-l45r.onrender.com/alumni/${alumniId}/verify`,
         {
           method: "PATCH",
           headers: {
@@ -388,7 +391,7 @@ const AlumniManagement = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `http://localhost:3001/alumni/delete/${alumniId}`,
+        `https://alumni-mits-l45r.onrender.com/alumni/delete/${alumniId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -683,7 +686,7 @@ const BulkRegister = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        "http://localhost:3001/auth/bulk-register-alumni",
+        "https://alumni-mits-l45r.onrender.com/auth/bulk-register-alumni",
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -885,9 +888,12 @@ const EventManagement = ({ onError, onSuccess }) => {
   const fetchEvents = async () => {
     try {
       const token = getAuthToken();
-      const response = await fetch("http://localhost:3001/event/all-event", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        "https://alumni-mits-l45r.onrender.com/event/all-event",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to fetch events");
 
@@ -910,7 +916,7 @@ const EventManagement = ({ onError, onSuccess }) => {
 
       if (action === "delete") {
         const response = await fetch(
-          `http://localhost:3001/event/delete/${eventId}`,
+          `https://alumni-mits-l45r.onrender.com/event/delete/${eventId}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
@@ -921,7 +927,7 @@ const EventManagement = ({ onError, onSuccess }) => {
         onSuccess("Event deleted successfully");
       } else {
         const response = await fetch(
-          `http://localhost:3001/event/review/${eventId}`,
+          `https://alumni-mits-l45r.onrender.com/event/review/${eventId}`,
           {
             method: "PUT",
             headers: {
@@ -1134,7 +1140,7 @@ const CampaignManagement = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        "http://localhost:3001/campaign/all-campaign",
+        "https://alumni-mits-l45r.onrender.com/campaign/all-campaign",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -1165,7 +1171,7 @@ const CampaignManagement = ({ onError, onSuccess }) => {
 
       if (action === "delete") {
         const response = await fetch(
-          `http://localhost:3001/campaign/delete/${campaignId}`,
+          `https://alumni-mits-l45r.onrender.com/campaign/delete/${campaignId}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
@@ -1176,7 +1182,7 @@ const CampaignManagement = ({ onError, onSuccess }) => {
         onSuccess("Campaign deleted successfully");
       } else if (action === "approve") {
         const response = await fetch(
-          `http://localhost:3001/campaign/${campaignId}/approval`,
+          `https://alumni-mits-l45r.onrender.com/campaign/${campaignId}/approval`,
           {
             method: "PATCH",
             headers: {
@@ -1411,16 +1417,19 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
         eventsResponse,
         campaignsResponse,
       ] = await Promise.all([
-        fetch("http://localhost:3001/alumni/all-alumni", {
+        fetch("https://alumni-mits-l45r.onrender.com/alumni/all-alumni", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:3001/alumni/all-nonvarified-alumni", {
+        fetch(
+          "https://alumni-mits-l45r.onrender.com/alumni/all-nonvarified-alumni",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        ),
+        fetch("https://alumni-mits-l45r.onrender.com/event/all-event", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch("http://localhost:3001/event/all-event", {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch("http://localhost:3001/campaign/all-campaign", {
+        fetch("https://alumni-mits-l45r.onrender.com/campaign/all-campaign", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);

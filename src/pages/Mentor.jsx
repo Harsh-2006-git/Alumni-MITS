@@ -119,7 +119,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     mentor_notes: "",
   });
 
-  const API_BASE = "http://localhost:3001/mentor";
+  const API_BASE = "https://alumni-mits-l45r.onrender.com/mentor";
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");

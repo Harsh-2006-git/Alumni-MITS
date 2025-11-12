@@ -45,7 +45,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
           try {
             const response = await fetch(
-              "http://localhost:3001/message/people",
+              "https://alumni-mits-l45r.onrender.com/message/people",
               {
                 headers: {
                   Authorization: `Bearer ${parsedAuth.accessToken}`,
@@ -150,12 +150,15 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
       console.log("Fetching people...");
 
-      const response = await fetch("http://localhost:3001/message/people", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://alumni-mits-l45r.onrender.com/message/people",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       console.log("People API response status:", response.status);
 
@@ -180,7 +183,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         setPeople(filteredPeople);
 
         const messagesResponse = await fetch(
-          "http://localhost:3001/message/my",
+          "https://alumni-mits-l45r.onrender.com/message/my",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -244,12 +247,15 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("Current user phone:", currentUser.phone);
       console.log("Selected user phone:", selectedUser.phone);
 
-      const response = await fetch("http://localhost:3001/message/my", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "https://alumni-mits-l45r.onrender.com/message/my",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.status === 401) {
         handleUnauthorized();
@@ -286,20 +292,23 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         return;
       }
 
-      const response = await fetch("http://localhost:3001/message/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          senderPhone: currentUser.phone,
-          senderType: currentUser.userType,
-          receiverPhone: selectedUser.phone,
-          receiverType: selectedUser.userType,
-          text: messageText,
-        }),
-      });
+      const response = await fetch(
+        "https://alumni-mits-l45r.onrender.com/message/send",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            senderPhone: currentUser.phone,
+            senderType: currentUser.userType,
+            receiverPhone: selectedUser.phone,
+            receiverType: selectedUser.userType,
+            text: messageText,
+          }),
+        }
+      );
 
       if (response.status === 401) {
         handleUnauthorized();

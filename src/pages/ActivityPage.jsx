@@ -686,24 +686,30 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       // Fetch events
-      const eventsPromise = fetch("http://localhost:3001/event/my-events", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }).then((res) => res.json());
+      const eventsPromise = fetch(
+        "https://alumni-mits-l45r.onrender.com/event/my-events",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res) => res.json());
 
       // Fetch jobs
-      const jobsPromise = fetch("http://localhost:3001/job/my-jobs", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }).then((res) => res.json());
+      const jobsPromise = fetch(
+        "https://alumni-mits-l45r.onrender.com/job/my-jobs",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((res) => res.json());
 
       // Fetch campaigns
       const campaignsPromise = fetch(
-        "http://localhost:3001/campaign/get-my-campaigns",
+        "https://alumni-mits-l45r.onrender.com/campaign/get-my-campaigns",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -749,15 +755,16 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
       let url, dataKey;
       switch (section) {
         case "events":
-          url = "http://localhost:3001/event/my-events";
+          url = "https://alumni-mits-l45r.onrender.com/event/my-events";
           dataKey = "events";
           break;
         case "jobs":
-          url = "http://localhost:3001/job/my-jobs";
+          url = "https://alumni-mits-l45r.onrender.com/job/my-jobs";
           dataKey = "data";
           break;
         case "campaigns":
-          url = "http://localhost:3001/campaign/get-my-campaigns";
+          url =
+            "https://alumni-mits-l45r.onrender.com/campaign/get-my-campaigns";
           dataKey = "campaigns";
           break;
         default:
@@ -804,9 +811,9 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     const token = getAuthToken();
     const endpoints = {
-      events: `http://localhost:3001/event/delete/${id}`,
-      jobs: `http://localhost:3001/job/delete/${id}`,
-      campaigns: `http://localhost:3001/campaign/delete/${id}`,
+      events: `https://alumni-mits-l45r.onrender.com/event/delete/${id}`,
+      jobs: `https://alumni-mits-l45r.onrender.com/job/delete/${id}`,
+      campaigns: `https://alumni-mits-l45r.onrender.com/campaign/delete/${id}`,
     };
 
     try {
@@ -846,7 +853,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/event/update/${formData.id}`,
+        `https://alumni-mits-l45r.onrender.com/event/update/${formData.id}`,
         {
           method: "PUT",
           headers: {
@@ -891,7 +898,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/job/update/${formData.id}`,
+        `https://alumni-mits-l45r.onrender.com/job/update/${formData.id}`,
         {
           method: "PUT",
           headers: {
@@ -920,7 +927,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/event/event-registrations/${eventId}`,
+        `https://alumni-mits-l45r.onrender.com/event/event-registrations/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -940,11 +947,14 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
   const downloadExcel = (eventId, eventTitle) => {
     const token = getAuthToken();
-    fetch(`http://localhost:3001/event/download-registrations/${eventId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch(
+      `https://alumni-mits-l45r.onrender.com/event/download-registrations/${eventId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((response) => response.blob())
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
