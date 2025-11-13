@@ -2082,19 +2082,6 @@ export default function AlumniHomePage({
 
       {/* Footer */}
       <Footer isDarkMode={isDarkMode} />
-
-      {/* Open Source Bookmark - Add to all pages */}
-      <div className="fixed left-0 bottom-8 z-50">
-        <a
-          href="/opensource"
-          className="flex items-center bg-red-500 text-white p-2 rounded-r-lg shadow-lg transition-all duration-300 group hover:p-3 hover:pr-5 hover:rounded-r-xl"
-        >
-          <Github className="w-5 h-5 group-hover:w-6 group-hover:h-6 transition-all duration-300" />
-          <span className="ml-0 opacity-0 w-0 group-hover:ml-2 group-hover:opacity-100 group-hover:w-auto text-xs font-semibold whitespace-nowrap transition-all duration-300 overflow-hidden">
-            Open Source
-          </span>
-        </a>
-      </div>
     </div>
   );
 }
