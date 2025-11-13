@@ -25,7 +25,8 @@ import MentorPage from "./pages/Mentor";
 import DistinguishedPage from "./pages/DistinguishAlumni";
 import ALumniMapPage from "./pages/AlumniMap";
 import BatchmatesPage from "./pages/Alumni-Batchmates";
-// import CreateEventPage from "./pages/CreateEventPage";
+import CreateEventPage from "./pages/CreateEventPage";
+import EventGalleryPage from "./pages/EventGallary";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -301,7 +302,7 @@ export default function App() {
               />
             }
           />
-          {/* <Route
+          <Route
             path="/event-register"
             element={
               <CreateEventPage
@@ -311,7 +312,18 @@ export default function App() {
                 setIsAuthenticated={setIsAuthenticated}
               />
             }
-          /> */}
+          />
+          <Route
+            path="/event-gallery"
+            element={
+              <EventGalleryPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
           <Route
             path="/campaign"
             element={

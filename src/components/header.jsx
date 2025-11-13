@@ -234,16 +234,16 @@ export default function Header({ isDarkMode, toggleTheme }) {
   // Events dropdown options with their navigation handlers
   const eventsOptions = [
     {
+      label: "All Events",
+      path: "/event",
+    },
+    {
       label: "Create Event",
-      path: "/create-event",
+      path: "/event-register",
     },
     {
       label: "Event Gallery",
       path: "/event-gallery",
-    },
-    {
-      label: "All Events",
-      path: "/event",
     },
   ];
 

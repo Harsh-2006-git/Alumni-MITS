@@ -554,14 +554,14 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
           <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
 
           {/* Action Button */}
-          <div className="flex justify-center">
+          {/* <div className="flex justify-center">
             <button
               onClick={() => setShowAddModal(true)}
               className="flex items-center justify-center gap-2 px-6 sm:px-8 lg:px-10 py-3 sm:py-3.5 lg:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95 text-sm lg:text-base"
             >
               <Plus className="w-4 h-4 lg:w-5 lg:h-5" /> Create New Event
             </button>
-          </div>
+          </div> */}
         </div>
       </section>
       <section className="w-full px-4 sm:px-6 lg:px-8 mx-auto max-w-7xl py-4">
