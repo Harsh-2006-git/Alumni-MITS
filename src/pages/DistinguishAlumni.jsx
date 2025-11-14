@@ -294,7 +294,7 @@ const alumni = [
 // Compact Scrolling Alumni Component
 export function ScrollingAlumni({ isDarkMode }) {
   return (
-    <section className="w-full py-8">
+    <section className="w-full py-8 mt-8">
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header - Compact */}
         <div className="text-center mb-8">

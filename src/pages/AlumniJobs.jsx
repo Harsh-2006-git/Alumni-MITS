@@ -692,11 +692,11 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
       if (data.success) {
         // Filter jobs where isAutoPosted is true
         const autoPostedJobs = (data.data || []).filter(
-          (job) => job.isAutoPosted === true
+          (job) => job.isAutoPosted === false
         );
         setJobs(autoPostedJobs);
         showToast(
-          `Loaded ${autoPostedJobs.length} auto-posted jobs successfully`,
+          `Loaded ${autoPostedJobs.length} alumni-posted jobs successfully`,
           "success"
         );
       } else {
@@ -812,9 +812,9 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
         onRefreshJobs={fetchJobs}
         loading={loading}
         jobCount={jobs.length}
-        title="Automated Jobs"
-        subtitle="Find Your Dream Job"
-        description="Discover automated job listings from top companies and take your career to the next level"
+        title="Alumni Jobs"
+        subtitle="Opportunities from MITS Alumni"
+        description="Discover exclusive job opportunities posted by our alumni network. Get referred and boost your career!"
       />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-6 sm:py-12">

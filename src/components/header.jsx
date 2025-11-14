@@ -20,10 +20,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showAlumniDropdown, setShowAlumniDropdown] = useState(false);
   const [showEventsDropdown, setShowEventsDropdown] = useState(false);
+  const [showJobsDropdown, setShowJobsDropdown] = useState(false);
   const [auth, setAuth] = useState(null);
   const dropdownRef = useRef(null);
   const alumniDropdownRef = useRef(null);
   const eventsDropdownRef = useRef(null);
+  const jobsDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const refreshIntervalRef = useRef(null);
 
@@ -34,6 +36,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
   };
   const toggleEventsDropdown = () => {
     setShowEventsDropdown(!showEventsDropdown);
+  };
+  const toggleJobsDropdown = () => {
+    setShowJobsDropdown(!showJobsDropdown);
   };
 
   const refreshAccessToken = async (refreshToken) => {
@@ -194,6 +199,14 @@ export default function Header({ isDarkMode, toggleTheme }) {
       ) {
         setShowEventsDropdown(false);
       }
+      // Only close jobs dropdown on desktop, not mobile
+      if (
+        jobsDropdownRef.current &&
+        !jobsDropdownRef.current.contains(event.target) &&
+        window.innerWidth >= 768
+      ) {
+        setShowJobsDropdown(false);
+      }
       // Close mobile menu when clicking outside
       if (
         mobileMenuRef.current &&
@@ -247,6 +260,26 @@ export default function Header({ isDarkMode, toggleTheme }) {
     },
   ];
 
+  // Jobs dropdown options with their navigation handlers
+  const jobsOptions = [
+    {
+      label: "Alumni/Admin Jobs",
+      path: "/job",
+    },
+    {
+      label: "Auto Posted Jobs",
+      path: "/autoposted-jobs",
+    },
+    {
+      label: "Create Jobs",
+      path: "/create-job",
+    },
+    {
+      label: "Job Market Analysis",
+      path: "/job-trends",
+    },
+  ];
+
   const handleAlumniOptionClick = (path) => {
     navigate(path);
     setShowAlumniDropdown(false);
@@ -256,6 +289,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const handleEventsOptionClick = (path) => {
     navigate(path);
     setShowEventsDropdown(false);
+    setIsMenuOpen(false);
+  };
+
+  const handleJobsOptionClick = (path) => {
+    navigate(path);
+    setShowJobsDropdown(false);
     setIsMenuOpen(false);
   };
 
@@ -449,16 +488,64 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 )}
               </div>
 
-              <button
-                onClick={() => handleNavClick("/job")}
-                className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
-                  isDarkMode
-                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                }`}
+              {/* Jobs Dropdown for Desktop */}
+              <div
+                className="relative"
+                ref={jobsDropdownRef}
+                onMouseEnter={() => setShowJobsDropdown(true)}
+                onMouseLeave={() => setShowJobsDropdown(false)}
               >
-                Jobs
-              </button>
+                {/* Invisible click box for better hover area */}
+                <div className="absolute -inset-2 z-10 cursor-pointer" />
+
+                <button
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
+                    isDarkMode
+                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  } ${
+                    showJobsDropdown
+                      ? isDarkMode
+                        ? "text-indigo-400 bg-gray-800"
+                        : "text-blue-600 bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  Jobs
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showJobsDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showJobsDropdown && (
+                  <div
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-blue-200"
+                    }`}
+                  >
+                    <div className="py-1">
+                      {jobsOptions.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleJobsOptionClick(option.path)}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
+                            isDarkMode
+                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => handleNavClick("/campaign")}
                 className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
@@ -899,16 +986,49 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 )}
               </div>
 
-              <button
-                onClick={() => handleNavClick("/job")}
-                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  isDarkMode
-                    ? "text-gray-300 hover:bg-gray-800"
-                    : "text-gray-700 hover:bg-blue-50"
-                }`}
-              >
-                Jobs
-              </button>
+              {/* Jobs Dropdown for Mobile */}
+              <div className="flex flex-col">
+                <button
+                  onClick={() => setShowJobsDropdown(!showJobsDropdown)}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
+                    isDarkMode
+                      ? "text-gray-300 hover:bg-gray-800"
+                      : "text-gray-700 hover:bg-blue-50"
+                  } ${
+                    showJobsDropdown
+                      ? isDarkMode
+                        ? "bg-gray-800"
+                        : "bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  <span>Jobs</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showJobsDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showJobsDropdown && (
+                  <div className="ml-4 mt-1 flex flex-col gap-1">
+                    {jobsOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleJobsOptionClick(option.path)}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-800"
+                            : "text-gray-600 hover:bg-blue-50"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => handleNavClick("/campaign")}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${

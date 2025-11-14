@@ -27,6 +27,9 @@ import ALumniMapPage from "./pages/AlumniMap";
 import BatchmatesPage from "./pages/Alumni-Batchmates";
 import CreateEventPage from "./pages/CreateEventPage";
 import EventGalleryPage from "./pages/EventGallary";
+import AlumniJobsPage from "./pages/AlumniJobs";
+import CreateJobPage from "./pages/CreateJob";
+import JobTrendPage from "./pages/JobTrend";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -272,7 +275,40 @@ export default function App() {
           <Route
             path="/job"
             element={
+              <AlumniJobsPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/autoposted-jobs"
+            element={
               <JobPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/create-job"
+            element={
+              <CreateJobPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/job-trends"
+            element={
+              <JobTrendPage
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
                 isAuthenticated={isAuthenticated}
