@@ -23,6 +23,8 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const [showJobsDropdown, setShowJobsDropdown] = useState(false);
   const [showCampaignDropdown, setShowCampaignDropdown] = useState(false);
   const [showMentorDropdown, setShowMentorDropdown] = useState(false);
+  const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+
   const [auth, setAuth] = useState(null);
   const dropdownRef = useRef(null);
   const alumniDropdownRef = useRef(null);
@@ -32,6 +34,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const mentorDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const refreshIntervalRef = useRef(null);
+  const aboutDropdownRef = useRef(null);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
@@ -49,6 +52,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
   };
   const toggleMentorDropdown = () => {
     setShowMentorDropdown(!showMentorDropdown);
+  };
+  const toggleAboutDropdown = () => {
+    setShowAboutDropdown(!showAboutDropdown);
   };
 
   const refreshAccessToken = async (refreshToken) => {
@@ -275,6 +281,29 @@ export default function Header({ isDarkMode, toggleTheme }) {
     },
   ];
 
+  const aboutOptions = [
+    {
+      label: "History",
+      path: "/about#history",
+    },
+    {
+      label: "Vision & Mission",
+      path: "/about#vision",
+    },
+    {
+      label: "Interaction Cell",
+      path: "/about#aiic",
+    },
+    {
+      label: "Meet Our Leadership",
+      path: "/about#leadership",
+    },
+    {
+      label: "Contact Us",
+      path: "/contact-us",
+    },
+  ];
+
   const handleAlumniOptionClick = (path) => {
     navigate(path);
     setShowAlumniDropdown(false);
@@ -308,6 +337,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
   // Navigation handlers for main nav items
   const handleNavClick = (path) => {
     navigate(path);
+    setIsMenuOpen(false);
+  };
+
+  const handleAboutOptionClick = (path) => {
+    navigate(path);
+    setShowAboutDropdown(false);
     setIsMenuOpen(false);
   };
 
@@ -365,6 +400,14 @@ export default function Header({ isDarkMode, toggleTheme }) {
         isMenuOpen
       ) {
         setIsMenuOpen(false);
+      }
+      // Update click outside handler in useEffect
+      if (
+        aboutDropdownRef.current &&
+        !aboutDropdownRef.current.contains(event.target) &&
+        windowWidth >= 1160
+      ) {
+        setShowAboutDropdown(false);
       }
     };
 
@@ -732,16 +775,61 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 )}
               </div>
 
-              <button
-                onClick={() => handleNavClick("/about")}
-                className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
-                  isDarkMode
-                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                }`}
+              {/* About Dropdown for Desktop */}
+              <div
+                className="relative"
+                ref={aboutDropdownRef}
+                onMouseEnter={() => setShowAboutDropdown(true)}
+                onMouseLeave={() => setShowAboutDropdown(false)}
               >
-                About
-              </button>
+                <div className="absolute -inset-1 z-10 cursor-pointer" />
+                <button
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 whitespace-nowrap ${
+                    isDarkMode
+                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  } ${
+                    showAboutDropdown
+                      ? isDarkMode
+                        ? "text-indigo-400 bg-gray-800"
+                        : "text-blue-600 bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  About
+                  <ChevronDown
+                    className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 ${
+                      showAboutDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showAboutDropdown && (
+                  <div
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-blue-200"
+                    }`}
+                  >
+                    <div className="py-1">
+                      {aboutOptions.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleAboutOptionClick(option.path)}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
+                            isDarkMode
+                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => handleNavClick("/developer")}
                 className={`relative inline-block text-sm font-semibold tracking-wide transition-all duration-300 cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
@@ -1281,16 +1369,48 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 )}
               </div>
 
-              <button
-                onClick={() => handleNavClick("/about")}
-                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  isDarkMode
-                    ? "text-gray-300 hover:bg-gray-800"
-                    : "text-gray-700 hover:bg-blue-50"
-                }`}
-              >
-                About
-              </button>
+              {/* About Dropdown for Mobile */}
+              <div className="flex flex-col">
+                <button
+                  onClick={() => setShowAboutDropdown(!showAboutDropdown)}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
+                    isDarkMode
+                      ? "text-gray-300 hover:bg-gray-800"
+                      : "text-gray-700 hover:bg-blue-50"
+                  } ${
+                    showAboutDropdown
+                      ? isDarkMode
+                        ? "bg-gray-800"
+                        : "bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  <span>About</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showAboutDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showAboutDropdown && (
+                  <div className="ml-4 mt-1 flex flex-col gap-1">
+                    {aboutOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAboutOptionClick(option.path)}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-800"
+                            : "text-gray-600 hover:bg-blue-50"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => handleNavClick("/developer")}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer ${

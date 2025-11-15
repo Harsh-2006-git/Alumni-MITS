@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import {
   Users,
   Target,
@@ -25,8 +26,24 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 
 export default function AboutPage({ isDarkMode, toggleTheme }) {
+  const location = useLocation();
   const [activeSection, setActiveSection] = useState("history");
 
+  // Handle URL hash changes
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (hash && sections[hash]) {
+      setActiveSection(hash);
+
+      // Scroll to top when section changes
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [location]);
+
+  // Your existing sections object remains exactly the same
   const sections = {
     history: {
       title: "Our Rich History",
@@ -141,32 +158,61 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
           {
             name: "Dr. Akhilesh Tiwari",
             role: "Dean, Academics",
+            image: "assets/images/atitrf.png",
           },
           {
             name: "Dr. Manish Dixit",
             role: "Dean, Public Relations",
+            image: "assets/images/md.png",
           },
           {
             name: "Dr. Manjaree Pandit",
             role: "Dean, Faculty of Engineering & Technology",
+            image: "assets/images/R.png",
           },
           {
             name: "Dr. R. S. Jadon",
             role: "Dean, Students Administration",
+            image: "assets/images/Rs-Jadon.png",
           },
           {
             name: "Dr. P. K. Singhal",
             role: "Dean, Quality Assurance",
+            image: "assets/images/pksinghal1.png",
           },
           {
             name: "Mr. Vikram Singh Rajput",
             role: "Head, T&P Cell",
+            image: "assets/images/OIP.png",
+          },
+          {
+            name: "Dr. M. K. Trivedi",
+            role: "Dean, Infrastructure Development",
+            image: "assets/images/mkt.png",
+          },
+          {
+            name: "Dr. Pratesh Jayaswal",
+            role: "Dean, Planning",
+            image: "assets/images/pj.png",
+          },
+          {
+            name: "Dr. M. K. Sagar",
+            role: "Dean, Student Welfare",
+            image: "assets/images/MK.png",
           },
         ],
       },
     },
   };
 
+  // Update the section change handler to update URL
+  const handleSectionChange = (sectionKey) => {
+    setActiveSection(sectionKey);
+    // Update URL without page reload
+    window.history.pushState(null, "", `/about#${sectionKey}`);
+  };
+
+  // Your existing renderContent function remains exactly the same
   const renderContent = () => {
     const section = sections[activeSection];
 
@@ -402,13 +448,15 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                       : "bg-gradient-to-br from-white to-orange-50 border-orange-200"
                   }`}
                 >
-                  <div
-                    className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${
-                      isDarkMode ? "bg-orange-500/20" : "bg-orange-100"
-                    }`}
-                  >
-                    <BookOpen className="w-8 h-8 text-orange-400" />
+                  <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-orange-300">
+                    <img
+                      src={dean.image}
+                      alt={dean.name}
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                      loading="lazy"
+                    />
                   </div>
+
                   <h5 className="font-bold text-base text-orange-400 mb-2">
                     {dean.name}
                   </h5>
@@ -427,6 +475,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       );
     }
   };
+
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${
@@ -438,7 +487,6 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       {/* Header */}
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      {/* Hero Section */}
       {/* Hero Section */}
       <section className="container mx-auto px-8 lg:px-12 py-16 text-center">
         <div className="max-w-4xl mx-auto">
@@ -465,7 +513,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
               return (
                 <button
                   key={key}
-                  onClick={() => setActiveSection(key)}
+                  onClick={() => handleSectionChange(key)}
                   className={`flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 rounded-full font-semibold transition-all text-sm sm:text-base flex-shrink-0 ${
                     activeSection === key
                       ? isDarkMode
@@ -484,6 +532,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
           </div>
         </div>
       </section>
+
       {/* Content Section */}
       <section className="container mx-auto px-6 pb-16">
         <div className="max-w-5xl mx-auto">

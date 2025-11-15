@@ -34,6 +34,9 @@ import AlumniAnalyticsPage from "./pages/AlumniAnalytics";
 import CreateCampaignPage from "./pages/CreateCampaign";
 import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorshipRequestsPage from "./pages/MentorshipRequestsPage";
+import ContactUsPage from "./pages/ContactUsPage";
+
+import { Contact } from "lucide-react";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -224,6 +227,17 @@ export default function App() {
             path="/about"
             element={
               <AboutPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/contact-us"
+            element={
+              <ContactUsPage
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
                 isAuthenticated={isAuthenticated}

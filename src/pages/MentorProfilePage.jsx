@@ -9,11 +9,8 @@ import {
   DollarSign,
   Clock,
   Edit2,
-  Save,
   X,
   Calendar,
-  Star,
-  Award,
   Users,
   MessageSquare,
   Target,
@@ -24,10 +21,9 @@ import {
   Mail,
   Phone,
   Globe,
-  BookOpen,
-  Heart,
   Lightbulb,
   TrendingUp,
+  Heart,
 } from "lucide-react";
 
 import Header from "../components/header";
@@ -45,17 +41,12 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
 
   // Form states
   const [profileForm, setProfileForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
     batch_year: "",
     branch: "",
     current_position: "",
     company: "",
-    location: "",
     linkedin_url: "",
-    website: "",
-    bio: "",
+    phone: "",
   });
 
   const [mentorForm, setMentorForm] = useState({
@@ -105,26 +96,9 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
 
   useEffect(() => {
     if (checkAuth()) {
-      loadUserProfile();
       loadMentorProfile();
     }
   }, []);
-
-  const loadUserProfile = async () => {
-    try {
-      const authToken = getAuthToken();
-      // Since we don't have a separate alumni profile endpoint, we'll use the mentor data
-      // For now, we'll set basic user data from auth
-      const authData = JSON.parse(localStorage.getItem("auth"));
-      setProfileForm((prev) => ({
-        ...prev,
-        name: authData.name || "",
-        email: authData.email || "",
-      }));
-    } catch (error) {
-      console.error("Error loading user profile:", error);
-    }
-  };
 
   const loadMentorProfile = async () => {
     try {
@@ -138,17 +112,14 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
 
       // Update profile form with mentor data
       if (mentorData) {
-        setProfileForm((prev) => ({
-          ...prev,
-          name: mentorData.name || "",
-          email: mentorData.email || "",
-          phone: mentorData.phone || "",
+        setProfileForm({
           batch_year: mentorData.batch_year || "",
           branch: mentorData.branch || "",
           current_position: mentorData.current_position || "",
           company: mentorData.company || "",
           linkedin_url: mentorData.linkedin_url || "",
-        }));
+          phone: mentorData.phone || "",
+        });
       }
     } catch (error) {
       console.error("Error loading mentor profile:", error);
@@ -166,12 +137,17 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
 
       // If mentor profile exists, update it, otherwise create it
       if (mentorProfile) {
-        await axios.put(`${MENTOR_API}/edit/${mentorProfile.id}`, profileForm, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await axios.put(
+          `${MENTOR_API}/edit/${mentorProfile.id}`,
+          profileForm,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setMentorProfile(response.data.data);
       } else {
         // Create mentor profile with profile data
         const response = await axios.post(`${MENTOR_API}/create`, profileForm, {
@@ -188,7 +164,11 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
       loadMentorProfile();
     } catch (error) {
       console.error("Error updating profile:", error);
-      showNotification("Failed to update profile. Please try again.", "error");
+      showNotification(
+        error.response?.data?.message ||
+          "Failed to update profile. Please try again.",
+        "error"
+      );
     } finally {
       setSaving(false);
     }
@@ -199,7 +179,14 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     try {
       setSaving(true);
       const authToken = getAuthToken();
-      const response = await axios.post(`${MENTOR_API}/create`, mentorForm, {
+
+      // Combine profile data with mentor-specific data
+      const mentorData = {
+        ...profileForm, // Include batch_year, branch, etc.
+        ...mentorForm, // Include expertise, topics, availability, fees
+      };
+
+      const response = await axios.post(`${MENTOR_API}/create`, mentorData, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
@@ -208,10 +195,12 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
       setMentorProfile(response.data.data);
       setShowMentorForm(false);
       showNotification("Mentor profile created successfully!", "success");
+      loadMentorProfile();
     } catch (error) {
       console.error("Error creating mentor profile:", error);
       showNotification(
-        "Failed to create mentor profile. Please try again.",
+        error.response?.data?.message ||
+          "Failed to create mentor profile. Please try again.",
         "error"
       );
     } finally {
@@ -240,7 +229,8 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     } catch (error) {
       console.error("Error updating mentor profile:", error);
       showNotification(
-        "Failed to update mentor profile. Please try again.",
+        error.response?.data?.message ||
+          "Failed to update mentor profile. Please try again.",
         "error"
       );
     } finally {
@@ -305,6 +295,66 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     }
     setShowMentorForm(true);
   };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: "bg-yellow-400/20 text-yellow-300 border-yellow-400/40",
+      active: "bg-green-400/20 text-green-300 border-green-400/40",
+      completed: "bg-blue-400/20 text-blue-300 border-blue-400/40",
+      cancelled: "bg-red-400/20 text-red-300 border-red-400/40",
+    };
+    return colors[status] || "bg-gray-400/20 text-gray-300 border-gray-400/40";
+  };
+
+  const StatCard = ({ icon: Icon, label, value, color = "purple" }) => (
+    <div
+      className={`rounded-xl p-3 sm:p-4 border-2 shadow-lg transition-all hover:scale-105 hover:shadow-xl ${
+        isDarkMode
+          ? `bg-gradient-to-br from-slate-900/90 via-${color}-900/30 to-blue-900/20 border-${color}-500/30`
+          : `bg-gradient-to-br from-white via-${color}-50/50 to-blue-50/50 border-${color}-300`
+      }`}
+    >
+      <div
+        className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl mb-2 sm:mb-3 ${
+          isDarkMode
+            ? `bg-gradient-to-br from-${color}-500/30 to-blue-500/20`
+            : `bg-gradient-to-br from-${color}-100 to-blue-100`
+        }`}
+      >
+        <Icon className={`text-${color}-500`} size={16} />
+      </div>
+      <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+        {value}
+      </div>
+      <div
+        className={`text-xs font-medium ${
+          isDarkMode ? "text-gray-300" : "text-gray-700"
+        }`}
+      >
+        {label}
+      </div>
+    </div>
+  );
+
+  // Get user info from auth data
+  const getUserInfo = () => {
+    const authData = localStorage.getItem("auth");
+    if (!authData)
+      return {
+        name: "",
+        email: "",
+        profilePhoto: "https://via.placeholder.com/100",
+      };
+
+    const user = JSON.parse(authData);
+    return {
+      name: user.name || "",
+      email: user.email || "",
+      profilePhoto: user.profilePhoto || "https://via.placeholder.com/100",
+    };
+  };
+
+  const userInfo = getUserInfo();
 
   if (loading) {
     return (
@@ -376,7 +426,48 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
         </div>
       )}
 
-      {/* Hero Section */}
+      {/* Global Loading Overlay */}
+      {saving && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70]">
+          <div
+            className={`rounded-3xl p-8 shadow-2xl ${
+              isDarkMode
+                ? "bg-gradient-to-br from-slate-900 to-blue-900/50"
+                : "bg-gradient-to-br from-white to-blue-50"
+            }`}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative w-16 h-16">
+                <div className="absolute inset-0 rounded-full border-4 border-blue-200/30"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-cyan-500 border-r-blue-500 animate-spin"></div>
+              </div>
+              <p
+                className={`text-lg font-semibold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Processing...
+              </p>
+              <div className="flex gap-1">
+                <div
+                  className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "0ms" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "150ms" }}
+                ></div>
+                <div
+                  className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"
+                  style={{ animationDelay: "300ms" }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hero Section - Responsive */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 text-center">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
@@ -393,617 +484,476 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
         </div>
       </section>
 
-      {/* Main Content */}
+      {/* Header Actions - Responsive */}
+      <section className="container mx-auto px-4 sm:px-6 pb-6 sm:pb-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col gap-4 sm:gap-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+              <StatCard
+                icon={User}
+                label="Profile Status"
+                value={mentorProfile ? "Complete" : "Incomplete"}
+                color="cyan"
+              />
+              <StatCard
+                icon={Users}
+                label="Mentor Status"
+                value={mentorProfile ? "Active" : "Not Setup"}
+                color="blue"
+              />
+              {mentorProfile && (
+                <>
+                  <StatCard
+                    icon={DollarSign}
+                    label="Session Fee"
+                    value={`₹${mentorProfile.fees}`}
+                    color="green"
+                  />
+                  <StatCard
+                    icon={MessageSquare}
+                    label="Availability"
+                    value={mentorProfile.available ? "Available" : "Busy"}
+                    color="purple"
+                  />
+                </>
+              )}
+            </div>
+
+            {/* Profile Actions */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center sm:justify-end gap-2 sm:gap-3">
+              {mentorProfile && (
+                <div
+                  className={`text-center sm:text-right px-3 py-2 sm:px-4 sm:py-2 rounded-lg border-2 ${
+                    isDarkMode
+                      ? "bg-gradient-to-r from-slate-800/50 to-blue-900/30 border-blue-500/30"
+                      : "bg-gradient-to-r from-white to-blue-50 border-blue-300"
+                  }`}
+                >
+                  <p
+                    className={`text-xs font-medium ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    Mentor Status
+                  </p>
+                  <p
+                    className={`text-sm sm:text-base font-bold ${
+                      mentorProfile.available
+                        ? "text-green-400"
+                        : "text-red-400"
+                    }`}
+                  >
+                    {mentorProfile.available ? "✓ Available" : "✗ Unavailable"}
+                  </p>
+                </div>
+              )}
+              <button
+                onClick={openProfileForm}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all text-sm"
+              >
+                <User size={16} />
+                {mentorProfile ? "Edit Profile" : "Setup Profile"}
+              </button>
+              <button
+                onClick={openMentorForm}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold hover:shadow-xl hover:shadow-purple-500/30 transition-all text-sm"
+              >
+                <Users size={16} />
+                {mentorProfile ? "Edit Mentor" : "Become Mentor"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content - Responsive */}
       <section className="container mx-auto px-4 sm:px-6 pb-12 sm:pb-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
-            {/* Left Column - Profile Overview */}
-            <div className="lg:col-span-2 space-y-6 sm:space-y-8">
-              {/* Profile Card */}
-              <div
-                className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 shadow-2xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/90 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm border-blue-500/20"
-                    : "bg-white border-blue-300 shadow-xl"
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
-                  <div className="flex items-start gap-4 sm:gap-6">
-                    <img
-                      src={
-                        mentorProfile?.alumni?.profilePhoto ||
-                        "https://via.placeholder.com/100"
-                      }
-                      alt={profileForm.name}
-                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"
-                    />
-                    <div>
-                      <h2
-                        className={`text-xl sm:text-2xl font-bold mb-2 ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
-                      >
-                        {profileForm.name || "Your Name"}
-                      </h2>
-                      <p
-                        className={`text-cyan-500 text-sm sm:text-base mb-3 ${
-                          isDarkMode ? "text-cyan-400" : "text-cyan-600"
-                        }`}
-                      >
-                        {profileForm.current_position || "Add your position"}
-                        {profileForm.company && ` at ${profileForm.company}`}
-                      </p>
-                      <div className="flex flex-wrap gap-3 text-xs sm:text-sm">
-                        {profileForm.batch_year && (
-                          <span
-                            className={`flex items-center gap-1 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-600"
-                            }`}
-                          >
-                            <GraduationCap size={14} />
-                            Batch {profileForm.batch_year}
-                          </span>
-                        )}
-                        {profileForm.branch && (
-                          <span
-                            className={`flex items-center gap-1 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-600"
-                            }`}
-                          >
-                            • {profileForm.branch}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={openProfileForm}
-                    className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all text-sm sm:text-base"
-                  >
-                    <Edit2 size={16} />
-                    Edit Profile
-                  </button>
-                </div>
-
-                {/* Contact Info */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  {profileForm.email && (
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`p-2 rounded-lg ${
-                          isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
-                        }`}
-                      >
-                        <Mail size={16} className="text-blue-500" />
-                      </div>
-                      <div>
-                        <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        >
-                          Email
-                        </p>
-                        <p
-                          className={`text-sm font-medium ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {profileForm.email}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {profileForm.phone && (
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`p-2 rounded-lg ${
-                          isDarkMode ? "bg-green-500/20" : "bg-green-100"
-                        }`}
-                      >
-                        <Phone size={16} className="text-green-500" />
-                      </div>
-                      <div>
-                        <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        >
-                          Phone
-                        </p>
-                        <p
-                          className={`text-sm font-medium ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {profileForm.phone}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {profileForm.linkedin_url && (
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`p-2 rounded-lg ${
-                          isDarkMode ? "bg-blue-600/20" : "bg-blue-100"
-                        }`}
-                      >
-                        <Linkedin size={16} className="text-blue-600" />
-                      </div>
-                      <div>
-                        <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        >
-                          LinkedIn
-                        </p>
-                        <a
-                          href={profileForm.linkedin_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium text-cyan-500 hover:text-cyan-400 transition-colors"
-                        >
-                          View Profile
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {profileForm.website && (
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`p-2 rounded-lg ${
-                          isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
-                        }`}
-                      >
-                        <Globe size={16} className="text-purple-500" />
-                      </div>
-                      <div>
-                        <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-400" : "text-gray-500"
-                          }`}
-                        >
-                          Website
-                        </p>
-                        <a
-                          href={profileForm.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm font-medium text-cyan-500 hover:text-cyan-400 transition-colors"
-                        >
-                          Visit Site
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Mentor Profile Card */}
-              <div
-                className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 border-2 shadow-2xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/90 via-purple-900/20 to-indigo-900/20 backdrop-blur-sm border-purple-500/20"
-                    : "bg-white border-purple-300 shadow-xl"
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-6 mb-6 sm:mb-8">
-                  <div>
+        <div className="max-w-7xl mx-auto">
+          <div
+            className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border-2 shadow-2xl ${
+              isDarkMode
+                ? "bg-gradient-to-br from-slate-900/90 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm border-blue-500/20"
+                : "bg-gradient-to-br from-white/90 via-cyan-50/50 to-blue-50/50 backdrop-blur-sm border-blue-300"
+            }`}
+          >
+            {/* Profile Overview */}
+            <div className="space-y-6 sm:space-y-8">
+              {/* Profile Header */}
+              <div className="flex flex-col lg:flex-row items-start justify-between gap-4 sm:gap-6">
+                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 w-full lg:w-auto">
+                  <img
+                    src={
+                      mentorProfile?.alumni?.profilePhoto ||
+                      userInfo.profilePhoto
+                    }
+                    alt={userInfo.name}
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"
+                  />
+                  <div className="flex-1">
                     <h2
-                      className={`text-xl sm:text-2xl font-bold mb-2 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent`}
-                    >
-                      Mentor Profile
-                    </h2>
-                    <p
-                      className={`text-sm sm:text-base ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
-                    >
-                      {mentorProfile
-                        ? "Manage your mentorship availability and preferences"
-                        : "Become a mentor and guide the next generation"}
-                    </p>
-                  </div>
-                  <button
-                    onClick={openMentorForm}
-                    className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold hover:shadow-xl hover:shadow-purple-500/30 transition-all text-sm sm:text-base"
-                  >
-                    <Users size={16} />
-                    {mentorProfile ? "Edit Mentor Profile" : "Become Mentor"}
-                  </button>
-                </div>
-
-                {mentorProfile ? (
-                  <div className="space-y-6">
-                    {/* Status & Fees */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                      <div
-                        className={`rounded-xl p-4 border-2 ${
-                          isDarkMode
-                            ? mentorProfile.available
-                              ? "bg-green-500/20 border-green-500/40"
-                              : "bg-red-500/20 border-red-500/40"
-                            : mentorProfile.available
-                            ? "bg-green-100 border-green-300"
-                            : "bg-red-100 border-red-300"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`p-2 rounded-lg ${
-                              isDarkMode ? "bg-white/20" : "bg-white"
-                            }`}
-                          >
-                            {mentorProfile.available ? (
-                              <CheckCircle
-                                size={16}
-                                className="text-green-500"
-                              />
-                            ) : (
-                              <XCircle size={16} className="text-red-500" />
-                            )}
-                          </div>
-                          <div>
-                            <p
-                              className={`text-xs ${
-                                isDarkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            >
-                              Status
-                            </p>
-                            <p
-                              className={`text-sm font-bold ${
-                                mentorProfile.available
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              } ${
-                                isDarkMode
-                                  ? mentorProfile.available
-                                    ? "text-green-400"
-                                    : "text-red-400"
-                                  : ""
-                              }`}
-                            >
-                              {mentorProfile.available
-                                ? "Available"
-                                : "Not Available"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className={`rounded-xl p-4 border-2 ${
-                          isDarkMode
-                            ? "bg-orange-500/20 border-orange-500/40"
-                            : "bg-orange-100 border-orange-300"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`p-2 rounded-lg ${
-                              isDarkMode ? "bg-white/20" : "bg-white"
-                            }`}
-                          >
-                            <DollarSign size={16} className="text-orange-500" />
-                          </div>
-                          <div>
-                            <p
-                              className={`text-xs ${
-                                isDarkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
-                            >
-                              Session Fee
-                            </p>
-                            <p
-                              className={`text-sm font-bold ${
-                                isDarkMode
-                                  ? "text-orange-400"
-                                  : "text-orange-600"
-                              }`}
-                            >
-                              ₹{mentorProfile.fees}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Expertise */}
-                    {mentorProfile.expertise && (
-                      <div>
-                        <h3
-                          className={`text-lg font-semibold mb-3 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent`}
-                        >
-                          Expertise
-                        </h3>
-                        <p
-                          className={`text-sm sm:text-base ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          {mentorProfile.expertise}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Topics */}
-                    {mentorProfile.topics &&
-                      mentorProfile.topics.length > 0 && (
-                        <div>
-                          <h3
-                            className={`text-lg font-semibold mb-3 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent`}
-                          >
-                            Mentorship Topics
-                          </h3>
-                          <div className="flex flex-wrap gap-2">
-                            {mentorProfile.topics.map((topic, index) => (
-                              <span
-                                key={index}
-                                className={`px-3 py-1.5 rounded-full font-medium border text-xs sm:text-sm ${
-                                  isDarkMode
-                                    ? "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-200 border-purple-400/40"
-                                    : "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-purple-300"
-                                }`}
-                              >
-                                {topic}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                    {/* Availability */}
-                    {mentorProfile.availability && (
-                      <div>
-                        <h3
-                          className={`text-lg font-semibold mb-3 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent`}
-                        >
-                          Availability
-                        </h3>
-                        <div className="space-y-2">
-                          {Object.entries(mentorProfile.availability).map(
-                            ([day, slots]) => (
-                              <div
-                                key={day}
-                                className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl gap-2 ${
-                                  isDarkMode ? "bg-slate-800/50" : "bg-gray-100"
-                                }`}
-                              >
-                                <span
-                                  className={`font-medium capitalize text-sm ${
-                                    isDarkMode
-                                      ? "text-gray-200"
-                                      : "text-gray-700"
-                                  }`}
-                                >
-                                  {day === "other_days" ? "Weekdays" : day}
-                                </span>
-                                <div className="flex flex-wrap gap-2">
-                                  {slots.map((slot, index) => (
-                                    <span
-                                      key={index}
-                                      className={`px-2 py-1 rounded text-xs border ${
-                                        isDarkMode
-                                          ? "bg-slate-700 text-gray-200 border-slate-600"
-                                          : "bg-white text-gray-800 border-gray-400"
-                                      }`}
-                                    >
-                                      {slot.from} - {slot.to}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Users
-                      className={`mx-auto mb-4 ${
-                        isDarkMode ? "text-gray-500" : "text-gray-400"
-                      }`}
-                      size={48}
-                    />
-                    <h3
-                      className={`text-lg font-medium mb-2 ${
+                      className={`text-xl sm:text-2xl font-bold ${
                         isDarkMode ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      Not a Mentor Yet
-                    </h3>
-                    <p
-                      className={`mb-6 max-w-md mx-auto ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
-                    >
-                      Share your knowledge and experience with students. Become
-                      a mentor to guide the next generation of professionals.
+                      {userInfo.name || "Your Name"}
+                    </h2>
+                    <p className="text-cyan-400 text-sm sm:text-base">
+                      {profileForm.current_position || "Add your position"}
+                      {profileForm.company && ` at ${profileForm.company}`}
                     </p>
-                    <button
-                      onClick={openMentorForm}
-                      className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-xl hover:shadow-purple-500/30 transition-all"
-                    >
-                      Setup Mentor Profile
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Right Column - Stats & Quick Actions */}
-            <div className="space-y-6 sm:space-y-8">
-              {/* Quick Stats */}
-              <div
-                className={`rounded-2xl sm:rounded-3xl p-6 border-2 shadow-xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/90 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm border-blue-500/20"
-                    : "bg-white border-blue-300 shadow-xl"
-                }`}
-              >
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent mb-4">
-                  Quick Stats
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
-                    >
-                      Profile Completion
-                    </span>
-                    <span className="text-sm font-bold text-cyan-500">85%</span>
-                  </div>
-                  <div
-                    className={`w-full rounded-full h-2 ${
-                      isDarkMode ? "bg-gray-700" : "bg-gray-200"
-                    }`}
-                  >
-                    <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-2 rounded-full w-4/5"></div>
-                  </div>
-
-                  {mentorProfile && (
-                    <>
-                      <div className="flex items-center justify-between pt-2">
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-2 text-xs sm:text-sm">
+                      {profileForm.batch_year && (
                         <span
-                          className={`text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                          className={`flex items-center gap-1 ${
+                            isDarkMode ? "text-gray-300" : "text-gray-700"
                           }`}
                         >
-                          Mentor Status
+                          <GraduationCap size={14} />
+                          Batch {profileForm.batch_year} • {profileForm.branch}
                         </span>
+                      )}
+                      {mentorProfile && (
                         <span
-                          className={`text-sm font-bold ${
+                          className={`flex items-center gap-1 font-medium ${
                             mentorProfile.available
-                              ? "text-green-500"
-                              : "text-red-500"
+                              ? "text-green-400"
+                              : "text-red-400"
                           }`}
                         >
-                          {mentorProfile.available ? "Active" : "Inactive"}
+                          {mentorProfile.available
+                            ? "✓ Available for Mentorship"
+                            : "✗ Not available"}
                         </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-600"
-                          }`}
-                        >
-                          Session Fee
-                        </span>
-                        <span className="text-sm font-bold text-orange-500">
-                          ₹{mentorProfile.fees}
-                        </span>
-                      </div>
-                    </>
-                  )}
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div
-                className={`rounded-2xl sm:rounded-3xl p-6 border-2 shadow-xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/90 via-green-900/20 to-emerald-900/20 backdrop-blur-sm border-green-500/20"
-                    : "bg-white border-green-300 shadow-xl"
-                }`}
-              >
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mb-4">
-                  Quick Actions
-                </h3>
-                <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
                   <button
                     onClick={openProfileForm}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-sm font-medium ${
-                      isDarkMode
-                        ? "border-blue-500/30 text-blue-300 hover:bg-blue-500/10"
-                        : "border-blue-300 text-blue-700 hover:bg-blue-50"
-                    }`}
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold hover:shadow-lg transition-all text-sm sm:text-base"
                   >
-                    <User size={16} />
-                    Update Profile
+                    <Edit2 size={14} className="sm:w-4 sm:h-4" />
+                    Edit Profile
                   </button>
-
                   <button
                     onClick={openMentorForm}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-sm font-medium ${
-                      isDarkMode
-                        ? "border-purple-500/30 text-purple-300 hover:bg-purple-500/10"
-                        : "border-purple-300 text-purple-700 hover:bg-purple-50"
-                    }`}
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold hover:shadow-lg transition-all text-sm sm:text-base"
                   >
-                    <Users size={16} />
+                    <Users size={14} className="sm:w-4 sm:h-4" />
                     {mentorProfile ? "Edit Mentor" : "Become Mentor"}
                   </button>
-
-                  {mentorProfile && (
-                    <button
-                      className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all text-sm font-medium ${
-                        isDarkMode
-                          ? "border-green-500/30 text-green-300 hover:bg-green-500/10"
-                          : "border-green-300 text-green-700 hover:bg-green-50"
-                      }`}
-                    >
-                      <MessageSquare size={16} />
-                      View Requests
-                    </button>
-                  )}
                 </div>
               </div>
 
-              {/* Tips */}
-              <div
-                className={`rounded-2xl sm:rounded-3xl p-6 border-2 shadow-xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/90 via-amber-900/20 to-orange-900/20 backdrop-blur-sm border-amber-500/20"
-                    : "bg-white border-amber-300 shadow-xl"
-                }`}
-              >
-                <h3 className="text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent mb-4">
-                  Profile Tips
-                </h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb
-                      size={16}
-                      className="text-amber-500 mt-0.5 flex-shrink-0"
-                    />
-                    <p
-                      className={isDarkMode ? "text-gray-300" : "text-gray-600"}
-                    >
-                      Keep your profile updated with current position and
-                      company
-                    </p>
+              {/* Contact & Basic Info */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                {/* Left Column - Contact Info */}
+                <div className="lg:col-span-1">
+                  <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent mb-4">
+                    Contact Information
+                  </h3>
+                  <div className="space-y-3">
+                    {userInfo.email && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl border-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-400/30">
+                        <Mail
+                          size={16}
+                          className="text-blue-500 flex-shrink-0"
+                        />
+                        <div>
+                          <p
+                            className={`text-xs ${
+                              isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          >
+                            Email
+                          </p>
+                          <p
+                            className={`text-sm font-medium ${
+                              isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
+                          >
+                            {userInfo.email}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {profileForm.phone && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl border-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-400/30">
+                        <Phone
+                          size={16}
+                          className="text-green-500 flex-shrink-0"
+                        />
+                        <div>
+                          <p
+                            className={`text-xs ${
+                              isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          >
+                            Phone
+                          </p>
+                          <p
+                            className={`text-sm font-medium ${
+                              isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
+                          >
+                            {profileForm.phone}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {profileForm.linkedin_url && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl border-2 bg-gradient-to-r from-blue-600/10 to-indigo-500/10 border-blue-500/30">
+                        <Linkedin
+                          size={16}
+                          className="text-blue-600 flex-shrink-0"
+                        />
+                        <div>
+                          <p
+                            className={`text-xs ${
+                              isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          >
+                            LinkedIn
+                          </p>
+                          <a
+                            href={profileForm.linkedin_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm font-medium text-cyan-500 hover:text-cyan-400 transition-colors"
+                          >
+                            View Profile
+                          </a>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-start gap-2">
-                    <TrendingUp
-                      size={16}
-                      className="text-amber-500 mt-0.5 flex-shrink-0"
-                    />
-                    <p
-                      className={isDarkMode ? "text-gray-300" : "text-gray-600"}
-                    >
-                      Add a professional bio to attract more mentorship requests
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <Heart
-                      size={16}
-                      className="text-amber-500 mt-0.5 flex-shrink-0"
-                    />
-                    <p
-                      className={isDarkMode ? "text-gray-300" : "text-gray-600"}
-                    >
-                      Set clear availability to help students schedule sessions
-                    </p>
-                  </div>
+                </div>
+
+                {/* Right Column - Mentor Profile */}
+                <div className="lg:col-span-2">
+                  {!mentorProfile ? (
+                    <div className="text-center py-12 rounded-2xl border-2 border-dashed border-blue-400/30">
+                      <Users
+                        className={`mx-auto mb-4 ${
+                          isDarkMode ? "text-gray-500" : "text-gray-400"
+                        }`}
+                        size={48}
+                      />
+                      <h3
+                        className={`text-xl font-bold mb-2 ${
+                          isDarkMode ? "text-gray-200" : "text-gray-900"
+                        }`}
+                      >
+                        Not a Mentor Yet
+                      </h3>
+                      <p
+                        className={`mb-6 max-w-md mx-auto text-sm sm:text-base ${
+                          isDarkMode ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
+                        Share your knowledge and experience with students. Guide
+                        the next generation of professionals.
+                      </p>
+                      <button
+                        onClick={openMentorForm}
+                        className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl font-semibold hover:shadow-2xl hover:shadow-purple-500/30 transition-all"
+                      >
+                        Become a Mentor
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {/* Status & Fees */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        <div
+                          className={`rounded-xl p-4 border-2 ${
+                            isDarkMode
+                              ? mentorProfile.available
+                                ? "bg-green-500/20 border-green-500/40"
+                                : "bg-red-500/20 border-red-500/40"
+                              : mentorProfile.available
+                              ? "bg-green-100 border-green-300"
+                              : "bg-red-100 border-red-300"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`p-2 rounded-lg ${
+                                isDarkMode ? "bg-white/20" : "bg-white"
+                              }`}
+                            >
+                              {mentorProfile.available ? (
+                                <CheckCircle
+                                  size={16}
+                                  className="text-green-500"
+                                />
+                              ) : (
+                                <XCircle size={16} className="text-red-500" />
+                              )}
+                            </div>
+                            <div>
+                              <p
+                                className={`text-xs ${
+                                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                              >
+                                Status
+                              </p>
+                              <p
+                                className={`text-sm font-bold ${
+                                  mentorProfile.available
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                } ${
+                                  isDarkMode
+                                    ? mentorProfile.available
+                                      ? "text-green-400"
+                                      : "text-red-400"
+                                    : ""
+                                }`}
+                              >
+                                {mentorProfile.available
+                                  ? "Available"
+                                  : "Not Available"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div
+                          className={`rounded-xl p-4 border-2 ${
+                            isDarkMode
+                              ? "bg-orange-500/20 border-orange-500/40"
+                              : "bg-orange-100 border-orange-300"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`p-2 rounded-lg ${
+                                isDarkMode ? "bg-white/20" : "bg-white"
+                              }`}
+                            >
+                              <DollarSign
+                                size={16}
+                                className="text-orange-500"
+                              />
+                            </div>
+                            <div>
+                              <p
+                                className={`text-xs ${
+                                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                              >
+                                Session Fee
+                              </p>
+                              <p
+                                className={`text-sm font-bold ${
+                                  isDarkMode
+                                    ? "text-orange-400"
+                                    : "text-orange-600"
+                                }`}
+                              >
+                                ₹{mentorProfile.fees}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Expertise */}
+                      {mentorProfile.expertise && (
+                        <div>
+                          <h3 className="text-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent mb-3">
+                            Expertise
+                          </h3>
+                          <p
+                            className={`rounded-xl p-3 sm:p-4 text-sm sm:text-base ${
+                              isDarkMode
+                                ? "bg-slate-800/50 text-gray-200"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {mentorProfile.expertise}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Topics */}
+                      {mentorProfile.topics &&
+                        mentorProfile.topics.length > 0 && (
+                          <div>
+                            <h3 className="text-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent mb-3">
+                              Mentorship Topics
+                            </h3>
+                            <div className="flex flex-wrap gap-2">
+                              {mentorProfile.topics.map((topic, index) => (
+                                <span
+                                  key={index}
+                                  className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg font-medium border text-xs sm:text-sm ${
+                                    isDarkMode
+                                      ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
+                                      : "bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 border-cyan-300"
+                                  }`}
+                                >
+                                  {topic}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                      {/* Availability */}
+                      {mentorProfile.availability && (
+                        <div>
+                          <h3 className="text-lg font-semibold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent mb-3">
+                            Availability
+                          </h3>
+                          <div className="space-y-2 sm:space-y-3">
+                            {Object.entries(mentorProfile.availability).map(
+                              ([day, slots]) => (
+                                <div
+                                  key={day}
+                                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-xl gap-2 ${
+                                    isDarkMode
+                                      ? "bg-slate-800/50"
+                                      : "bg-gray-100"
+                                  }`}
+                                >
+                                  <span
+                                    className={`font-medium capitalize text-sm sm:text-base ${
+                                      isDarkMode
+                                        ? "text-gray-200"
+                                        : "text-gray-800"
+                                    }`}
+                                  >
+                                    {day === "other_days" ? "Weekdays" : day}
+                                  </span>
+                                  <div className="flex flex-wrap gap-2">
+                                    {slots.map((slot, index) => (
+                                      <span
+                                        key={index}
+                                        className={`px-2 sm:px-3 py-1 rounded text-xs sm:text-sm border ${
+                                          isDarkMode
+                                            ? "bg-slate-700 text-gray-200 border-slate-600"
+                                            : "bg-white text-gray-800 border-gray-400"
+                                        }`}
+                                      >
+                                        {slot.from} - {slot.to}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1022,6 +972,8 @@ const AlumniProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
           saving={saving}
           onClose={() => setShowProfileForm(false)}
           onSubmit={updateProfile}
+          userInfo={userInfo}
+          isEdit={!!mentorProfile}
         />
       )}
 
@@ -1052,6 +1004,8 @@ const ProfileFormModal = ({
   saving,
   onClose,
   onSubmit,
+  userInfo,
+  isEdit,
 }) => (
   <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div className="max-w-2xl w-full max-h-[90vh] flex flex-col">
@@ -1059,19 +1013,19 @@ const ProfileFormModal = ({
         className={`rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-full overflow-hidden ${
           isDarkMode
             ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
-            : "bg-white border-blue-300"
+            : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
         }`}
       >
         <div
           className={`p-4 sm:p-6 border-b-2 flex-shrink-0 ${
             isDarkMode
               ? "border-blue-500/30 bg-slate-900/90"
-              : "border-blue-300 bg-white"
+              : "border-blue-300 bg-white/90"
           }`}
         >
           <div className="flex items-center justify-between">
             <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
-              Edit Profile
+              {isEdit ? "Edit Profile" : "Create Profile"}
             </h2>
             <button
               onClick={onClose}
@@ -1081,7 +1035,7 @@ const ProfileFormModal = ({
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
-              <X size={20} />
+              <X size={20} className="sm:w-6 sm:h-6" />
             </button>
           </div>
         </div>
@@ -1098,21 +1052,25 @@ const ProfileFormModal = ({
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Full Name *
+                  Full Name
                 </label>
                 <input
                   type="text"
-                  value={profileForm.name}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, name: e.target.value })
-                  }
-                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base ${
+                  value={userInfo.name}
+                  disabled
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-sm sm:text-base ${
                     isDarkMode
-                      ? "bg-slate-800/50 border-blue-500/30 text-white"
-                      : "bg-white border-blue-300 text-gray-900"
+                      ? "bg-slate-800/30 border-blue-500/20 text-gray-400"
+                      : "bg-gray-100 border-gray-300 text-gray-500"
                   }`}
-                  required
                 />
+                <p
+                  className={`text-xs sm:text-sm mt-1 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
+                  Name from your account
+                </p>
               </div>
 
               <div>
@@ -1121,21 +1079,25 @@ const ProfileFormModal = ({
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  Email *
+                  Email
                 </label>
                 <input
                   type="email"
-                  value={profileForm.email}
-                  onChange={(e) =>
-                    setProfileForm({ ...profileForm, email: e.target.value })
-                  }
-                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base ${
+                  value={userInfo.email}
+                  disabled
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 transition-all text-sm sm:text-base ${
                     isDarkMode
-                      ? "bg-slate-800/50 border-blue-500/30 text-white"
-                      : "bg-white border-blue-300 text-gray-900"
+                      ? "bg-slate-800/30 border-blue-500/20 text-gray-400"
+                      : "bg-gray-100 border-gray-300 text-gray-500"
                   }`}
-                  required
                 />
+                <p
+                  className={`text-xs sm:text-sm mt-1 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
+                  Email from your account
+                </p>
               </div>
 
               <div>
@@ -1157,6 +1119,7 @@ const ProfileFormModal = ({
                       ? "bg-slate-800/50 border-blue-500/30 text-white"
                       : "bg-white border-blue-300 text-gray-900"
                   }`}
+                  placeholder="+91 1234567890"
                 />
               </div>
 
@@ -1183,6 +1146,7 @@ const ProfileFormModal = ({
                       : "bg-white border-blue-300 text-gray-900"
                   }`}
                   required
+                  placeholder="e.g., 2020"
                 />
               </div>
 
@@ -1206,6 +1170,7 @@ const ProfileFormModal = ({
                       : "bg-white border-blue-300 text-gray-900"
                   }`}
                   required
+                  placeholder="e.g., Computer Science"
                 />
               </div>
 
@@ -1258,7 +1223,7 @@ const ProfileFormModal = ({
                 />
               </div>
 
-              <div>
+              <div className="sm:col-span-2">
                 <label
                   className={`block text-sm font-medium mb-2 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -1296,7 +1261,7 @@ const ProfileFormModal = ({
                 className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 border-2 rounded-lg sm:rounded-xl transition-colors font-medium text-sm sm:text-base ${
                   isDarkMode
                     ? "border-blue-500/30 text-gray-300 hover:bg-slate-800"
-                    : "border-blue-300 text-gray-700 hover:bg-gray-100"
+                    : "border-blue-300 text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 Cancel
@@ -1311,8 +1276,10 @@ const ProfileFormModal = ({
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     Saving...
                   </span>
+                ) : isEdit ? (
+                  "Update Profile"
                 ) : (
-                  "Save Changes"
+                  "Create Profile"
                 )}
               </button>
             </div>
@@ -1342,14 +1309,14 @@ const MentorFormModal = ({
         className={`rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-full overflow-hidden ${
           isDarkMode
             ? "bg-gradient-to-br from-slate-900 via-purple-900/30 to-indigo-900/20 border-2 border-purple-500/30"
-            : "bg-white border-purple-300"
+            : "bg-gradient-to-br from-white via-purple-50/30 to-indigo-50/30 border-2 border-purple-300"
         }`}
       >
         <div
           className={`p-4 sm:p-6 border-b-2 flex-shrink-0 ${
             isDarkMode
               ? "border-purple-500/30 bg-slate-900/90"
-              : "border-purple-300 bg-white"
+              : "border-purple-300 bg-white/90"
           }`}
         >
           <div className="flex items-center justify-between">
@@ -1364,7 +1331,7 @@ const MentorFormModal = ({
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               }`}
             >
-              <X size={20} />
+              <X size={20} className="sm:w-6 sm:h-6" />
             </button>
           </div>
         </div>

@@ -218,16 +218,15 @@ export default function AlumniHomePage({
       {/* Header / Navbar */}
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       {/* Hero Section */}
-      {/* Hero Section */}
       <section
-        className={`w-full min-h-[80vh] px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-12 relative overflow-hidden transition-colors duration-500 ${
+        className={`w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-12 relative overflow-hidden transition-colors duration-500 ${
           isDarkMode
             ? "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
             : "bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-50"
         }`}
       >
         {/* Animated Background Shapes - Parallax Layer 1 */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none hidden lg:block">
           <div
             className={`absolute top-20 -left-20 w-72 h-72 rounded-full filter blur-3xl animate-blob opacity-20 ${
               isDarkMode ? "bg-blue-500" : "bg-blue-400"
@@ -250,9 +249,7 @@ export default function AlumniHomePage({
 
         {/* Background Image with Parallax - Layer 2 */}
         <div
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 ${
-            isDarkMode ? "opacity-20" : "opacity-30"
-          }`}
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 opacity-20`}
           style={{
             backgroundImage: "url(/assets/images/bg.png)",
             transform: "translateZ(0) scale(1.1)",
@@ -263,12 +260,12 @@ export default function AlumniHomePage({
         <div
           className={`absolute inset-0 transition-all duration-500 animate-fade-in ${
             isDarkMode
-              ? "bg-gradient-to-b from-slate-900/50 via-transparent to-slate-900/80"
-              : "bg-gradient-to-b from-white/30 via-transparent to-blue-50/50"
+              ? "bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60"
+              : "bg-gradient-to-b from-white/40 via-transparent to-blue-50/50"
           }`}
         ></div>
 
-        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center h-full">
+        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center min-h-[500px]">
           {/* Left Content */}
           <div className="space-y-5 sm:space-y-6 animate-slide-up">
             {/* Welcome Badge with Pulse Animation */}
@@ -554,7 +551,7 @@ export default function AlumniHomePage({
               <div
                 className={`absolute top-4 right-4 px-4 py-2 rounded-full backdrop-blur-md ${
                   isDarkMode
-                    ? "bg-blue-500/50 text-white-200 border border-blue-400/30"
+                    ? "bg-blue-500/50 text-white border border-blue-400/30"
                     : "bg-white/80 text-blue-700 border border-blue-200"
                 } font-semibold text-sm animate-float shadow-lg`}
               >
@@ -705,9 +702,10 @@ export default function AlumniHomePage({
     }
   `}</style>
       </section>
+
       {/* Features Section - Same as Video Section */}
       {/* Features Section - Same as Video Section */}
-      <section className="hidden md:block w-full px-6 md:px-10 lg:px-14 py-10 mt-9">
+      <section className="hidden md:block w-full px-6 md:px-10 lg:px-14 py-10 mt-10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-6">
             <h2
