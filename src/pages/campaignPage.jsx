@@ -179,7 +179,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
       });
 
       const response = await fetch(
-        "http://localhost:3001/campaign/create-campaign",
+        "https://alumni-mits-l45r.onrender.com/campaign/create-campaign",
         {
           method: "POST",
           headers: {

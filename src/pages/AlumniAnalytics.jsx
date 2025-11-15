@@ -44,7 +44,9 @@ export default function AlumniAnalytics({
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
-        const response = await fetch("http://localhost:3001/alumni/all-alumni");
+        const response = await fetch(
+          "https://alumni-mits-l45r.onrender.com/alumni/all-alumni"
+        );
         const result = await response.json();
         if (result.success) {
           setAlumniData(result.data);

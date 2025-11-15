@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
+
 export default function Footer({ isDarkMode }) {
   const navigate = useNavigate();
+
   return (
     <footer
-      className={`${isDarkMode ? "bg-gray-900" : "bg-white"} border-t ${
+      className={`w-full ${isDarkMode ? "bg-gray-900" : "bg-white"} border-t ${
         isDarkMode ? "border-gray-800" : "border-gray-200"
       }`}
     >
