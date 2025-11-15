@@ -20,6 +20,19 @@ import {
   Download,
   Filter,
   Search,
+  Server,
+  Layers,
+  Shield,
+  Brain,
+  Database,
+  Cpu,
+  Settings,
+  Code,
+  Globe,
+  Lock,
+  CircuitBoard,
+  BarChart,
+  Workflow,
 } from "lucide-react";
 
 import Header from "../components/header";
@@ -311,20 +324,6 @@ const MarketTrendsSection = ({ isDarkMode }) => {
 
 // Domain Card Component
 const DomainCard = ({ domain, isDarkMode, onSelect }) => {
-  const getDomainColor = (name) => {
-    const colors = {
-      Frontend: "from-blue-500 to-cyan-500",
-      Backend: "from-green-500 to-emerald-500",
-      "Full Stack": "from-purple-500 to-pink-500",
-      Cybersecurity: "from-red-500 to-orange-500",
-      AI: "from-indigo-500 to-purple-500",
-      "Data Science": "from-teal-500 to-blue-500",
-      "Machine Learning": "from-purple-500 to-red-500",
-      DevOps: "from-orange-500 to-yellow-500",
-    };
-    return colors[name] || "from-gray-500 to-gray-600";
-  };
-
   return (
     <div
       className={`p-6 rounded-xl border transition-all cursor-pointer hover:scale-105 ${
@@ -335,9 +334,7 @@ const DomainCard = ({ domain, isDarkMode, onSelect }) => {
       onClick={() => onSelect(domain)}
     >
       <div
-        className={`w-12 h-12 rounded-lg mb-4 flex items-center justify-center bg-gradient-to-r ${getDomainColor(
-          domain.name
-        )}`}
+        className={`w-12 h-12 rounded-lg mb-4 flex items-center justify-center bg-gradient-to-r ${domain.color}`}
       >
         <domain.icon className="w-6 h-6 text-white" />
       </div>
@@ -387,19 +384,77 @@ const DomainCard = ({ domain, isDarkMode, onSelect }) => {
   );
 };
 
+// Progress Bar Component
+const ProgressBar = ({ label, percentage, color, isDarkMode }) => {
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between items-center">
+        <span
+          className={`text-sm font-medium ${
+            isDarkMode ? "text-gray-300" : "text-gray-700"
+          }`}
+        >
+          {label}
+        </span>
+        <span
+          className={`text-sm font-bold ${
+            percentage > 70
+              ? "text-green-500"
+              : percentage > 40
+              ? "text-blue-500"
+              : "text-orange-500"
+          }`}
+        >
+          {percentage}%
+        </span>
+      </div>
+      <div
+        className={`h-2 rounded-full ${
+          isDarkMode ? "bg-slate-700" : "bg-gray-200"
+        }`}
+      >
+        <div
+          className={`h-2 rounded-full transition-all duration-1000 ease-out ${color}`}
+          style={{ width: `${percentage}%` }}
+        ></div>
+      </div>
+    </div>
+  );
+};
+
 // Domain Detail Modal
 const DomainDetailModal = ({ domain, isOpen, onClose, isDarkMode }) => {
   if (!isOpen || !domain) return null;
 
+  const marketMetrics = [
+    {
+      label: "Market Demand",
+      value: domain.demandScore || 85,
+      color: "bg-green-500",
+    },
+    {
+      label: "Salary Range",
+      value: domain.salaryScore || 78,
+      color: "bg-blue-500",
+    },
+    { label: "Growth Potential", value: domain.growth, color: "bg-purple-500" },
+    {
+      label: "Entry Barrier",
+      value: domain.entryBarrier || 65,
+      color: "bg-orange-500",
+    },
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div
-        className={`relative w-full sm:max-w-4xl sm:my-8 mt-0 mb-0 min-h-screen sm:min-h-0 sm:max-h-[90vh] overflow-y-auto rounded-t-2xl sm:rounded-xl border-0 sm:border ${
+        className={`relative w-[90vw] h-[90vh] sm:w-full sm:max-w-4xl sm:h-auto sm:max-h-[90vh] overflow-hidden rounded-xl border ${
           isDarkMode
-            ? "bg-slate-900 sm:border-slate-700"
-            : "bg-white sm:border-gray-200"
-        }`}
+            ? "bg-slate-900 border-slate-700"
+            : "bg-white border-gray-200"
+        } shadow-2xl transform transition-all duration-300`}
       >
+        {/* Header - Sticky */}
         <div
           className={`sticky top-0 z-10 p-4 sm:p-6 border-b backdrop-blur-lg ${
             isDarkMode
@@ -407,182 +462,226 @@ const DomainDetailModal = ({ domain, isOpen, onClose, isDarkMode }) => {
               : "bg-white/95 border-gray-200"
           }`}
         >
-          <button
-            onClick={onClose}
-            className={`absolute top-4 right-4 p-2 rounded-lg transition-all ${
-              isDarkMode
-                ? "bg-slate-800 hover:bg-slate-700"
-                : "bg-gray-100 hover:bg-gray-200"
-            }`}
-          >
-            <span className="w-5 h-5">×</span>
-          </button>
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r ${domain.color}`}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div
+                className={`w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-r ${domain.color}`}
+              >
+                <domain.icon className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2
+                  className={`text-xl sm:text-2xl font-bold ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  {domain.name}
+                </h2>
+                <p
+                  className={`text-sm mt-1 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  Career Path & Market Analysis
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className={`p-2 rounded-lg transition-all hover:scale-110 ${
+                isDarkMode
+                  ? "bg-slate-800 hover:bg-slate-700 text-gray-300"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+              }`}
             >
-              <domain.icon className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h2
-                className={`text-xl sm:text-2xl font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {domain.name}
-              </h2>
-              <p
-                className={`text-sm mt-1 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                Career Path & Market Analysis
-              </p>
-            </div>
+              <span className="w-5 h-5">×</span>
+            </button>
           </div>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-6">
-          {/* Overview */}
-          <section>
-            <h3
-              className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              <BookOpen className="w-5 h-5 text-blue-500" />
-              Overview
-            </h3>
-            <p
-              className={`text-sm leading-relaxed ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              {domain.overview}
-            </p>
-          </section>
-
-          {/* Skills Required */}
-          <section>
-            <h3
-              className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              <Target className="w-5 h-5 text-green-500" />
-              Skills Required
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {domain.skills.map((skill, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700"
-                      : "bg-gray-50 border-gray-200"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span
-                      className={`font-medium ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {skill}
-                    </span>
+        {/* Scrollable Content */}
+        <div className="h-[calc(90vh-80px)] sm:h-[calc(90vh-88px)] overflow-y-auto">
+          <div className="p-4 sm:p-6 space-y-6">
+            {/* Market Metrics */}
+            <section>
+              <h3
+                className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                <BarChart className="w-5 h-5 text-blue-500" />
+                Market Metrics
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {marketMetrics.map((metric, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-lg border ${
+                      isDarkMode
+                        ? "bg-slate-800 border-slate-700"
+                        : "bg-gray-50 border-gray-200"
+                    }`}
+                  >
+                    <ProgressBar
+                      label={metric.label}
+                      percentage={metric.value}
+                      color={metric.color}
+                      isDarkMode={isDarkMode}
+                    />
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
 
-          {/* Learning Roadmap */}
-          <section>
-            <h3
-              className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              <TrendingUp className="w-5 h-5 text-purple-500" />
-              Learning Roadmap
-            </h3>
-            <div className="space-y-3">
-              {domain.roadmap.map((step, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700"
-                      : "bg-gray-50 border-gray-200"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                        isDarkMode
-                          ? "bg-blue-600 text-white"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
-                    >
-                      {index + 1}
-                    </div>
-                    <div>
-                      <h4
-                        className={`font-semibold mb-1 ${
+            {/* Overview */}
+            <section>
+              <h3
+                className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                <BookOpen className="w-5 h-5 text-blue-500" />
+                Overview
+              </h3>
+              <p
+                className={`text-sm leading-relaxed ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                {domain.overview}
+              </p>
+            </section>
+
+            {/* Skills Required */}
+            <section>
+              <h3
+                className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                <Target className="w-5 h-5 text-green-500" />
+                Skills Required
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {domain.skills.map((skill, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded-lg border ${
+                      isDarkMode
+                        ? "bg-slate-800 border-slate-700"
+                        : "bg-gray-50 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span
+                        className={`font-medium ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
-                        {step.title}
-                      </h4>
-                      <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        {skill}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Learning Roadmap */}
+            <section>
+              <h3
+                className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                <TrendingUp className="w-5 h-5 text-purple-500" />
+                Learning Roadmap
+              </h3>
+              <div className="space-y-4">
+                {domain.roadmap.map((step, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-lg border ${
+                      isDarkMode
+                        ? "bg-slate-800 border-slate-700"
+                        : "bg-gray-50 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          isDarkMode
+                            ? "bg-blue-600 text-white"
+                            : "bg-blue-100 text-blue-700"
                         }`}
                       >
-                        {step.description}
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <h4
+                          className={`font-semibold mb-2 ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {step.title}
+                        </h4>
+                        <p
+                          className={`text-sm ${
+                            isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
+                        >
+                          {step.description}
+                        </p>
+                        <div className="mt-3">
+                          <ProgressBar
+                            label="Completion"
+                            percentage={Math.min(100, (index + 1) * 25)}
+                            color="bg-gradient-to-r from-cyan-500 to-blue-600"
+                            isDarkMode={isDarkMode}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* How to Get Job/Intern */}
+            <section>
+              <h3
+                className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                <Briefcase className="w-5 h-5 text-orange-500" />
+                How to Get Job/Intern
+              </h3>
+              <div className="space-y-3">
+                {domain.jobTips.map((tip, index) => (
+                  <div
+                    key={index}
+                    className={`p-3 rounded-lg border ${
+                      isDarkMode
+                        ? "bg-slate-800 border-slate-700"
+                        : "bg-gray-50 border-gray-200"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Star className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+                      <p
+                        className={`text-sm ${
+                          isDarkMode ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
+                        {tip}
                       </p>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* How to Get Job/Intern */}
-          <section>
-            <h3
-              className={`text-lg font-semibold mb-4 flex items-center gap-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              <Briefcase className="w-5 h-5 text-orange-500" />
-              How to Get Job/Intern
-            </h3>
-            <div className="space-y-3">
-              {domain.jobTips.map((tip, index) => (
-                <div
-                  key={index}
-                  className={`p-3 rounded-lg border ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700"
-                      : "bg-gray-50 border-gray-200"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <Star className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
-                    <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
-                    >
-                      {tip}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </div>
@@ -606,10 +705,13 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
   const domains = [
     {
       name: "Frontend",
-      icon: Sparkles,
+      icon: Globe,
       description: "Building user interfaces and client-side applications",
       demand: "High",
       growth: 12,
+      demandScore: 82,
+      salaryScore: 75,
+      entryBarrior: 60,
       color: "from-blue-500 to-cyan-500",
       overview:
         "Frontend development focuses on creating the user interface and user experience of web applications. It involves working with technologies that run in the browser and ensuring responsive, accessible, and performant web applications.",
@@ -658,6 +760,9 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
       description: "Server-side development and database management",
       demand: "High",
       growth: 15,
+      demandScore: 85,
+      salaryScore: 80,
+      entryBarrior: 70,
       color: "from-green-500 to-emerald-500",
       overview:
         "Backend development involves server-side logic, database management, and API development. It ensures data is processed, stored, and delivered efficiently to frontend applications.",
@@ -703,6 +808,9 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
       description: "End-to-end web application development",
       demand: "Very High",
       growth: 18,
+      demandScore: 90,
+      salaryScore: 85,
+      entryBarrior: 75,
       color: "from-purple-500 to-pink-500",
       overview:
         "Full stack developers work on both frontend and backend aspects of web applications. They understand the complete development process from UI design to database management.",
@@ -748,6 +856,9 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
       description: "Protecting systems and networks from digital attacks",
       demand: "Very High",
       growth: 28,
+      demandScore: 88,
+      salaryScore: 82,
+      entryBarrior: 80,
       color: "from-red-500 to-orange-500",
       overview:
         "Cybersecurity focuses on protecting computer systems, networks, and data from digital attacks. It involves implementing security measures and responding to security breaches.",
@@ -796,6 +907,9 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
       description: "Artificial Intelligence and intelligent systems",
       demand: "Very High",
       growth: 35,
+      demandScore: 92,
+      salaryScore: 88,
+      entryBarrior: 85,
       color: "from-indigo-500 to-purple-500",
       overview:
         "Artificial Intelligence involves creating intelligent machines that can perform tasks typically requiring human intelligence. It includes machine learning, natural language processing, and computer vision.",
@@ -843,6 +957,9 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
       description: "Extracting insights from complex data sets",
       demand: "High",
       growth: 25,
+      demandScore: 85,
+      salaryScore: 80,
+      entryBarrior: 75,
       color: "from-teal-500 to-blue-500",
       overview:
         "Data Science combines statistics, programming, and domain knowledge to extract meaningful insights from data. It involves data analysis, visualization, and predictive modeling.",
@@ -888,6 +1005,9 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
       description: "Algorithms that learn from data patterns",
       demand: "Very High",
       growth: 32,
+      demandScore: 90,
+      salaryScore: 85,
+      entryBarrior: 82,
       color: "from-purple-500 to-red-500",
       overview:
         "Machine Learning focuses on developing algorithms that can learn from and make predictions on data. It's a subset of AI that enables computers to learn without explicit programming.",
@@ -929,10 +1049,13 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
     },
     {
       name: "DevOps",
-      icon: Settings,
+      icon: Workflow,
       description: "Streamlining development and operations",
       demand: "High",
       growth: 22,
+      demandScore: 83,
+      salaryScore: 78,
+      entryBarrior: 70,
       color: "from-orange-500 to-yellow-500",
       overview:
         "DevOps combines software development and IT operations to shorten the development lifecycle while delivering features, fixes, and updates frequently in close alignment with business objectives.",
@@ -978,20 +1101,12 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
   const handleDomainSelect = (domain) => {
     setSelectedDomain(domain);
     setShowDomainModal(true);
-    document.body.style.overflow = "hidden";
   };
 
   const closeDomainModal = () => {
     setShowDomainModal(false);
     setSelectedDomain(null);
-    document.body.style.overflow = "unset";
   };
-
-  useEffect(() => {
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, []);
 
   return (
     <div
@@ -1059,12 +1174,3 @@ export default function JobMarketAnalysis({ isDarkMode, toggleTheme }) {
     </div>
   );
 }
-
-// Add missing icon components
-const Server = ({ className }) => <div className={className}>🖥️</div>;
-const Layers = ({ className }) => <div className={className}>🔗</div>;
-const Shield = ({ className }) => <div className={className}>🛡️</div>;
-const Brain = ({ className }) => <div className={className}>🧠</div>;
-const Database = ({ className }) => <div className={className}>💾</div>;
-const Cpu = ({ className }) => <div className={className}>⚙️</div>;
-const Settings = ({ className }) => <div className={className}>⚡</div>;

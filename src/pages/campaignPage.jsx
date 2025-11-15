@@ -307,36 +307,6 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
           </p>
           <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-10">
-            {isAuthenticated ? (
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
-              >
-                <Plus className="w-5 h-5" /> Create Campaign
-              </button>
-            ) : (
-              <button
-                onClick={() =>
-                  showMessage("Please login to create a campaign", "error")
-                }
-                className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
-              >
-                <Plus className="w-5 h-5" /> Login to Create
-              </button>
-            )}
-            <button
-              className={`px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95 ${
-                isDarkMode
-                  ? "bg-slate-800 text-cyan-300 border border-cyan-500/30"
-                  : "bg-white text-blue-600 border border-blue-300 shadow-lg"
-              }`}
-            >
-              Browse All
-            </button>
-          </div>
-
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
             <div

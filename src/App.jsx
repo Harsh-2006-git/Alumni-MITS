@@ -30,6 +30,10 @@ import EventGalleryPage from "./pages/EventGallary";
 import AlumniJobsPage from "./pages/AlumniJobs";
 import CreateJobPage from "./pages/CreateJob";
 import JobTrendPage from "./pages/JobTrend";
+import AlumniAnalyticsPage from "./pages/AlumniAnalytics";
+import CreateCampaignPage from "./pages/CreateCampaign";
+import MentorProfilePage from "./pages/MentorProfilePage";
+import MentorshipRequestsPage from "./pages/MentorshipRequestsPage";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -262,9 +266,42 @@ export default function App() {
             }
           />
           <Route
+            path="/alumni-analytics"
+            element={
+              <AlumniAnalyticsPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
             path="/mentor"
             element={
               <MentorPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/mentor-profile"
+            element={
+              <MentorProfilePage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/mentorship-requests"
+            element={
+              <MentorshipRequestsPage
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
                 isAuthenticated={isAuthenticated}
@@ -368,6 +405,27 @@ export default function App() {
                 toggleTheme={toggleTheme}
                 isAuthenticated={isAuthenticated}
                 setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/campaigns"
+            element={
+              <CampaignPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+              />
+            }
+          />
+          <Route
+            path="/create-campaign"
+            element={
+              <CreateCampaignPage
+                isDarkMode={isDarkMode}
+                toggleTheme={toggleTheme}
+                isAuthenticated={isAuthenticated}
               />
             }
           />

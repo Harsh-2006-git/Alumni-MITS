@@ -21,11 +21,15 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const [showAlumniDropdown, setShowAlumniDropdown] = useState(false);
   const [showEventsDropdown, setShowEventsDropdown] = useState(false);
   const [showJobsDropdown, setShowJobsDropdown] = useState(false);
+  const [showCampaignDropdown, setShowCampaignDropdown] = useState(false);
+  const [showMentorDropdown, setShowMentorDropdown] = useState(false);
   const [auth, setAuth] = useState(null);
   const dropdownRef = useRef(null);
   const alumniDropdownRef = useRef(null);
   const eventsDropdownRef = useRef(null);
   const jobsDropdownRef = useRef(null);
+  const campaignDropdownRef = useRef(null);
+  const mentorDropdownRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const refreshIntervalRef = useRef(null);
 
@@ -39,6 +43,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
   };
   const toggleJobsDropdown = () => {
     setShowJobsDropdown(!showJobsDropdown);
+  };
+  const toggleCampaignDropdown = () => {
+    setShowCampaignDropdown(!showCampaignDropdown);
+  };
+  const toggleMentorDropdown = () => {
+    setShowMentorDropdown(!showMentorDropdown);
   };
 
   const refreshAccessToken = async (refreshToken) => {
@@ -177,53 +187,6 @@ export default function Header({ isDarkMode, toggleTheme }) {
     setIsMenuOpen(false);
   };
 
-  // Handle click outside for all dropdowns and mobile menu
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowProfileMenu(false);
-      }
-      // Only close alumni dropdown on desktop, not mobile
-      if (
-        alumniDropdownRef.current &&
-        !alumniDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
-      ) {
-        setShowAlumniDropdown(false);
-      }
-      // Only close events dropdown on desktop, not mobile
-      if (
-        eventsDropdownRef.current &&
-        !eventsDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
-      ) {
-        setShowEventsDropdown(false);
-      }
-      // Only close jobs dropdown on desktop, not mobile
-      if (
-        jobsDropdownRef.current &&
-        !jobsDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
-      ) {
-        setShowJobsDropdown(false);
-      }
-      // Close mobile menu when clicking outside
-      if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target) &&
-        !event.target.closest('button[aria-label="Toggle menu"]') &&
-        isMenuOpen
-      ) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isMenuOpen]);
-
   // Alumni dropdown options with their navigation handlers
   const alumniOptions = [
     {
@@ -241,6 +204,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
     {
       label: "Your BatchMates",
       path: "/batchmates",
+    },
+    {
+      label: "Alumni Analytics",
+      path: "/alumni-analytics",
     },
   ];
 
@@ -280,6 +247,34 @@ export default function Header({ isDarkMode, toggleTheme }) {
     },
   ];
 
+  // Campaign dropdown options with their navigation handlers
+  const campaignOptions = [
+    {
+      label: "All Campaigns",
+      path: "/campaign",
+    },
+    {
+      label: "Create Campaign",
+      path: "/create-campaign",
+    },
+  ];
+
+  // Mentor dropdown options with their navigation handlers
+  const mentorOptions = [
+    {
+      label: "All Mentors",
+      path: "/mentor",
+    },
+    {
+      label: "Become a Mentor",
+      path: "/mentor-profile",
+    },
+    {
+      label: "Mentorship Requests",
+      path: "/mentorship-requests",
+    },
+  ];
+
   const handleAlumniOptionClick = (path) => {
     navigate(path);
     setShowAlumniDropdown(false);
@@ -298,11 +293,86 @@ export default function Header({ isDarkMode, toggleTheme }) {
     setIsMenuOpen(false);
   };
 
+  const handleCampaignOptionClick = (path) => {
+    navigate(path);
+    setShowCampaignDropdown(false);
+    setIsMenuOpen(false);
+  };
+
+  const handleMentorOptionClick = (path) => {
+    navigate(path);
+    setShowMentorDropdown(false);
+    setIsMenuOpen(false);
+  };
+
   // Navigation handlers for main nav items
   const handleNavClick = (path) => {
     navigate(path);
     setIsMenuOpen(false);
   };
+
+  // Handle click outside for all dropdowns and mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileMenu(false);
+      }
+      // Only close alumni dropdown on desktop, not mobile
+      if (
+        alumniDropdownRef.current &&
+        !alumniDropdownRef.current.contains(event.target) &&
+        window.innerWidth >= 768
+      ) {
+        setShowAlumniDropdown(false);
+      }
+      // Only close events dropdown on desktop, not mobile
+      if (
+        eventsDropdownRef.current &&
+        !eventsDropdownRef.current.contains(event.target) &&
+        window.innerWidth >= 768
+      ) {
+        setShowEventsDropdown(false);
+      }
+      // Only close jobs dropdown on desktop, not mobile
+      if (
+        jobsDropdownRef.current &&
+        !jobsDropdownRef.current.contains(event.target) &&
+        window.innerWidth >= 768
+      ) {
+        setShowJobsDropdown(false);
+      }
+      // Only close campaign dropdown on desktop, not mobile
+      if (
+        campaignDropdownRef.current &&
+        !campaignDropdownRef.current.contains(event.target) &&
+        window.innerWidth >= 768
+      ) {
+        setShowCampaignDropdown(false);
+      }
+      // Only close mentor dropdown on desktop, not mobile
+      if (
+        mentorDropdownRef.current &&
+        !mentorDropdownRef.current.contains(event.target) &&
+        window.innerWidth >= 768
+      ) {
+        setShowMentorDropdown(false);
+      }
+      // Close mobile menu when clicking outside
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target) &&
+        !event.target.closest('button[aria-label="Toggle menu"]') &&
+        isMenuOpen
+      ) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -546,26 +616,122 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 )}
               </div>
 
-              <button
-                onClick={() => handleNavClick("/campaign")}
-                className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
-                  isDarkMode
-                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                    : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-                }`}
+              {/* Campaign Dropdown for Desktop */}
+              <div
+                className="relative"
+                ref={campaignDropdownRef}
+                onMouseEnter={() => setShowCampaignDropdown(true)}
+                onMouseLeave={() => setShowCampaignDropdown(false)}
               >
-                Campaign
-              </button>
-              <button
-                onClick={() => handleNavClick("/mentor")}
-                className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
-                  isDarkMode
-                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                    : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-                }`}
+                {/* Invisible click box for better hover area */}
+                <div className="absolute -inset-2 z-10 cursor-pointer" />
+
+                <button
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
+                    isDarkMode
+                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  } ${
+                    showCampaignDropdown
+                      ? isDarkMode
+                        ? "text-indigo-400 bg-gray-800"
+                        : "text-blue-600 bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  Campaign
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showCampaignDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showCampaignDropdown && (
+                  <div
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-blue-200"
+                    }`}
+                  >
+                    <div className="py-1">
+                      {campaignOptions.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleCampaignOptionClick(option.path)}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
+                            isDarkMode
+                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Mentor Dropdown for Desktop */}
+              <div
+                className="relative"
+                ref={mentorDropdownRef}
+                onMouseEnter={() => setShowMentorDropdown(true)}
+                onMouseLeave={() => setShowMentorDropdown(false)}
               >
-                Mentorship
-              </button>
+                {/* Invisible click box for better hover area */}
+                <div className="absolute -inset-2 z-10 cursor-pointer" />
+
+                <button
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
+                    isDarkMode
+                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                  } ${
+                    showMentorDropdown
+                      ? isDarkMode
+                        ? "text-indigo-400 bg-gray-800"
+                        : "text-blue-600 bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  Mentorship
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showMentorDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showMentorDropdown && (
+                  <div
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-blue-200"
+                    }`}
+                  >
+                    <div className="py-1">
+                      {mentorOptions.map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleMentorOptionClick(option.path)}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
+                            isDarkMode
+                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => handleNavClick("/about")}
                 className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
@@ -1029,26 +1195,92 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 )}
               </div>
 
-              <button
-                onClick={() => handleNavClick("/campaign")}
-                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  isDarkMode
-                    ? "text-gray-300 hover:bg-gray-800"
-                    : "text-gray-700 hover:bg-blue-50"
-                }`}
-              >
-                Campaign
-              </button>
-              <button
-                onClick={() => handleNavClick("/mentor")}
-                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                  isDarkMode
-                    ? "text-gray-300 hover:bg-gray-800"
-                    : "text-gray-700 hover:bg-blue-50"
-                }`}
-              >
-                Mentorship
-              </button>
+              {/* Campaign Dropdown for Mobile */}
+              <div className="flex flex-col">
+                <button
+                  onClick={() => setShowCampaignDropdown(!showCampaignDropdown)}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
+                    isDarkMode
+                      ? "text-gray-300 hover:bg-gray-800"
+                      : "text-gray-700 hover:bg-blue-50"
+                  } ${
+                    showCampaignDropdown
+                      ? isDarkMode
+                        ? "bg-gray-800"
+                        : "bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  <span>Campaign</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showCampaignDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showCampaignDropdown && (
+                  <div className="ml-4 mt-1 flex flex-col gap-1">
+                    {campaignOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleCampaignOptionClick(option.path)}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-800"
+                            : "text-gray-600 hover:bg-blue-50"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Mentor Dropdown for Mobile */}
+              <div className="flex flex-col">
+                <button
+                  onClick={() => setShowMentorDropdown(!showMentorDropdown)}
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
+                    isDarkMode
+                      ? "text-gray-300 hover:bg-gray-800"
+                      : "text-gray-700 hover:bg-blue-50"
+                  } ${
+                    showMentorDropdown
+                      ? isDarkMode
+                        ? "bg-gray-800"
+                        : "bg-blue-50"
+                      : ""
+                  }`}
+                >
+                  <span>Mentorship</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      showMentorDropdown ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+
+                {showMentorDropdown && (
+                  <div className="ml-4 mt-1 flex flex-col gap-1">
+                    {mentorOptions.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleMentorOptionClick(option.path)}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-800"
+                            : "text-gray-600 hover:bg-blue-50"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={() => handleNavClick("/about")}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer ${

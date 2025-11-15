@@ -34,7 +34,7 @@ export default function BatchmatesFinder({
   const [showModal, setShowModal] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [expandedBatch, setExpandedBatch] = useState(null);
-  const [viewMode, setViewMode] = useState("list");
+  const [viewMode, setViewMode] = useState("batches");
 
   // Fetch alumni data from API
   useEffect(() => {
