@@ -219,7 +219,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
           {section.content.paragraphs.map((para, index) => (
             <p
               key={index}
-              className={`text-sm sm:text-base lg:text-lg leading-relaxed ${
+              className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -242,7 +242,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                 </h4>
               </div>
               <p
-                className={`text-sm sm:text-base ${
+                className={`text-[15px] sm:text-base ${
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
@@ -264,7 +264,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                 </h4>
               </div>
               <p
-                className={`text-sm sm:text-base ${
+                className={`text-base sm:text-base ${
                   isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
@@ -293,7 +293,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
               </h4>
             </div>
             <p
-              className={`text-sm sm:text-base lg:text-lg leading-relaxed ${
+              className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -325,7 +325,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                     <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-400" />
                   </div>
                   <p
-                    className={`text-sm sm:text-base lg:text-lg flex-1 ${
+                    className={`text-[15px] sm:text-base lg:text-lg flex-1 ${
                       isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
@@ -343,7 +343,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       return (
         <div className="space-y-6 sm:space-y-8">
           <p
-            className={`text-sm sm:text-base lg:text-lg leading-relaxed ${
+            className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
               isDarkMode ? "text-gray-300" : "text-gray-700"
             }`}
           >
@@ -371,7 +371,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                   {initiative.title}
                 </h4>
                 <p
-                  className={`text-xs sm:text-sm lg:text-base ${
+                  className={`text-[14px] sm:text-sm lg:text-base ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -388,7 +388,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       return (
         <div className="space-y-8 sm:space-y-10">
           <p
-            className={`text-sm sm:text-base lg:text-lg leading-relaxed ${
+            className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
               isDarkMode ? "text-gray-300" : "text-gray-700"
             }`}
           >
@@ -430,7 +430,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                     {member.name}
                   </h5>
                   <p
-                    className={`text-xs sm:text-sm lg:text-base font-semibold ${
+                    className={`text-[14px] sm:text-sm lg:text-base font-semibold ${
                       isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
@@ -470,7 +470,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                     {dean.name}
                   </h5>
                   <p
-                    className={`text-xs sm:text-sm ${
+                    className={`text-[14px] sm:text-sm ${
                       isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
@@ -501,12 +501,12 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-cyan-400 flex-shrink-0" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-3xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight">
               About MITS Alumni
             </h1>
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-cyan-400 flex-shrink-0" />
           </div>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-3 sm:mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold px-4">
+          <p className="text-lg sm:text-lg md:text-xl lg:text-2xl mb-3 sm:mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold px-4">
             Connecting Generations, Building Futures
           </p>
           <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full"></div>
@@ -523,7 +523,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                 <button
                   key={key}
                   onClick={() => handleSectionChange(key)}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-full font-semibold transition-all text-xs sm:text-sm lg:text-base flex-shrink-0 ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-full font-semibold transition-all text-sm sm:text-sm lg:text-base flex-shrink-0 ${
                     activeSection === key
                       ? isDarkMode
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg scale-105`
@@ -533,7 +533,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                       : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow"
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5 flex-shrink-0" />
+                  <Icon className="w-4 h-4 sm:w-4 sm:h-4 lg:w-5 lg:h-5 flex-shrink-0" />
                   <span className="whitespace-nowrap">{section.title}</span>
                 </button>
               );
@@ -567,7 +567,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                 );
               })()}
               <h2
-                className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r ${sections[activeSection].color} bg-clip-text text-transparent leading-tight`}
+                className={`text-2xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r ${sections[activeSection].color} bg-clip-text text-transparent leading-tight`}
               >
                 {sections[activeSection].title}
               </h2>
