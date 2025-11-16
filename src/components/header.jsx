@@ -401,11 +401,11 @@ export default function Header({ isDarkMode, toggleTheme }) {
       ) {
         setIsMenuOpen(false);
       }
-      // Update click outside handler in useEffect
+      // Update click outside handler for about dropdown - FIX THIS LINE
       if (
         aboutDropdownRef.current &&
         !aboutDropdownRef.current.contains(event.target) &&
-        windowWidth >= 1160
+        window.innerWidth >= 768 // ✅ Changed from windowWidth to window.innerWidth
       ) {
         setShowAboutDropdown(false);
       }

@@ -358,7 +358,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
       const authData = localStorage.getItem("auth");
       const token = authData ? JSON.parse(authData).accessToken : null;
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/upcoming-event",
+        "http://localhost:3001/event/upcoming-event",
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
@@ -383,17 +383,14 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         showMessage("error", "Please login to create an event");
         return;
       }
-      const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/add-event",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch("http://localhost:3001/event/add-event", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
       const data = await response.json();
       if (response.ok) {
         await fetchEvents();
@@ -428,17 +425,14 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         showMessage("error", "Please login to register for this event");
         return;
       }
-      const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/registration",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ eventId }),
-        }
-      );
+      const response = await fetch("http://localhost:3001/event/registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ eventId }),
+      });
       const data = await response.json();
       if (response.ok) {
         showMessage(
