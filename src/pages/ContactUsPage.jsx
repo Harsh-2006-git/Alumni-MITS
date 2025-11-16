@@ -120,40 +120,40 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-8 lg:px-12 py-16 text-center">
+      <section className="container mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16 text-center">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Send className="w-8 h-8 text-cyan-400" />
-            <h1 className="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <Send className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-cyan-400 flex-shrink-0" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight">
               Contact Us
             </h1>
-            <Send className="w-8 h-8 text-cyan-400" />
+            <Send className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 text-cyan-400 flex-shrink-0" />
           </div>
-          <p className="text-xl lg:text-2xl mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-3 sm:mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold px-4">
             Get in Touch with MITS
           </p>
-          <div className="w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full"></div>
+          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full"></div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="container mx-auto px-6 pb-16">
+      <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-16">
         <div className="max-w-6xl mx-auto">
           <div
-            className={`rounded-3xl p-8 lg:p-12 border-2 shadow-2xl transition-all ${
+            className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12 border-2 shadow-2xl transition-all ${
               isDarkMode
                 ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 backdrop-blur-sm border-blue-600/20"
                 : "bg-gradient-to-br from-white to-blue-100/80 backdrop-blur-sm border-blue-200 shadow-xl"
             }`}
           >
-            <div className="flex items-center gap-3 mb-8">
-              <Building className="w-8 h-8 text-cyan-400" />
-              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 lg:mb-8">
+              <Building className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-cyan-400 flex-shrink-0" />
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent leading-tight">
                 Main Campus
               </h2>
             </div>
             <p
-              className={`text-lg mb-8 ${
+              className={`text-sm sm:text-base lg:text-lg mb-6 sm:mb-8 ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -162,14 +162,14 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
               environment.
             </p>
 
-            <div className="grid lg:grid-cols-2 gap-8">
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
               {/* Left Column - Contact Information */}
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {/* Main Contact Info */}
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-cyan-400 mb-4 flex items-center gap-2">
-                    <Phone className="w-6 h-6" />
-                    Contact Information
+                <div className="space-y-3 sm:space-y-4">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-cyan-400 mb-3 sm:mb-4 flex items-center gap-2">
+                    <Phone className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                    <span>Contact Information</span>
                   </h3>
                   {contactInfo.main.map((item, index) => {
                     const Icon = item.icon;
@@ -177,27 +177,27 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                       <a
                         key={index}
                         href={item.link}
-                        className={`flex items-start gap-4 p-4 rounded-xl transition-all hover:scale-105 ${
+                        className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg sm:rounded-xl transition-all hover:scale-105 ${
                           isDarkMode
                             ? "bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700"
                             : "bg-white hover:bg-gray-50 border border-gray-200 shadow"
                         }`}
                       >
                         <div
-                          className={`p-3 rounded-full ${
+                          className={`p-2 sm:p-3 rounded-full flex-shrink-0 ${
                             isDarkMode ? "bg-cyan-500/20" : "bg-cyan-100"
                           }`}
                         >
-                          <Icon className="w-5 h-5 text-cyan-400" />
+                          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-cyan-400">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-cyan-400 text-sm sm:text-base">
                             {item.label}
                           </p>
                           <p
-                            className={
+                            className={`text-xs sm:text-sm lg:text-base break-words ${
                               isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }
+                            }`}
                           >
                             {item.value}
                           </p>
@@ -209,12 +209,12 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
 
                 {/* Department Contacts */}
                 <div>
-                  <h3 className="text-2xl font-bold text-blue-400 mb-4 flex items-center gap-2">
-                    <Users className="w-6 h-6" />
-                    Department Contacts
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-400 mb-3 sm:mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                    <span>Department Contacts</span>
                   </h3>
                   <div
-                    className={`p-6 rounded-xl ${
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
                       isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
@@ -223,7 +223,7 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     {contactInfo.departments.map((dept, index) => (
                       <div
                         key={index}
-                        className="flex justify-between items-center py-3 border-b last:border-b-0"
+                        className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2 py-2.5 sm:py-3 border-b last:border-b-0"
                         style={{
                           borderColor: isDarkMode
                             ? "rgba(100, 116, 139, 0.3)"
@@ -231,15 +231,15 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <span
-                          className={
+                          className={`text-xs sm:text-sm lg:text-base ${
                             isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }
+                          }`}
                         >
                           {dept.department}
                         </span>
                         <a
                           href={`tel:${dept.phone.replace(/\D/g, "")}`}
-                          className="text-blue-400 hover:text-blue-300 font-semibold"
+                          className="text-blue-400 hover:text-blue-300 font-semibold text-xs sm:text-sm lg:text-base"
                         >
                           {dept.phone}
                         </a>
@@ -250,12 +250,12 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
 
                 {/* Email Contacts */}
                 <div>
-                  <h3 className="text-2xl font-bold text-purple-400 mb-4 flex items-center gap-2">
-                    <Mail className="w-6 h-6" />
-                    Email Contacts
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-400 mb-3 sm:mb-4 flex items-center gap-2">
+                    <Mail className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                    <span>Email Contacts</span>
                   </h3>
                   <div
-                    className={`p-6 rounded-xl ${
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
                       isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
@@ -264,7 +264,7 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     {contactInfo.emails.map((email, index) => (
                       <div
                         key={index}
-                        className="py-3 border-b last:border-b-0"
+                        className="py-2.5 sm:py-3 border-b last:border-b-0"
                         style={{
                           borderColor: isDarkMode
                             ? "rgba(100, 116, 139, 0.3)"
@@ -272,15 +272,15 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <p
-                          className={
+                          className={`text-xs sm:text-sm lg:text-base mb-1 ${
                             isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }
+                          }`}
                         >
                           {email.department}:
                         </p>
                         <a
                           href={`mailto:${email.email}`}
-                          className="text-purple-400 hover:text-purple-300 font-semibold break-all"
+                          className="text-purple-400 hover:text-purple-300 font-semibold text-xs sm:text-sm lg:text-base break-all"
                         >
                           {email.email}
                         </a>
@@ -291,20 +291,20 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
               </div>
 
               {/* Right Column - Map and Additional Info */}
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {/* Map */}
                 <div>
-                  <h3 className="text-2xl font-bold text-emerald-400 mb-4 flex items-center gap-2">
-                    <MapPin className="w-6 h-6" />
-                    Campus Location
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-emerald-400 mb-3 sm:mb-4 flex items-center gap-2">
+                    <MapPin className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                    <span>Campus Location</span>
                   </h3>
                   <div
-                    className={`rounded-xl overflow-hidden border-2 ${
+                    className={`rounded-lg sm:rounded-xl overflow-hidden border-2 ${
                       isDarkMode ? "border-slate-700" : "border-gray-200"
                     }`}
                   >
                     {/* Google Maps Embed */}
-                    <div className="w-full h-64">
+                    <div className="w-full h-48 sm:h-56 lg:h-64">
                       <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.126265347955!2d78.20456327588724!3d26.230225377047315!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3976c14c64938e5f%3A0x87b3d6a725f7b077!2sMadhav%20Institute%20of%20Technology%20%26%20Science%2C%20Gwalior!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
                         width="100%"
@@ -320,24 +320,24 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
 
                     {/* Location Info Overlay */}
                     <div
-                      className={`p-4 ${
+                      className={`p-3 sm:p-4 ${
                         isDarkMode ? "bg-slate-800" : "bg-white"
                       } border-t ${
                         isDarkMode ? "border-slate-700" : "border-gray-200"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <MapPin className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-                        <div>
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                        <div className="min-w-0 flex-1">
                           <p
-                            className={`font-semibold ${
+                            className={`font-semibold text-sm sm:text-base ${
                               isDarkMode ? "text-white" : "text-gray-900"
                             }`}
                           >
                             Madhav Institute of Technology and Science
                           </p>
                           <p
-                            className={`text-sm ${
+                            className={`text-xs sm:text-sm ${
                               isDarkMode ? "text-gray-300" : "text-gray-600"
                             }`}
                           >
@@ -350,12 +350,12 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                   </div>
 
                   {/* Quick Actions */}
-                  <div className="flex gap-3 mt-4">
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-3 sm:mt-4">
                     <a
                       href="https://www.google.com/maps/place/Madhav+Institute+of+Technology+%26+Science,+Gwalior/@26.232364,78.21004,15z/data=!4m14!1m7!3m6!1s0x3976c14c64938e5f:0x87b3d6a725f7b077!2sMadhav+Institute+of+Technology+%26+Science,+Gwalior!8m2!3d26.2302254!4d78.207152!16s%2Fm%2F02qxs_p!3m5!1s0x3976c14c64938e5f:0x87b3d6a725f7b077!8m2!3d26.2302254!4d78.207152!16s%2Fm%2F02qxs_p?hl=en&entry=ttu&g_ep=EgoyMDI1MTExMi4wIKXMDSoASAFQAw%3D%3D"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex-1 text-center py-2 px-4 rounded-lg transition-all hover:scale-105 ${
+                      className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-lg text-xs sm:text-sm lg:text-base transition-all hover:scale-105 ${
                         isDarkMode
                           ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
                           : "bg-emerald-100 text-emerald-600 border border-emerald-200 hover:bg-emerald-200"
@@ -367,7 +367,7 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                       href="https://www.google.com/maps/dir//Madhav+Institute+of+Technology+%26+Science,+Gwalior/@26.2302254,78.207152,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3976c14c64938e5f:0x87b3d6a725f7b077!2m2!1d78.207152!2d26.2302254?hl=en&entry=ttu&g_ep=EgoyMDI1MTExMi4wIKXMDSoASAFQAw%3D%3D"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex-1 text-center py-2 px-4 rounded-lg transition-all hover:scale-105 ${
+                      className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-lg text-xs sm:text-sm lg:text-base transition-all hover:scale-105 ${
                         isDarkMode
                           ? "bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30"
                           : "bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-200"
@@ -380,12 +380,12 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
 
                 {/* Office Hours */}
                 <div>
-                  <h3 className="text-2xl font-bold text-amber-400 mb-4 flex items-center gap-2">
-                    <Clock className="w-6 h-6" />
-                    Office Hours
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-amber-400 mb-3 sm:mb-4 flex items-center gap-2">
+                    <Clock className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                    <span>Office Hours</span>
                   </h3>
                   <div
-                    className={`p-6 rounded-xl ${
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
                       isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
@@ -394,7 +394,7 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     {contactInfo.hours.map((hour, index) => (
                       <div
                         key={index}
-                        className="flex justify-between items-center py-3 border-b last:border-b-0"
+                        className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 sm:gap-2 py-2.5 sm:py-3 border-b last:border-b-0"
                         style={{
                           borderColor: isDarkMode
                             ? "rgba(100, 116, 139, 0.3)"
@@ -402,14 +402,14 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <span
-                          className={
+                          className={`text-xs sm:text-sm lg:text-base ${
                             isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }
+                          }`}
                         >
                           {hour.day}
                         </span>
                         <span
-                          className={`font-semibold ${
+                          className={`font-semibold text-xs sm:text-sm lg:text-base ${
                             hour.time === "Closed"
                               ? "text-red-400"
                               : "text-amber-400"
@@ -424,12 +424,12 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
 
                 {/* Online Resources */}
                 <div>
-                  <h3 className="text-2xl font-bold text-indigo-400 mb-4 flex items-center gap-2">
-                    <Globe className="w-6 h-6" />
-                    Online Resources
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-indigo-400 mb-3 sm:mb-4 flex items-center gap-2">
+                    <Globe className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                    <span>Online Resources</span>
                   </h3>
                   <div
-                    className={`p-6 rounded-xl ${
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
                       isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
@@ -438,7 +438,7 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     {contactInfo.websites.map((site, index) => (
                       <div
                         key={index}
-                        className="py-3 border-b last:border-b-0"
+                        className="py-2.5 sm:py-3 border-b last:border-b-0"
                         style={{
                           borderColor: isDarkMode
                             ? "rgba(100, 116, 139, 0.3)"
@@ -446,9 +446,9 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <p
-                          className={
+                          className={`text-xs sm:text-sm lg:text-base mb-1 ${
                             isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }
+                          }`}
                         >
                           {site.name}:
                         </p>
@@ -456,7 +456,7 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                           href={site.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-indigo-400 hover:text-indigo-300 font-semibold break-all"
+                          className="text-indigo-400 hover:text-indigo-300 font-semibold text-xs sm:text-sm lg:text-base break-all"
                         >
                           {site.url}
                         </a>

@@ -101,10 +101,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
       showNotification("🚀 Mentorship request sent successfully!", "success");
     } catch (error) {
       console.error("Error sending mentorship request:", error);
-      showNotification(
-        "Failed to send mentorship request. Please try again.",
-        "error"
-      );
+      showNotification("Failed to send mentorship request.", error);
     } finally {
       setLoading(false);
     }
