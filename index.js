@@ -98,7 +98,7 @@ const startServer = async () => {
     //await seed();
 
     // Sync database
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     //await sequelize.sync({ force: true });
 
     // Start server
