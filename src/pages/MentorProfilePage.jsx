@@ -491,7 +491,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                     <img
                       src={
                         myMentorProfile.alumni?.profilePhoto ||
-                        "https://via.placeholder.com/80"
+                        "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
                       }
                       alt={myMentorProfile.name}
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"

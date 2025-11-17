@@ -26,6 +26,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Show notification helper
   const showNotification = (message, type = "success") => {
@@ -46,10 +47,30 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     return authData ? JSON.parse(authData).accessToken : null;
   };
 
+  const getCurrentUser = () => {
+    const authData = localStorage.getItem("auth");
+    if (authData) {
+      const parsedData = JSON.parse(authData);
+      return {
+        isLoggedIn: true,
+        userType: parsedData.userType,
+        userId: parsedData.userId,
+        name: parsedData.name,
+      };
+    }
+    return {
+      isLoggedIn: false,
+      userType: null,
+      userId: null,
+      name: null,
+    };
+  };
+
   const authToken = getAuthToken();
 
   useEffect(() => {
     loadMentors();
+    setCurrentUser(getCurrentUser());
   }, []);
 
   const loadMentors = async () => {
@@ -79,6 +100,18 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
 
   const sendMentorshipRequest = async (e) => {
     e.preventDefault();
+
+    // Check if user is logged in and is a student
+    if (!currentUser.isLoggedIn) {
+      showNotification("Please log in to send mentorship requests.", "error");
+      return;
+    }
+
+    if (currentUser.userType !== "student") {
+      showNotification("Only students can send mentorship requests.", "error");
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axios.post(
@@ -101,13 +134,24 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
       showNotification("🚀 Mentorship request sent successfully!", "success");
     } catch (error) {
       console.error("Error sending mentorship request:", error);
-      showNotification("Failed to send mentorship request.", error);
+      showNotification("Failed to send mentorship request.", "error");
     } finally {
       setLoading(false);
     }
   };
 
   const openRequestForm = (mentor) => {
+    // Check if user is logged in and is a student
+    if (!currentUser.isLoggedIn) {
+      showNotification("Please log in to send mentorship requests.", "error");
+      return;
+    }
+
+    if (currentUser.userType !== "student") {
+      showNotification("Only students can send mentorship requests.", "error");
+      return;
+    }
+
     setSelectedMentor(mentor);
     setShowRequestForm(true);
   };
@@ -129,6 +173,10 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     };
     return dayMap[day] || day;
   };
+
+  // Check if user can request mentorship
+  const canRequestMentorship =
+    currentUser?.isLoggedIn && currentUser?.userType === "student";
 
   const StatCard = ({ icon: Icon, label, value, color = "purple" }) => (
     <div
@@ -359,7 +407,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                       <img
                         src={
                           mentor.alumni?.profilePhoto ||
-                          "https://via.placeholder.com/64"
+                          "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
                         }
                         alt={mentor.name}
                         className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"
@@ -512,13 +560,31 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                         <ExternalLink size={12} className="sm:w-3.5 sm:h-3.5" />
                         Details
                       </button>
-                      <button
-                        onClick={() => openRequestForm(mentor)}
-                        className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-2 rounded-lg font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm"
-                      >
-                        <Send size={12} className="sm:w-3.5 sm:h-3.5" />
-                        Request
-                      </button>
+
+                      {/* Conditionally render Request button */}
+                      {canRequestMentorship ? (
+                        <button
+                          onClick={() => openRequestForm(mentor)}
+                          className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-2 rounded-lg font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm"
+                        >
+                          <Send size={12} className="sm:w-3.5 sm:h-3.5" />
+                          Request
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${
+                            isDarkMode
+                              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          }`}
+                        >
+                          <Send size={12} className="sm:w-3.5 sm:h-3.5" />
+                          {!currentUser?.isLoggedIn
+                            ? "Login to Request"
+                            : "Students Only"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -558,14 +624,14 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
               className={`rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-full overflow-hidden ${
                 isDarkMode
                   ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
-                  : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
+                  : "bg-gradient-to-br from-white via-cyan-50 to-blue-50/80 border-2 border-blue-200 backdrop-blur-sm"
               }`}
             >
               <div
                 className={`sticky top-0 p-4 sm:p-6 border-b-2 backdrop-blur-sm ${
                   isDarkMode
                     ? "border-blue-500/30 bg-slate-900/90"
-                    : "border-blue-300 bg-white/90"
+                    : "border-blue-200 bg-white/90"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -592,7 +658,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                     <img
                       src={
                         selectedMentor.alumni?.profilePhoto ||
-                        "https://via.placeholder.com/80"
+                        "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
                       }
                       alt={selectedMentor.name}
                       className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"
@@ -605,7 +671,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                       >
                         {selectedMentor.name}
                       </h3>
-                      <p className="text-cyan-400 text-sm sm:text-base">
+                      <p className="text-cyan-500 text-sm sm:text-base">
                         {selectedMentor.current_position} at{" "}
                         {selectedMentor.company}
                       </p>
@@ -619,7 +685,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                           Batch {selectedMentor.batch_year} •{" "}
                           {selectedMentor.branch}
                         </span>
-                        <span className="flex items-center gap-1 text-green-400">
+                        <span className="flex items-center gap-1 text-green-500">
                           <Clock size={14} />
                           Available for mentorship
                         </span>
@@ -663,7 +729,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                               href={selectedMentor.linkedin_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-400 hover:text-blue-300 underline"
+                              className="text-blue-500 hover:text-blue-600 underline"
                             >
                               View Profile
                             </a>
@@ -700,7 +766,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                       className={`rounded-xl p-4 text-sm ${
                         isDarkMode
                           ? "bg-slate-800/50 text-gray-200"
-                          : "bg-gray-100 text-gray-800"
+                          : "bg-white text-gray-800 border border-gray-200 shadow-sm"
                       }`}
                     >
                       {selectedMentor.expertise}
@@ -723,7 +789,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                           className={`px-3 py-2 rounded-lg font-medium border text-sm ${
                             isDarkMode
                               ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
-                              : "bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 border-cyan-300"
+                              : "bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-700 border-cyan-200 shadow-sm"
                           }`}
                         >
                           {topic}
@@ -747,7 +813,9 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                           <div
                             key={day}
                             className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-xl gap-2 ${
-                              isDarkMode ? "bg-slate-800/50" : "bg-gray-100"
+                              isDarkMode
+                                ? "bg-slate-800/50"
+                                : "bg-white border border-gray-200 shadow-sm"
                             }`}
                           >
                             <span
@@ -764,7 +832,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                                   className={`px-3 py-1 rounded text-sm border ${
                                     isDarkMode
                                       ? "bg-slate-700 text-gray-200 border-slate-600"
-                                      : "bg-white text-gray-800 border-gray-400"
+                                      : "bg-cyan-50 text-cyan-700 border-cyan-200"
                                   }`}
                                 >
                                   {formatTimeSlot(slot)}
@@ -783,19 +851,35 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                 className={`sticky bottom-0 p-4 border-t-2 ${
                   isDarkMode
                     ? "border-blue-500/30 bg-slate-900/90"
-                    : "border-blue-300 bg-white/90"
+                    : "border-blue-200 bg-white/90"
                 }`}
               >
-                <button
-                  onClick={() => {
-                    setShowProfilePopup(false);
-                    openRequestForm(selectedMentor);
-                  }}
-                  className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                  <Send size={16} />
-                  Request Mentorship
-                </button>
+                {canRequestMentorship ? (
+                  <button
+                    onClick={() => {
+                      setShowProfilePopup(false);
+                      openRequestForm(selectedMentor);
+                    }}
+                    className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    <Send size={16} />
+                    Request Mentorship
+                  </button>
+                ) : (
+                  <button
+                    disabled
+                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                      isDarkMode
+                        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                        : "bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300"
+                    }`}
+                  >
+                    <Send size={16} />
+                    {!currentUser?.isLoggedIn
+                      ? "Login to Request Mentorship"
+                      : "Students Only"}
+                  </button>
+                )}
               </div>
             </div>
           </div>

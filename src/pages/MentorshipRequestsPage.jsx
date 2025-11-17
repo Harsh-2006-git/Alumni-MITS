@@ -14,6 +14,90 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
+// Date and time formatting utilities
+const formatDate = (dateString) => {
+  if (!dateString) return "Not scheduled";
+
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "Invalid date";
+
+    return date.toLocaleDateString("en-US", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch (error) {
+    console.error("Error formatting date:", error);
+    return "Invalid date";
+  }
+};
+
+const formatTime = (timeString) => {
+  if (!timeString) return "";
+
+  try {
+    // Handle both "HH:MM" and "HH:MM:SS" formats
+    const [hours, minutes] = timeString.split(":");
+    const hour = parseInt(hours, 10);
+    const minute = minutes || "00";
+
+    // Convert to 12-hour format with AM/PM
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const twelveHour = hour % 12 || 12;
+
+    return `${twelveHour}:${minute.padStart(2, "0")} ${ampm}`;
+  } catch (error) {
+    console.error("Error formatting time:", error);
+    return timeString;
+  }
+};
+
+const formatDateTime = (dateString, timeString) => {
+  if (!dateString) return "Not scheduled";
+
+  const formattedDate = formatDate(dateString);
+  const formattedTime = formatTime(timeString);
+
+  if (!formattedTime) return formattedDate;
+
+  return `${formattedDate} at ${formattedTime}`;
+};
+
+const formatRequestDateTime = (dateString, timeString) => {
+  if (!dateString) return "Unknown date";
+
+  const formattedDate = formatDate(dateString);
+  const formattedTime = formatTime(timeString);
+
+  return `${formattedDate} • ${formattedTime}`;
+};
+
+// Check if session is upcoming
+const isUpcomingSession = (sessionDate, sessionTime) => {
+  if (!sessionDate) return false;
+
+  try {
+    const sessionDateTime = new Date(sessionDate);
+    if (sessionTime) {
+      const [hours, minutes] = sessionTime.split(":");
+      sessionDateTime.setHours(
+        parseInt(hours, 10),
+        parseInt(minutes, 10),
+        0,
+        0
+      );
+    }
+
+    const now = new Date();
+    return sessionDateTime > now;
+  } catch (error) {
+    console.error("Error checking session date:", error);
+    return false;
+  }
+};
+
 const MentorshipRequestsPage = ({
   isDarkMode = false,
   toggleTheme = () => {},
@@ -40,7 +124,7 @@ const MentorshipRequestsPage = ({
   const authToken = getAuthToken();
   const userData = JSON.parse(localStorage.getItem("auth") || "{}");
   const userType = userData.userType;
-  const isLoggedIn = !!authToken; // Check if user is logged in
+  const isLoggedIn = !!authToken;
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -108,23 +192,36 @@ const MentorshipRequestsPage = ({
     e.preventDefault();
     try {
       setLoading(true);
-      await axios.put(
-        `${API_BASE}/mentorships/${selectedMentorship.id}/session`,
-        sessionForm,
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+
+      let endpoint;
+      if (userType === "student") {
+        endpoint = `${API_BASE}/mentorships/${selectedMentorship.id}/session`;
+      } else if (userType === "alumni") {
+        endpoint = `${API_BASE}/mentorships/${selectedMentorship.id}/session`;
+      } else {
+        console.error("Invalid user type");
+        return;
+      }
+
+      const response = await axios.put(endpoint, sessionForm, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
       setShowSessionForm(false);
       setSelectedMentorship(null);
       setSessionForm({ session_date: "", session_time: "", mentor_notes: "" });
-      if (userType === "student") loadMyMentorships();
-      if (userType === "alumni") loadMentorRequests();
+
+      if (userType === "student") {
+        loadMyMentorships();
+      } else if (userType === "alumni") {
+        loadMentorRequests();
+      }
     } catch (error) {
       console.error("Error updating session:", error);
+      alert("Failed to update session. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -149,6 +246,20 @@ const MentorshipRequestsPage = ({
     };
     return colors[status] || "bg-gray-400/20 text-gray-300 border-gray-400/40";
   };
+
+  // Filter active mentorships with upcoming sessions for students
+  const upcomingStudentMentorships = myMentorships.filter(
+    (mentorship) =>
+      mentorship.status === "active" &&
+      isUpcomingSession(mentorship.session_date, mentorship.session_time)
+  );
+
+  // Filter active requests with upcoming sessions for alumni
+  const upcomingMentorRequests = mentorRequests.filter(
+    (request) =>
+      request.status === "active" &&
+      isUpcomingSession(request.session_date, request.session_time)
+  );
 
   return (
     <div
@@ -228,12 +339,12 @@ const MentorshipRequestsPage = ({
             {isLoggedIn && userType === "student" && (
               <div>
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent mb-8">
-                  My Mentorship Requests
+                  My Upcoming Mentorship Sessions
                 </h2>
 
-                {myMentorships.length === 0 ? (
+                {upcomingStudentMentorships.length === 0 ? (
                   <div className="text-center py-12">
-                    <MessageSquare
+                    <Calendar
                       className={`mx-auto mb-4 ${
                         isDarkMode ? "text-gray-500" : "text-gray-400"
                       }`}
@@ -244,19 +355,19 @@ const MentorshipRequestsPage = ({
                         isDarkMode ? "text-gray-200" : "text-gray-900"
                       }`}
                     >
-                      No mentorship requests
+                      No upcoming sessions
                     </h3>
                     <p
                       className={`mb-6 ${
                         isDarkMode ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
-                      Start by browsing available mentors and sending requests.
+                      You don't have any upcoming mentorship sessions scheduled.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {myMentorships.map((mentorship) => (
+                    {upcomingStudentMentorships.map((mentorship) => (
                       <div
                         key={mentorship.id}
                         className={`rounded-2xl border-2 p-6 transition-all ${
@@ -270,7 +381,7 @@ const MentorshipRequestsPage = ({
                             <img
                               src={
                                 mentorship.mentor?.alumni?.profilePhoto ||
-                                "https://via.placeholder.com/48"
+                                "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
                               }
                               alt={mentorship.mentor?.name}
                               className="w-12 h-12 rounded-xl object-cover"
@@ -310,7 +421,13 @@ const MentorshipRequestsPage = ({
                               }`}
                             >
                               <Calendar size={16} />
-                              <span>Requested: {mentorship.request_date}</span>
+                              <span>
+                                Requested:{" "}
+                                {formatRequestDateTime(
+                                  mentorship.request_date,
+                                  mentorship.request_time
+                                )}
+                              </span>
                             </div>
 
                             {mentorship.session_date && (
@@ -321,8 +438,11 @@ const MentorshipRequestsPage = ({
                               >
                                 <Clock size={16} />
                                 <span>
-                                  Session: {mentorship.session_date} at{" "}
-                                  {mentorship.session_time}
+                                  Session:{" "}
+                                  {formatDateTime(
+                                    mentorship.session_date,
+                                    mentorship.session_time
+                                  )}
                                 </span>
                               </div>
                             )}
@@ -358,16 +478,14 @@ const MentorshipRequestsPage = ({
                           )}
                         </div>
 
-                        {mentorship.status === "active" && (
-                          <div className="flex gap-3 mt-6">
-                            <button
-                              onClick={() => openSessionForm(mentorship)}
-                              className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
-                            >
-                              Update Session
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex gap-3 mt-6">
+                          <button
+                            onClick={() => openSessionForm(mentorship)}
+                            className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+                          >
+                            Update Session
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -420,7 +538,7 @@ const MentorshipRequestsPage = ({
                             <img
                               src={
                                 request.student?.profilePhoto ||
-                                "https://via.placeholder.com/40"
+                                "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
                               }
                               alt={request.student?.name}
                               className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
@@ -438,7 +556,10 @@ const MentorshipRequestsPage = ({
                                   isDarkMode ? "text-gray-400" : "text-gray-600"
                                 }`}
                               >
-                                {request.request_date} • {request.request_time}
+                                {formatRequestDateTime(
+                                  request.request_date,
+                                  request.request_time
+                                )}
                               </p>
                             </div>
                           </div>
@@ -473,7 +594,18 @@ const MentorshipRequestsPage = ({
                           >
                             <Calendar size={12} />
                             <span>
-                              {request.session_date} at {request.session_time}
+                              {formatDateTime(
+                                request.session_date,
+                                request.session_time
+                              )}
+                              {isUpcomingSession(
+                                request.session_date,
+                                request.session_time
+                              ) && (
+                                <span className="ml-1 text-green-500">
+                                  ● Upcoming
+                                </span>
+                              )}
                             </span>
                           </div>
                         )}
@@ -497,14 +629,7 @@ const MentorshipRequestsPage = ({
                           </div>
                         )}
 
-                        {request.status === "active" && (
-                          <button
-                            onClick={() => openSessionForm(request)}
-                            className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-2 rounded-lg font-semibold hover:shadow-lg transition-all text-xs"
-                          >
-                            Update Session
-                          </button>
-                        )}
+                        {/* Removed Update Session button for alumni */}
                       </div>
                     ))}
                   </div>
@@ -517,8 +642,8 @@ const MentorshipRequestsPage = ({
 
       <Footer isDarkMode={isDarkMode} />
 
-      {/* Session Form Modal */}
-      {showSessionForm && selectedMentorship && (
+      {/* Session Form Modal - Only show for students */}
+      {showSessionForm && selectedMentorship && userType === "student" && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div
             className={`rounded-3xl max-w-md w-full shadow-2xl ${
@@ -537,19 +662,14 @@ const MentorshipRequestsPage = ({
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
-                    {userType === "alumni" &&
-                    selectedMentorship.status === "pending"
-                      ? "Respond to Request"
-                      : "Update Session Details"}
+                    Update Session Details
                   </h2>
                   <p
                     className={`text-sm mt-1 ${
                       isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                   >
-                    {userType === "student"
-                      ? `With ${selectedMentorship.mentor?.name}`
-                      : `From ${selectedMentorship.student?.name}`}
+                    With {selectedMentorship.mentor?.name}
                   </p>
                 </div>
                 <button
@@ -565,14 +685,7 @@ const MentorshipRequestsPage = ({
               </div>
             </div>
 
-            <form
-              onSubmit={
-                userType === "student"
-                  ? updateSession
-                  : (e) => e.preventDefault()
-              }
-              className="p-6 space-y-6"
-            >
+            <form onSubmit={updateSession} className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label
@@ -630,9 +743,7 @@ const MentorshipRequestsPage = ({
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
-                  {userType === "alumni"
-                    ? "Notes for Student"
-                    : "Additional Notes"}
+                  Additional Notes
                 </label>
                 <textarea
                   value={sessionForm.mentor_notes}
@@ -647,11 +758,7 @@ const MentorshipRequestsPage = ({
                       ? "bg-slate-800/50 border-blue-500/30 text-white"
                       : "bg-white border-blue-300 text-gray-900"
                   }`}
-                  placeholder={
-                    userType === "alumni"
-                      ? "Add any notes or instructions for the student..."
-                      : "Add any additional notes..."
-                  }
+                  placeholder="Add any additional notes for your mentor..."
                 />
               </div>
 
@@ -667,61 +774,20 @@ const MentorshipRequestsPage = ({
                 >
                   Cancel
                 </button>
-
-                {userType === "alumni" &&
-                selectedMentorship.status === "pending" ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        respondToRequest(selectedMentorship.id, "accept")
-                      }
-                      disabled={loading}
-                      className="flex-1 bg-gradient-to-r from-green-400 to-emerald-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Processing...
-                        </>
-                      ) : (
-                        "Accept"
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        respondToRequest(selectedMentorship.id, "reject")
-                      }
-                      disabled={loading}
-                      className="flex-1 bg-gradient-to-r from-red-400 to-pink-500 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Processing...
-                        </>
-                      ) : (
-                        "Reject"
-                      )}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Updating...
-                      </>
-                    ) : (
-                      "Update Session"
-                    )}
-                  </button>
-                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Updating...
+                    </>
+                  ) : (
+                    "Update Session"
+                  )}
+                </button>
               </div>
             </form>
           </div>

@@ -20,6 +20,7 @@ import {
   CheckCircle,
   Clock,
 } from "lucide-react";
+import ForgotPasswordPopup from "../components/ForgotPasswordPopup";
 
 export default function AlumniAuth({
   setIsAuthenticated,
@@ -41,6 +42,7 @@ export default function AlumniAuth({
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [showMessage, setShowMessage] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -644,6 +646,7 @@ export default function AlumniAuth({
                       </label>
                       <button
                         type="button"
+                        onClick={() => setShowForgotPassword(true)}
                         className={`font-medium ${
                           isDarkMode
                             ? "text-purple-400 hover:text-purple-300"
@@ -737,6 +740,11 @@ export default function AlumniAuth({
           animation: blob 7s infinite;
         }
       `}</style>
+      <ForgotPasswordPopup
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        isDarkMode={isDarkMode}
+      />
     </div>
   );
 }
