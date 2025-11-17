@@ -72,6 +72,12 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
       setMyMentorProfile(response.data.data);
     } catch (error) {
       console.error("Error loading mentor profile:", error);
+      // Only show error if it's not a 404 (profile doesn't exist)
+      if (error.response?.status !== 404) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to load mentor profile";
+        showNotification(errorMessage, "error");
+      }
     } finally {
       setLoading(false);
     }
@@ -126,13 +132,16 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
       });
       setMyMentorProfile(response.data.data);
       setShowMentorForm(false);
-      showNotification("🎉 Mentor profile created successfully!", "success");
+      showNotification(
+        response.data.message || "Mentor profile created successfully!",
+        "success"
+      );
     } catch (error) {
       console.error("Error creating mentor profile:", error);
-      showNotification(
-        "Failed to create mentor profile. Please try again.",
-        "error"
-      );
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to create mentor profile. Please try again.";
+      showNotification(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -154,13 +163,16 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
       );
       setMyMentorProfile(response.data.data);
       setShowMentorForm(false);
-      showNotification("✅ Mentor profile updated successfully!", "success");
+      showNotification(
+        response.data.message || "Mentor profile updated successfully!",
+        "success"
+      );
     } catch (error) {
       console.error("Error updating mentor profile:", error);
-      showNotification(
-        "Failed to update mentor profile. Please try again.",
-        "error"
-      );
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to update mentor profile. Please try again.";
+      showNotification(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -843,7 +855,6 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                         }
                         onChange={(e) => {
                           const inputValue = e.target.value;
-                          // Store the raw input to preserve commas and spaces while typing
                           setMentorForm({
                             ...mentorForm,
                             topics: inputValue

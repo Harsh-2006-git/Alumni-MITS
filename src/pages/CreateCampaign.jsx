@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Upload, Sparkles, CheckCircle, X } from "lucide-react";
+import { Upload, Sparkles, CheckCircle, X, Plus, Users } from "lucide-react";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { useNavigate } from "react-router-dom";
+import AuthPopup from "../components/AuthPopup";
 
 export default function CreateCampaignPage({
   isDarkMode,
@@ -14,7 +14,8 @@ export default function CreateCampaignPage({
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
-  const navigate = useNavigate();
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [showCampaignDialog, setShowCampaignDialog] = useState(false);
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -44,17 +45,13 @@ export default function CreateCampaignPage({
           return;
         }
       }
-      // If no valid auth found, redirect to login
-      navigate("/login");
+      setIsCheckingAuth(false);
     } catch (error) {
       console.error("Error checking authentication:", error);
-      navigate("/login");
-    } finally {
       setIsCheckingAuth(false);
     }
   };
 
-  // Rest of your component code remains the same...
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -92,6 +89,14 @@ export default function CreateCampaignPage({
   const showMessage = (text, type) => {
     setMessage({ text, type });
     setTimeout(() => setMessage({ text: "", type: "" }), 5000);
+  };
+
+  const handleCreateCampaignClick = () => {
+    if (!userInfo) {
+      setShowAuthPopup(true);
+      return;
+    }
+    setShowCampaignDialog(true);
   };
 
   const handleSubmit = async (e) => {
@@ -152,6 +157,7 @@ export default function CreateCampaignPage({
 
     if (!token) {
       showMessage("Please login to create a campaign", "error");
+      setShowAuthPopup(true);
       return;
     }
 
@@ -184,11 +190,9 @@ export default function CreateCampaignPage({
       const data = await response.json();
 
       if (response.ok) {
-        showMessage("Campaign created successfully! Redirecting...", "success");
+        showMessage("Campaign created successfully!", "success");
         resetForm();
-        setTimeout(() => {
-          navigate("/campaigns");
-        }, 2000);
+        setShowCampaignDialog(false);
       } else {
         showMessage(data.message || "Error creating campaign", "error");
       }
@@ -216,6 +220,114 @@ export default function CreateCampaignPage({
     setSelectedFiles([]);
   };
 
+  // Custom hero section for create campaign page
+  const CreateCampaignHeroSection = ({
+    isDarkMode,
+    onCreateCampaign,
+    isUserLoggedIn,
+  }) => (
+    <section className="text-center py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
+            Create Campaign
+          </h1>
+          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+        </div>
+
+        <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
+          Launch Your Vision, Inspire Change
+        </p>
+
+        <p
+          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
+            isDarkMode ? "text-gray-300" : "text-gray-700"
+          }`}
+        >
+          Share your innovative project with the MITS community and get the
+          support you need to make it happen.
+        </p>
+
+        <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
+
+        {!isUserLoggedIn && (
+          <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 max-w-md mx-auto">
+            <p
+              className={`text-sm ${
+                isDarkMode ? "text-yellow-300" : "text-yellow-700"
+              }`}
+            >
+              💡 Please login to create campaigns and access all features
+            </p>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+          <button
+            onClick={onCreateCampaign}
+            className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
+          >
+            <Plus className="w-5 h-5" /> Create Campaign
+          </button>
+        </div>
+
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+          <div
+            className={`p-4 rounded-lg ${
+              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+            }`}
+          >
+            <Upload className="w-8 h-8 text-blue-500 mb-2" />
+            <h3 className="font-semibold mb-2">Easy Campaign Creation</h3>
+            <p
+              className={`text-sm ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Fill out a simple form to launch your campaign and start receiving
+              support.
+            </p>
+          </div>
+
+          <div
+            className={`p-4 rounded-lg ${
+              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+            }`}
+          >
+            <Sparkles className="w-8 h-8 text-green-500 mb-2" />
+            <h3 className="font-semibold mb-2">Reach Supporters</h3>
+            <p
+              className={`text-sm ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Your campaign will be visible to MITS alumni and students who want
+              to support great ideas.
+            </p>
+          </div>
+
+          <div
+            className={`p-4 rounded-lg ${
+              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+            }`}
+          >
+            <Users className="w-8 h-8 text-purple-500 mb-2" />
+            <h3 className="font-semibold mb-2">Build Community</h3>
+            <p
+              className={`text-sm ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Connect with like-minded individuals from the MITS community and
+              grow your network.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
   // Show loading while checking authentication
   if (isCheckingAuth) {
     return (
@@ -234,11 +346,6 @@ export default function CreateCampaignPage({
     );
   }
 
-  // If not authenticated, this won't render because we redirect in checkAuthentication
-  if (!userInfo) {
-    return null; // This should not happen due to the redirect
-  }
-
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${
@@ -249,378 +356,484 @@ export default function CreateCampaignPage({
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      {/* Hero Section */}
-      <section className="text-center py-8 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-2 sm:gap-3 ">
-            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
-              Create Campaign
-            </h1>
-            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+      {/* Auth Popup */}
+      {showAuthPopup && (
+        <AuthPopup
+          isOpen={showAuthPopup}
+          onClose={() => setShowAuthPopup(false)}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
+      <CreateCampaignHeroSection
+        isDarkMode={isDarkMode}
+        onCreateCampaign={handleCreateCampaignClick}
+        isUserLoggedIn={!!userInfo}
+      />
+
+      {/* Why Create Campaigns Section */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-12">
+        <div
+          className={`p-8 rounded-xl ${
+            isDarkMode ? "bg-slate-900" : "bg-white shadow-lg"
+          }`}
+        >
+          <h2
+            className={`text-2xl font-bold mb-6 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
+            Why Create Campaigns on Our Platform?
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div
+              className={`p-6 rounded-lg ${
+                isDarkMode ? "bg-slate-800" : "bg-gray-50"
+              }`}
+            >
+              <h3 className="font-semibold mb-3 text-blue-500">
+                Targeted Support
+              </h3>
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Reach specifically MITS alumni and students who understand and
+                value your vision.
+              </p>
+            </div>
+
+            <div
+              className={`p-6 rounded-lg ${
+                isDarkMode ? "bg-slate-800" : "bg-gray-50"
+              }`}
+            >
+              <h3 className="font-semibold mb-3 text-green-500">
+                No Platform Fees
+              </h3>
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Launch your campaigns for free and keep more of the funds you
+                raise.
+              </p>
+            </div>
+
+            <div
+              className={`p-6 rounded-lg ${
+                isDarkMode ? "bg-slate-800" : "bg-gray-50"
+              }`}
+            >
+              <h3 className="font-semibold mb-3 text-purple-500">
+                Alumni Network
+              </h3>
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Leverage the strong MITS alumni network for mentorship,
+                guidance, and support.
+              </p>
+            </div>
+
+            <div
+              className={`p-6 rounded-lg ${
+                isDarkMode ? "bg-slate-800" : "bg-gray-50"
+              }`}
+            >
+              <h3 className="font-semibold mb-3 text-orange-500">
+                Community Driven
+              </h3>
+              <p
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                Build lasting relationships with supporters who genuinely care
+                about your success.
+              </p>
+            </div>
           </div>
-          <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
-            Launch Your Vision, Inspire Change
-          </p>
-          <p
-            className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
-              isDarkMode ? "text-gray-300" : "text-gray-700"
-            }`}
-          >
-            Share your innovative project with the MITS community and get the
-            support you need
-          </p>
-          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full "></div>
+
+          {!userInfo && (
+            <div className="mt-8 p-6 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 text-center">
+              <h3 className="font-semibold mb-2 text-blue-400">
+                Ready to Launch Your Campaign?
+              </h3>
+              <p
+                className={`text-sm mb-4 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                Login to access the campaign creation form and start bringing
+                your vision to life.
+              </p>
+              <button
+                onClick={() => setShowAuthPopup(true)}
+                className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold hover:scale-105 transition-all"
+              >
+                Login to Continue
+              </button>
+            </div>
+          )}
         </div>
-      </section>
+      </div>
 
-      {/* Main Content */}
-      <section className="container mx-auto px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* User Info Display */}
-          {userInfo && (
+      {/* Campaign Creation Dialog */}
+      {showCampaignDialog && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div
-              className={`mb-6 p-4 sm:p-6 rounded-2xl border-2 ${
+              className={`rounded-2xl sm:rounded-3xl shadow-2xl ${
                 isDarkMode
-                  ? "bg-green-500/10 border-green-500/30"
-                  : "bg-green-50 border-green-200"
+                  ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
+                  : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
               }`}
             >
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0" />
-                <div className="min-w-0">
-                  <div className="font-semibold text-green-400 break-words">
-                    Logged in as: {userInfo.userName || userInfo.userEmail}
-                  </div>
-                  <div className="text-xs sm:text-sm text-gray-400">
-                    Type: {userInfo.userType || "student"}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Message */}
-          {message.text && (
-            <div
-              className={`mb-6 p-4 rounded-xl text-sm sm:text-base ${
-                message.type === "success"
-                  ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                  : "bg-red-500/20 text-red-400 border border-red-500/30"
-              }`}
-            >
-              {message.text}
-            </div>
-          )}
-
-          {/* Form */}
-          <div
-            className={`p-6 sm:p-8 rounded-3xl border-2 shadow-xl ${
-              isDarkMode
-                ? "bg-slate-900/50 border-cyan-500/20"
-                : "bg-white border-blue-200"
-            }`}
-          >
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Campaign Title */}
-              <div>
-                <label className="block mb-3 font-semibold text-sm sm:text-base">
-                  Campaign Title <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="campaignTitle"
-                  value={formData.campaignTitle}
-                  onChange={handleInputChange}
-                  placeholder="Enter campaign title"
-                  required
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                    isDarkMode
-                      ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                      : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block mb-3 font-semibold text-sm sm:text-base">
-                  Category <span className="text-red-400">*</span>
-                </label>
-                <select
-                  name="categories"
-                  value={formData.categories}
-                  onChange={handleInputChange}
-                  required
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                    isDarkMode
-                      ? "bg-slate-800 border-cyan-500/20 text-white"
-                      : "bg-gray-50 border-blue-200 text-gray-900"
-                  }`}
-                >
-                  <option value="">Select a category</option>
-                  <option value="startup">Startup</option>
-                  <option value="research">Research</option>
-                  <option value="innovation">Innovation</option>
-                  <option value="infrastructure">Infrastructure</option>
-                  <option value="scholarship">Scholarship</option>
-                  <option value="community">Community</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-
-              {/* Tagline */}
-              <div>
-                <label className="block mb-3 font-semibold text-sm sm:text-base">
-                  Tagline
-                </label>
-                <input
-                  type="text"
-                  name="tagline"
-                  value={formData.tagline}
-                  onChange={handleInputChange}
-                  placeholder="Short catchy phrase"
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                    isDarkMode
-                      ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                      : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block mb-3 font-semibold text-sm sm:text-base">
-                  Detailed Description
-                </label>
-                <textarea
-                  name="detailedDescription"
-                  value={formData.detailedDescription}
-                  onChange={handleInputChange}
-                  placeholder="Describe your campaign..."
-                  rows="6"
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                    isDarkMode
-                      ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                      : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                  }`}
-                ></textarea>
-              </div>
-
-              {/* Dates */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block mb-3 font-semibold text-sm sm:text-base">
-                    Start Date <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="datetime-local"
-                    name="startDate"
-                    value={formData.startDate}
-                    onChange={handleInputChange}
-                    required
-                    className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+              <div
+                className={`p-4 sm:p-6 border-b-2 flex-shrink-0 ${
+                  isDarkMode
+                    ? "border-blue-500/30 bg-slate-900/90"
+                    : "border-blue-300 bg-white/90"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+                    Create Campaign
+                  </h2>
+                  <button
+                    onClick={() => setShowCampaignDialog(false)}
+                    className={`p-2 rounded-lg transition-colors ${
                       isDarkMode
-                        ? "bg-slate-800 border-cyan-500/20 text-white"
-                        : "bg-gray-50 border-blue-200 text-gray-900"
+                        ? "text-gray-400 hover:text-white hover:bg-slate-800"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                     }`}
-                  />
-                </div>
-                <div>
-                  <label className="block mb-3 font-semibold text-sm sm:text-base">
-                    End Date <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="datetime-local"
-                    name="endDate"
-                    value={formData.endDate}
-                    onChange={handleInputChange}
-                    required
-                    className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                      isDarkMode
-                        ? "bg-slate-800 border-cyan-500/20 text-white"
-                        : "bg-gray-50 border-blue-200 text-gray-900"
-                    }`}
-                  />
-                </div>
-              </div>
-
-              {/* Amount */}
-              <div>
-                <label className="block mb-3 font-semibold text-sm sm:text-base">
-                  Target Amount (₹) <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="number"
-                  name="totalAmount"
-                  value={formData.totalAmount}
-                  onChange={handleInputChange}
-                  placeholder="Enter target amount"
-                  step="0.01"
-                  min="0"
-                  required
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                    isDarkMode
-                      ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                      : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-              </div>
-
-              {/* Links */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block mb-3 font-semibold text-sm sm:text-base">
-                    Project Link
-                  </label>
-                  <input
-                    type="url"
-                    name="projectLink"
-                    value={formData.projectLink}
-                    onChange={handleInputChange}
-                    placeholder="https://your-project.com"
-                    className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                      isDarkMode
-                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                    }`}
-                  />
-                </div>
-                <div>
-                  <label className="block mb-3 font-semibold text-sm sm:text-base">
-                    GitHub
-                  </label>
-                  <input
-                    type="url"
-                    name="github"
-                    value={formData.github}
-                    onChange={handleInputChange}
-                    placeholder="https://github.com/your-repo"
-                    className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                      isDarkMode
-                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                    }`}
-                  />
-                </div>
-              </div>
-
-              {/* Contact */}
-              <div>
-                <label className="block mb-3 font-semibold text-sm sm:text-base">
-                  Contact Number <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="tel"
-                  name="contact"
-                  value={formData.contact}
-                  onChange={handleInputChange}
-                  placeholder="+91 9876543210"
-                  required
-                  className={`w-full px-4 py-3 rounded-xl border-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
-                    isDarkMode
-                      ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                      : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                  }`}
-                />
-              </div>
-
-              {/* Images */}
-              <div>
-                <label className="block mb-3 font-semibold text-sm sm:text-base">
-                  Campaign Images (Max 3)
-                </label>
-                <div
-                  className={`border-2 border-dashed rounded-xl p-6 sm:p-8 text-center ${
-                    isDarkMode
-                      ? "border-cyan-500/30 bg-slate-800/50"
-                      : "border-blue-300 bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="file"
-                    id="fileInput"
-                    accept=".jpg,.jpeg,.png"
-                    multiple
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="fileInput"
-                    className="cursor-pointer flex flex-col items-center gap-3 sm:gap-4"
                   >
-                    <Upload className="w-12 h-12 sm:w-16 sm:h-16 text-cyan-400" />
-                    <span className="text-lg sm:text-xl text-cyan-400 font-semibold">
-                      Click to upload or drag and drop
-                    </span>
-                    <span className="text-sm text-gray-400">
-                      PNG, JPG, JPEG (Max 5MB each)
-                    </span>
-                  </label>
+                    <X size={20} className="sm:w-6 sm:h-6" />
+                  </button>
                 </div>
+              </div>
 
-                {/* Selected Files */}
-                {selectedFiles.length > 0 && (
-                  <div className="mt-6 space-y-3">
-                    <h4 className="font-semibold text-cyan-400">
-                      Selected Files:
-                    </h4>
-                    {selectedFiles.map((file, index) => (
-                      <div
-                        key={index}
-                        className={`flex items-center justify-between p-4 rounded-xl text-sm ${
-                          isDarkMode ? "bg-slate-800" : "bg-gray-100"
-                        }`}
-                      >
-                        <span className="truncate flex-1">
-                          {file.name} ({(file.size / 1024 / 1024).toFixed(2)}{" "}
-                          MB)
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => removeFile(index)}
-                          className="ml-2 p-2 hover:bg-red-500/20 rounded-lg transition-all flex-shrink-0"
-                        >
-                          <X className="w-4 h-4 text-red-400" />
-                        </button>
-                      </div>
-                    ))}
+              <div className="p-4 sm:p-6">
+                {message.text && (
+                  <div
+                    className={`mb-4 p-4 rounded-xl text-sm ${
+                      message.type === "success"
+                        ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                        : "bg-red-500/20 text-red-400 border border-red-500/30"
+                    }`}
+                  >
+                    {message.text}
                   </div>
                 )}
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 pt-6">
-                <button
-                  type="submit"
-                  disabled={createLoading}
-                  className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-4 rounded-xl font-bold text-lg shadow-xl hover:scale-105 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                >
-                  {createLoading ? (
-                    <span className="flex items-center justify-center gap-3">
-                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      Creating Campaign...
-                    </span>
-                  ) : (
-                    "Create Campaign"
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate("/campaigns")}
-                  className={`px-8 py-4 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 ${
-                    isDarkMode
-                      ? "bg-slate-800 text-cyan-400 border border-cyan-500/30"
-                      : "bg-white text-blue-600 border border-blue-300"
-                  }`}
-                >
-                  Cancel
-                </button>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Campaign Title */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      Campaign Title *
+                    </label>
+                    <input
+                      type="text"
+                      name="campaignTitle"
+                      value={formData.campaignTitle}
+                      onChange={handleInputChange}
+                      placeholder="Enter campaign title"
+                      required
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                        isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                      }`}
+                    />
+                  </div>
+
+                  {/* Category */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      Category *
+                    </label>
+                    <select
+                      name="categories"
+                      value={formData.categories}
+                      onChange={handleInputChange}
+                      required
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                        isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white"
+                          : "bg-gray-50 border-blue-200 text-gray-900"
+                      }`}
+                    >
+                      <option value="">Select a category</option>
+                      <option value="startup">Startup</option>
+                      <option value="research">Research</option>
+                      <option value="innovation">Innovation</option>
+                      <option value="infrastructure">Infrastructure</option>
+                      <option value="scholarship">Scholarship</option>
+                      <option value="community">Community</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  {/* Tagline */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      Tagline
+                    </label>
+                    <input
+                      type="text"
+                      name="tagline"
+                      value={formData.tagline}
+                      onChange={handleInputChange}
+                      placeholder="Short catchy phrase"
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                        isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                      }`}
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      Detailed Description
+                    </label>
+                    <textarea
+                      name="detailedDescription"
+                      value={formData.detailedDescription}
+                      onChange={handleInputChange}
+                      placeholder="Describe your campaign..."
+                      rows="4"
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                        isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                      }`}
+                    ></textarea>
+                  </div>
+
+                  {/* Dates */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block mb-2 font-semibold text-sm">
+                        Start Date *
+                      </label>
+                      <input
+                        type="datetime-local"
+                        name="startDate"
+                        value={formData.startDate}
+                        onChange={handleInputChange}
+                        required
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                          isDarkMode
+                            ? "bg-slate-800 border-cyan-500/20 text-white"
+                            : "bg-gray-50 border-blue-200 text-gray-900"
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2 font-semibold text-sm">
+                        End Date *
+                      </label>
+                      <input
+                        type="datetime-local"
+                        name="endDate"
+                        value={formData.endDate}
+                        onChange={handleInputChange}
+                        required
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                          isDarkMode
+                            ? "bg-slate-800 border-cyan-500/20 text-white"
+                            : "bg-gray-50 border-blue-200 text-gray-900"
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Amount */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      Target Amount (₹) *
+                    </label>
+                    <input
+                      type="number"
+                      name="totalAmount"
+                      value={formData.totalAmount}
+                      onChange={handleInputChange}
+                      placeholder="Enter target amount"
+                      step="0.01"
+                      min="0"
+                      required
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                        isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                      }`}
+                    />
+                  </div>
+
+                  {/* Links */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block mb-2 font-semibold text-sm">
+                        Project Link
+                      </label>
+                      <input
+                        type="url"
+                        name="projectLink"
+                        value={formData.projectLink}
+                        onChange={handleInputChange}
+                        placeholder="https://your-project.com"
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                          isDarkMode
+                            ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                            : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-2 font-semibold text-sm">
+                        GitHub
+                      </label>
+                      <input
+                        type="url"
+                        name="github"
+                        value={formData.github}
+                        onChange={handleInputChange}
+                        placeholder="https://github.com/your-repo"
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                          isDarkMode
+                            ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                            : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Contact */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      Contact Number *
+                    </label>
+                    <input
+                      type="tel"
+                      name="contact"
+                      value={formData.contact}
+                      onChange={handleInputChange}
+                      placeholder="+91 9876543210"
+                      required
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                        isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                      }`}
+                    />
+                  </div>
+
+                  {/* Images */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      Campaign Images (Max 3)
+                    </label>
+                    <div
+                      className={`border-2 border-dashed rounded-lg p-4 text-center ${
+                        isDarkMode
+                          ? "border-cyan-500/30 bg-slate-800/50"
+                          : "border-blue-300 bg-gray-50"
+                      }`}
+                    >
+                      <input
+                        type="file"
+                        id="fileInput"
+                        accept=".jpg,.jpeg,.png"
+                        multiple
+                        onChange={handleFileChange}
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="fileInput"
+                        className="flex flex-col items-center gap-2 cursor-pointer"
+                      >
+                        <Upload className="w-8 h-8 text-cyan-400" />
+                        <span className="text-cyan-400 font-semibold text-sm">
+                          Click to upload
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          PNG, JPG, JPEG (Max 5MB each)
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Selected Files */}
+                    {selectedFiles.length > 0 && (
+                      <div className="mt-4 space-y-2">
+                        <h4 className="font-semibold text-cyan-400 text-sm">
+                          Selected Files:
+                        </h4>
+                        {selectedFiles.map((file, index) => (
+                          <div
+                            key={index}
+                            className={`flex items-center justify-between p-2 rounded text-xs ${
+                              isDarkMode ? "bg-slate-800" : "bg-gray-100"
+                            }`}
+                          >
+                            <span className="truncate flex-1">
+                              {file.name} (
+                              {(file.size / 1024 / 1024).toFixed(2)} MB)
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeFile(index)}
+                              className="ml-2 p-1 hover:bg-red-500/20 rounded transition-all"
+                            >
+                              <X className="w-3 h-3 text-red-400" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                    <button
+                      type="submit"
+                      disabled={createLoading}
+                      className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {createLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Creating...
+                        </span>
+                      ) : (
+                        "Create Campaign"
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowCampaignDialog(false)}
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+                        isDarkMode
+                          ? "bg-slate-800 text-cyan-400 border border-cyan-500/30"
+                          : "bg-white text-blue-600 border border-blue-300"
+                      }`}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
-      </section>
+      )}
 
       <Footer isDarkMode={isDarkMode} />
     </div>

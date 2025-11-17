@@ -3,12 +3,20 @@ import { Sparkles, Upload, Plus, Users } from "lucide-react";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
-import PostJobDialog from "../components/PostJobDialog"; // Make sure this import path is correct
+import PostJobDialog from "../components/PostJobDialog";
 import Toast from "../components/Toast";
+import AuthPopup from "../components/AuthPopup"; // Import the auth popup
 
 export default function CreateJobPage({ isDarkMode, toggleTheme }) {
   const [showPostJobDialog, setShowPostJobDialog] = useState(false);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [toast, setToast] = useState(null);
+
+  // Check if user is logged in
+  const isLoggedIn = () => {
+    const authData = localStorage.getItem("auth");
+    return authData && JSON.parse(authData).accessToken;
+  };
 
   const showToast = (message, type = "info") => {
     setToast({ message, type });
@@ -16,6 +24,15 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
 
   const closeToast = () => {
     setToast(null);
+  };
+
+  // Handle post job button click
+  const handlePostJobClick = () => {
+    if (!isLoggedIn()) {
+      setShowAuthPopup(true);
+      return;
+    }
+    setShowPostJobDialog(true);
   };
 
   // Post new job
@@ -26,6 +43,7 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
 
       if (!token) {
         showToast("Please login to post a job", "error");
+        setShowAuthPopup(true);
         return;
       }
 
@@ -56,7 +74,7 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
   };
 
   // Custom hero section for create job page
-  const CreateJobHeroSection = ({ isDarkMode, onPostJob }) => (
+  const CreateJobHeroSection = ({ isDarkMode, onPostJob, isUserLoggedIn }) => (
     <section className="text-center py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
@@ -157,9 +175,19 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
+      {/* Auth Popup */}
+      {showAuthPopup && (
+        <AuthPopup
+          isOpen={showAuthPopup}
+          onClose={() => setShowAuthPopup(false)}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
       <CreateJobHeroSection
         isDarkMode={isDarkMode}
-        onPostJob={() => setShowPostJobDialog(true)}
+        onPostJob={handlePostJobClick}
+        isUserLoggedIn={isLoggedIn()}
       />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-12">
@@ -249,6 +277,28 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
               </p>
             </div>
           </div>
+
+          {!isLoggedIn() && (
+            <div className="mt-8 p-6 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 text-center">
+              <h3 className="font-semibold mb-2 text-blue-400">
+                Ready to Post a Job?
+              </h3>
+              <p
+                className={`text-sm mb-4 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                Login to access the job posting form and start connecting with
+                talented candidates from the MITS community.
+              </p>
+              <button
+                onClick={() => setShowAuthPopup(true)}
+                className="px-6 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold hover:scale-105 transition-all"
+              >
+                Login to Continue
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
