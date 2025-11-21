@@ -25,11 +25,14 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
     setMessage({ type: "", text: "" });
 
     try {
-      const response = await fetch("http://localhost:3001/auth/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch(
+        "https://alumni-mits-l45r.onrender.com/auth/check",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
 
       const data = await response.json();
 
@@ -70,7 +73,7 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:3001/auth/forgot-password",
+        "https://alumni-mits-l45r.onrender.com/auth/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -132,7 +135,7 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:3001/auth/forgot-password",
+        "https://alumni-mits-l45r.onrender.com/auth/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -423,21 +426,84 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
                 >
                   Enter OTP
                 </label>
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) =>
-                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
-                  className={`w-full px-4 py-3 rounded-xl outline-none transition text-center text-lg tracking-widest ${
-                    isDarkMode
-                      ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                      : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                  }`}
-                  placeholder="123456"
-                  maxLength={6}
-                  required
-                />
+                <div className="flex gap-2 justify-center">
+                  {[0, 1, 2, 3, 4, 5].map((index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      value={otp[index] || ""}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, "");
+
+                        // Handle paste and multiple digit input
+                        if (value.length > 1) {
+                          const pastedOtp = value.slice(0, 6);
+                          setOtp(pastedOtp);
+
+                          // Focus next available input
+                          const nextIndex = Math.min(pastedOtp.length, 5);
+                          document.getElementById(`otp-${nextIndex}`)?.focus();
+                          return;
+                        }
+
+                        // Handle single digit input
+                        const newOtp = otp.split("");
+                        newOtp[index] = value;
+                        const joinedOtp = newOtp.join("").slice(0, 6);
+                        setOtp(joinedOtp);
+
+                        // Auto-focus next input
+                        if (value && index < 5) {
+                          document.getElementById(`otp-${index + 1}`)?.focus();
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        // Handle backspace
+                        if (e.key === "Backspace") {
+                          if (!otp[index] && index > 0) {
+                            document
+                              .getElementById(`otp-${index - 1}`)
+                              ?.focus();
+                          }
+                        }
+
+                        // Handle arrow keys
+                        if (e.key === "ArrowLeft" && index > 0) {
+                          document.getElementById(`otp-${index - 1}`)?.focus();
+                        }
+                        if (e.key === "ArrowRight" && index < 5) {
+                          document.getElementById(`otp-${index + 1}`)?.focus();
+                        }
+                      }}
+                      onPaste={(e) => {
+                        e.preventDefault();
+                        const pastedData = e.clipboardData
+                          .getData("text")
+                          .replace(/\D/g, "")
+                          .slice(0, 6);
+                        if (pastedData) {
+                          setOtp(pastedData);
+
+                          // Focus next available input after paste
+                          const nextIndex = Math.min(pastedData.length, 5);
+                          setTimeout(() => {
+                            document
+                              .getElementById(`otp-${nextIndex}`)
+                              ?.focus();
+                          }, 0);
+                        }
+                      }}
+                      onFocus={(e) => e.target.select()}
+                      className={`w-12 h-12 text-center text-lg font-semibold rounded-xl outline-none transition-all ${
+                        isDarkMode
+                          ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                          : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                      }`}
+                      maxLength={1}
+                      id={`otp-${index}`}
+                    />
+                  ))}
+                </div>
               </div>
 
               <div>

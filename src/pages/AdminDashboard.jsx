@@ -20,6 +20,22 @@ import {
   CheckCircle,
   Loader,
   Home,
+  Mail,
+  Phone,
+  MapPin,
+  Building,
+  GraduationCap,
+  Briefcase,
+  Globe,
+  Github,
+  Twitter,
+  Link,
+  DollarSign,
+  Target,
+  Clock,
+  UserCheck,
+  UserX,
+  BarChart3,
 } from "lucide-react";
 
 // Utility Components
@@ -27,6 +43,7 @@ const Alert = ({ type = "success", message, onClose }) => {
   const styles = {
     success: "bg-green-50 border-green-200 text-green-800",
     error: "bg-red-50 border-red-200 text-red-800",
+    info: "bg-blue-50 border-blue-200 text-blue-800",
   };
 
   return (
@@ -36,8 +53,10 @@ const Alert = ({ type = "success", message, onClose }) => {
       <div className="flex items-center gap-2">
         {type === "success" ? (
           <CheckCircle className="w-5 h-5" />
-        ) : (
+        ) : type === "error" ? (
           <AlertCircle className="w-5 h-5" />
+        ) : (
+          <AlertCircle className="w-5 h-5 text-blue-600" />
         )}
         <span className="font-medium">{message}</span>
       </div>
@@ -48,31 +67,48 @@ const Alert = ({ type = "success", message, onClose }) => {
   );
 };
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
   if (!isOpen) return null;
+
+  const sizes = {
+    sm: "max-w-md",
+    md: "max-w-2xl",
+    lg: "max-w-4xl",
+    xl: "max-w-6xl",
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fade-in">
-      <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in">
+      <div
+        className={`bg-white rounded-xl shadow-2xl ${sizes[size]} w-full max-h-[90vh] overflow-y-auto animate-scale-in`}
+      >
         <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 rounded-t-xl">
-          <h2 className="text-2xl font-bold">{title}</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold">{title}</h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/10 rounded-lg transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
         <div className="p-6">{children}</div>
-        <div className="sticky bottom-0 bg-gray-50 p-4 rounded-b-xl border-t">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition"
-          >
-            Close
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
 // Header Component
-const Header = ({ adminData, onLogout, onMenuClick, onHomeClick }) => {
+const Header = ({
+  adminData,
+  onLogout,
+  onMenuClick,
+  onHomeClick,
+  notifications = [],
+}) => {
+  const [showNotifications, setShowNotifications] = useState(false);
+
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,21 +121,16 @@ const Header = ({ adminData, onLogout, onMenuClick, onHomeClick }) => {
               <Menu className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-3">
-              {/* Logo Space */}
               <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                 <img
                   src="/assets/images/mits-logo.png"
                   alt="MITS Logo"
-                  className="w-15 h-15 object-contain"
+                  className="w-8 h-8 object-contain"
                 />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-xl font-bold hidden sm:block">
-                  Alumni Portal
-                </h1>
-                <span className="text-xs text-white/80 hidden sm:block">
-                  Admin Dashboard
-                </span>
+                <h1 className="text-xl font-bold">Alumni Portal</h1>
+                <span className="text-xs text-white/80">Admin Dashboard</span>
               </div>
             </div>
           </div>
@@ -113,6 +144,51 @@ const Header = ({ adminData, onLogout, onMenuClick, onHomeClick }) => {
               <Home className="w-4 h-4" />
               <span className="hidden sm:inline">Home</span>
             </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="p-2 rounded-lg hover:bg-white/10 transition relative"
+              >
+                <Bell className="w-5 h-5" />
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border animate-scale-in">
+                  <div className="p-4 border-b">
+                    <h3 className="font-semibold text-gray-900">
+                      Notifications
+                    </h3>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length > 0 ? (
+                      notifications.map((notification, index) => (
+                        <div
+                          key={index}
+                          className="p-4 border-b hover:bg-gray-50"
+                        >
+                          <p className="text-sm text-gray-900">
+                            {notification.message}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {notification.time}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-center text-gray-500">
+                        No new notifications
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg">
               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center font-bold">
@@ -148,7 +224,7 @@ const Footer = () => {
                 <img
                   src="/assets/images/mits-logo.png"
                   alt="MITS Logo"
-                  className="w-18 h-18 object-contain"
+                  className="w-8 h-8 object-contain"
                 />
               </div>
               <h3 className="text-xl font-bold">Alumni Portal</h3>
@@ -224,11 +300,18 @@ const Footer = () => {
   );
 };
 
-// Stats Card Component
-const StatsCard = ({ icon: Icon, label, value, gradient, loading = false }) => {
+// Enhanced Stats Card Component
+const StatsCard = ({
+  icon: Icon,
+  label,
+  value,
+  gradient,
+  loading = false,
+  change,
+}) => {
   return (
     <div
-      className={`bg-gradient-to-br ${gradient} rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-300`}
+      className={`bg-gradient-to-br ${gradient} rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 group`}
     >
       <div className="flex items-center justify-between">
         <div>
@@ -240,8 +323,18 @@ const StatsCard = ({ icon: Icon, label, value, gradient, loading = false }) => {
               value
             )}
           </p>
+          {change && (
+            <p
+              className={`text-xs mt-1 ${
+                change > 0 ? "text-green-200" : "text-red-200"
+              }`}
+            >
+              {change > 0 ? "+" : ""}
+              {change}% from last month
+            </p>
+          )}
         </div>
-        <div className="bg-white/20 p-3 rounded-lg">
+        <div className="bg-white/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
           <Icon className="w-8 h-8" />
         </div>
       </div>
@@ -252,10 +345,11 @@ const StatsCard = ({ icon: Icon, label, value, gradient, loading = false }) => {
 // Sidebar Component
 const Sidebar = ({ activeTab, onTabChange, isOpen, onClose }) => {
   const menuItems = [
-    { id: 0, label: "Alumni Management", icon: Users },
-    { id: 1, label: "Bulk Register", icon: Upload },
-    { id: 2, label: "Event", icon: Calendar },
-    { id: 3, label: "Campaign", icon: TrendingUp },
+    { id: 0, label: "Dashboard", icon: LayoutDashboard },
+    { id: 1, label: "Alumni Management", icon: Users },
+    { id: 2, label: "Bulk Register", icon: Upload },
+    { id: 3, label: "Event Management", icon: Calendar },
+    { id: 4, label: "Campaign Management", icon: TrendingUp },
   ];
 
   return (
@@ -312,13 +406,15 @@ const Sidebar = ({ activeTab, onTabChange, isOpen, onClose }) => {
   );
 };
 
-// Alumni Management Component
+// Enhanced Alumni Management Component
 const AlumniManagement = ({ onError, onSuccess }) => {
   const [alumni, setAlumni] = useState([]);
   const [nonVerifiedAlumni, setNonVerifiedAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");
@@ -408,6 +504,18 @@ const AlumniManagement = ({ onError, onSuccess }) => {
     }
   };
 
+  const filteredAlumni = alumni.filter(
+    (alum) =>
+      alum.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alum.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredNonVerifiedAlumni = nonVerifiedAlumni.filter(
+    (alum) =>
+      alum.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      alum.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -416,191 +524,336 @@ const AlumniManagement = ({ onError, onSuccess }) => {
     );
   }
 
-  const AlumniTable = ({ data, showActions, showDelete }) => (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-              Name
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">
-              Email
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden lg:table-cell">
-              Phone
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">
-              Status
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {data.map((alum) => (
-            <tr key={alum.id} className="hover:bg-gray-50 transition">
-              <td className="px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {alum.name?.[0] || "A"}
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">{alum.name}</p>
-                    <p className="text-sm text-gray-500 md:hidden">
-                      {alum.email}
-                    </p>
-                  </div>
-                </div>
-              </td>
-              <td className="px-4 py-4 text-sm text-gray-600 hidden md:table-cell">
-                {alum.email}
-              </td>
-              <td className="px-4 py-4 text-sm text-gray-600 hidden lg:table-cell">
-                {alum.phone}
-              </td>
-              <td className="px-4 py-4 hidden sm:table-cell">
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                    alum.isVerified
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
+  const AlumniCard = ({ alum, showActions, showDelete }) => (
+    <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+            {alum.name?.[0] || "A"}
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-lg text-gray-900">{alum.name}</h3>
+            <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+              <Mail className="w-4 h-4" />
+              <span>{alum.email}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+              <Phone className="w-4 h-4" />
+              <span>{alum.phone}</span>
+            </div>
+            {alum.profile?.location && (
+              <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                <MapPin className="w-4 h-4" />
+                <span>{alum.profile.location}</span>
+              </div>
+            )}
+            {alum.profile?.branch && (
+              <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                <Building className="w-4 h-4" />
+                <span>{alum.profile.branch}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end gap-2">
+          <span
+            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+              alum.isVerified
+                ? "bg-green-100 text-green-800"
+                : "bg-yellow-100 text-yellow-800"
+            }`}
+          >
+            {alum.isVerified ? (
+              <>
+                <UserCheck className="w-4 h-4" />
+                Verified
+              </>
+            ) : (
+              <>
+                <UserX className="w-4 h-4" />
+                Pending
+              </>
+            )}
+          </span>
+
+          <div className="flex items-center gap-2">
+            {showActions && (
+              <>
+                <button
+                  onClick={() => handleVerifyAlumni(alum.id, "accept")}
+                  className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition"
+                  title="Accept"
                 >
-                  {alum.isVerified ? "Verified" : "Pending"}
-                </span>
-              </td>
-              <td className="px-4 py-4">
-                <div className="flex items-center gap-2">
-                  {showActions && (
-                    <>
-                      <button
-                        onClick={() => handleVerifyAlumni(alum.id, "accept")}
-                        className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition"
-                        title="Accept"
-                      >
-                        <Check className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleVerifyAlumni(alum.id, "reject")}
-                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                        title="Reject"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                    </>
-                  )}
-                  {showDelete && (
-                    <button
-                      onClick={() => setDeleteConfirm(alum)}
-                      className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setSelectedAlumni(alum)}
-                    className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
-                    title="View Details"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <Check className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleVerifyAlumni(alum.id, "reject")}
+                  className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                  title="Reject"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
+              </>
+            )}
+            {showDelete && (
+              <button
+                onClick={() => setDeleteConfirm(alum)}
+                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                title="Delete"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+            <button
+              onClick={() => setSelectedAlumni(alum)}
+              className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+              title="View Details"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-gray-900">Alumni Management</h2>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 text-white">
-            <h3 className="text-xl font-bold">Verified Alumni</h3>
-            <p className="text-3xl font-bold mt-2">{alumni.length}</p>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <h2 className="text-3xl font-bold text-gray-900">Alumni Management</h2>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search alumni..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+            />
+            <Users className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
           </div>
-          <div className="p-6">
-            {alumni.length > 0 ? (
-              <AlumniTable data={alumni} showDelete={true} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold">Verified Alumni</h3>
+                <p className="text-3xl font-bold mt-2">{alumni.length}</p>
+              </div>
+              <UserCheck className="w-12 h-12 text-white/80" />
+            </div>
+          </div>
+
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {filteredAlumni.length > 0 ? (
+              filteredAlumni.map((alum) => (
+                <AlumniCard key={alum.id} alum={alum} showDelete={true} />
+              ))
             ) : (
-              <p className="text-center text-gray-500 py-8">
+              <div className="text-center py-8 text-gray-500 bg-white rounded-xl shadow-lg">
                 No verified alumni found
-              </p>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 p-6 text-white">
-            <h3 className="text-xl font-bold">Pending Verification</h3>
-            <p className="text-3xl font-bold mt-2">
-              {nonVerifiedAlumni.length}
-            </p>
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold">Pending Verification</h3>
+                <p className="text-3xl font-bold mt-2">
+                  {nonVerifiedAlumni.length}
+                </p>
+              </div>
+              <UserX className="w-12 h-12 text-white/80" />
+            </div>
           </div>
-          <div className="p-6">
-            {nonVerifiedAlumni.length > 0 ? (
-              <AlumniTable data={nonVerifiedAlumni} showActions={true} />
+
+          <div className="space-y-4 max-h-96 overflow-y-auto">
+            {filteredNonVerifiedAlumni.length > 0 ? (
+              filteredNonVerifiedAlumni.map((alum) => (
+                <AlumniCard key={alum.id} alum={alum} showActions={true} />
+              ))
             ) : (
-              <p className="text-center text-gray-500 py-8">
+              <div className="text-center py-8 text-gray-500 bg-white rounded-xl shadow-lg">
                 No pending alumni
-              </p>
+              </div>
             )}
           </div>
         </div>
       </div>
 
+      {/* Enhanced Alumni Details Modal */}
       <Modal
         isOpen={!!selectedAlumni}
         onClose={() => setSelectedAlumni(null)}
         title={`Alumni Details - ${selectedAlumni?.name}`}
+        size="lg"
       >
         {selectedAlumni && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-bold text-lg mb-3 text-purple-600">
-                Basic Information
-              </h4>
-              <div className="space-y-2">
-                <p>
-                  <span className="font-semibold">ID:</span> {selectedAlumni.id}
-                </p>
-                <p>
-                  <span className="font-semibold">Name:</span>{" "}
+          <div className="space-y-6">
+            {/* Header Section */}
+            <div className="flex items-start gap-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
+                {selectedAlumni.name?.[0] || "A"}
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900">
                   {selectedAlumni.name}
-                </p>
-                <p>
-                  <span className="font-semibold">Email:</span>{" "}
-                  {selectedAlumni.email}
-                </p>
-                <p>
-                  <span className="font-semibold">Phone:</span>{" "}
-                  {selectedAlumni.phone}
-                </p>
-                <p>
-                  <span className="font-semibold">Branch:</span>{" "}
-                  {selectedAlumni.branch || "N/A"}
-                </p>
+                </h3>
+                <div className="flex flex-wrap gap-4 mt-3">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Mail className="w-4 h-4" />
+                    <span>{selectedAlumni.email}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Phone className="w-4 h-4" />
+                    <span>{selectedAlumni.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedAlumni.isVerified
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {selectedAlumni.isVerified ? (
+                        <>
+                          <UserCheck className="w-4 h-4" />
+                          Verified
+                        </>
+                      ) : (
+                        <>
+                          <UserX className="w-4 h-4" />
+                          Pending Verification
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div>
-              <h4 className="font-bold text-lg mb-3 text-purple-600">Status</h4>
-              <span
-                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium ${
-                  selectedAlumni.isVerified
-                    ? "bg-green-100 text-green-800"
-                    : "bg-yellow-100 text-yellow-800"
-                }`}
-              >
-                {selectedAlumni.isVerified ? "Verified" : "Pending"}
-              </span>
+
+            {/* Profile Information */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600 flex items-center gap-2">
+                  <UserCheck className="w-5 h-5" />
+                  Basic Information
+                </h4>
+                <div className="space-y-3">
+                  <InfoRow label="User ID" value={selectedAlumni.id} />
+                  <InfoRow
+                    label="Location"
+                    value={selectedAlumni.profile?.location}
+                  />
+                  <InfoRow
+                    label="Branch"
+                    value={selectedAlumni.profile?.branch}
+                  />
+                  <InfoRow
+                    label="Batch"
+                    value={selectedAlumni.profile?.batch}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600 flex items-center gap-2">
+                  <Globe className="w-5 h-5" />
+                  Social Links
+                </h4>
+                <div className="space-y-3">
+                  <SocialLinkRow
+                    icon={Link}
+                    label="LinkedIn"
+                    value={selectedAlumni.profile?.linkedin}
+                  />
+                  <SocialLinkRow
+                    icon={Github}
+                    label="GitHub"
+                    value={selectedAlumni.profile?.github}
+                  />
+                  <SocialLinkRow
+                    icon={Twitter}
+                    label="Twitter"
+                    value={selectedAlumni.profile?.twitter}
+                  />
+                  <SocialLinkRow
+                    icon={Globe}
+                    label="Portfolio"
+                    value={selectedAlumni.profile?.portfolio}
+                  />
+                </div>
+              </div>
             </div>
+
+            {/* Education Section */}
+            {selectedAlumni.profile?.education &&
+              selectedAlumni.profile.education.length > 0 && (
+                <div className="space-y-4">
+                  <h4 className="font-bold text-lg text-purple-600 flex items-center gap-2">
+                    <GraduationCap className="w-5 h-5" />
+                    Education
+                  </h4>
+                  <div className="space-y-3">
+                    {selectedAlumni.profile.education.map((edu, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">{edu.stream}</p>
+                            <p className="text-gray-600">{edu.institution}</p>
+                          </div>
+                          <div className="text-right text-sm text-gray-500">
+                            <p>
+                              {new Date(edu.from).getFullYear()} -{" "}
+                              {new Date(edu.to).getFullYear()}
+                            </p>
+                            <p>GPA: {edu.gpa}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            {/* Experience Section */}
+            {selectedAlumni.profile?.experience &&
+              selectedAlumni.profile.experience.length > 0 && (
+                <div className="space-y-4">
+                  <h4 className="font-bold text-lg text-purple-600 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5" />
+                    Experience
+                  </h4>
+                  <div className="space-y-3">
+                    {selectedAlumni.profile.experience.map((exp, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">{exp.position}</p>
+                            <p className="text-gray-600">{exp.company}</p>
+                          </div>
+                          <div className="text-right text-sm text-gray-500">
+                            <p>
+                              {new Date(exp.from).toLocaleDateString()} -{" "}
+                              {exp.to
+                                ? new Date(exp.to).toLocaleDateString()
+                                : "Present"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
           </div>
         )}
       </Modal>
@@ -636,7 +889,36 @@ const AlumniManagement = ({ onError, onSuccess }) => {
   );
 };
 
-// Bulk Register Component
+// Helper Components for Alumni Details
+const InfoRow = ({ label, value }) => (
+  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+    <span className="font-medium text-gray-600">{label}:</span>
+    <span className="text-gray-900">{value || "N/A"}</span>
+  </div>
+);
+
+const SocialLinkRow = ({ icon: Icon, label, value }) => (
+  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+    <span className="font-medium text-gray-600 flex items-center gap-2">
+      <Icon className="w-4 h-4" />
+      {label}:
+    </span>
+    {value ? (
+      <a
+        href={value}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-600 hover:underline"
+      >
+        View Profile
+      </a>
+    ) : (
+      <span className="text-gray-400">Not provided</span>
+    )}
+  </div>
+);
+
+// Bulk Register Component (Enhanced)
 const BulkRegister = ({ onError, onSuccess }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -874,7 +1156,7 @@ Neha Verma,neha.verma@example.com,9876543215,Electrical Engineering,2021-2025,Pu
   );
 };
 
-// Event Management Component
+// Enhanced Event Management Component
 const EventManagement = ({ onError, onSuccess }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -958,6 +1240,79 @@ const EventManagement = ({ onError, onSuccess }) => {
     );
   }
 
+  const EventCard = ({ event }) => (
+    <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start gap-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+            <Calendar className="w-8 h-8 text-white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-lg text-gray-900">{event.title}</h3>
+            <p className="text-gray-600 mt-1">{event.description}</p>
+            <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-500">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                {new Date(event.date).toLocaleDateString()}
+              </div>
+              <div className="flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
+                {event.location}
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                {event.maxAttendees} max attendees
+              </div>
+              <div className="flex items-center gap-1">
+                <DollarSign className="w-4 h-4" />
+                {event.price === 0 ? "Free" : `$${event.price}`}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-end gap-2">
+          <span
+            className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+              event.isScheduled
+                ? "bg-green-100 text-green-800"
+                : "bg-yellow-100 text-yellow-800"
+            }`}
+          >
+            {event.isScheduled ? "Scheduled" : "Pending"}
+          </span>
+
+          <div className="flex items-center gap-2">
+            {!event.isScheduled && (
+              <button
+                onClick={() => handleEventAction(event.id, "accept")}
+                className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition"
+                title="Accept"
+              >
+                <Check className="w-4 h-4" />
+              </button>
+            )}
+            <button
+              onClick={() => handleEventAction(event.id, "reject")}
+              className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+              title="Reject"
+            >
+              <XCircle className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => setSelectedEvent(event)}
+              className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+              title="View Details"
+            >
+              <Eye className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-gray-900">Event Management</h2>
@@ -973,91 +1328,14 @@ const EventManagement = ({ onError, onSuccess }) => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Title
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden lg:table-cell">
-                  Location
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {events.map((event) => (
-                <tr key={event.id} className="hover:bg-gray-50 transition">
-                  <td className="px-4 py-4">
-                    <p className="font-medium text-gray-900">{event.title}</p>
-                    <p className="text-sm text-gray-500 md:hidden">
-                      {new Date(event.date).toLocaleDateString()}
-                    </p>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-600 hidden md:table-cell">
-                    {new Date(event.date).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-4 text-sm text-gray-600 hidden lg:table-cell">
-                    {event.location}
-                  </td>
-                  <td className="px-4 py-4 hidden sm:table-cell">
-                    <span
-                      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-                        event.isScheduled
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {event.isScheduled ? "Scheduled" : "Pending"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-2">
-                      {!event.isScheduled && (
-                        <button
-                          onClick={() => handleEventAction(event.id, "accept")}
-                          className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition"
-                          title="Accept"
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleEventAction(event.id, "reject")}
-                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                        title="Reject"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleEventAction(event.id, "delete")}
-                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setSelectedEvent(event)}
-                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
-                        title="View Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-4">
+          {events.length > 0 ? (
+            events.map((event) => <EventCard key={event.id} event={event} />)
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No events found
+            </div>
+          )}
         </div>
       </div>
 
@@ -1065,59 +1343,97 @@ const EventManagement = ({ onError, onSuccess }) => {
         isOpen={!!selectedEvent}
         onClose={() => setSelectedEvent(null)}
         title="Event Details"
+        size="lg"
       >
         {selectedEvent && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-bold text-lg mb-3 text-purple-600">
-                Basic Information
-              </h4>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-semibold">Title:</span>{" "}
+          <div className="space-y-6">
+            <div className="flex items-start gap-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center">
+                <Calendar className="w-12 h-12 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900">
                   {selectedEvent.title}
-                </p>
-                <p>
-                  <span className="font-semibold">Description:</span>{" "}
+                </h3>
+                <p className="text-gray-600 mt-2">
                   {selectedEvent.description}
                 </p>
-                <p>
-                  <span className="font-semibold">Date:</span>{" "}
-                  {new Date(selectedEvent.date).toLocaleDateString()}
-                </p>
-                <p>
-                  <span className="font-semibold">Location:</span>{" "}
-                  {selectedEvent.location}
-                </p>
-                <p>
-                  <span className="font-semibold">Organizer:</span>{" "}
-                  {selectedEvent.organizer}
-                </p>
+                <div className="flex flex-wrap gap-4 mt-3">
+                  <span
+                    className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedEvent.isScheduled
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {selectedEvent.isScheduled
+                      ? "Scheduled"
+                      : "Pending Approval"}
+                  </span>
+                </div>
               </div>
             </div>
-            <div>
-              <h4 className="font-bold text-lg mb-3 text-purple-600">
-                Additional Details
-              </h4>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-semibold">Type:</span>{" "}
-                  {selectedEvent.type}
-                </p>
-                <p>
-                  <span className="font-semibold">Category:</span>{" "}
-                  {selectedEvent.category}
-                </p>
-                <p>
-                  <span className="font-semibold">Max Attendees:</span>{" "}
-                  {selectedEvent.maxAttendees}
-                </p>
-                <p>
-                  <span className="font-semibold">Price:</span> $
-                  {selectedEvent.price}
-                </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600">
+                  Event Information
+                </h4>
+                <div className="space-y-3">
+                  <InfoRow
+                    label="Date"
+                    value={new Date(selectedEvent.date).toLocaleDateString()}
+                  />
+                  <InfoRow label="Location" value={selectedEvent.location} />
+                  <InfoRow label="Organizer" value={selectedEvent.organizer} />
+                  <InfoRow
+                    label="Organizer Email"
+                    value={selectedEvent.organizerEmail}
+                  />
+                  <InfoRow
+                    label="Price"
+                    value={
+                      selectedEvent.price === 0
+                        ? "Free"
+                        : `$${selectedEvent.price}`
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600">
+                  Event Details
+                </h4>
+                <div className="space-y-3">
+                  <InfoRow label="Category" value={selectedEvent.category} />
+                  <InfoRow label="Type" value={selectedEvent.type} />
+                  <InfoRow
+                    label="Max Attendees"
+                    value={selectedEvent.maxAttendees}
+                  />
+                  <InfoRow
+                    label="Created"
+                    value={new Date(
+                      selectedEvent.createdAt
+                    ).toLocaleDateString()}
+                  />
+                </div>
               </div>
             </div>
+
+            {selectedEvent.image && (
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600">
+                  Event Image
+                </h4>
+                <img
+                  src={selectedEvent.image}
+                  alt={selectedEvent.title}
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+              </div>
+            )}
           </div>
         )}
       </Modal>
@@ -1125,7 +1441,7 @@ const EventManagement = ({ onError, onSuccess }) => {
   );
 };
 
-// Campaign Management Component
+// Enhanced Campaign Management Component
 const CampaignManagement = ({ onError, onSuccess }) => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1213,6 +1529,99 @@ const CampaignManagement = ({ onError, onSuccess }) => {
     );
   }
 
+  const CampaignCard = ({ campaign }) => {
+    const progress = (campaign.currentAmount / campaign.totalAmount) * 100;
+
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-8 h-8 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-lg text-gray-900">
+                {campaign.campaignTitle}
+              </h3>
+              <p className="text-gray-600 mt-1">{campaign.tagline}</p>
+              <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-500">
+                <div className="flex items-center gap-1">
+                  <Target className="w-4 h-4" />
+                  Goal: ${parseFloat(campaign.totalAmount).toLocaleString()}
+                </div>
+                <div className="flex items-center gap-1">
+                  <DollarSign className="w-4 h-4" />
+                  Raised: ${parseFloat(campaign.currentAmount).toLocaleString()}
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {new Date(campaign.endDate).toLocaleDateString()}
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="mt-3">
+                <div className="flex justify-between text-sm text-gray-600 mb-1">
+                  <span>Progress</span>
+                  <span>{Math.round(progress)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-2">
+            <span
+              className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                campaign.isApproved
+                  ? "bg-green-100 text-green-800"
+                  : "bg-yellow-100 text-yellow-800"
+              }`}
+            >
+              {campaign.isApproved ? "Approved" : "Pending"}
+            </span>
+
+            <div className="flex items-center gap-2">
+              {!campaign.isApproved && (
+                <button
+                  onClick={() =>
+                    handleCampaignAction(campaign.id, "approve", true)
+                  }
+                  className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition"
+                  title="Approve"
+                >
+                  <Check className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                onClick={() =>
+                  handleCampaignAction(campaign.id, "approve", false)
+                }
+                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                title="Reject"
+              >
+                <XCircle className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setSelectedCampaign(campaign)}
+                className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
+                title="View Details"
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-bold text-gray-900">Campaign Management</h2>
@@ -1228,99 +1637,16 @@ const CampaignManagement = ({ onError, onSuccess }) => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Title
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden md:table-cell">
-                  Target
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden lg:table-cell">
-                  Raised
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase hidden sm:table-cell">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {campaigns.map((campaign) => (
-                <tr key={campaign.id} className="hover:bg-gray-50 transition">
-                  <td className="px-4 py-4">
-                    <p className="font-medium text-gray-900">
-                      {campaign.campaignTitle}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {campaign.categories}
-                    </p>
-                  </td>
-                  <td className="px-4 py-4 text-sm font-semibold text-purple-600 hidden md:table-cell">
-                    ${parseFloat(campaign.totalAmount).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-4 text-sm font-semibold text-green-600 hidden lg:table-cell">
-                    ${parseFloat(campaign.currentAmount).toLocaleString()}
-                  </td>
-                  <td className="px-4 py-4 hidden sm:table-cell">
-                    <span
-                      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${
-                        campaign.isApproved
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {campaign.isApproved ? "Approved" : "Pending"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-2">
-                      {!campaign.isApproved && (
-                        <button
-                          onClick={() =>
-                            handleCampaignAction(campaign.id, "approve", true)
-                          }
-                          className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition"
-                          title="Approve"
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() =>
-                          handleCampaignAction(campaign.id, "approve", false)
-                        }
-                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                        title="Reject"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          handleCampaignAction(campaign.id, "delete")
-                        }
-                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
-                        title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setSelectedCampaign(campaign)}
-                        className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition"
-                        title="View Details"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-4">
+          {campaigns.length > 0 ? (
+            campaigns.map((campaign) => (
+              <CampaignCard key={campaign.id} campaign={campaign} />
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No campaigns found
+            </div>
+          )}
         </div>
       </div>
 
@@ -1328,58 +1654,291 @@ const CampaignManagement = ({ onError, onSuccess }) => {
         isOpen={!!selectedCampaign}
         onClose={() => setSelectedCampaign(null)}
         title="Campaign Details"
+        size="lg"
       >
         {selectedCampaign && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-bold text-lg mb-3 text-purple-600">
-                Campaign Information
-              </h4>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-semibold">Title:</span>{" "}
+          <div className="space-y-6">
+            <div className="flex items-start gap-6">
+              <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center">
+                <TrendingUp className="w-12 h-12 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900">
                   {selectedCampaign.campaignTitle}
-                </p>
-                <p>
-                  <span className="font-semibold">Tagline:</span>{" "}
-                  {selectedCampaign.tagline}
-                </p>
-                <p>
-                  <span className="font-semibold">Description:</span>{" "}
-                  {selectedCampaign.detailedDescription}
-                </p>
-                <p>
-                  <span className="font-semibold">Category:</span>{" "}
-                  {selectedCampaign.categories}
-                </p>
+                </h3>
+                <p className="text-gray-600 mt-2">{selectedCampaign.tagline}</p>
+                <div className="flex flex-wrap gap-4 mt-3">
+                  <span
+                    className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedCampaign.isApproved
+                        ? "bg-green-100 text-green-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {selectedCampaign.isApproved
+                      ? "Approved"
+                      : "Pending Approval"}
+                  </span>
+                  <span className="inline-flex px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    {selectedCampaign.categories}
+                  </span>
+                </div>
               </div>
             </div>
-            <div>
-              <h4 className="font-bold text-lg mb-3 text-purple-600">
-                Financial Details
-              </h4>
-              <div className="space-y-2 text-sm">
-                <p>
-                  <span className="font-semibold">Target:</span> $
-                  {parseFloat(selectedCampaign.totalAmount).toLocaleString()}
-                </p>
-                <p>
-                  <span className="font-semibold">Raised:</span> $
-                  {parseFloat(selectedCampaign.currentAmount).toLocaleString()}
-                </p>
-                <p>
-                  <span className="font-semibold">Contact:</span>{" "}
-                  {selectedCampaign.email}
-                </p>
-                <p>
-                  <span className="font-semibold">Phone:</span>{" "}
-                  {selectedCampaign.contact}
-                </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600">
+                  Campaign Information
+                </h4>
+                <div className="space-y-3">
+                  <InfoRow
+                    label="Description"
+                    value={selectedCampaign.detailedDescription}
+                  />
+                  <InfoRow
+                    label="Category"
+                    value={selectedCampaign.categories}
+                  />
+                  <InfoRow
+                    label="Start Date"
+                    value={new Date(
+                      selectedCampaign.startDate
+                    ).toLocaleDateString()}
+                  />
+                  <InfoRow
+                    label="End Date"
+                    value={new Date(
+                      selectedCampaign.endDate
+                    ).toLocaleDateString()}
+                  />
+                  <InfoRow
+                    label="Contact Email"
+                    value={selectedCampaign.email}
+                  />
+                  <InfoRow
+                    label="Contact Phone"
+                    value={selectedCampaign.contact}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600">
+                  Financial Details
+                </h4>
+                <div className="space-y-3">
+                  <InfoRow
+                    label="Target Amount"
+                    value={`$${parseFloat(
+                      selectedCampaign.totalAmount
+                    ).toLocaleString()}`}
+                  />
+                  <InfoRow
+                    label="Raised Amount"
+                    value={`$${parseFloat(
+                      selectedCampaign.currentAmount
+                    ).toLocaleString()}`}
+                  />
+                  <InfoRow
+                    label="Progress"
+                    value={`${Math.round(
+                      (selectedCampaign.currentAmount /
+                        selectedCampaign.totalAmount) *
+                        100
+                    )}%`}
+                  />
+                  <InfoRow
+                    label="Project Link"
+                    value={
+                      <a
+                        href={selectedCampaign.projectLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        View Project
+                      </a>
+                    }
+                  />
+                  <InfoRow
+                    label="GitHub"
+                    value={
+                      selectedCampaign.github ? (
+                        <a
+                          href={selectedCampaign.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          View Repository
+                        </a>
+                      ) : (
+                        "N/A"
+                      )
+                    }
+                  />
+                </div>
               </div>
             </div>
+
+            {selectedCampaign.images && selectedCampaign.images.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="font-bold text-lg text-purple-600">
+                  Campaign Images
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {selectedCampaign.images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Campaign image ${index + 1}`}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </Modal>
+    </div>
+  );
+};
+
+// Dashboard Overview Component
+const DashboardOverview = ({ stats, loading, onTabChange }) => {
+  const recentActivities = [
+    {
+      type: "alumni",
+      message: "New alumni registration pending approval",
+      time: "2 minutes ago",
+    },
+    {
+      type: "event",
+      message: "New event created: Alumni Meet 2024",
+      time: "1 hour ago",
+    },
+    {
+      type: "campaign",
+      message: 'Campaign "Green Campus" reached 50% of goal',
+      time: "3 hours ago",
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-3xl font-bold text-gray-900">Dashboard Overview</h2>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard
+          icon={Users}
+          label="Total Alumni"
+          value={stats.totalAlumni}
+          gradient="from-purple-500 to-indigo-600"
+          loading={loading}
+          change={12}
+        />
+        <StatsCard
+          icon={UserX}
+          label="Pending Verification"
+          value={stats.pendingAlumni}
+          gradient="from-orange-500 to-red-600"
+          loading={loading}
+          change={-5}
+        />
+        <StatsCard
+          icon={Calendar}
+          label="Active Events"
+          value={stats.activeEvents}
+          gradient="from-blue-500 to-cyan-600"
+          loading={loading}
+          change={8}
+        />
+        <StatsCard
+          icon={TrendingUp}
+          label="Running Campaigns"
+          value={stats.activeCampaigns}
+          gradient="from-green-500 to-emerald-600"
+          loading={loading}
+          change={15}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Quick Actions */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-xl font-bold mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              onClick={() => onTabChange(1)}
+              className="p-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
+            >
+              <Users className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Manage Alumni</h4>
+              <p className="text-sm text-white/80">
+                View and verify alumni accounts
+              </p>
+            </button>
+            <button
+              onClick={() => onTabChange(2)}
+              className="p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
+            >
+              <Upload className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Bulk Register</h4>
+              <p className="text-sm text-white/80">
+                Upload multiple alumni at once
+              </p>
+            </button>
+            <button
+              onClick={() => onTabChange(3)}
+              className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
+            >
+              <Calendar className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Event Management</h4>
+              <p className="text-sm text-white/80">Manage campus events</p>
+            </button>
+            <button
+              onClick={() => onTabChange(4)}
+              className="p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
+            >
+              <TrendingUp className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Campaigns</h4>
+              <p className="text-sm text-white/80">
+                Oversee fundraising campaigns
+              </p>
+            </button>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-xl font-bold mb-4">Recent Activity</h3>
+          <div className="space-y-4">
+            {recentActivities.map((activity, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+              >
+                <div
+                  className={`w-2 h-2 mt-2 rounded-full ${
+                    activity.type === "alumni"
+                      ? "bg-purple-500"
+                      : activity.type === "event"
+                      ? "bg-blue-500"
+                      : "bg-green-500"
+                  }`}
+                ></div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">{activity.message}</p>
+                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -1400,6 +1959,14 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
   const [statsLoading, setStatsLoading] = useState(true);
   const navigate = useNavigate();
 
+  const notifications = [
+    { message: "New alumni registration requires approval", time: "5 min ago" },
+    {
+      message: 'Event "Tech Symposium" is scheduled for tomorrow',
+      time: "1 hour ago",
+    },
+  ];
+
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");
     return authData ? JSON.parse(authData).accessToken : null;
@@ -1410,7 +1977,6 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
       const token = getAuthToken();
       if (!token) throw new Error("Authentication token not found");
 
-      // Fetch all stats in parallel
       const [
         alumniResponse,
         nonVerifiedResponse,
@@ -1505,6 +2071,7 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
         onLogout={handleLogout}
         onMenuClick={() => setSidebarOpen(true)}
         onHomeClick={handleHomeClick}
+        notifications={notifications}
       />
 
       <div className="flex flex-1">
@@ -1517,39 +2084,6 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
 
         <main className="flex-1 p-4 lg:p-8">
           <div className="max-w-7xl mx-auto">
-            {activeTab === 0 && (
-              <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatsCard
-                  icon={Users}
-                  label="Total Alumni"
-                  value={stats.totalAlumni}
-                  gradient="from-purple-500 to-indigo-600"
-                  loading={statsLoading}
-                />
-                <StatsCard
-                  icon={Users}
-                  label="Pending Verification"
-                  value={stats.pendingAlumni}
-                  gradient="from-orange-500 to-red-600"
-                  loading={statsLoading}
-                />
-                <StatsCard
-                  icon={Calendar}
-                  label="Active Events"
-                  value={stats.activeEvents}
-                  gradient="from-blue-500 to-cyan-600"
-                  loading={statsLoading}
-                />
-                <StatsCard
-                  icon={TrendingUp}
-                  label="Running Campaigns"
-                  value={stats.activeCampaigns}
-                  gradient="from-green-500 to-emerald-600"
-                  loading={statsLoading}
-                />
-              </div>
-            )}
-
             {error && (
               <Alert
                 type="error"
@@ -1566,15 +2100,22 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
             )}
 
             {activeTab === 0 && (
-              <AlumniManagement onError={setError} onSuccess={setSuccess} />
+              <DashboardOverview
+                stats={stats}
+                loading={statsLoading}
+                onTabChange={setActiveTab}
+              />
             )}
             {activeTab === 1 && (
-              <BulkRegister onError={setError} onSuccess={setSuccess} />
+              <AlumniManagement onError={setError} onSuccess={setSuccess} />
             )}
             {activeTab === 2 && (
-              <EventManagement onError={setError} onSuccess={setSuccess} />
+              <BulkRegister onError={setError} onSuccess={setSuccess} />
             )}
             {activeTab === 3 && (
+              <EventManagement onError={setError} onSuccess={setSuccess} />
+            )}
+            {activeTab === 4 && (
               <CampaignManagement onError={setError} onSuccess={setSuccess} />
             )}
           </div>
