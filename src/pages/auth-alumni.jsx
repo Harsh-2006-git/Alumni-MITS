@@ -113,8 +113,8 @@ export default function AlumniAuth({
 
     try {
       const endpoint = isLogin
-        ? "https://alumni-mits-l45r.onrender.com/auth/login-alumni"
-        : "https://alumni-mits-l45r.onrender.com/auth/register-alumni";
+        ? "https://alumni-mits-backend.onrender.com/auth/login-alumni"
+        : "https://alumni-mits-backend.onrender.com/auth/register-alumni";
 
       const payload = isLogin
         ? { email: formData.email, password: formData.password }

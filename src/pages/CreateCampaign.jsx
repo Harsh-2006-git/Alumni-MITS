@@ -177,7 +177,7 @@ export default function CreateCampaignPage({
       });
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/campaign/create-campaign",
+        "https://alumni-mits-backend.onrender.com/campaign/create-campaign",
         {
           method: "POST",
           headers: {

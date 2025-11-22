@@ -61,7 +61,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
     console.log("Refreshing token:", refreshToken);
     try {
       const res = await fetch(
-        "https://alumni-mits-l45r.onrender.com/auth/refresh",
+        "https://alumni-mits-backend.onrender.com/auth/refresh",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

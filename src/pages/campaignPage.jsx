@@ -83,7 +83,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/campaign/get-approve-campaign"
+        "https://alumni-mits-backend.onrender.com/campaign/get-approve-campaign"
       );
       const data = await response.json();
       if (response.ok) {
@@ -179,7 +179,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
       });
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/campaign/create-campaign",
+        "https://alumni-mits-backend.onrender.com/campaign/create-campaign",
         {
           method: "POST",
           headers: {

@@ -48,7 +48,7 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
       }
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/job/create-job",
+        "https://alumni-mits-backend.onrender.com/job/create-job",
         {
           method: "POST",
           headers: {

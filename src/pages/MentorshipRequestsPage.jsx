@@ -115,7 +115,7 @@ const MentorshipRequestsPage = ({
     mentor_notes: "",
   });
 
-  const API_BASE = "https://alumni-mits-l45r.onrender.com/mentor";
+  const API_BASE = "https://alumni-mits-backend.onrender.com/mentor";
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");

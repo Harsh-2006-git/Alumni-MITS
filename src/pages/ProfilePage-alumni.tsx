@@ -130,7 +130,7 @@ export default function AlumniProfilePage() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [showResumeModal, setShowResumeModal] = useState(false);
 
-  const API_BASE_URL = "https://alumni-mits-l45r.onrender.com";
+  const API_BASE_URL = "https://alumni-mits-backend.onrender.com";
 
   useEffect(() => {
     fetchUserData();

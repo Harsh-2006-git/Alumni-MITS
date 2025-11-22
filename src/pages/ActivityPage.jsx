@@ -687,7 +687,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
     try {
       // Fetch events
       const eventsPromise = fetch(
-        "https://alumni-mits-l45r.onrender.com/event/my-events",
+        "https://alumni-mits-backend.onrender.com/event/my-events",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -698,7 +698,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
       // Fetch jobs
       const jobsPromise = fetch(
-        "https://alumni-mits-l45r.onrender.com/job/my-jobs",
+        "https://alumni-mits-backend.onrender.com/job/my-jobs",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -709,7 +709,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
       // Fetch campaigns
       const campaignsPromise = fetch(
-        "https://alumni-mits-l45r.onrender.com/campaign/get-my-campaigns",
+        "https://alumni-mits-backend.onrender.com/campaign/get-my-campaigns",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -755,16 +755,16 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
       let url, dataKey;
       switch (section) {
         case "events":
-          url = "https://alumni-mits-l45r.onrender.com/event/my-events";
+          url = "https://alumni-mits-backend.onrender.com/event/my-events";
           dataKey = "events";
           break;
         case "jobs":
-          url = "https://alumni-mits-l45r.onrender.com/job/my-jobs";
+          url = "https://alumni-mits-backend.onrender.com/job/my-jobs";
           dataKey = "data";
           break;
         case "campaigns":
           url =
-            "https://alumni-mits-l45r.onrender.com/campaign/get-my-campaigns";
+            "https://alumni-mits-backend.onrender.com/campaign/get-my-campaigns";
           dataKey = "campaigns";
           break;
         default:
@@ -811,9 +811,9 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     const token = getAuthToken();
     const endpoints = {
-      events: `https://alumni-mits-l45r.onrender.com/event/delete/${id}`,
-      jobs: `https://alumni-mits-l45r.onrender.com/job/delete/${id}`,
-      campaigns: `https://alumni-mits-l45r.onrender.com/campaign/delete/${id}`,
+      events: `https://alumni-mits-backend.onrender.com/event/delete/${id}`,
+      jobs: `https://alumni-mits-backend.onrender.com/job/delete/${id}`,
+      campaigns: `https://alumni-mits-backend.onrender.com/campaign/delete/${id}`,
     };
 
     try {
@@ -853,7 +853,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `https://alumni-mits-l45r.onrender.com/event/update/${formData.id}`,
+        `https://alumni-mits-backend.onrender.com/event/update/${formData.id}`,
         {
           method: "PUT",
           headers: {
@@ -898,7 +898,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `https://alumni-mits-l45r.onrender.com/job/update/${formData.id}`,
+        `https://alumni-mits-backend.onrender.com/job/update/${formData.id}`,
         {
           method: "PUT",
           headers: {
@@ -927,7 +927,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `https://alumni-mits-l45r.onrender.com/event/event-registrations/${eventId}`,
+        `https://alumni-mits-backend.onrender.com/event/event-registrations/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -948,7 +948,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
   const downloadExcel = (eventId, eventTitle) => {
     const token = getAuthToken();
     fetch(
-      `https://alumni-mits-l45r.onrender.com/event/download-registrations/${eventId}`,
+      `https://alumni-mits-backend.onrender.com/event/download-registrations/${eventId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

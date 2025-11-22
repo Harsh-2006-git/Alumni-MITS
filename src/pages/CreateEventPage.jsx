@@ -110,7 +110,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
       const token = authData ? JSON.parse(authData).accessToken : null;
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/add-event",
+        "https://alumni-mits-backend.onrender.com/event/add-event",
         {
           method: "POST",
           headers: {

@@ -680,7 +680,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/job/all-jobs"
+        "https://alumni-mits-backend.onrender.com/job/all-jobs"
       );
 
       if (!response.ok) {

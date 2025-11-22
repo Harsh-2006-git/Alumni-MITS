@@ -45,7 +45,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
           try {
             const response = await fetch(
-              "https://alumni-mits-l45r.onrender.com/message/people",
+              "https://alumni-mits-backend.onrender.com/message/people",
               {
                 headers: {
                   Authorization: `Bearer ${parsedAuth.accessToken}`,
@@ -151,7 +151,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("Fetching people...");
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/message/people",
+        "https://alumni-mits-backend.onrender.com/message/people",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -183,7 +183,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         setPeople(filteredPeople);
 
         const messagesResponse = await fetch(
-          "https://alumni-mits-l45r.onrender.com/message/my",
+          "https://alumni-mits-backend.onrender.com/message/my",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -248,7 +248,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("Selected user phone:", selectedUser.phone);
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/message/my",
+        "https://alumni-mits-backend.onrender.com/message/my",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -293,7 +293,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       }
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/message/send",
+        "https://alumni-mits-backend.onrender.com/message/send",
         {
           method: "POST",
           headers: {

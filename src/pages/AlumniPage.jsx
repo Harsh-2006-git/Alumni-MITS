@@ -80,7 +80,7 @@ export default function AlumniDirectory({
     const fetchAlumni = async () => {
       try {
         const response = await fetch(
-          "https://alumni-mits-l45r.onrender.com/alumni/all-alumni"
+          "https://alumni-mits-backend.onrender.com/alumni/all-alumni"
         );
         const result = await response.json();
         if (result.success) {
@@ -310,7 +310,8 @@ export default function AlumniDirectory({
                     : "bg-white border-blue-200 shadow-lg"
                 }`}
               >
-                <div className="flex flex-col md:flex-row gap-4 mb-4">
+                <div className="flex flex-row gap-3 items-center mb-4">
+                  {/* Search Input - Takes most width */}
                   <div className="flex-1 relative">
                     <Search
                       className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
@@ -329,29 +330,29 @@ export default function AlumniDirectory({
                       } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                     />
                   </div>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => setShowFilters(!showFilters)}
-                      className={`px-6 py-3 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 ${
-                        isDarkMode
-                          ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
-                          : "border-purple-500 text-purple-600 hover:bg-purple-50"
-                      }`}
-                    >
-                      <Filter className="w-5 h-5" />
-                      Filters
-                    </button>
-                    <button
-                      onClick={clearFilters}
-                      className={`px-6 py-3 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 ${
-                        isDarkMode
-                          ? "border-gray-600 text-gray-400 hover:bg-gray-900/30"
-                          : "border-gray-500 text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      Clear
-                    </button>
-                  </div>
+
+                  {/* Buttons - Smaller */}
+                  <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`px-3 py-2 rounded-lg font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 whitespace-nowrap ${
+                      isDarkMode
+                        ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
+                        : "border-purple-500 text-purple-600 hover:bg-purple-50"
+                    }`}
+                  >
+                    <Filter className="w-4 h-4" />
+                    Filters
+                  </button>
+                  <button
+                    onClick={clearFilters}
+                    className={`px-3 py-2 rounded-lg font-semibold border-2 transition-all hover:scale-105 whitespace-nowrap ${
+                      isDarkMode
+                        ? "border-gray-600 text-gray-400 hover:bg-gray-900/30"
+                        : "border-gray-500 text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    Clear
+                  </button>
                 </div>
 
                 {showFilters && (
@@ -459,15 +460,19 @@ export default function AlumniDirectory({
                       key={alumni.id}
                       className={`rounded-xl md:rounded-2xl border transition-all duration-300 hover:scale-105 hover:shadow-xl md:hover:shadow-2xl cursor-pointer overflow-hidden flex flex-col md:flex-col h-full ${
                         isDarkMode
-                          ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                          ? "bg-gradient-to-br from-slate-800/80 to-blue-900/50 border-blue-600/30 shadow-lg"
                           : "bg-white border-blue-200 shadow-md md:shadow-lg"
                       }`}
                       onClick={() => openModal(alumni)}
                     >
-                      {/* Mobile Layout: Image on left with grey bg, content on right with white bg */}
+                      {/* Mobile Layout: Image on left with theme-appropriate bg, content on right */}
                       <div className="flex flex-row md:flex-col h-full">
-                        {/* Grey Background Section - Left side on mobile, top on desktop */}
-                        <div className="bg-gray-100 w-24 md:w-full md:h-40 flex flex-col items-center justify-center py-3 md:py-0 relative">
+                        {/* Image Background Section - Left side on mobile, top on desktop */}
+                        <div
+                          className={`w-24 md:w-full md:h-40 flex flex-col items-center justify-center py-3 md:py-0 relative ${
+                            isDarkMode ? "bg-slate-700/50" : "bg-gray-100"
+                          }`}
+                        >
                           {/* Profile Image */}
                           <div className="flex items-center justify-center mb-2 md:mb-0">
                             <img
@@ -490,9 +495,15 @@ export default function AlumniDirectory({
                           {/* Verified Badge - Below image on mobile, top right on desktop */}
                           {alumni.isVerified && (
                             <>
-                              {/* Mobile - Below image in grey section */}
+                              {/* Mobile - Below image */}
                               <div className="block md:hidden">
-                                <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-lg">
+                                <div
+                                  className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-lg ${
+                                    isDarkMode
+                                      ? "bg-blue-600 text-white"
+                                      : "bg-blue-500 text-white"
+                                  }`}
+                                >
                                   <Shield className="w-3 h-3" />
                                   <span className="text-xs">Verified</span>
                                 </div>
@@ -500,7 +511,13 @@ export default function AlumniDirectory({
 
                               {/* Desktop - Top right corner */}
                               <div className="hidden md:block absolute top-3 right-3">
-                                <div className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-lg">
+                                <div
+                                  className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-lg ${
+                                    isDarkMode
+                                      ? "bg-blue-600 text-white"
+                                      : "bg-blue-500 text-white"
+                                  }`}
+                                >
                                   <Shield className="w-3 h-3" />
                                   <span className="text-xs">Verified</span>
                                 </div>
@@ -509,20 +526,16 @@ export default function AlumniDirectory({
                           )}
                         </div>
 
-                        {/* Content Section - Right side on mobile with white background */}
+                        {/* Content Section */}
                         <div
-                          className={`flex-1 p-3 md:p-6 flex flex-col bg-white md:bg-transparent ${
-                            isDarkMode
-                              ? "md:bg-transparent"
-                              : "md:bg-transparent"
+                          className={`flex-1 p-3 md:p-6 flex flex-col ${
+                            isDarkMode ? "bg-slate-800/50" : "bg-white"
                           }`}
                         >
                           <div className="mb-2 md:mb-4 flex-1">
                             <h3
                               className={`font-bold text-sm md:text-xl mb-1 md:mb-3 md:text-center ${
-                                isDarkMode
-                                  ? "md:text-white text-gray-900"
-                                  : "text-gray-900"
+                                isDarkMode ? "text-white" : "text-gray-900"
                               }`}
                             >
                               {alumni.name}
@@ -532,16 +545,12 @@ export default function AlumniDirectory({
                             <div className="flex items-center gap-1 md:justify-center md:gap-2 mb-1 md:mb-3">
                               <GraduationCap
                                 className={`w-3 h-3 md:w-4 md:h-4 ${
-                                  isDarkMode
-                                    ? "md:text-cyan-400 text-blue-600"
-                                    : "text-blue-600"
+                                  isDarkMode ? "text-cyan-400" : "text-blue-600"
                                 }`}
                               />
                               <span
                                 className={`text-xs md:text-sm font-medium ${
-                                  isDarkMode
-                                    ? "md:text-cyan-400 text-blue-600"
-                                    : "text-blue-600"
+                                  isDarkMode ? "text-cyan-400" : "text-blue-600"
                                 }`}
                               >
                                 {getAlumniBranch(alumni)}
@@ -554,14 +563,14 @@ export default function AlumniDirectory({
                                 <Calendar
                                   className={`w-3 h-3 md:w-4 md:h-4 ${
                                     isDarkMode
-                                      ? "md:text-green-400 text-green-600"
+                                      ? "text-green-400"
                                       : "text-green-600"
                                   }`}
                                 />
                                 <span
                                   className={`text-xs md:text-sm font-medium ${
                                     isDarkMode
-                                      ? "md:text-green-400 text-green-600"
+                                      ? "text-green-400"
                                       : "text-green-600"
                                   }`}
                                 >
@@ -578,14 +587,14 @@ export default function AlumniDirectory({
                                     <Building2
                                       className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${
                                         isDarkMode
-                                          ? "md:text-gray-400 text-gray-500"
+                                          ? "text-gray-300"
                                           : "text-gray-500"
                                       }`}
                                     />
                                     <span
                                       className={`text-xs md:text-sm font-semibold ${
                                         isDarkMode
-                                          ? "md:text-gray-300 text-gray-700"
+                                          ? "text-gray-200"
                                           : "text-gray-700"
                                       }`}
                                     >
@@ -595,7 +604,7 @@ export default function AlumniDirectory({
                                   <span
                                     className={`text-xs md:text-sm ${
                                       isDarkMode
-                                        ? "md:text-gray-400 text-gray-600"
+                                        ? "text-gray-400"
                                         : "text-gray-600"
                                     }`}
                                   >
@@ -609,14 +618,14 @@ export default function AlumniDirectory({
                                   <MapPin
                                     className={`w-3 h-3 md:w-4 md:h-4 flex-shrink-0 ${
                                       isDarkMode
-                                        ? "md:text-gray-400 text-gray-500"
+                                        ? "text-gray-300"
                                         : "text-gray-500"
                                     }`}
                                   />
                                   <span
                                     className={`text-xs md:text-sm ${
                                       isDarkMode
-                                        ? "md:text-gray-300 text-gray-700"
+                                        ? "text-gray-300"
                                         : "text-gray-700"
                                     }`}
                                   >
@@ -629,7 +638,13 @@ export default function AlumniDirectory({
 
                           {/* Fixed bottom button */}
                           <div className="mt-auto pt-2 md:pt-4">
-                            <button className="w-full px-3 py-1.5 md:px-5 md:py-2.5 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-xs md:text-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105 shadow-lg">
+                            <button
+                              className={`w-full px-3 py-1.5 md:px-5 md:py-2.5 rounded-full font-medium text-xs md:text-sm transition-all duration-300 hover:scale-105 shadow-lg ${
+                                isDarkMode
+                                  ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                                  : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                              }`}
+                            >
                               View Profile
                             </button>
                           </div>

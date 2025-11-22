@@ -26,7 +26,7 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
     try {
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/auth/check",
+        "https://alumni-mits-backend.onrender.com/auth/check",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -73,7 +73,7 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
     try {
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/auth/forgot-password",
+        "https://alumni-mits-backend.onrender.com/auth/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -135,7 +135,7 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
     try {
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/auth/forgot-password",
+        "https://alumni-mits-backend.onrender.com/auth/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

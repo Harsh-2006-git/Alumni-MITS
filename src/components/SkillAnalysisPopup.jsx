@@ -53,7 +53,7 @@ const SkillAnalysisPopup = ({ job, isOpen, onClose, isDarkMode }) => {
       console.log("Sending skill analysis request:", payload);
 
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/alumni/analyze",
+        "https://alumni-mits-backend.onrender.com/alumni/analyze",
         {
           method: "POST",
           headers: {

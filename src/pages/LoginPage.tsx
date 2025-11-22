@@ -28,7 +28,7 @@ interface Props {
   toggleTheme: () => void;
 }
 
-const API_URL = "https://alumni-mits-l45r.onrender.com/auth";
+const API_URL = "https://alumni-mits-backend.onrender.com/auth";
 
 export default function LoginPage({
   setIsAuthenticated,
