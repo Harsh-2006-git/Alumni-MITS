@@ -2,7 +2,6 @@ import AlumniProfile from "../models/AlumniProfile.js";
 import Alumni from "../models/alumni.js";
 import Student from "../models/user.js";
 import StudentProfile from "../models/studentProfile.js";
-import { sequelize } from "../config/database.js";
 
 export const saveAlumniProfile = async (req, res) => {
   try {
@@ -26,23 +25,27 @@ export const saveAlumniProfile = async (req, res) => {
     } = req.body;
 
     // Check if profile exists
-    let profile = await AlumniProfile.findOne({ where: { alumniId } });
+    let profile = await AlumniProfile.findOne({ alumniId });
 
     if (profile) {
       // Update existing profile
-      await profile.update({
-        location,
-        branch,
-        about,
-        skills,
-        achievements,
-        linkedin,
-        github,
-        twitter,
-        portfolio,
-        education,
-        experience,
-      });
+      profile = await AlumniProfile.findOneAndUpdate(
+        { alumniId },
+        {
+          location,
+          branch,
+          about,
+          skills,
+          achievements,
+          linkedin,
+          github,
+          twitter,
+          portfolio,
+          education,
+          experience,
+        },
+        { new: true }
+      );
     } else {
       // Create new profile
       profile = await AlumniProfile.create({
@@ -91,23 +94,27 @@ export const saveStudentProfile = async (req, res) => {
     } = req.body;
 
     // Check if profile exists
-    let profile = await StudentProfile.findOne({ where: { studentId } });
+    let profile = await StudentProfile.findOne({ studentId });
 
     if (profile) {
       // Update existing profile
-      await profile.update({
-        location,
-        branch,
-        about,
-        skills,
-        achievements,
-        linkedin,
-        github,
-        twitter,
-        portfolio,
-        education,
-        experience,
-      });
+      profile = await StudentProfile.findOneAndUpdate(
+        { studentId },
+        {
+          location,
+          branch,
+          about,
+          skills,
+          achievements,
+          linkedin,
+          github,
+          twitter,
+          portfolio,
+          education,
+          experience,
+        },
+        { new: true }
+      );
     } else {
       // Create new profile
       profile = await StudentProfile.create({
@@ -135,6 +142,7 @@ export const saveStudentProfile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 export const deleteAlumni = async (req, res) => {
   try {
     const { id } = req.params;
@@ -148,7 +156,7 @@ export const deleteAlumni = async (req, res) => {
     }
 
     // Check if alumni exists
-    const alumni = await Alumni.findByPk(id);
+    const alumni = await Alumni.findById(id);
     if (!alumni) {
       return res.status(404).json({
         success: false,
@@ -156,24 +164,12 @@ export const deleteAlumni = async (req, res) => {
       });
     }
 
-    // Use transaction to ensure data consistency
-    const transaction = await sequelize.transaction();
-
     try {
-      // Delete alumni profile first (due to foreign key constraint)
-      await AlumniProfile.destroy({
-        where: { alumniId: id },
-        transaction,
-      });
+      // Delete alumni profile first
+      await AlumniProfile.deleteOne({ alumniId: id });
 
       // Delete alumni record
-      await Alumni.destroy({
-        where: { id },
-        transaction,
-      });
-
-      // Commit transaction
-      await transaction.commit();
+      await Alumni.findByIdAndDelete(id);
 
       res.status(200).json({
         success: true,
@@ -185,8 +181,6 @@ export const deleteAlumni = async (req, res) => {
         },
       });
     } catch (transactionError) {
-      // Rollback transaction if any error occurs
-      await transaction.rollback();
       throw transactionError;
     }
   } catch (error) {
@@ -198,6 +192,7 @@ export const deleteAlumni = async (req, res) => {
     });
   }
 };
+
 export const getAlumniProfile = async (req, res) => {
   try {
     // Extract user info from token (middleware must set req.user)
@@ -207,24 +202,21 @@ export const getAlumniProfile = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized access" });
     }
 
-    // Fetch alumni along with related profile data
-    const alumni = await Alumni.findOne({
-      where: { id },
-      include: [
-        {
-          model: AlumniProfile,
-          as: "profile",
-        },
-      ],
-    });
-
+    // Fetch alumni
+    const alumni = await Alumni.findById(id);
     if (!alumni) {
       return res.status(404).json({ message: "Alumni not found" });
     }
 
+    // Fetch profile using alumniId association
+    const profile = await AlumniProfile.findOne({ alumniId: id });
+
     res.status(200).json({
       message: "Alumni details fetched successfully",
-      alumni,
+      alumni: {
+        ...alumni.toJSON(),
+        profile: profile || {},
+      },
     });
   } catch (error) {
     console.error("Error fetching alumni details:", error);
@@ -241,62 +233,64 @@ export const getStudentProfile = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized access" });
     }
 
-    // Fetch student and their associated profile
-    const student = await Student.findOne({
-      where: { id },
-      include: [
-        {
-          model: StudentProfile,
-          as: "profile",
-        },
-      ],
-    });
-
+    // Fetch student
+    const student = await Student.findById(id);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
+    // Fetch profile using studentId association
+    const profile = await StudentProfile.findOne({ studentId: id });
+
     res.status(200).json({
       message: "Student details fetched successfully",
-      student,
+      student: {
+        ...student.toJSON(),
+        profile: profile || {},
+      },
     });
   } catch (error) {
     console.error("Error fetching student details:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 export const getAllAlumni = async (req, res) => {
   try {
-    const alumniList = await Alumni.findAll({
-      where: { isVerified: true },
-      include: [
-        {
-          model: AlumniProfile,
-          as: "profile",
-          attributes: {
-            exclude: ["createdAt", "updatedAt"],
-          },
-        },
-      ],
-      attributes: {
-        exclude: ["password", "createdAt", "updatedAt"],
-      },
-      order: [["id", "ASC"]],
+    const alumniList = await Alumni.find({ isVerified: true })
+      .select("-password")
+      .sort({ _id: 1 });
+
+    // Get all alumni IDs for batch profile lookup
+    const alumniIds = alumniList.map((alumni) => alumni._id);
+
+    // Fetch all profiles in one query
+    const profiles = await AlumniProfile.find({ alumniId: { $in: alumniIds } });
+
+    // Create a map for quick profile lookup
+    const profileMap = new Map();
+    profiles.forEach((profile) => {
+      profileMap.set(profile.alumniId.toString(), profile);
     });
 
-    // ✅ Combine both resumes for clarity
-    const formattedAlumni = alumniList.map((alumni) => ({
-      id: alumni.id,
-      name: alumni.name,
-      email: alumni.email,
-      phone: alumni.phone,
-      isVerified: alumni.isVerified,
-      userType: alumni.userType,
-      profilePhoto: alumni.profilePhoto || null,
-      alumniResume: alumni.resume || null, // from main Alumni table
-      profileResume: alumni.profile?.resume || null, // from AlumniProfile
-      profile: alumni.profile || {},
-    }));
+    // Combine alumni with their profiles
+    const formattedAlumni = alumniList.map((alumni) => {
+      const profile = profileMap.get(alumni._id.toString());
+      return {
+        id: alumni._id,
+        name: alumni.name,
+        email: alumni.email,
+        phone: alumni.phone,
+        isVerified: alumni.isVerified,
+        userType: alumni.userType,
+        profilePhoto: alumni.profilePhoto || null,
+        alumniResume: alumni.resume || null,
+        profileResume: profile?.resume || null,
+        batch: profile?.batch || null,
+        batch: alumni.batch || null,
+        profile: profile || {},
+      };
+    });
 
     res.status(200).json({
       success: true,
@@ -312,37 +306,39 @@ export const getAllAlumni = async (req, res) => {
     });
   }
 };
+
 export const getAllAlumni2 = async (req, res) => {
   try {
-    const alumniList = await Alumni.findAll({
-      include: [
-        {
-          model: AlumniProfile,
-          as: "profile",
-          attributes: {
-            exclude: ["createdAt", "updatedAt"],
-          },
-        },
-      ],
-      attributes: {
-        exclude: ["password", "createdAt", "updatedAt"],
-      },
-      order: [["id", "ASC"]],
+    const alumniList = await Alumni.find().select("-password").sort({ _id: 1 });
+
+    // Get all alumni IDs for batch profile lookup
+    const alumniIds = alumniList.map((alumni) => alumni._id);
+
+    // Fetch all profiles in one query
+    const profiles = await AlumniProfile.find({ alumniId: { $in: alumniIds } });
+
+    // Create a map for quick profile lookup
+    const profileMap = new Map();
+    profiles.forEach((profile) => {
+      profileMap.set(profile.alumniId.toString(), profile);
     });
 
-    // ✅ Combine both resumes for clarity
-    const formattedAlumni = alumniList.map((alumni) => ({
-      id: alumni.id,
-      name: alumni.name,
-      email: alumni.email,
-      phone: alumni.phone,
-      isVerified: alumni.isVerified,
-      userType: alumni.userType,
-      profilePhoto: alumni.profilePhoto || null,
-      alumniResume: alumni.resume || null, // from main Alumni table
-      profileResume: alumni.profile?.resume || null, // from AlumniProfile
-      profile: alumni.profile || {},
-    }));
+    // Combine alumni with their profiles
+    const formattedAlumni = alumniList.map((alumni) => {
+      const profile = profileMap.get(alumni._id.toString());
+      return {
+        id: alumni._id,
+        name: alumni.name,
+        email: alumni.email,
+        phone: alumni.phone,
+        isVerified: alumni.isVerified,
+        userType: alumni.userType,
+        profilePhoto: alumni.profilePhoto || null,
+        alumniResume: alumni.resume || null,
+        profileResume: profile?.resume || null,
+        profile: profile || {},
+      };
+    });
 
     res.status(200).json({
       success: true,
@@ -358,36 +354,40 @@ export const getAllAlumni2 = async (req, res) => {
     });
   }
 };
+
 export const getUnverifiedAlumni = async (req, res) => {
   try {
-    const pendingAlumni = await Alumni.findAll({
-      where: { isVerified: false },
-      include: [
-        {
-          model: AlumniProfile,
-          as: "profile",
-          attributes: {
-            exclude: ["createdAt", "updatedAt"],
-          },
-        },
-      ],
-      attributes: {
-        exclude: ["password", "createdAt", "updatedAt"],
-      },
-      order: [["id", "ASC"]],
+    const pendingAlumni = await Alumni.find({ isVerified: false })
+      .select("-password")
+      .sort({ _id: 1 });
+
+    // Get all alumni IDs for batch profile lookup
+    const alumniIds = pendingAlumni.map((alumni) => alumni._id);
+
+    // Fetch all profiles in one query
+    const profiles = await AlumniProfile.find({ alumniId: { $in: alumniIds } });
+
+    // Create a map for quick profile lookup
+    const profileMap = new Map();
+    profiles.forEach((profile) => {
+      profileMap.set(profile.alumniId.toString(), profile);
     });
 
-    const formatted = pendingAlumni.map((alumni) => ({
-      id: alumni.id,
-      name: alumni.name,
-      email: alumni.email,
-      phone: alumni.phone,
-      userType: alumni.userType,
-      profilePhoto: alumni.profilePhoto || null,
-      alumniResume: alumni.resume || null,
-      profileResume: alumni.profile?.resume || null,
-      profile: alumni.profile || {},
-    }));
+    // Combine alumni with their profiles
+    const formatted = pendingAlumni.map((alumni) => {
+      const profile = profileMap.get(alumni._id.toString());
+      return {
+        id: alumni._id,
+        name: alumni.name,
+        email: alumni.email,
+        phone: alumni.phone,
+        userType: alumni.userType,
+        profilePhoto: alumni.profilePhoto || null,
+        alumniResume: alumni.resume || null,
+        profileResume: profile?.resume || null,
+        profile: profile || {},
+      };
+    });
 
     res.status(200).json({
       success: true,
@@ -409,7 +409,7 @@ export const verifyAlumniStatus = async (req, res) => {
     const { id } = req.params; // alumni ID
     const { action } = req.body; // 'accept' or 'reject'
 
-    const alumni = await Alumni.findByPk(id);
+    const alumni = await Alumni.findById(id);
     if (!alumni) {
       return res.status(404).json({
         success: false,
@@ -428,7 +428,7 @@ export const verifyAlumniStatus = async (req, res) => {
     }
 
     if (action === "reject") {
-      await alumni.destroy();
+      await Alumni.findByIdAndDelete(id);
 
       return res.status(200).json({
         success: true,
@@ -539,15 +539,9 @@ export const uploadProfilePhoto = async (req, res) => {
         // Update database
         try {
           if (userType === "alumni") {
-            await Alumni.update(
-              { profilePhoto: imageUrl },
-              { where: { id: userId } }
-            );
+            await Alumni.findByIdAndUpdate(userId, { profilePhoto: imageUrl });
           } else if (userType === "student") {
-            await Student.update(
-              { profilePhoto: imageUrl },
-              { where: { id: userId } }
-            );
+            await Student.findByIdAndUpdate(userId, { profilePhoto: imageUrl });
           }
 
           console.log("✅ Database updated successfully");
@@ -642,21 +636,19 @@ export const uploadResume = async (req, res) => {
     // Update database based on user type
     let updatedRecord;
     if (userType === "alumni") {
-      updatedRecord = await Alumni.update(
-        { resume: resumeUrl },
-        { where: { id: userId } }
-      );
+      updatedRecord = await Alumni.findByIdAndUpdate(userId, {
+        resume: resumeUrl,
+      });
     } else if (userType === "student") {
-      updatedRecord = await Student.update(
-        { resume: resumeUrl },
-        { where: { id: userId } }
-      );
+      updatedRecord = await Student.findByIdAndUpdate(userId, {
+        resume: resumeUrl,
+      });
     } else {
       return res.status(400).json({ message: "Invalid user type" });
     }
 
     // Check if database update was successful
-    if (updatedRecord[0] === 0) {
+    if (!updatedRecord) {
       console.warn("⚠️ Database update affected 0 rows for user:", userId);
     }
 
@@ -690,16 +682,19 @@ export const uploadResume = async (req, res) => {
     });
   }
 };
+
 import axios from "axios";
+import { GoogleGenAI } from "@google/genai";
 
-// ✅ Use environment variable for API key
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+// ✅ Initialize GoogleGenAI with API key from environment variable
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
-// ✅ Rate limiting setup
+// ✅ Rate limiting setup - increased limits
 let requestCount = 0;
 let lastResetTime = Date.now();
-const MAX_REQUESTS_PER_MINUTE = 10;
+const MAX_REQUESTS_PER_MINUTE = 60; // Increased from 10 to 60
 
 const checkRateLimit = () => {
   const now = Date.now();
@@ -725,7 +720,7 @@ export const analyzeSkillsMatch = async (req, res) => {
     const { id, userType } = req.user || {};
 
     // ✅ Validate environment variable
-    if (!GEMINI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
         success: false,
         message: "Gemini API key not configured",
@@ -740,29 +735,24 @@ export const analyzeSkillsMatch = async (req, res) => {
       });
     }
 
-    // ✅ Check rate limit
+    // ✅ Check rate limit (your custom rate limiter)
     try {
       checkRateLimit();
     } catch (rateLimitError) {
       return res.status(429).json({
         success: false,
         message: rateLimitError.message,
+        retryAfter: "60 seconds",
       });
     }
 
     // ✅ Fetch user profile skills
     let userSkills = [];
     if (userType === "student") {
-      const student = await StudentProfile.findOne({
-        where: { id },
-        attributes: ["skills"],
-      });
+      const student = await StudentProfile.findOne({ studentId: id });
       if (student?.skills) userSkills = student.skills;
     } else if (userType === "alumni") {
-      const alumni = await AlumniProfile.findOne({
-        where: { id },
-        attributes: ["skills"],
-      });
+      const alumni = await AlumniProfile.findOne({ alumniId: id });
       if (alumni?.skills) userSkills = alumni.skills;
     }
 
@@ -774,7 +764,7 @@ export const analyzeSkillsMatch = async (req, res) => {
       });
     }
 
-    // ✅ Build intelligent prompt
+    // ✅ Build intelligent prompt (EXACTLY THE SAME AS BEFORE)
     const prompt = `
 You are an expert career assistant. Compare the user's skills with the required job skills for the role "${
       jobTitle || "unspecified job"
@@ -802,27 +792,23 @@ Respond strictly in this JSON format:
 }
 `;
 
-    // ✅ Call Gemini API with better error handling
-    const response = await axios.post(
-      GEMINI_API_URL,
-      {
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.4,
-          maxOutputTokens: 2048,
+    // ✅ Use GoogleGenAI client instead of direct axios call
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash", // Using the same model as your URL
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
         },
+      ],
+      generationConfig: {
+        temperature: 0.4,
+        maxOutputTokens: 2048,
       },
-      {
-        timeout: 30000,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    });
 
     // ✅ Extract Gemini raw text
-    const geminiText =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    const geminiText = response.text?.trim() || "";
 
     if (!geminiText) {
       return res.status(500).json({
@@ -831,7 +817,7 @@ Respond strictly in this JSON format:
       });
     }
 
-    // ✅ Clean and Parse JSON (remove \n, ``` etc.)
+    // ✅ Clean and Parse JSON (remove \n, ``` etc.) - SAME AS BEFORE
     let cleaned = geminiText
       .replace(/```json/i, "")
       .replace(/```/g, "")
@@ -865,7 +851,10 @@ Respond strictly in this JSON format:
     console.error("❌ Gemini API Error:", error.message);
 
     // ✅ Handle specific error types
-    if (error.response?.status === 429) {
+    if (
+      error.message?.includes("RATE_LIMIT_EXCEEDED") ||
+      error.status === 429
+    ) {
       return res.status(429).json({
         success: false,
         message: "Too many requests. Please wait a moment and try again.",

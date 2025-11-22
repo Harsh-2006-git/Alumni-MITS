@@ -1,133 +1,126 @@
 // models/Job.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import mongoose from "mongoose";
 
-const Job = sequelize.define(
-  "Job",
+const JobSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     title: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     company: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     companyLogo: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     type: {
-      type: DataTypes.ENUM(
-        "full-time",
-        "part-time",
-        "contract",
-        "internship",
-        "remote"
-      ),
-      defaultValue: "full-time",
+      type: String,
+      enum: ["full-time", "part-time", "contract", "internship", "remote"],
+      default: "full-time",
     },
     location: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     salary: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     experience: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     applicationDeadline: {
-      type: DataTypes.DATE,
-      allowNull: false,
+      type: Date,
+      required: true,
     },
     postedDate: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Date,
+      default: Date.now,
     },
     closedDate: {
-      type: DataTypes.DATE,
-      allowNull: true,
+      type: Date,
+      default: null,
     },
     verified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      type: Boolean,
+      default: false,
     },
     userType: {
-      type: DataTypes.ENUM("Alumni", "Company", "Admin", "Auto"),
-      defaultValue: "Alumni",
+      type: String,
+      enum: [
+        "alumni",
+        "Company",
+        "admin",
+        "auto",
+        "Auto",
+        "student",
+        "Student",
+      ],
+      default: "alumni",
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: { isEmail: true },
+      type: String,
+      required: true,
     },
     description: {
-      type: DataTypes.TEXT,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     requiredSkills: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array,
+      default: [],
     },
     qualifications: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array,
+      default: [],
     },
     companyWebsite: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     category: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     source: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      comment: "Source platform (internshala, remoteok, wellfound)",
+      type: String,
+      default: null,
     },
     sourceId: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: true,
-      comment: "Unique ID from source platform",
+      type: String,
+      sparse: true,
+      default: null,
     },
     sourceUrl: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      comment: "URL of the original job posting",
+      type: String,
+      default: null,
     },
     isAutoPosted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      comment: "Whether job was automatically scraped",
+      type: Boolean,
+      default: false,
     },
     applyLink: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      comment: "Direct application link",
+      type: String,
+      default: null,
     },
     status: {
-      type: DataTypes.ENUM("active", "closed", "expired", "expiring_soon"),
-      defaultValue: "active",
+      type: String,
+      enum: ["active", "closed", "expired", "expiring_soon"],
+      default: "active",
     },
     lastChecked: {
-      type: DataTypes.DATE,
-      allowNull: true,
+      type: Date,
+      default: null,
     },
   },
   {
-    tableName: "jobs",
     timestamps: true,
   }
 );
+
+const Job = mongoose.model("Job", JobSchema);
 
 export default Job;

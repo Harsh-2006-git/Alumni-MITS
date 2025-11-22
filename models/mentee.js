@@ -1,95 +1,57 @@
 // models/MentorStudent.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
-import Mentor from "./mentor.js";
-import Student from "./user.js";
+import mongoose from "mongoose";
 
-const MentorStudent = sequelize.define(
-  "MentorStudent",
+const MentorStudentSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     mentor_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: "mentors",
-        key: "id",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Mentor",
+      required: true,
     },
     student_id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: "students",
-        key: "id",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
     },
     status: {
-      type: DataTypes.ENUM("pending", "active", "completed", "cancelled"),
-      defaultValue: "pending",
+      type: String,
+      enum: ["pending", "active", "completed", "cancelled"],
+      default: "pending",
     },
     request_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
+      type: Date,
+      default: Date.now,
+      required: true,
     },
     request_time: {
-      type: DataTypes.TIME,
-      allowNull: false,
-      defaultValue: DataTypes.NOW,
+      type: String,
+      default: Date.now,
+      required: true,
     },
     session_date: {
-      type: DataTypes.DATEONLY,
-      allowNull: true,
+      type: Date,
+      default: null,
     },
     session_time: {
-      type: DataTypes.TIME,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     request_message: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     mentor_notes: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      type: String,
+      default: null,
     },
   },
   {
-    tableName: "mentor_students",
     timestamps: true,
-    indexes: [
-      {
-        unique: true,
-        fields: ["mentor_id", "student_id"],
-      },
-    ],
   }
 );
 
-// Define associations
-MentorStudent.belongsTo(Mentor, {
-  foreignKey: "mentor_id",
-  as: "mentor",
-});
+MentorStudentSchema.index({ mentor_id: 1, student_id: 1 }, { unique: true });
 
-MentorStudent.belongsTo(Student, {
-  foreignKey: "student_id",
-  as: "student",
-});
-
-Mentor.hasMany(MentorStudent, {
-  foreignKey: "mentor_id",
-  as: "mentorshipRelations",
-});
-
-Student.hasMany(MentorStudent, {
-  foreignKey: "student_id",
-  as: "mentorshipRelations",
-});
+const MentorStudent = mongoose.model("MentorStudent", MentorStudentSchema);
 
 export default MentorStudent;

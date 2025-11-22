@@ -1,57 +1,60 @@
-// models/Student.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import mongoose from "mongoose";
 
-const Student = sequelize.define(
-  "Student",
+const studentSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
     name: {
-      type: DataTypes.STRING(64),
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     email: {
-      type: DataTypes.STRING(64),
-      allowNull: false,
-      //unique: true,
-      validate: { isEmail: true },
+      type: String,
+      required: true,
+      validate: {
+        validator: function (v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+      },
     },
+
     phone: {
-      type: DataTypes.STRING(15),
-      allowNull: false,
-      //unique: true,
-      validate: { is: /^[0-9]{10,15}$/ },
+      type: String,
+      required: true,
+      validate: {
+        validator: function (v) {
+          return /^[0-9]{10,15}$/.test(v);
+        },
+      },
     },
+
     password: {
-      type: DataTypes.STRING(64),
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     userType: {
-      type: DataTypes.ENUM("student", "alumni"),
-      defaultValue: "student",
-      allowNull: false,
+      type: String,
+      enum: ["student", "alumni"],
+      default: "student",
+      required: true,
     },
+
     profilePhoto: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
     },
+
     resume: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
     },
   },
   {
-    tableName: "students",
     timestamps: true,
-    indexes: [
-      { unique: true, fields: ["email"] },
-      { unique: true, fields: ["phone"] },
-    ],
   }
 );
+
+studentSchema.index({ email: 1 }, { unique: true });
+studentSchema.index({ phone: 1 }, { unique: true });
+
+const Student = mongoose.model("Student", studentSchema);
 
 export default Student;

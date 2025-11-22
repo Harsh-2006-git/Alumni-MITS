@@ -4,6 +4,7 @@ import Alumni from "../models/alumni.js";
 import Student from "../models/user.js";
 import cloudinary from "cloudinary";
 import multer from "multer";
+import mongoose from "mongoose";
 
 // Create Campaign Controller
 export const createCampaign = async (req, res) => {
@@ -63,10 +64,10 @@ export const createCampaign = async (req, res) => {
     let isApproved = false; // Default to false
 
     if (userType === "alumni") {
-      user = await Alumni.findOne({ where: { email } });
+      user = await Alumni.findOne({ email });
       isApproved = false; // Alumni campaigns need approval
     } else if (userType === "student") {
-      user = await Student.findOne({ where: { email } });
+      user = await Student.findOne({ email });
       isApproved = false; // Student campaigns need approval
     } else if (userType === "admin") {
       // For college user type, use vice chancellor email and auto-approve
@@ -74,7 +75,7 @@ export const createCampaign = async (req, res) => {
       campaignUserType = "admin";
       isApproved = true; // College campaigns are auto-approved
       // No need to check user existence in Alumni/Student tables for college
-      user = { id: "college_admin" }; // Mock user object for college
+      user = { _id: "college_admin" }; // Mock user object for college
     } else {
       return res.status(400).json({
         message: "Invalid user type",
@@ -113,7 +114,7 @@ export const createCampaign = async (req, res) => {
       }
     }
 
-    // Create campaign in database
+    // Create campaign in database - store images as array directly
     const campaign = await Campaign.create({
       campaignTitle,
       categories,
@@ -124,7 +125,7 @@ export const createCampaign = async (req, res) => {
       totalAmount: parseFloat(totalAmount),
       projectLink: projectLink || null,
       github: github || null,
-      images: imageUrls.length > 0 ? imageUrls.join(",") : null, // Comma separated
+      images: imageUrls, // Store as array directly, no need for comma separation
       email: campaignEmail, // Use vice chancellor email for college type
       contact,
       userType: campaignUserType,
@@ -136,7 +137,7 @@ export const createCampaign = async (req, res) => {
     res.status(201).json({
       message: "Campaign created successfully",
       campaign: {
-        id: campaign.id,
+        id: campaign._id, // This is now a string ObjectId
         campaignTitle: campaign.campaignTitle,
         categories: campaign.categories,
         tagline: campaign.tagline,
@@ -145,7 +146,7 @@ export const createCampaign = async (req, res) => {
         totalAmount: campaign.totalAmount,
         projectLink: campaign.projectLink,
         github: campaign.github,
-        images: campaign.images ? campaign.images.split(",") : [],
+        images: campaign.images || [], // Already an array
         email: campaign.email,
         contact: campaign.contact,
         userType: campaign.userType,
@@ -201,15 +202,14 @@ const uploadToCloudinary = (file) => {
 // Get all campaigns (only approved ones for public view)
 export const getAllCampaigns = async (req, res) => {
   try {
-    const campaigns = await Campaign.findAll({
-      where: { isApproved: true }, // Only show approved campaigns
-      order: [["createdAt", "DESC"]],
-    });
+    const campaigns = await Campaign.find({ isApproved: true }) // Only show approved campaigns
+      .sort({ createdAt: -1 });
 
-    // Convert comma separated images back to array
+    // No need to convert images - they're already arrays
     const campaignsWithImageArray = campaigns.map((campaign) => ({
       ...campaign.toJSON(),
-      images: campaign.images ? campaign.images.split(",") : [],
+      id: campaign._id, // Include string _id as id
+      images: campaign.images || [], // Already an array
     }));
 
     res.status(200).json({
@@ -228,15 +228,14 @@ export const getAllCampaigns = async (req, res) => {
 export const getmyCampaigns = async (req, res) => {
   try {
     const { email, userType } = req.user;
-    const campaigns = await Campaign.findAll({
-      where: { email: email, userType: userType }, // Only show approved campaigns
-      order: [["createdAt", "DESC"]],
-    });
+    const campaigns = await Campaign.find({ email: email, userType: userType }) // Only show approved campaigns
+      .sort({ createdAt: -1 });
 
-    // Convert comma separated images back to array
+    // No need to convert images - they're already arrays
     const campaignsWithImageArray = campaigns.map((campaign) => ({
       ...campaign.toJSON(),
-      images: campaign.images ? campaign.images.split(",") : [],
+      id: campaign._id, // Include string _id as id
+      images: campaign.images || [], // Already an array
     }));
 
     res.status(200).json({
@@ -255,14 +254,13 @@ export const getmyCampaigns = async (req, res) => {
 // Get all campaigns for admin (unapproved)
 export const getAllCampaignsAdmin = async (req, res) => {
   try {
-    const campaigns = await Campaign.findAll({
-      order: [["createdAt", "DESC"]],
-    });
+    const campaigns = await Campaign.find().sort({ createdAt: -1 });
 
-    // Convert comma separated images back to array
+    // No need to convert images - they're already arrays
     const campaignsWithImageArray = campaigns.map((campaign) => ({
       ...campaign.toJSON(),
-      images: campaign.images ? campaign.images.split(",") : [],
+      id: campaign._id, // Include string _id as id
+      images: campaign.images || [], // Already an array
     }));
 
     res.status(200).json({
@@ -285,6 +283,13 @@ export const updateCampaignApproval = async (req, res) => {
     const { isApproved } = req.body;
     const userType = req.user?.userType;
 
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Invalid campaign ID format",
+      });
+    }
+
     // Check if user is admin or has sufficient privileges
     const allowedUserTypes = ["admin", "superadmin", "moderator"];
     if (!allowedUserTypes.includes(userType)) {
@@ -293,7 +298,7 @@ export const updateCampaignApproval = async (req, res) => {
       });
     }
 
-    const campaign = await Campaign.findByPk(id);
+    const campaign = await Campaign.findById(id);
 
     if (!campaign) {
       return res.status(404).json({
@@ -305,12 +310,12 @@ export const updateCampaignApproval = async (req, res) => {
       // Approve campaign
       campaign.isApproved = true;
       await campaign.save();
-      console.log(`📝 Campaign ${campaign.id} approved by ${userType}`);
+      console.log(`📝 Campaign ${campaign._id} approved by ${userType}`);
 
       return res.status(200).json({
         message: "Campaign approved successfully",
         campaign: {
-          id: campaign.id,
+          id: campaign._id, // String ID
           campaignTitle: campaign.campaignTitle,
           isApproved: campaign.isApproved,
           userType: campaign.userType,
@@ -320,14 +325,14 @@ export const updateCampaignApproval = async (req, res) => {
       });
     } else {
       // Reject campaign and delete it
-      await campaign.destroy();
+      await Campaign.findByIdAndDelete(id);
       console.log(
-        `🗑️ Campaign ${campaign.id} rejected and deleted by ${userType}`
+        `🗑️ Campaign ${campaign._id} rejected and deleted by ${userType}`
       );
 
       return res.status(200).json({
         message: "Campaign rejected and deleted successfully",
-        campaignId: campaign.id,
+        campaignId: campaign._id, // String ID
       });
     }
   } catch (error) {
@@ -344,16 +349,24 @@ export const deleteCampaign = async (req, res) => {
     const { id } = req.params;
     const { email, userType } = req.user; // Get email from token for authorization
 
-    const campaign = await Campaign.findByPk(id);
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid campaign ID format",
+      });
+    }
+
+    const campaign = await Campaign.findById(id);
 
     if (!campaign) {
       return res.status(404).json({
         success: false,
-        message: "campaign not found",
+        message: "Campaign not found",
       });
     }
 
-    // Check if user owns the job
+    // Check if user owns the campaign
     if (campaign.email !== email && campaign.userType !== userType) {
       return res.status(403).json({
         success: false,
@@ -361,11 +374,11 @@ export const deleteCampaign = async (req, res) => {
       });
     }
 
-    await campaign.destroy();
+    await Campaign.findByIdAndDelete(id);
 
     res.status(200).json({
       success: true,
-      message: "campaign deleted successfully",
+      message: "Campaign deleted successfully",
     });
   } catch (error) {
     console.error("Error deleting campaign:", error);
@@ -381,6 +394,14 @@ export const updateCampaign = async (req, res) => {
   try {
     const { id } = req.params;
     const { email, userType } = req.user; // Get user data from token
+
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid campaign ID format",
+      });
+    }
 
     // All available fields from req.body
     const {
@@ -400,7 +421,7 @@ export const updateCampaign = async (req, res) => {
       isCompleted,
     } = req.body;
 
-    const campaign = await Campaign.findByPk(id);
+    const campaign = await Campaign.findById(id);
 
     if (!campaign) {
       return res.status(404).json({
@@ -440,18 +461,63 @@ export const updateCampaign = async (req, res) => {
     }
 
     // Update campaign
-    await campaign.update(updateData);
+    const updatedCampaign = await Campaign.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     res.status(200).json({
       success: true,
       message: "Campaign updated successfully",
-      data: campaign,
+      data: {
+        ...updatedCampaign.toJSON(),
+        id: updatedCampaign._id, // Include string _id as id
+      },
     });
   } catch (error) {
     console.error("Error updating campaign:", error);
     res.status(500).json({
       success: false,
       message: "Error updating campaign",
+      error: error.message,
+    });
+  }
+};
+
+// Get single campaign by ID
+export const getCampaignById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid campaign ID format",
+      });
+    }
+
+    const campaign = await Campaign.findById(id);
+
+    if (!campaign) {
+      return res.status(404).json({
+        success: false,
+        message: "Campaign not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Campaign fetched successfully",
+      data: {
+        ...campaign.toJSON(),
+        id: campaign._id, // Include string _id as id
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching campaign:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching campaign",
       error: error.message,
     });
   }

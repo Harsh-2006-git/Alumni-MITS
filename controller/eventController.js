@@ -1,9 +1,10 @@
 import Event from "../models/event.js";
 import EventRegistration from "../models/eventRegistration.js";
+import mongoose from "mongoose";
 
 export const addEvent = async (req, res) => {
   try {
-    const { email, userType } = req.user; // assuming your token contains { email: "..." }
+    const { email, userType } = req.user;
     const IsCollege = req.user.userType === "admin";
     if (!email) {
       return res
@@ -26,7 +27,6 @@ export const addEvent = async (req, res) => {
     } = req.body;
 
     // ✅ Create new event
-    // ✅ Create new event (use single block, dynamic isScheduled)
     const event = await Event.create({
       title,
       description,
@@ -57,16 +57,25 @@ export const addEvent = async (req, res) => {
       .json({ message: "Server error", error: error.message });
   }
 };
+
 export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;
     const { email, userType } = req.user;
-    const eventId = id;
-    const event = await Event.findByPk(id);
 
-    // Fixed: Remove the assignment in the where clause
-    const eventRegistrations = await EventRegistration.findAll({
-      where: { eventId: id }, // Use object notation instead of assignment
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid event ID format",
+      });
+    }
+
+    const event = await Event.findById(id);
+
+    // Find all registrations for this event
+    const eventRegistrations = await EventRegistration.find({
+      eventId: id,
     });
 
     if (!event) {
@@ -76,15 +85,23 @@ export const deleteEvent = async (req, res) => {
       });
     }
 
-    // Fixed: You need to destroy each registration individually
-    // or use bulk destroy since findAll returns an array
-    if (eventRegistrations.length > 0) {
-      await EventRegistration.destroy({
-        where: { eventId: id },
+    // Check if user owns the event
+    if (event.organizerEmail !== email && event.userType !== userType) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only delete your own events",
       });
     }
 
-    await event.destroy();
+    // Delete all registrations for this event
+    if (eventRegistrations.length > 0) {
+      await EventRegistration.deleteMany({
+        eventId: id,
+      });
+    }
+
+    // Delete the event
+    await Event.findByIdAndDelete(id);
 
     res.status(200).json({
       success: true,
@@ -99,56 +116,40 @@ export const deleteEvent = async (req, res) => {
     });
   }
 };
-// find the event which doest not have paased yet
-import { Op } from "sequelize";
 
+// Get all events (including past events)
 export const getallEvents = async (req, res) => {
   try {
-    const today = new Date();
+    const events = await Event.find({}).sort({ date: 1 }); // Sort by date
 
-    const upcomingEvents = await Event.findAll({
-      where: {
-        // ✅ Only approved/scheduled events
-        date: {
-          [Op.gt]: today, // ✅ Future events only
-        },
-      },
-      order: [["date", "ASC"]], // Sort by nearest date first
-    });
-
-    if (!upcomingEvents || upcomingEvents.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "No upcoming scheduled events found" });
+    if (!events || events.length === 0) {
+      return res.status(200).json({ message: "No events found" });
     }
 
     return res.status(200).json({
-      message: "Upcoming scheduled events fetched successfully",
-      count: upcomingEvents.length,
-      events: upcomingEvents,
+      message: "Events fetched successfully",
+      count: events.length,
+      events: events,
     });
   } catch (error) {
-    console.error("Error fetching upcoming events:", error);
+    console.error("Error fetching events:", error);
     return res.status(500).json({
       message: "Server error",
       error: error.message,
     });
   }
 };
+
 export const getUpcomingEvents = async (req, res) => {
   try {
-    const today = new Date();
+    const today = new Date().toISOString().split("T")[0]; // Get today as YYYY-MM-DD string
 
-    const upcomingEvents = await Event.findAll({
-      where: {
-        isScheduled: true,
-        // ✅ Only approved/scheduled events
-        date: {
-          [Op.gt]: today, // ✅ Future events only
-        },
+    const upcomingEvents = await Event.find({
+      isScheduled: true,
+      date: {
+        $gte: today, // Events from today onwards
       },
-      order: [["date", "ASC"]], // Sort by nearest date first
-    });
+    }).sort({ date: 1 }); // Sort by nearest date first
 
     if (!upcomingEvents || upcomingEvents.length === 0) {
       return res
@@ -172,33 +173,24 @@ export const getUpcomingEvents = async (req, res) => {
 
 export const getmyevents = async (req, res) => {
   try {
-    const today = new Date();
     const { email, userType } = req.user;
 
-    const upcomingEvents = await Event.findAll({
-      where: {
-        organizerEmail: email,
-        userType: userType, // ✅ Only approved/scheduled events
-        date: {
-          [Op.gt]: today, // ✅ Future events only
-        },
-      },
-      order: [["date", "ASC"]], // Sort by nearest date first
-    });
+    const myEvents = await Event.find({
+      organizerEmail: email,
+      userType: userType,
+    }).sort({ date: 1 }); // Sort by date
 
-    if (!upcomingEvents || upcomingEvents.length === 0) {
-      return res
-        .status(200)
-        .json({ message: "No upcoming scheduled events found" });
+    if (!myEvents || myEvents.length === 0) {
+      return res.status(200).json({ message: "No events found" });
     }
 
     return res.status(200).json({
-      message: "Upcoming scheduled events fetched successfully",
-      count: upcomingEvents.length,
-      events: upcomingEvents,
+      message: "Your events fetched successfully",
+      count: myEvents.length,
+      events: myEvents,
     });
   } catch (error) {
-    console.error("Error fetching upcoming events:", error);
+    console.error("Error fetching your events:", error);
     return res.status(500).json({
       message: "Server error",
       error: error.message,
@@ -217,22 +209,36 @@ export const reviewEvent = async (req, res) => {
     const { eventId } = req.params;
     const { action } = req.body; // "accept" or "reject"
 
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({
+        message: "Invalid event ID format",
+      });
+    }
+
     // ✅ Find event
-    const event = await Event.findByPk(eventId);
+    const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
 
     if (action === "accept") {
-      event.isScheduled = true;
-      await event.save();
+      const updatedEvent = await Event.findByIdAndUpdate(
+        eventId,
+        { isScheduled: true },
+        { new: true }
+      );
 
       return res.status(200).json({
         message: "Event accepted successfully",
-        event,
+        event: updatedEvent,
       });
     } else if (action === "reject") {
-      await event.destroy();
+      // Delete all registrations for this event first
+      await EventRegistration.deleteMany({ eventId: eventId });
+
+      // Then delete the event
+      await Event.findByIdAndDelete(eventId);
 
       return res.status(200).json({
         message: "Event rejected and deleted successfully",
@@ -256,6 +262,15 @@ export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
     const { email, userType } = req.user;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid event ID format",
+      });
+    }
+
     // All available fields from req.body
     const {
       title,
@@ -272,7 +287,7 @@ export const updateEvent = async (req, res) => {
       image,
     } = req.body;
 
-    const event = await Event.findByPk(id);
+    const event = await Event.findById(id);
 
     if (!event) {
       return res.status(404).json({
@@ -281,7 +296,8 @@ export const updateEvent = async (req, res) => {
       });
     }
 
-    if (event.email !== email && event.userType !== userType) {
+    // Check if user owns the event
+    if (event.organizerEmail !== email && event.userType !== userType) {
       return res.status(403).json({
         success: false,
         message: "You can only update your own event",
@@ -289,25 +305,29 @@ export const updateEvent = async (req, res) => {
     }
 
     // Update event with all fields
-    await event.update({
-      title,
-      description,
-      date,
-      location,
-      price,
-      organizer,
-      organizerEmail,
-      postedBy,
-      category,
-      type,
-      maxAttendees,
-      image,
-    });
+    const updatedEvent = await Event.findByIdAndUpdate(
+      id,
+      {
+        title,
+        description,
+        date,
+        location,
+        price,
+        organizer,
+        organizerEmail,
+        postedBy,
+        category,
+        type,
+        maxAttendees,
+        image,
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,
       message: "Event updated successfully",
-      data: event,
+      data: updatedEvent,
     });
   } catch (error) {
     console.error("Error updating event:", error);
@@ -319,7 +339,7 @@ export const updateEvent = async (req, res) => {
   }
 };
 
-import EmailService from "../services/EmailService.js"; // Import the EmailService
+import EmailService from "../services/EmailService.js";
 
 // Register for an event
 export const registerForEvent = async (req, res) => {
@@ -334,7 +354,15 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
-    const event = await Event.findByPk(eventId);
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid event ID format",
+      });
+    }
+
+    const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({
         success: false,
@@ -350,7 +378,8 @@ export const registerForEvent = async (req, res) => {
     }
 
     const existingRegistration = await EventRegistration.findOne({
-      where: { eventId, userEmail: email },
+      eventId: eventId,
+      userEmail: email,
     });
 
     if (existingRegistration) {
@@ -360,8 +389,8 @@ export const registerForEvent = async (req, res) => {
       });
     }
 
-    const currentRegistrations = await EventRegistration.count({
-      where: { eventId },
+    const currentRegistrations = await EventRegistration.countDocuments({
+      eventId: eventId,
     });
 
     if (currentRegistrations >= event.maxAttendees) {
@@ -394,7 +423,7 @@ export const registerForEvent = async (req, res) => {
         eventTime: event.eventTime,
         eventLocation: event.location || "Online",
         eventDescription: event.description,
-        registrationId: registration.id,
+        registrationId: registration._id,
         registrationDate: registration.registrationDate,
         eventId: eventId,
       };
@@ -419,13 +448,22 @@ export const registerForEvent = async (req, res) => {
     });
   }
 };
+
 export const getEventRegistrations = async (req, res) => {
   try {
     const { eventId } = req.params;
     const { email, userType } = req.user;
 
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid event ID format",
+      });
+    }
+
     // Check if event exists and user has permission
-    const event = await Event.findByPk(eventId);
+    const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({
         success: false,
@@ -441,28 +479,73 @@ export const getEventRegistrations = async (req, res) => {
       });
     }
 
-    const registrations = await EventRegistration.findAll({
-      where: { eventId },
-      include: [
-        {
-          model: Event,
-          as: "event",
-          attributes: ["id", "title", "date", "location", "organizer"],
-        },
-      ],
-      order: [["registrationDate", "DESC"]],
+    const registrations = await EventRegistration.find({
+      eventId: eventId,
+    })
+      .populate("eventId", "title date location organizer")
+      .sort({ registrationDate: -1 });
+
+    // Process registrations to match the expected structure
+    const processedRegistrations = registrations.map((registration) => {
+      const regData = registration.toObject
+        ? registration.toObject()
+        : registration;
+
+      if (regData.eventId) {
+        regData.event = {
+          id: regData.eventId._id,
+          title: regData.eventId.title,
+          date: regData.eventId.date,
+          location: regData.eventId.location,
+          organizer: regData.eventId.organizer,
+        };
+        delete regData.eventId;
+      }
+
+      regData.id = regData._id || regData.id;
+      return regData;
     });
 
     res.status(200).json({
       success: true,
-      data: registrations,
-      count: registrations.length,
+      data: processedRegistrations,
+      count: processedRegistrations.length,
     });
   } catch (error) {
     console.error("Error fetching event registrations:", error);
     res.status(500).json({
       success: false,
       message: "Error fetching event registrations",
+      error: error.message,
+    });
+  }
+};
+
+// Get events that need admin approval
+export const getPendingEvents = async (req, res) => {
+  try {
+    const userType = req.user.userType;
+    if (userType !== "admin") {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    const pendingEvents = await Event.find({
+      isScheduled: false,
+    }).sort({ createdAt: -1 });
+
+    if (!pendingEvents || pendingEvents.length === 0) {
+      return res.status(200).json({ message: "No pending events found" });
+    }
+
+    return res.status(200).json({
+      message: "Pending events fetched successfully",
+      count: pendingEvents.length,
+      events: pendingEvents,
+    });
+  } catch (error) {
+    console.error("Error fetching pending events:", error);
+    return res.status(500).json({
+      message: "Server error",
       error: error.message,
     });
   }

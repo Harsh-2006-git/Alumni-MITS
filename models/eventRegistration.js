@@ -1,56 +1,59 @@
-// models/EventRegistration.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
-import Event from "./event.js";
+import mongoose from "mongoose";
 
-const EventRegistration = sequelize.define(
-  "EventRegistration",
+const EventRegistrationSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
     eventId: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      references: {
-        model: "events",
-        key: "id",
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Event",
+      required: true,
     },
+
     userEmail: {
-      type: DataTypes.STRING(120),
-      allowNull: false,
+      type: String,
+      required: true,
       validate: {
-        isEmail: true,
+        validator: function (v) {
+          return /^\S+@\S+\.\S+$/.test(v);
+        },
       },
     },
+
     userName: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     userType: {
-      type: DataTypes.ENUM("alumni", "student", "admin"),
-      allowNull: false,
+      type: String,
+      enum: ["alumni", "student", "admin"],
+      required: true,
     },
+
     registrationDate: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Date,
+      default: Date.now,
     },
   },
   {
-    tableName: "event_registrations",
     timestamps: true,
+    collection: "event_registrations",
   }
 );
 
-import("./event.js").then(({ default: Event }) => {
-  EventRegistration.belongsTo(Event, {
-    foreignKey: "eventId",
-    as: "event",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  });
+// ✅ Virtual for event association
+EventRegistrationSchema.virtual("event", {
+  ref: "Event",
+  localField: "eventId",
+  foreignField: "_id",
+  justOne: true,
 });
+
+// Enable virtuals in JSON output
+EventRegistrationSchema.set("toJSON", { virtuals: true });
+
+const EventRegistration = mongoose.model(
+  "EventRegistration",
+  EventRegistrationSchema
+);
+
 export default EventRegistration;

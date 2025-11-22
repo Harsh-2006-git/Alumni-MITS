@@ -118,7 +118,7 @@ passport.use(
           return done(null, false, { message: "unauthorized_domain" });
         }
 
-        let user = await User.findOne({ where: { email } });
+        let user = await User.findOne({ email });
         if (!user) {
           const randomPassword = await bcrypt.hash(
             Math.random().toString(36).slice(-12),
@@ -187,10 +187,10 @@ export const register = async (req, res) => {
     if (!email.endsWith("@mitsgwl.ac.in"))
       return res.status(403).json({ message: "Only @mitsgwl.ac.in allowed" });
 
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(409).json({ message: "Email exists" });
 
-    const existingPhone = await User.findOne({ where: { phone } });
+    const existingPhone = await User.findOne({ phone });
     if (existingPhone) return res.status(409).json({ message: "Phone exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -246,7 +246,7 @@ export const login = async (req, res) => {
     if (!email || !password)
       return res.status(400).json({ message: "Email & password required" });
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isValid = await bcrypt.compare(password, user.password);
@@ -281,52 +281,244 @@ export const login = async (req, res) => {
   }
 };
 
-// ===================== REGISTER / LOGIN ALUMNI =====================
+// ===================== REGISTER ALUMNI (Modified to match bulk registration but with manual password) =====================
 export const registerAlumni = async (req, res) => {
   try {
-    const { name, email, phone, password, branch } = req.body;
-
-    const existing = await Alumni.findOne({ where: { email } });
-    if (existing)
-      return res.status(400).json({ message: "Email already exists" });
-
-    const existingPhone = await Alumni.findOne({ where: { phone } });
-    if (existingPhone)
-      return res.status(400).json({ message: "Phone number already exists" });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const alumni = await Alumni.create({
+    const {
       name,
       email,
       phone,
-      password: hashedPassword,
+      password,
       branch,
+      batchYear,
+      location,
+      linkedinUrl,
+    } = req.body;
+
+    // Validate required fields (same as bulk registration but with password)
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !password ||
+      !branch ||
+      !batchYear ||
+      !location ||
+      !linkedinUrl
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required fields (name, email, phone, password, branch, or batchYear)",
+      });
+    }
+
+    // Validate email (same validation as bulk)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
+      });
+    }
+
+    // Validate phone (same validation as bulk)
+    const cleanedPhone = phone.toString().replace(/\D/g, "");
+    if (cleanedPhone.length < 10 || cleanedPhone.length > 15) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid phone number format",
+      });
+    }
+
+    // Validate batch year (same validation as bulk)
+    const batchRegex = /^\d{4}-\d{4}$/;
+    if (!batchRegex.test(batchYear)) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Invalid batch year format. Use format: YYYY-YYYY (e.g., 2020-2024)",
+      });
+    }
+
+    const [startYear, endYear] = batchYear.split("-").map(Number);
+    const currentYear = new Date().getFullYear();
+
+    if (
+      !(
+        startYear < endYear &&
+        endYear - startYear <= 6 &&
+        startYear >= 2000 &&
+        endYear <= currentYear + 6
+      )
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid batch year range",
+      });
+    }
+
+    // Check for existing records (same as bulk)
+    const normalizedEmail = email.toLowerCase().trim();
+    const sanitizedPhone = cleanedPhone.substring(0, 15);
+
+    const existingEmail = await Alumni.findOne({ email: normalizedEmail });
+    if (existingEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already exists in system",
+      });
+    }
+
+    const existingPhone = await Alumni.findOne({ phone: sanitizedPhone });
+    if (existingPhone) {
+      return res.status(400).json({
+        success: false,
+        message: "Phone number already exists in system",
+      });
+    }
+
+    // Sanitize inputs (same as bulk)
+    const sanitizeInput = (input) => {
+      if (typeof input !== "string") return input;
+      return input.trim();
+    };
+
+    const sanitizeLinkedInUrl = (url) => {
+      if (!url || url.trim() === "" || url === "Not provided") return null;
+
+      let sanitizedUrl = url.trim();
+      if (!sanitizedUrl.startsWith("http")) {
+        sanitizedUrl = "https://" + sanitizedUrl;
+      }
+
+      const linkedinRegex = /^https?:\/\/(www\.)?linkedin\.com\/.+/i;
+      if (!linkedinRegex.test(sanitizedUrl)) {
+        return null;
+      }
+
+      return sanitizedUrl;
+    };
+
+    const sanitizeLocation = (location) => {
+      if (!location || location.trim() === "" || location === "Not provided")
+        return null;
+      return location.trim();
+    };
+
+    // Generate education data from batch year (EXACT same format as bulk)
+    const generateEducationFromBatch = (batchYear, branch) => {
+      const [startYear, endYear] = batchYear.split("-").map(Number);
+
+      const startDate = `${startYear}-08-01`; // 1st August of start year
+      const endDate = `${endYear}-05-30`; // 30th May of end year
+
+      const educationEntry = {
+        type: "Bachelor",
+        stream: branch,
+        institution: "MITS Gwalior",
+        from: startDate,
+        to: endDate,
+        gpa: "7.5",
+      };
+
+      return [educationEntry];
+    };
+
+    // Hash the provided password (NOT auto-generated)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Sanitize location and LinkedIn URL (same as bulk)
+    const sanitizedLocation = sanitizeLocation(location);
+    const sanitizedLinkedIn = sanitizeLinkedInUrl(linkedinUrl);
+
+    // Generate education data (same as bulk)
+    const education = generateEducationFromBatch(batchYear, branch);
+
+    console.log(
+      "Generated education (exact format):",
+      JSON.stringify(education, null, 2)
+    );
+
+    // Create alumni record (same structure as bulk but with isVerified: false)
+    const alumni = await Alumni.create({
+      name: sanitizeInput(name),
+      email: normalizedEmail,
+      phone: sanitizedPhone,
+      branch: sanitizeInput(branch),
+      password: hashedPassword,
       userType: "alumni",
-      isVerified: false, // Set to false initially
+      isVerified: false, // Set to false for manual registration
     });
 
-    // ✅ Send welcome email to alumni (non-blocking)
-    emailService.sendWelcomeEmail(alumni).catch((error) => {
-      console.error("Failed to send welcome email to alumni:", error);
-      // Don't fail the registration if email fails
-    });
+    // Create alumni profile with education data (EXACT same as bulk)
+    const alumniProfileData = {
+      alumniId: alumni._id,
+      branch: sanitizeInput(branch),
+      batch: sanitizeInput(batchYear),
+      location: sanitizedLocation,
+      linkedin: sanitizedLinkedIn,
+      education: education, // Same exact format as bulk registration
+    };
 
-    // Remove token generation for registration
+    console.log("Creating profile with exact education format");
+
+    await AlumniProfile.create(alumniProfileData);
+
+    // Prepare user data for email
+    const userWithCredentials = {
+      ...alumni.toJSON(),
+      batchYear: sanitizeInput(batchYear),
+      location: sanitizedLocation,
+      linkedinUrl: sanitizedLinkedIn,
+      education: education,
+    };
+
+    // Send welcome email (same as bulk)
+    try {
+      await emailService.sendWelcomeEmail(userWithCredentials);
+      console.log(`✅ Welcome email sent to ${alumni.email}`);
+    } catch (emailError) {
+      console.error(
+        `❌ Failed to send welcome email to ${alumni.email}:`,
+        emailError
+      );
+      // Don't fail registration if email fails (same as bulk)
+    }
+
+    // Return response (without temporary password)
     res.status(201).json({
+      success: true,
       message:
         "Alumni registered successfully. Your account is under verification.",
-      user: {
-        id: alumni.id,
-        name: alumni.name,
-        email: alumni.email,
-        branch: alumni.branch,
-        userType: alumni.userType,
-        isVerified: alumni.isVerified,
+      data: {
+        alumni: {
+          id: alumni._id,
+          name: alumni.name,
+          email: alumni.email,
+          phone: alumni.phone,
+          branch: alumni.branch,
+          userType: alumni.userType,
+          isVerified: alumni.isVerified,
+        },
+        profile: {
+          batchYear: batchYear,
+          location: sanitizedLocation || "Not provided",
+          linkedinUrl: sanitizedLinkedIn || "Not provided",
+          education: education,
+        },
       },
     });
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+  } catch (error) {
+    console.error("Alumni registration error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error during alumni registration",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : "Internal server error",
+    });
   }
 };
 
@@ -335,7 +527,7 @@ export const registerAlumni = async (req, res) => {
 export const loginAlumni = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const alumni = await Alumni.findOne({ where: { email } });
+    const alumni = await Alumni.findOne({ email });
 
     if (!alumni) return res.status(404).json({ message: "User not found" });
 
@@ -488,4 +680,243 @@ export const authenticateToken = (req, res, next) => {
     req.user = user;
     next();
   });
+};
+
+import nodemailer from "nodemailer";
+
+// Configure nodemailer
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
+// Generate OTP
+const generateOTP = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Forgot Password - Single controller for OTP send, verify and reset
+export const handleForgotPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword, action } = req.body;
+
+    // Validate required fields based on action
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    // Check if alumni exists
+    const alumni = await Alumni.findOne({ email });
+    if (!alumni) {
+      return res.status(404).json({
+        success: false,
+        message: "No alumni found with this email address",
+      });
+    }
+
+    // Handle different actions
+    switch (action) {
+      case "send-otp":
+        return await handleSendOTP(alumni, res);
+
+      case "verify-reset":
+        return await handleVerifyAndReset(alumni, otp, newPassword, res);
+
+      default:
+        return res.status(400).json({
+          success: false,
+          message: "Invalid action. Use 'send-otp' or 'verify-reset'",
+        });
+    }
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+// Handle OTP sending
+const handleSendOTP = async (alumni, res) => {
+  try {
+    // Generate OTP and set expiry (10 minutes)
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    // Save OTP and expiry to alumni record
+    alumni.resetPasswordOTP = otp;
+    alumni.resetPasswordOTPExpiry = otpExpiry;
+    await alumni.save();
+
+    // Send OTP via email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: alumni.email,
+      subject: "Password Reset OTP - Alumni Portal",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Password Reset Request</h2>
+          <p>Hello ${alumni.name},</p>
+          <p>You have requested to reset your password. Use the OTP below to proceed:</p>
+          <div style="background-color: #f4f4f4; padding: 15px; text-align: center; margin: 20px 0;">
+            <h1 style="margin: 0; color: #333; letter-spacing: 5px;">${otp}</h1>
+          </div>
+          <p>This OTP will expire in 10 minutes.</p>
+          <p>If you didn't request this, please ignore this email.</p>
+          <br>
+          <p>Best regards,<br>Alumni Portal Team</p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "OTP sent successfully to your email",
+      action: "otp-sent",
+    });
+  } catch (error) {
+    console.error("Send OTP error:", error);
+    throw error;
+  }
+};
+
+// Handle OTP verification and password reset
+const handleVerifyAndReset = async (alumni, otp, newPassword, res) => {
+  try {
+    // Validate required fields
+    if (!otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP and new password are required",
+      });
+    }
+
+    // Check password strength
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    // Verify OTP
+    if (alumni.resetPasswordOTP !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    // Check if OTP has expired
+    if (new Date() > alumni.resetPasswordOTPExpiry) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP has expired. Please request a new one.",
+      });
+    }
+
+    // Hash the new password using bcrypt
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear OTP fields
+    alumni.password = hashedPassword;
+    alumni.resetPasswordOTP = undefined;
+    alumni.resetPasswordOTPExpiry = undefined;
+    await alumni.save();
+
+    // Send confirmation email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: alumni.email,
+      subject: "Password Reset Successful - Alumni Portal",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Password Reset Successful</h2>
+          <p>Hello ${alumni.name},</p>
+          <p>Your password has been successfully reset.</p>
+          <p>If you didn't make this change, please contact support immediately.</p>
+          <br>
+          <p>Best regards,<br>Alumni Portal Team</p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+      action: "password-reset",
+    });
+  } catch (error) {
+    console.error("Verify and reset error:", error);
+    throw error;
+  }
+};
+
+// check if alumni email is registered and verified or not
+export const checkAlumniEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    // Check if alumni exists with this email
+    const alumni = await Alumni.findOne({ email });
+
+    if (!alumni) {
+      return res.status(404).json({
+        success: false,
+        isRegistered: false,
+        message: "This email is not registered as an alumni",
+      });
+    }
+
+    // Check if alumni is verified
+    if (!alumni.isVerified) {
+      return res.status(200).json({
+        success: true,
+        isRegistered: true,
+        isVerified: false,
+        message:
+          "Email found but account is not verified. Please verify your account first.",
+        data: {
+          name: alumni.name,
+          email: alumni.email,
+        },
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      isRegistered: true,
+      isVerified: true,
+      message: "Email verified as registered alumni",
+      data: {
+        name: alumni.name,
+        email: alumni.email,
+        userType: alumni.userType,
+      },
+    });
+  } catch (error) {
+    console.error("Check alumni email error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };

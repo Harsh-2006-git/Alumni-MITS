@@ -27,7 +27,7 @@ router.get("/get-approve-campaign", getAllCampaigns);
 router.get("/get-my-campaigns", authenticateToken, getmyCampaigns);
 
 // Admin routes (all campaigns including unapproved)
-router.get("/all-campaign", authenticateToken, getAllCampaignsAdmin);
+router.get("/all-campaign", getAllCampaignsAdmin);
 router.patch("/:id/approval", authenticateToken, updateCampaignApproval);
 router.delete("/delete/:id", authenticateToken, deleteCampaign);
 router.put("/update/:id", authenticateToken, updateCampaign);

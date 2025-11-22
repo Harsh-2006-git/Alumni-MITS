@@ -9,6 +9,8 @@ import {
   registerAlumni,
   loginAlumni,
   adminLogin,
+  checkAlumniEmail,
+  handleForgotPassword,
 } from "../controller/AuthController.js";
 
 // Change this import - use default import instead of named import
@@ -46,5 +48,8 @@ router.get("/profile", authenticateToken, async (req, res) => {
 router.post("/register-alumni", registerAlumni);
 router.post("/bulk-register-alumni", upload.single("file"), BulkRegisterAlumni);
 router.post("/login-alumni", loginAlumni);
+
+router.post("/forgot-password", handleForgotPassword);
+router.post("/check", checkAlumniEmail);
 
 export default router;

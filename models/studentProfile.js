@@ -1,59 +1,42 @@
 // models/studentProfile.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
-import Student from "./user.js";
+import mongoose from "mongoose";
 
-const StudentProfile = sequelize.define(
+const StudentProfile = mongoose.model(
   "StudentProfile",
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    studentId: {
-      type: DataTypes.INTEGER.UNSIGNED, // ✅ Match Student.id type
-      allowNull: false,
-      references: {
-        model: Student,
-        key: "id",
+  new mongoose.Schema(
+    {
+      studentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "Student",
       },
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
+      location: { type: String },
+      branch: { type: String },
+      about: { type: String },
+      skills: { type: mongoose.Schema.Types.Mixed },
+      achievements: { type: mongoose.Schema.Types.Mixed },
+      linkedin: { type: String },
+      github: { type: String },
+      twitter: { type: String },
+      portfolio: { type: String },
+      education: { type: mongoose.Schema.Types.Mixed },
+      profilePhoto: { type: String },
+      resume: {
+        type: String,
+      },
+      experience: {
+        type: mongoose.Schema.Types.Mixed,
+        // Example:
+        // [
+        //   { designation: "Software Engineer", company: "Google", from: "2020-01-01", to: "2022-06-30", current: false, location: "NY", description: "Worked on X" },
+        //   { designation: "Senior Engineer", company: "Meta", from: "2022-07-01", to: null, current: true, location: "CA", description: "Leading Y project" }
+        // ]
+      },
     },
-    location: { type: DataTypes.STRING, allowNull: true },
-    branch: { type: DataTypes.STRING, allowNull: true },
-    about: { type: DataTypes.TEXT, allowNull: true },
-    skills: { type: DataTypes.JSON, allowNull: true },
-    achievements: { type: DataTypes.JSON, allowNull: true },
-    linkedin: { type: DataTypes.STRING, allowNull: true },
-    github: { type: DataTypes.STRING, allowNull: true },
-    twitter: { type: DataTypes.STRING, allowNull: true },
-    portfolio: { type: DataTypes.STRING, allowNull: true },
-    education: { type: DataTypes.JSON, allowNull: true },
-    profilePhoto: { type: DataTypes.STRING, allowNull: true },
-    resume: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    experience: {
-      type: DataTypes.JSON,
-      allowNull: true,
-      // Example:
-      // [
-      //   { designation: "Software Engineer", company: "Google", from: "2020-01-01", to: "2022-06-30", current: false, location: "NY", description: "Worked on X" },
-      //   { designation: "Senior Engineer", company: "Meta", from: "2022-07-01", to: null, current: true, location: "CA", description: "Leading Y project" }
-      // ]
-    },
-  },
-  {
-    tableName: "student_profiles",
-    timestamps: true,
-  }
+    {
+      timestamps: true,
+    }
+  )
 );
-
-// Associations
-StudentProfile.belongsTo(Student, { foreignKey: "studentId", as: "student" });
-Student.hasOne(StudentProfile, { foreignKey: "studentId", as: "profile" });
 
 export default StudentProfile;

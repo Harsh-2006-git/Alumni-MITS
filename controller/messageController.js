@@ -4,12 +4,8 @@ import Alumni from "../models/alumni.js";
 
 export const getAllPeople = async (req, res) => {
   try {
-    const students = await Student.findAll({
-      attributes: ["id", "name", "email", "phone", "userType"],
-    });
-    const alumni = await Alumni.findAll({
-      attributes: ["id", "name", "email", "phone", "userType"],
-    });
+    const students = await Student.find({}, "id name email phone userType");
+    const alumni = await Alumni.find({}, "id name email phone userType");
 
     const combined = [
       ...students.map((s) => s.toJSON()),
@@ -43,7 +39,7 @@ export const sendMessage = async (req, res) => {
     // 🔹 Find receiver
     const receiverModel = receiverType === "student" ? Student : Alumni;
     const receiver = await receiverModel.findOne({
-      where: { phone: receiverPhone },
+      phone: receiverPhone,
     });
 
     if (!receiver) {
@@ -65,37 +61,35 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-import { Op } from "sequelize";
 
 export const getMyMessages = async (req, res) => {
   try {
     const { id: userId, userType } = req.user;
 
-    const messages = await Message.findAll({
-      where: {
-        [Op.or]: [
-          { senderId: userId, senderType: userType },
-          { receiverId: userId, receiverType: userType },
-        ],
-      },
-      order: [["createdAt", "ASC"]],
-    });
+    const messages = await Message.find({
+      $or: [
+        { senderId: userId, senderType: userType },
+        { receiverId: userId, receiverType: userType },
+      ],
+    }).sort({ createdAt: 1 });
 
     const messagesWithUsers = await Promise.all(
       messages.map(async (msg) => {
         const senderModel = msg.senderType === "student" ? Student : Alumni;
         const receiverModel = msg.receiverType === "student" ? Student : Alumni;
 
-        const sender = await senderModel.findByPk(msg.senderId, {
-          attributes: ["id", "name", "userType", "phone", "email"],
-        });
+        const sender = await senderModel.findById(
+          msg.senderId,
+          "id name userType phone email"
+        );
 
-        const receiver = await receiverModel.findByPk(msg.receiverId, {
-          attributes: ["id", "name", "userType", "phone", "email"],
-        });
+        const receiver = await receiverModel.findById(
+          msg.receiverId,
+          "id name userType phone email"
+        );
 
         return {
-          id: msg.id,
+          id: msg._id,
           text: msg.text,
           createdAt: msg.createdAt,
           sender: sender ? sender.toJSON() : null,

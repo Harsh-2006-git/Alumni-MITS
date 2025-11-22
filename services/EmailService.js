@@ -140,7 +140,7 @@ class EmailService {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
-        
+
         .header { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 50%, #1a237e 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
         .header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; z-index: 0; }
         .header::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; z-index: 0; }
@@ -148,13 +148,13 @@ class EmailService {
         .logo { width: 70px; height: 70px; border-radius: 12px; object-fit: contain; background: rgba(255, 255, 255, 0.15); padding: 8px; display: block; margin: 0 auto 15px auto; border: 2px solid rgba(255, 255, 255, 0.3); }
         .college-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 1; }
         .welcome-title { color: white; font-size: 22px; font-weight: 700; margin: 20px 0 10px 0; position: relative; z-index: 1; letter-spacing: 0.5px; }
-        
+
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
         .greeting { font-size: 26px; color: #0d47a1; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
-        
+
         .qr-section { background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); padding: 30px 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #42a5f5; text-align: center; }
         .qr-title { font-size: 20px; color: #1565c0; margin-bottom: 20px; font-weight: 700; }
         .qr-container { background: white; padding: 20px; border-radius: 12px; display: inline-block; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(21, 101, 192, 0.2); }
@@ -162,30 +162,30 @@ class EmailService {
         .qr-instructions { text-align: left; max-width: 400px; margin: 0 auto; }
         .qr-instruction { color: #455a64; font-size: 13px; line-height: 1.5; margin-bottom: 8px; padding-left: 15px; position: relative; }
         .qr-instruction::before { content: '•'; position: absolute; left: 0; color: #1565c0; font-weight: bold; }
-        
+
         .event-details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
         .event-title { font-size: 20px; color: #2e7d32; margin-bottom: 20px; text-align: center; font-weight: 700; }
         .detail-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #4caf50; }
         .detail-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         .detail-value { color: #455a64; font-size: 15px; display: block; font-weight: 500; }
-        
+
         .registration-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e1f5fe 100%); padding: 30px 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #1565c0; }
         .registration-title { font-size: 18px; color: #0d47a1; margin-bottom: 22px; text-align: center; font-weight: 700; }
-        
+
         .instructions-section { background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%); padding: 20px; border-radius: 12px; margin: 25px 0; border: 2px solid #ffa000; }
         .instructions-title { font-size: 16px; color: #ef6c00; margin-bottom: 12px; text-align: center; font-weight: 700; }
         .instruction-item { color: #5d4037; font-size: 13px; line-height: 1.5; margin-bottom: 8px; padding-left: 15px; position: relative; }
         .instruction-item::before { content: '•'; position: absolute; left: 0; color: #ef6c00; font-weight: bold; }
-        
+
         .help-section { text-align: center; padding: 28px 25px; background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); border-radius: 12px; margin: 30px 0; border-top: 3px solid #42a5f5; }
         .help-title { font-size: 17px; color: #0d47a1; margin-bottom: 12px; font-weight: 700; }
         .help-text { color: #455a64; font-size: 14px; margin-bottom: 10px; font-weight: 500; }
         .contact-email { color: #1565c0; font-weight: 700; text-decoration: none; border-bottom: 2px solid #1565c0; }
-        
+
         .footer { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 28px 20px; text-align: center; }
         .footer-text { font-size: 12px; line-height: 1.7; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
         .footer-text:last-child { margin-bottom: 0; opacity: 0.7; font-size: 11px; }
-        
+
         @media (max-width: 480px) {
             body { padding: 5px; }
             .header { padding: 30px 15px; }
@@ -207,7 +207,7 @@ class EmailService {
             <div class="college-name">Madhav Institute of Technology & Science</div>
             <div class="welcome-title">Event Registration Confirmation</div>
         </div>
-        
+
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">🎉</div>
@@ -248,7 +248,7 @@ class EmailService {
                     : ""
                 }
             </div>
-            
+
             <div class="registration-section">
                 <div class="registration-title">Registration Details</div>
                 <div class="detail-item">
@@ -268,7 +268,7 @@ class EmailService {
                     <div class="detail-value">${formattedRegistrationDate}</div>
                 </div>
             </div>
-            
+
             <div class="instructions-section">
                 <div class="instructions-title">📋 Important Instructions</div>
                 <div class="instruction-item">Please save this confirmation email for your records</div>
@@ -282,14 +282,14 @@ class EmailService {
                     : ""
                 }
             </div>
-            
+
             <div class="help-section">
                 <div class="help-title">❓ Need Help?</div>
                 <div class="help-text">Contact our event coordination team</div>
                 <div class="help-text">Email: <a href="mailto:events@mitsgwalior.in" class="contact-email">events@mitsgwalior.in</a></div>
             </div>
         </div>
-        
+
         <div class="footer">
             <div class="footer-text">MITS ${userTypeText} Association</div>
             <div class="footer-text">Madhav Institute of Technology & Science, Gwalior</div>

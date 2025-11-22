@@ -3,6 +3,37 @@ import Mentor from "../models/mentor.js";
 import Alumni from "../models/alumni.js";
 import Student from "../models/user.js";
 import MentorStudent from "../models/mentee.js";
+import MentorshipEmailService from "../services/MentorshipEmailService.js";
+import mongoose from "mongoose";
+
+const emailService = new MentorshipEmailService();
+
+// Helper function to process MongoDB data to match Sequelize response structure
+const processMentorData = (mentor) => {
+  const mentorData = mentor.toObject ? mentor.toObject() : mentor;
+
+  // Convert Decimal128 fees to number
+  if (mentorData.fees && typeof mentorData.fees === "object") {
+    mentorData.fees = parseFloat(mentorData.fees.toString());
+  }
+
+  // Ensure id field is present (matching Sequelize response)
+  mentorData.id = mentorData._id || mentorData.id;
+
+  return mentorData;
+};
+
+// Helper function to process mentorship data
+const processMentorshipData = (mentorship) => {
+  const mentorshipData = mentorship.toObject
+    ? mentorship.toObject()
+    : mentorship;
+
+  // Ensure id field is present
+  mentorshipData.id = mentorshipData._id || mentorshipData.id;
+
+  return mentorshipData;
+};
 
 // Create mentor profile - only for Alumni userType
 export const createMentor = async (req, res) => {
@@ -32,7 +63,7 @@ export const createMentor = async (req, res) => {
     const { id: alumni_id, name, email, phone } = req.user;
 
     // Check if alumni exists in database
-    const alumni = await Alumni.findByPk(alumni_id);
+    const alumni = await Alumni.findById(alumni_id);
     if (!alumni) {
       return res.status(404).json({
         success: false,
@@ -42,7 +73,7 @@ export const createMentor = async (req, res) => {
 
     // Check if mentor profile already exists for this alumni
     const existingMentor = await Mentor.findOne({
-      where: { alumni_id },
+      alumni_id: alumni_id,
     });
 
     if (existingMentor) {
@@ -82,7 +113,7 @@ export const createMentor = async (req, res) => {
     res.status(201).json({
       success: true,
       message: "Mentor profile created successfully",
-      data: mentor,
+      data: processMentorData(mentor),
     });
   } catch (error) {
     console.error("Error creating mentor:", error);
@@ -120,7 +151,7 @@ export const editMentor = async (req, res) => {
     } = req.body;
 
     // Find mentor
-    const mentor = await Mentor.findByPk(mentorId);
+    const mentor = await Mentor.findById(mentorId);
 
     if (!mentor) {
       return res.status(404).json({
@@ -130,7 +161,7 @@ export const editMentor = async (req, res) => {
     }
 
     // Check if the logged-in user owns this mentor profile
-    if (mentor.alumni_id !== req.user.id) {
+    if (mentor.alumni_id.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
         message: "Access denied. You can only edit your own mentor profile",
@@ -153,23 +184,25 @@ export const editMentor = async (req, res) => {
     if (available !== undefined) updateData.available = available;
 
     // Update mentor
-    await mentor.update(updateData);
+    const updatedMentor = await Mentor.findByIdAndUpdate(mentorId, updateData, {
+      new: true,
+    }).populate("alumni_id", "name email profilePhoto");
 
-    // Fetch updated mentor
-    const updatedMentor = await Mentor.findByPk(mentorId, {
-      include: [
-        {
-          model: Alumni,
-          as: "alumni",
-          attributes: ["id", "name", "email", "profilePhoto"],
-        },
-      ],
-    });
+    // Structure response to match Sequelize include format
+    const responseData = processMentorData(updatedMentor);
+    if (updatedMentor.alumni_id) {
+      responseData.alumni = {
+        id: updatedMentor.alumni_id._id,
+        name: updatedMentor.alumni_id.name,
+        email: updatedMentor.alumni_id.email,
+        profilePhoto: updatedMentor.alumni_id.profilePhoto,
+      };
+    }
 
     res.json({
       success: true,
       message: "Mentor profile updated successfully",
-      data: updatedMentor,
+      data: responseData,
     });
   } catch (error) {
     console.error("Error updating mentor:", error);
@@ -193,15 +226,8 @@ export const getMyMentorProfile = async (req, res) => {
     }
 
     const mentor = await Mentor.findOne({
-      where: { alumni_id: req.user.id },
-      include: [
-        {
-          model: Alumni,
-          as: "alumni",
-          attributes: ["id", "name", "email", "profilePhoto", "phone"],
-        },
-      ],
-    });
+      alumni_id: req.user.id,
+    }).populate("alumni_id", "name email profilePhoto phone");
 
     if (!mentor) {
       return res.status(404).json({
@@ -211,9 +237,21 @@ export const getMyMentorProfile = async (req, res) => {
       });
     }
 
+    // Structure response to match Sequelize include format
+    const responseData = processMentorData(mentor);
+    if (mentor.alumni_id) {
+      responseData.alumni = {
+        id: mentor.alumni_id._id,
+        name: mentor.alumni_id.name,
+        email: mentor.alumni_id.email,
+        profilePhoto: mentor.alumni_id.profilePhoto,
+        phone: mentor.alumni_id.phone,
+      };
+    }
+
     res.json({
       success: true,
-      data: mentor,
+      data: responseData,
     });
   } catch (error) {
     console.error("Error fetching mentor profile:", error);
@@ -234,26 +272,36 @@ export const getAllMentors = async (req, res) => {
     const whereConditions = { available: true }; // Only show available mentors by default
 
     if (branch) whereConditions.branch = branch;
-    if (expertise) whereConditions.expertise = { [Op.like]: `%${expertise}%` };
+    if (expertise)
+      whereConditions.expertise = { $regex: expertise, $options: "i" };
     if (available !== undefined)
       whereConditions.available = available === "true";
 
-    const mentors = await Mentor.findAll({
-      where: whereConditions,
-      include: [
-        {
-          model: Alumni,
-          as: "alumni",
-          attributes: ["id", "name", "email", "profilePhoto"],
-        },
-      ],
-      order: [["createdAt", "DESC"]],
+    const mentors = await Mentor.find(whereConditions)
+      .populate("alumni_id", "name email profilePhoto")
+      .sort({ createdAt: -1 });
+
+    // Process mentors to match Sequelize response structure
+    const processedMentors = mentors.map((mentor) => {
+      const mentorData = processMentorData(mentor);
+
+      // Structure alumni data to match Sequelize include
+      if (mentor.alumni_id) {
+        mentorData.alumni = {
+          id: mentor.alumni_id._id,
+          name: mentor.alumni_id.name,
+          email: mentor.alumni_id.email,
+          profilePhoto: mentor.alumni_id.profilePhoto,
+        };
+      }
+
+      return mentorData;
     });
 
     res.json({
       success: true,
-      count: mentors.length,
-      data: mentors,
+      count: processedMentors.length,
+      data: processedMentors,
     });
   } catch (error) {
     console.error("Error fetching mentors:", error);
@@ -279,7 +327,7 @@ export const canCreateMentor = async (req, res) => {
 
     // Check if mentor profile already exists
     const existingMentor = await Mentor.findOne({
-      where: { alumni_id: req.user.id },
+      alumni_id: req.user.id,
     });
 
     if (existingMentor) {
@@ -287,7 +335,7 @@ export const canCreateMentor = async (req, res) => {
         success: true,
         canCreate: false,
         reason: "Mentor profile already exists",
-        existingProfile: existingMentor.id,
+        existingProfile: existingMentor._id,
       });
     }
 
@@ -305,10 +353,6 @@ export const canCreateMentor = async (req, res) => {
   }
 };
 
-import MentorshipEmailService from "../services/MentorshipEmailService.js";
-
-const emailService = new MentorshipEmailService();
-
 // Student requests to register under a mentor
 export const requestMentorship = async (req, res) => {
   try {
@@ -324,15 +368,10 @@ export const requestMentorship = async (req, res) => {
     const studentId = req.user.id;
 
     // Check if mentor exists and is available
-    const mentor = await Mentor.findByPk(mentorId, {
-      include: [
-        {
-          model: Alumni,
-          as: "alumni",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
+    const mentor = await Mentor.findById(mentorId).populate(
+      "alumni_id",
+      "name email"
+    );
 
     if (!mentor) {
       return res.status(404).json({
@@ -349,7 +388,7 @@ export const requestMentorship = async (req, res) => {
     }
 
     // Check if student exists
-    const student = await Student.findByPk(studentId);
+    const student = await Student.findById(studentId);
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -359,10 +398,8 @@ export const requestMentorship = async (req, res) => {
 
     // Check if mentorship request already exists
     const existingRequest = await MentorStudent.findOne({
-      where: {
-        mentor_id: mentorId,
-        student_id: studentId,
-      },
+      mentor_id: mentorId,
+      student_id: studentId,
     });
 
     if (existingRequest) {
@@ -387,7 +424,7 @@ export const requestMentorship = async (req, res) => {
     // Send email notifications
     try {
       await emailService.sendMentorshipRequestEmail(
-        mentor.alumni.email, // Mentor's email
+        mentor.alumni_id.email, // Mentor's email
         student.email, // Student's email
         {
           studentName: student.name,
@@ -405,31 +442,44 @@ export const requestMentorship = async (req, res) => {
     }
 
     // Fetch created relationship with details
-    const mentorshipWithDetails = await MentorStudent.findByPk(mentorship.id, {
-      include: [
-        {
-          model: Mentor,
-          as: "mentor",
-          include: [
-            {
-              model: Alumni,
-              as: "alumni",
-              attributes: ["id", "name", "email", "profilePhoto"],
-            },
-          ],
+    const mentorshipWithDetails = await MentorStudent.findById(mentorship._id)
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email profilePhoto",
         },
-        {
-          model: Student,
-          as: "student",
-          attributes: ["id", "name", "email", "phone", "profilePhoto"],
+      })
+      .populate("student_id", "name email phone profilePhoto");
+
+    // Structure response to match Sequelize include format
+    const responseData = processMentorshipData(mentorshipWithDetails);
+    if (mentorshipWithDetails.mentor_id) {
+      responseData.mentor = {
+        id: mentorshipWithDetails.mentor_id._id,
+        name: mentorshipWithDetails.mentor_id.name,
+        alumni: {
+          id: mentorshipWithDetails.mentor_id.alumni_id._id,
+          name: mentorshipWithDetails.mentor_id.alumni_id.name,
+          email: mentorshipWithDetails.mentor_id.alumni_id.email,
+          profilePhoto: mentorshipWithDetails.mentor_id.alumni_id.profilePhoto,
         },
-      ],
-    });
+      };
+    }
+    if (mentorshipWithDetails.student_id) {
+      responseData.student = {
+        id: mentorshipWithDetails.student_id._id,
+        name: mentorshipWithDetails.student_id.name,
+        email: mentorshipWithDetails.student_id.email,
+        phone: mentorshipWithDetails.student_id.phone,
+        profilePhoto: mentorshipWithDetails.student_id.profilePhoto,
+      };
+    }
 
     res.status(201).json({
       success: true,
       message: "Mentorship request sent successfully",
-      data: mentorshipWithDetails,
+      data: responseData,
     });
   } catch (error) {
     console.error("Error requesting mentorship:", error);
@@ -454,30 +504,19 @@ export const respondToMentorshipRequest = async (req, res) => {
     const { requestId } = req.params;
     const { action, mentor_notes, session_date, session_time } = req.body;
 
-    // Find mentorship request with mentor and student details
-    const mentorship = await MentorStudent.findByPk(requestId, {
-      include: [
-        {
-          model: Mentor,
-          as: "mentor",
-          where: { alumni_id: req.user.id },
-          include: [
-            {
-              model: Alumni,
-              as: "alumni",
-              attributes: ["id", "name", "email"],
-            },
-          ],
+    // Find mentorship request
+    const mentorship = await MentorStudent.findById(requestId)
+      .populate({
+        path: "mentor_id",
+        match: { alumni_id: req.user.id },
+        populate: {
+          path: "alumni_id",
+          select: "name email",
         },
-        {
-          model: Student,
-          as: "student",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
+      })
+      .populate("student_id", "name email");
 
-    if (!mentorship) {
+    if (!mentorship || !mentorship.mentor_id) {
       return res.status(404).json({
         success: false,
         message: "Mentorship request not found or access denied",
@@ -516,21 +555,33 @@ export const respondToMentorshipRequest = async (req, res) => {
     }
 
     // Update mentorship status
-    await mentorship.update(updateData);
+    const updatedMentorship = await MentorStudent.findByIdAndUpdate(
+      requestId,
+      updateData,
+      { new: true }
+    )
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email profilePhoto",
+        },
+      })
+      .populate("student_id", "name email phone profilePhoto");
 
     // Send email notifications
     try {
       await emailService.sendStatusChangeEmail(
-        mentorship.mentor.alumni.email, // Mentor's email
-        mentorship.student.email, // Student's email
+        updatedMentorship.mentor_id.alumni_id.email, // Mentor's email
+        updatedMentorship.student_id.email, // Student's email
         {
-          studentName: mentorship.student.name,
-          mentorName: mentorship.mentor.name,
+          studentName: updatedMentorship.student_id.name,
+          mentorName: updatedMentorship.mentor_id.name,
           newStatus: newStatus,
           oldStatus: "pending",
           mentorNotes: mentor_notes,
-          sessionDate: session_date || mentorship.session_date,
-          sessionTime: session_time || mentorship.session_time,
+          sessionDate: session_date || updatedMentorship.session_date,
+          sessionTime: session_time || updatedMentorship.session_time,
         }
       );
     } catch (emailError) {
@@ -538,32 +589,34 @@ export const respondToMentorshipRequest = async (req, res) => {
       // Continue with the response even if email fails
     }
 
-    // Fetch updated relationship with details
-    const updatedMentorship = await MentorStudent.findByPk(requestId, {
-      include: [
-        {
-          model: Mentor,
-          as: "mentor",
-          include: [
-            {
-              model: Alumni,
-              as: "alumni",
-              attributes: ["id", "name", "email", "profilePhoto"],
-            },
-          ],
+    // Structure response to match Sequelize include format
+    const responseData = processMentorshipData(updatedMentorship);
+    if (updatedMentorship.mentor_id) {
+      responseData.mentor = {
+        id: updatedMentorship.mentor_id._id,
+        name: updatedMentorship.mentor_id.name,
+        alumni: {
+          id: updatedMentorship.mentor_id.alumni_id._id,
+          name: updatedMentorship.mentor_id.alumni_id.name,
+          email: updatedMentorship.mentor_id.alumni_id.email,
+          profilePhoto: updatedMentorship.mentor_id.alumni_id.profilePhoto,
         },
-        {
-          model: Student,
-          as: "student",
-          attributes: ["id", "name", "email", "phone", "profilePhoto"],
-        },
-      ],
-    });
+      };
+    }
+    if (updatedMentorship.student_id) {
+      responseData.student = {
+        id: updatedMentorship.student_id._id,
+        name: updatedMentorship.student_id.name,
+        email: updatedMentorship.student_id.email,
+        phone: updatedMentorship.student_id.phone,
+        profilePhoto: updatedMentorship.student_id.profilePhoto,
+      };
+    }
 
     res.json({
       success: true,
       message: `Mentorship request ${action}ed successfully`,
-      data: updatedMentorship,
+      data: responseData,
     });
   } catch (error) {
     console.error("Error responding to mentorship request:", error);
@@ -575,33 +628,22 @@ export const respondToMentorshipRequest = async (req, res) => {
   }
 };
 
-// Update mentorship session details
+// Update mentorship session details - fixed version
 export const updateSessionDetails = async (req, res) => {
   try {
     const { requestId } = req.params;
     const { session_date, session_time, mentor_notes } = req.body;
 
-    // Find mentorship with mentor and student details
-    const mentorship = await MentorStudent.findByPk(requestId, {
-      include: [
-        {
-          model: Mentor,
-          as: "mentor",
-          include: [
-            {
-              model: Alumni,
-              as: "alumni",
-              attributes: ["id", "name", "email"],
-            },
-          ],
+    // Find mentorship
+    const mentorship = await MentorStudent.findById(requestId)
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email",
         },
-        {
-          model: Student,
-          as: "student",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
+      })
+      .populate("student_id", "name email");
 
     if (!mentorship) {
       return res.status(404).json({
@@ -611,16 +653,30 @@ export const updateSessionDetails = async (req, res) => {
     }
 
     // Check authorization - either mentor or student can update
-    const isMentor =
-      req.user.userType === "alumni" &&
-      mentorship.mentor.alumni_id === req.user.id;
-    const isStudent =
-      req.user.userType === "student" && mentorship.student_id === req.user.id;
+    const isMentor = req.user.userType === "alumni";
+    const isStudent = req.user.userType === "student";
 
-    if (!isMentor && !isStudent) {
+    if (isMentor) {
+      // For alumni, check if they own the mentor profile in this mentorship
+      // Directly compare the alumni_id from the populated mentor with the logged-in user
+      if (mentorship.mentor_id.alumni_id._id.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. You can only update your own mentorships",
+        });
+      }
+    } else if (isStudent) {
+      // For students, check if they own the student profile
+      if (mentorship.student_id._id.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. You can only update your own mentorships",
+        });
+      }
+    } else {
       return res.status(403).json({
         success: false,
-        message: "Access denied. You can only update your own mentorships",
+        message: "Access denied",
       });
     }
 
@@ -629,7 +685,19 @@ export const updateSessionDetails = async (req, res) => {
     if (session_time !== undefined) updateData.session_time = session_time;
     if (mentor_notes !== undefined) updateData.mentor_notes = mentor_notes;
 
-    await mentorship.update(updateData);
+    const updatedMentorship = await MentorStudent.findByIdAndUpdate(
+      requestId,
+      updateData,
+      { new: true }
+    )
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email profilePhoto",
+        },
+      })
+      .populate("student_id", "name email phone profilePhoto");
 
     // Send email notifications for updates
     try {
@@ -639,25 +707,48 @@ export const updateSessionDetails = async (req, res) => {
       if (mentor_notes) updates.push("mentor notes");
 
       await emailService.sendMentorshipUpdateEmail(
-        mentorship.mentor.alumni.email, // Mentor's email
-        mentorship.student.email, // Student's email
+        updatedMentorship.mentor_id.alumni_id.email,
+        updatedMentorship.student_id.email,
         {
-          studentName: mentorship.student.name,
-          mentorName: mentorship.mentor.name,
+          studentName: updatedMentorship.student_id.name,
+          mentorName: updatedMentorship.mentor_id.name,
           updates: updates.join(", "),
-          sessionDate: session_date || mentorship.session_date,
-          sessionTime: session_time || mentorship.session_time,
+          sessionDate: session_date || updatedMentorship.session_date,
+          sessionTime: session_time || updatedMentorship.session_time,
         }
       );
     } catch (emailError) {
       console.error("Failed to send update emails:", emailError);
-      // Continue with the response even if email fails
+    }
+
+    // Structure response to match Sequelize include format
+    const responseData = processMentorshipData(updatedMentorship);
+    if (updatedMentorship.mentor_id) {
+      responseData.mentor = {
+        id: updatedMentorship.mentor_id._id,
+        name: updatedMentorship.mentor_id.name,
+        alumni: {
+          id: updatedMentorship.mentor_id.alumni_id._id,
+          name: updatedMentorship.mentor_id.alumni_id.name,
+          email: updatedMentorship.mentor_id.alumni_id.email,
+          profilePhoto: updatedMentorship.mentor_id.alumni_id.profilePhoto,
+        },
+      };
+    }
+    if (updatedMentorship.student_id) {
+      responseData.student = {
+        id: updatedMentorship.student_id._id,
+        name: updatedMentorship.student_id.name,
+        email: updatedMentorship.student_id.email,
+        phone: updatedMentorship.student_id.phone,
+        profilePhoto: updatedMentorship.student_id.profilePhoto,
+      };
     }
 
     res.json({
       success: true,
       message: "Session details updated successfully",
-      data: mentorship,
+      data: responseData,
     });
   } catch (error) {
     console.error("Error updating session details:", error);
@@ -668,7 +759,6 @@ export const updateSessionDetails = async (req, res) => {
     });
   }
 };
-
 // Get all mentorship requests for a mentor
 export const getMentorshipRequests = async (req, res) => {
   try {
@@ -683,7 +773,7 @@ export const getMentorshipRequests = async (req, res) => {
 
     // Find mentor profile for this alumni
     const mentor = await Mentor.findOne({
-      where: { alumni_id: req.user.id },
+      alumni_id: req.user.id,
     });
 
     if (!mentor) {
@@ -693,36 +783,54 @@ export const getMentorshipRequests = async (req, res) => {
       });
     }
 
-    const whereConditions = { mentor_id: mentor.id };
+    const whereConditions = { mentor_id: mentor._id };
     if (status) whereConditions.status = status;
 
-    const requests = await MentorStudent.findAll({
-      where: whereConditions,
-      include: [
-        {
-          model: Student,
-          as: "student",
-          attributes: ["id", "name", "email", "phone", "profilePhoto"],
+    const requests = await MentorStudent.find(whereConditions)
+      .populate("student_id", "name email phone profilePhoto")
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email profilePhoto",
         },
-        {
-          model: Mentor,
-          as: "mentor",
-          include: [
-            {
-              model: Alumni,
-              as: "alumni",
-              attributes: ["id", "name", "email", "profilePhoto"],
-            },
-          ],
-        },
-      ],
-      order: [["createdAt", "DESC"]],
+      })
+      .sort({ createdAt: -1 });
+
+    // Process requests to match Sequelize response structure
+    const processedRequests = requests.map((request) => {
+      const requestData = processMentorshipData(request);
+
+      // Structure data to match Sequelize include
+      if (request.student_id) {
+        requestData.student = {
+          id: request.student_id._id,
+          name: request.student_id.name,
+          email: request.student_id.email,
+          phone: request.student_id.phone,
+          profilePhoto: request.student_id.profilePhoto,
+        };
+      }
+      if (request.mentor_id) {
+        requestData.mentor = {
+          id: request.mentor_id._id,
+          name: request.mentor_id.name,
+          alumni: {
+            id: request.mentor_id.alumni_id._id,
+            name: request.mentor_id.alumni_id.name,
+            email: request.mentor_id.alumni_id.email,
+            profilePhoto: request.mentor_id.alumni_id.profilePhoto,
+          },
+        };
+      }
+
+      return requestData;
     });
 
     res.json({
       success: true,
-      count: requests.length,
-      data: requests,
+      count: processedRequests.length,
+      data: processedRequests,
     });
   } catch (error) {
     console.error("Error fetching mentorship requests:", error);
@@ -750,33 +858,51 @@ export const getStudentMentorships = async (req, res) => {
     const whereConditions = { student_id: studentId };
     if (status) whereConditions.status = status;
 
-    const mentorships = await MentorStudent.findAll({
-      where: whereConditions,
-      include: [
-        {
-          model: Mentor,
-          as: "mentor",
-          include: [
-            {
-              model: Alumni,
-              as: "alumni",
-              attributes: ["id", "name", "email", "profilePhoto"],
-            },
-          ],
+    const mentorships = await MentorStudent.find(whereConditions)
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email profilePhoto",
         },
-        {
-          model: Student,
-          as: "student",
-          attributes: ["id", "name", "email", "phone", "profilePhoto"],
-        },
-      ],
-      order: [["createdAt", "DESC"]],
+      })
+      .populate("student_id", "name email phone profilePhoto")
+      .sort({ createdAt: -1 });
+
+    // Process mentorships to match Sequelize response structure
+    const processedMentorships = mentorships.map((mentorship) => {
+      const mentorshipData = processMentorshipData(mentorship);
+
+      // Structure data to match Sequelize include
+      if (mentorship.mentor_id) {
+        mentorshipData.mentor = {
+          id: mentorship.mentor_id._id,
+          name: mentorship.mentor_id.name,
+          alumni: {
+            id: mentorship.mentor_id.alumni_id._id,
+            name: mentorship.mentor_id.alumni_id.name,
+            email: mentorship.mentor_id.alumni_id.email,
+            profilePhoto: mentorship.mentor_id.alumni_id.profilePhoto,
+          },
+        };
+      }
+      if (mentorship.student_id) {
+        mentorshipData.student = {
+          id: mentorship.student_id._id,
+          name: mentorship.student_id.name,
+          email: mentorship.student_id.email,
+          phone: mentorship.student_id.phone,
+          profilePhoto: mentorship.student_id.profilePhoto,
+        };
+      }
+
+      return mentorshipData;
     });
 
     res.json({
       success: true,
-      count: mentorships.length,
-      data: mentorships,
+      count: processedMentorships.length,
+      data: processedMentorships,
     });
   } catch (error) {
     console.error("Error fetching student mentorships:", error);
@@ -794,27 +920,16 @@ export const updateMentorshipStatus = async (req, res) => {
     const { requestId } = req.params;
     const { action, notes } = req.body;
 
-    // Find mentorship with mentor and student details
-    const mentorship = await MentorStudent.findByPk(requestId, {
-      include: [
-        {
-          model: Mentor,
-          as: "mentor",
-          include: [
-            {
-              model: Alumni,
-              as: "alumni",
-              attributes: ["id", "name", "email"],
-            },
-          ],
+    // Find mentorship
+    const mentorship = await MentorStudent.findById(requestId)
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email",
         },
-        {
-          model: Student,
-          as: "student",
-          attributes: ["id", "name", "email"],
-        },
-      ],
-    });
+      })
+      .populate("student_id", "name email");
 
     if (!mentorship) {
       return res.status(404).json({
@@ -824,16 +939,28 @@ export const updateMentorshipStatus = async (req, res) => {
     }
 
     // Check authorization - either mentor or student can update
-    const isMentor =
-      req.user.userType === "alumni" &&
-      mentorship.mentor.alumni_id === req.user.id;
-    const isStudent =
-      req.user.userType === "student" && mentorship.student_id === req.user.id;
+    const isMentor = req.user.userType === "alumni";
+    const isStudent = req.user.userType === "student";
 
-    if (!isMentor && !isStudent) {
+    if (isMentor) {
+      const mentor = await Mentor.findById(mentorship.mentor_id);
+      if (!mentor || mentor.alumni_id.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. You can only update your own mentorships",
+        });
+      }
+    } else if (isStudent) {
+      if (mentorship.student_id._id.toString() !== req.user.id) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. You can only update your own mentorships",
+        });
+      }
+    } else {
       return res.status(403).json({
         success: false,
-        message: "Access denied. You can only update your own mentorships",
+        message: "Access denied",
       });
     }
 
@@ -862,21 +989,33 @@ export const updateMentorshipStatus = async (req, res) => {
       });
     }
 
-    await mentorship.update(updateData);
+    const updatedMentorship = await MentorStudent.findByIdAndUpdate(
+      requestId,
+      updateData,
+      { new: true }
+    )
+      .populate({
+        path: "mentor_id",
+        populate: {
+          path: "alumni_id",
+          select: "name email",
+        },
+      })
+      .populate("student_id", "name email");
 
     // Send email notifications for status change
     try {
       await emailService.sendStatusChangeEmail(
-        mentorship.mentor.alumni.email, // Mentor's email
-        mentorship.student.email, // Student's email
+        updatedMentorship.mentor_id.alumni_id.email, // Mentor's email
+        updatedMentorship.student_id.email, // Student's email
         {
-          studentName: mentorship.student.name,
-          mentorName: mentorship.mentor.name,
+          studentName: updatedMentorship.student_id.name,
+          mentorName: updatedMentorship.mentor_id.name,
           newStatus: newStatus,
           oldStatus: mentorship.status,
-          mentorNotes: notes || mentorship.mentor_notes,
-          sessionDate: mentorship.session_date,
-          sessionTime: mentorship.session_time,
+          mentorNotes: notes || updatedMentorship.mentor_notes,
+          sessionDate: updatedMentorship.session_date,
+          sessionTime: updatedMentorship.session_time,
         }
       );
     } catch (emailError) {
@@ -887,7 +1026,7 @@ export const updateMentorshipStatus = async (req, res) => {
     res.json({
       success: true,
       message: `Mentorship ${action}d successfully`,
-      data: mentorship,
+      data: updatedMentorship,
     });
   } catch (error) {
     console.error("Error updating mentorship status:", error);

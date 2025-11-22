@@ -1,100 +1,102 @@
-// models/Event.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
-import EventRegistration from "./eventRegistration.js";
+import mongoose from "mongoose";
 
-const Event = sequelize.define(
-  "Event",
+const EventSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
     title: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
+      type: String,
+      required: true,
+      maxlength: 100,
     },
+
     description: {
-      type: DataTypes.TEXT,
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     date: {
-      type: DataTypes.DATEONLY,
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     location: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
+      type: String,
+      required: true,
+      maxlength: 100,
     },
+
     price: {
-      type: DataTypes.FLOAT.UNSIGNED,
-      allowNull: false,
-      defaultValue: 0,
+      type: Number,
+      required: true,
+      default: 0,
     },
+
     organizer: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
+      type: String,
+      required: true,
+      maxlength: 100,
     },
+
     organizerEmail: {
-      type: DataTypes.STRING(120),
-      allowNull: false,
-      validate: {
-        isEmail: true,
-      },
-      unique: false,
+      type: String,
+      required: true,
     },
+
     userType: {
-      type: DataTypes.ENUM("alumni", "student", "admin"),
-      defaultValue: "alumni",
+      type: String,
+      enum: ["alumni", "student", "admin"],
+      default: "alumni",
     },
+
     isScheduled: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      type: Boolean,
+      default: false,
     },
+
     category: {
-      type: DataTypes.ENUM(
+      type: String,
+      enum: [
         "trainig and mentorships",
         "tech",
         "cultural",
         "sports",
         "educational",
-        "special"
-      ),
-      allowNull: false,
-      defaultValue: "special",
+        "special",
+      ],
+      default: "special",
     },
+
     type: {
-      type: DataTypes.ENUM("virtual", "in-person"),
-      allowNull: false,
-      defaultValue: "in-person",
+      type: String,
+      enum: ["virtual", "in-person"],
+      default: "in-person",
     },
+
     maxAttendees: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
-      defaultValue: 30,
+      type: Number,
+      default: 30,
     },
+
     image: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
     },
+
     createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Date,
+      default: Date.now,
     },
   },
-  {
-    tableName: "events",
-    timestamps: false,
-  }
+  { timestamps: false }
 );
-import("./eventRegistration.js").then(({ default: EventRegistration }) => {
-  Event.hasMany(EventRegistration, {
-    foreignKey: "eventId",
-    as: "registrations",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  });
+
+EventSchema.virtual("registrations", {
+  ref: "EventRegistration",
+  localField: "_id",
+  foreignField: "eventId",
 });
+
+EventSchema.set("toObject", { virtuals: true });
+EventSchema.set("toJSON", { virtuals: true });
+
+const Event = mongoose.model("Event", EventSchema);
 
 export default Event;

@@ -1,59 +1,68 @@
 // models/Alumni.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
 
-const Alumni = sequelize.define(
-  "Alumni",
+import mongoose from "mongoose";
+
+const AlumniSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      //unique: true,
-      validate: { isEmail: true },
+      type: String,
+      required: true,
+      // unique: true, // keep same commented
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+    },
+    recoveryEmail: {
+      type: String,
+      required: true,
+      required: false,
+      default: null,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
     },
     phone: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      //unique: true,
-      validate: { is: /^[0-9+\-() ]+$/ },
+      type: String,
+      required: true,
+      // unique: true,
+      match: [/^[0-9+\-() ]+$/, "Invalid phone number"],
     },
-    branch: { type: DataTypes.STRING, allowNull: true },
+    branch: {
+      type: String,
+      default: null,
+    },
     password: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     isVerified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      type: Boolean,
+      default: false,
     },
     userType: {
-      type: DataTypes.ENUM("student", "alumni"),
-      defaultValue: "alumni",
-      allowNull: false,
+      type: String,
+      enum: ["student", "alumni"],
+      default: "alumni",
+      required: true,
     },
-    // models/Student.js
     profilePhoto: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     resume: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
+    },
+    resetPasswordOTP: {
+      type: String,
+      default: null,
+    },
+    resetPasswordOTPExpiry: {
+      type: Date,
+      default: null,
     },
   },
-  {
-    tableName: "alumni",
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default Alumni;
+export default mongoose.model("Alumni", AlumniSchema, "alumni");

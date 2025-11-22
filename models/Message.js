@@ -1,49 +1,50 @@
 // models/Message.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import mongoose from "mongoose";
 
-const Message = sequelize.define(
-  "Message",
+const MessageSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
     senderType: {
-      type: DataTypes.ENUM("student", "alumni"),
-      allowNull: false,
+      type: String,
+      enum: ["student", "alumni"],
+      required: true,
     },
     senderId: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
     },
     receiverType: {
-      type: DataTypes.ENUM("student", "alumni"),
-      allowNull: false,
+      type: String,
+      enum: ["student", "alumni"],
+      required: true,
     },
     receiverId: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      allowNull: false,
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
     },
     text: {
-      type: DataTypes.STRING(500),
-      allowNull: false,
+      type: String,
+      maxlength: 500,
+      required: true,
     },
     profilePhoto: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     resume: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW,
+      type: Date,
+      default: Date.now,
     },
   },
-  { tableName: "messages", timestamps: false }
+  {
+    collection: "messages",
+    timestamps: false,
+  }
 );
+
+const Message = mongoose.model("Message", MessageSchema);
 
 export default Message;

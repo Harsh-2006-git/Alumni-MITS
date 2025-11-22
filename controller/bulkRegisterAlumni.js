@@ -3,7 +3,6 @@ import multer from "multer";
 import csv from "csv-parser";
 import { Readable } from "stream";
 import bcrypt from "bcrypt";
-import sequelize from "../config/database.js";
 import AlumniProfile from "../models/AlumniProfile.js";
 import Alumni from "../models/alumni.js";
 import EmailService from "../services/NewUserEmailService.js";
@@ -130,15 +129,12 @@ const generateEducationFromBatch = (batchYear, branch) => {
 
 // Check for existing records in bulk
 const checkExistingRecords = async (emails, phones) => {
-  const existingEmails = await Alumni.findAll({
-    where: { email: emails },
-    attributes: ["email"],
-  });
+  const existingEmails = await Alumni.find({ email: { $in: emails } }, "email");
 
-  const existingPhones = await Alumni.findAll({
-    where: { phone: phones.map((phone) => sanitizePhone(phone)) },
-    attributes: ["phone"],
-  });
+  const existingPhones = await Alumni.find(
+    { phone: { $in: phones.map((phone) => sanitizePhone(phone)) } },
+    "phone"
+  );
 
   return {
     existingEmails: new Set(existingEmails.map((e) => e.email.toLowerCase())),
@@ -151,8 +147,6 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Enhanced bulk registration controller with exact education format
 const BulkRegisterAlumni = async (req, res) => {
-  let transaction;
-
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -318,27 +312,21 @@ const BulkRegisterAlumni = async (req, res) => {
         const password = `${firstName}@${randomDigits}`;
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Start transaction for this record
-        transaction = await sequelize.transaction();
-
         try {
           // Create alumni record
-          const alumni = await Alumni.create(
-            {
-              name: name.trim(),
-              email: normalizedEmail,
-              phone: sanitizedPhone,
-              branch: branch.trim(),
-              password: hashedPassword,
-              userType: "alumni",
-              isVerified: true,
-            },
-            { transaction }
-          );
+          const alumni = await Alumni.create({
+            name: name.trim(),
+            email: normalizedEmail,
+            phone: sanitizedPhone,
+            branch: branch.trim(),
+            password: hashedPassword,
+            userType: "alumni",
+            isVerified: true,
+          });
 
           // Create alumni profile with education data in EXACT format
           const alumniProfileData = {
-            alumniId: alumni.id,
+            alumniId: alumni._id,
             branch: branch.trim(),
             batch: batchYear.trim(),
             location: sanitizedLocation,
@@ -348,9 +336,7 @@ const BulkRegisterAlumni = async (req, res) => {
 
           console.log("Creating profile with exact education format");
 
-          await AlumniProfile.create(alumniProfileData, { transaction });
-
-          await transaction.commit();
+          await AlumniProfile.create(alumniProfileData);
 
           // Add to successful registrations
           successfulRegistrations.push({
@@ -396,7 +382,6 @@ const BulkRegisterAlumni = async (req, res) => {
             });
           }
         } catch (transactionError) {
-          if (transaction) await transaction.rollback();
           console.error(
             `Transaction error for row ${rowNumber}:`,
             transactionError
@@ -445,7 +430,6 @@ const BulkRegisterAlumni = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    if (transaction) await transaction.rollback();
     console.error("Bulk registration error:", error);
     res.status(500).json({
       success: false,

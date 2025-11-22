@@ -1,121 +1,96 @@
 // models/Mentor.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
-import Alumni from "./alumni.js";
-import Student from "./user.js";
+import mongoose from "mongoose";
 
-const Mentor = sequelize.define(
-  "Mentor",
+const MentorSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     alumni_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Alumni,
-        key: "id",
-      },
-      onDelete: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Alumni",
+      required: true,
     },
     name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: { isEmail: true },
+      type: String,
+      required: true,
+      match: /.+\@.+\..+/,
     },
     phone: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: { is: /^[0-9+\-() ]+$/ },
+      type: String,
+      required: true,
+      match: /^[0-9+\-() ]+$/,
     },
     batch_year: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      type: Number,
+      required: true,
     },
     branch: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
     current_position: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     company: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     linkedin_url: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: { isUrl: true },
+      type: String,
+      match: /^https?:\/\/.+/,
+      default: null,
     },
     expertise: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     topics: {
-      type: DataTypes.JSON,
-      allowNull: true,
-      defaultValue: [],
+      type: [String],
+      default: [],
     },
     availability: {
-      type: DataTypes.JSON,
-      allowNull: true,
-      defaultValue: {},
+      type: Object,
+      default: {},
     },
     fees: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-      defaultValue: 0.0,
+      type: Number,
+      default: 0.0,
     },
+
     available: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      type: Boolean,
+      default: true,
     },
     mentee_students: {
-      type: DataTypes.JSON,
-      allowNull: true,
-      defaultValue: [],
-      comment: "Array of student IDs who are mentees under this mentor",
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Student",
+      default: [],
     },
   },
   {
-    tableName: "mentors",
     timestamps: true,
   }
 );
 
-// Define associations
-Mentor.belongsTo(Alumni, {
-  foreignKey: "alumni_id",
-  as: "alumni",
+MentorSchema.virtual("alumni", {
+  ref: "Alumni",
+  localField: "alumni_id",
+  foreignField: "_id",
+  justOne: true,
 });
 
-Alumni.hasOne(Mentor, {
-  foreignKey: "alumni_id",
-  as: "mentor",
+MentorSchema.virtual("mentees", {
+  ref: "MentorStudent",
+  localField: "_id",
+  foreignField: "mentor_id",
 });
 
-// Many-to-Many relationship between Mentor and Student
-Mentor.belongsToMany(Student, {
-  through: "MentorStudent",
-  as: "mentees",
-  foreignKey: "mentor_id",
-  otherKey: "student_id",
-});
+MentorSchema.set("toObject", { virtuals: true });
+MentorSchema.set("toJSON", { virtuals: true });
 
-Student.belongsToMany(Mentor, {
-  through: "MentorStudent",
-  as: "mentors",
-  foreignKey: "student_id",
-  otherKey: "mentor_id",
-});
+const Mentor = mongoose.model("Mentor", MentorSchema);
 
 export default Mentor;

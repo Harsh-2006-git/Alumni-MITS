@@ -1,44 +1,38 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import mongoose from "mongoose";
 import Alumni from "./alumni.js"; // Your existing Alumni model
 
-const AlumniProfile = sequelize.define(
-  "AlumniProfile",
+const AlumniProfileSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
+    // Replacing INTEGER with MongoDB ObjectId reference
     alumniId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: Alumni,
-        key: "id",
-      },
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Alumni",
+      required: true,
     },
-    location: { type: DataTypes.STRING, allowNull: true },
-    branch: { type: DataTypes.STRING, allowNull: true },
-    about: { type: DataTypes.TEXT, allowNull: true },
-    skills: { type: DataTypes.JSON, allowNull: true }, // ["JavaScript", "Node.js"]
-    achievements: { type: DataTypes.JSON, allowNull: true }, // ["Won Hackathon 2024", "Published Paper"]
-    linkedin: { type: DataTypes.STRING, allowNull: true },
-    github: { type: DataTypes.STRING, allowNull: true },
-    twitter: { type: DataTypes.STRING, allowNull: true },
-    portfolio: { type: DataTypes.STRING, allowNull: true },
+
+    location: { type: String, default: null },
+    branch: { type: String, default: null },
+    about: { type: String, default: null },
+
+    // Same JSON structure
+    skills: { type: Array, default: null }, // ["JavaScript", "Node.js"]
+    achievements: { type: Array, default: null }, // ["Won Hackathon 2024", "Published Paper"]
+
+    linkedin: { type: String, default: null },
+    github: { type: String, default: null },
+    twitter: { type: String, default: null },
+    portfolio: { type: String, default: null },
+
     batch: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
       // Example: "2024-2028"
     },
 
     // Multiple education entries
     education: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array,
+      default: null,
       // Example:
       // [
       //   { type: "Bachelor", stream: "CS", institution: "MIT", from: "2015-08-01", to: "2019-05-30", gpa: "9.2" },
@@ -48,32 +42,37 @@ const AlumniProfile = sequelize.define(
 
     // Multiple experience entries
     experience: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array,
+      default: null,
       // Example:
       // [
       //   { designation: "Software Engineer", company: "Google", from: "2020-01-01", to: "2022-06-30", current: false, location: "NY", description: "Worked on X" },
       //   { designation: "Senior Engineer", company: "Meta", from: "2022-07-01", to: null, current: true, location: "CA", description: "Leading Y project" }
       // ]
     },
+
     // models/Student.js
     profilePhoto: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
     resume: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
   },
   {
-    tableName: "alumni_profiles",
     timestamps: true,
+    collection: "alumni_profiles",
   }
 );
 
-// Associations
-AlumniProfile.belongsTo(Alumni, { foreignKey: "alumniId", as: "alumni" });
-Alumni.hasOne(AlumniProfile, { foreignKey: "alumniId", as: "profile" });
+// Associations (Mongo version of belongsTo / hasOne)
+AlumniProfileSchema.virtual("alumni", {
+  ref: "Alumni",
+  localField: "alumniId",
+  foreignField: "_id",
+  justOne: true,
+});
 
-export default AlumniProfile;
+export default mongoose.model("AlumniProfile", AlumniProfileSchema);

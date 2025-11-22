@@ -1,100 +1,109 @@
-// models/Campaign.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import mongoose from "mongoose";
 
-const Campaign = sequelize.define(
-  "Campaign",
+const CampaignSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     campaignTitle: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     categories: {
-      type: DataTypes.ENUM(
+      type: String,
+      enum: [
         "startup",
         "research",
         "innovation",
         "infrastructure",
         "scholarship",
         "community",
-        "other"
-      ),
-      allowNull: false,
+        "other",
+      ],
+      required: true,
     },
+
     tagline: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      default: null,
     },
+
     detailedDescription: {
-      type: DataTypes.TEXT,
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     startDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
+      type: Date,
+      required: true,
     },
+
     endDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
+      type: Date,
+      required: true,
     },
+
     totalAmount: {
-      type: DataTypes.DECIMAL(15, 2),
-      allowNull: false,
+      type: Number,
+      required: true,
     },
+
     currentAmount: {
-      type: DataTypes.DECIMAL(15, 2),
-      defaultValue: 0,
-      allowNull: false,
+      type: Number,
+      default: 0,
+      required: true,
     },
+
     projectLink: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: { isUrl: true },
+      type: String,
+      default: null,
+      match: [/^https?:\/\/.+/, "Invalid URL"],
     },
+
     github: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: { isUrl: true },
+      type: String,
+      default: null,
+      match: [/^https?:\/\/.+/, "Invalid URL"],
     },
+
     images: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array,
+      default: null,
     },
+
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: { isEmail: true },
+      type: String,
+      required: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email"],
     },
+
     contact: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: { is: /^[0-9+\-() ]+$/ },
+      type: String,
+      required: true,
+      match: [/^[0-9+\-() ]+$/, "Invalid phone"],
     },
+
     userType: {
-      type: DataTypes.ENUM("student", "alumni", "college", "admin"),
-      defaultValue: "alumni",
-      allowNull: false,
+      type: String,
+      enum: ["student", "alumni", "college", "admin"],
+      default: "alumni",
+      required: true,
     },
+
     isApproved: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
+      type: Boolean,
+      default: false,
+      required: true,
     },
+
     isCompleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      allowNull: false,
+      type: Boolean,
+      default: false,
+      required: true,
     },
   },
   {
-    tableName: "campaigns",
     timestamps: true,
+    collection: "campaigns",
   }
 );
 
-export default Campaign;
+export default mongoose.model("Campaign", CampaignSchema);

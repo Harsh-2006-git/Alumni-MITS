@@ -245,7 +245,7 @@ class MentorshipEmailService {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
-        
+
         .header { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 50%, #1a237e 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
         .header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; z-index: 0; }
         .header::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; z-index: 0; }
@@ -254,37 +254,37 @@ class MentorshipEmailService {
         .college-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 1; }
         .welcome-title { color: white; font-size: 22px; font-weight: 700; margin: 20px 0 10px 0; position: relative; z-index: 1; letter-spacing: 0.5px; }
         .welcome-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 16px; position: relative; z-index: 1; }
-        
+
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
         .greeting { font-size: 26px; color: #0d47a1; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
-        
+
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
         .details-title { font-size: 20px; color: #2e7d32; margin-bottom: 20px; text-align: center; font-weight: 700; }
         .detail-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #4caf50; }
         .detail-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         .detail-value { color: #455a64; font-size: 15px; display: block; font-weight: 500; }
-        
+
         .message-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e1f5fe 100%); padding: 30px 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #1565c0; }
         .message-title { font-size: 18px; color: #0d47a1; margin-bottom: 22px; text-align: center; font-weight: 700; }
         .message-content { background: white; padding: 20px; border-radius: 8px; font-style: italic; color: #455a64; line-height: 1.6; }
-        
+
         .action-section { background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%); padding: 20px; border-radius: 12px; margin: 25px 0; border: 2px solid #ffa000; }
         .action-title { font-size: 16px; color: #ef6c00; margin-bottom: 12px; text-align: center; font-weight: 700; }
         .action-item { color: #5d4037; font-size: 13px; line-height: 1.5; margin-bottom: 8px; padding-left: 15px; position: relative; }
         .action-item::before { content: '•'; position: absolute; left: 0; color: #ef6c00; font-weight: bold; }
-        
+
         .help-section { text-align: center; padding: 28px 25px; background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); border-radius: 12px; margin: 30px 0; border-top: 3px solid #42a5f5; }
         .help-title { font-size: 17px; color: #0d47a1; margin-bottom: 12px; font-weight: 700; }
         .help-text { color: #455a64; font-size: 14px; margin-bottom: 10px; font-weight: 500; }
         .contact-email { color: #1565c0; font-weight: 700; text-decoration: none; border-bottom: 2px solid #1565c0; }
-        
+
         .footer { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 28px 20px; text-align: center; }
         .footer-text { font-size: 12px; line-height: 1.7; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
         .footer-text:last-child { margin-bottom: 0; opacity: 0.7; font-size: 11px; }
-        
+
         @media (max-width: 480px) {
             body { padding: 5px; }
             .header { padding: 30px 15px; }
@@ -303,7 +303,7 @@ class MentorshipEmailService {
           "New Mentorship Request",
           "You have received a new mentorship request"
         )}
-        
+
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">🎯</div>
@@ -372,14 +372,14 @@ class MentorshipEmailService {
                 <div class="action-item">Communicate any schedule changes to the student</div>
                 <div class="action-item">Provide constructive feedback if declining the request</div>
             </div>
-            
+
             <div class="help-section">
                 <div class="help-title">❓ Need Assistance?</div>
                 <div class="help-text">Contact our mentorship coordination team</div>
                 <div class="help-text">Email: <a href="mailto:mentorship@mitsgwalior.in" class="contact-email">mentorship@mitsgwalior.in</a></div>
             </div>
         </div>
-        
+
         ${this.generateFooter("Mentorship")}
     </div>
 </body>
@@ -417,7 +417,7 @@ class MentorshipEmailService {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
-        
+
         .header { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 50%, #1a237e 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
         .header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; z-index: 0; }
         .header::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; z-index: 0; }
@@ -426,37 +426,37 @@ class MentorshipEmailService {
         .college-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 1; }
         .welcome-title { color: white; font-size: 22px; font-weight: 700; margin: 20px 0 10px 0; position: relative; z-index: 1; letter-spacing: 0.5px; }
         .welcome-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 16px; position: relative; z-index: 1; }
-        
+
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
         .greeting { font-size: 26px; color: #0d47a1; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
-        
+
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
         .details-title { font-size: 20px; color: #2e7d32; margin-bottom: 20px; text-align: center; font-weight: 700; }
         .detail-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #4caf50; }
         .detail-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         .detail-value { color: #455a64; font-size: 15px; display: block; font-weight: 500; }
-        
+
         .message-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e1f5fe 100%); padding: 30px 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #1565c0; }
         .message-title { font-size: 18px; color: #0d47a1; margin-bottom: 22px; text-align: center; font-weight: 700; }
         .message-content { background: white; padding: 20px; border-radius: 8px; font-style: italic; color: #455a64; line-height: 1.6; }
-        
+
         .instructions-section { background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%); padding: 20px; border-radius: 12px; margin: 25px 0; border: 2px solid #ffa000; }
         .instructions-title { font-size: 16px; color: #ef6c00; margin-bottom: 12px; text-align: center; font-weight: 700; }
         .instruction-item { color: #5d4037; font-size: 13px; line-height: 1.5; margin-bottom: 8px; padding-left: 15px; position: relative; }
         .instruction-item::before { content: '•'; position: absolute; left: 0; color: #ef6c00; font-weight: bold; }
-        
+
         .help-section { text-align: center; padding: 28px 25px; background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); border-radius: 12px; margin: 30px 0; border-top: 3px solid #42a5f5; }
         .help-title { font-size: 17px; color: #0d47a1; margin-bottom: 12px; font-weight: 700; }
         .help-text { color: #455a64; font-size: 14px; margin-bottom: 10px; font-weight: 500; }
         .contact-email { color: #1565c0; font-weight: 700; text-decoration: none; border-bottom: 2px solid #1565c0; }
-        
+
         .footer { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 28px 20px; text-align: center; }
         .footer-text { font-size: 12px; line-height: 1.7; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
         .footer-text:last-child { margin-bottom: 0; opacity: 0.7; font-size: 11px; }
-        
+
         @media (max-width: 480px) {
             body { padding: 5px; }
             .header { padding: 30px 15px; }
@@ -475,7 +475,7 @@ class MentorshipEmailService {
           "Mentorship Request Sent",
           "Your request has been successfully submitted"
         )}
-        
+
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">✅</div>
@@ -541,14 +541,14 @@ class MentorshipEmailService {
                 <div class="instruction-item">Prepare any questions or topics you'd like to discuss</div>
                 <div class="instruction-item">Keep your schedule flexible for the proposed session time</div>
             </div>
-            
+
             <div class="help-section">
                 <div class="help-title">❓ Need Assistance?</div>
                 <div class="help-text">Contact our mentorship coordination team</div>
                 <div class="help-text">Email: <a href="mailto:mentorship@mitsgwalior.in" class="contact-email">mentorship@mitsgwalior.in</a></div>
             </div>
         </div>
-        
+
         ${this.generateFooter("Mentorship")}
     </div>
 </body>
@@ -595,7 +595,7 @@ class MentorshipEmailService {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
-        
+
         .header { background: linear-gradient(135deg, ${
           statusColors[newStatus]
         } 0%, ${statusColors[newStatus]}dd 50%, ${
@@ -608,7 +608,7 @@ class MentorshipEmailService {
         .college-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 1; }
         .welcome-title { color: white; font-size: 22px; font-weight: 700; margin: 20px 0 10px 0; position: relative; z-index: 1; letter-spacing: 0.5px; }
         .welcome-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 16px; position: relative; z-index: 1; }
-        
+
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
@@ -616,29 +616,29 @@ class MentorshipEmailService {
           statusColors[newStatus]
         }; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
-        
+
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
         .details-title { font-size: 20px; color: #2e7d32; margin-bottom: 20px; text-align: center; font-weight: 700; }
         .detail-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #4caf50; }
         .detail-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         .detail-value { color: #455a64; font-size: 15px; display: block; font-weight: 500; }
-        
+
         .status-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e1f5fe 100%); padding: 30px 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #1565c0; }
         .status-title { font-size: 18px; color: #0d47a1; margin-bottom: 22px; text-align: center; font-weight: 700; }
         .status-content { background: white; padding: 20px; border-radius: 8px; }
         .status-item { margin-bottom: 15px; }
         .status-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 5px; }
         .status-value { color: #455a64; }
-        
+
         .help-section { text-align: center; padding: 28px 25px; background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); border-radius: 12px; margin: 30px 0; border-top: 3px solid #42a5f5; }
         .help-title { font-size: 17px; color: #0d47a1; margin-bottom: 12px; font-weight: 700; }
         .help-text { color: #455a64; font-size: 14px; margin-bottom: 10px; font-weight: 500; }
         .contact-email { color: #1565c0; font-weight: 700; text-decoration: none; border-bottom: 2px solid #1565c0; }
-        
+
         .footer { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 28px 20px; text-align: center; }
         .footer-text { font-size: 12px; line-height: 1.7; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
         .footer-text:last-child { margin-bottom: 0; opacity: 0.7; font-size: 11px; }
-        
+
         @media (max-width: 480px) {
             body { padding: 5px; }
             .header { padding: 30px 15px; }
@@ -657,7 +657,7 @@ class MentorshipEmailService {
           statusMessages[newStatus],
           `You ${newStatus} a mentorship request`
         )}
-        
+
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">${statusIcons[newStatus]}</div>
@@ -737,14 +737,14 @@ class MentorshipEmailService {
                     }
                 </div>
             </div>
-            
+
             <div class="help-section">
                 <div class="help-title">❓ Need Assistance?</div>
                 <div class="help-text">Contact our mentorship coordination team</div>
                 <div class="help-text">Email: <a href="mailto:mentorship@mitsgwalior.in" class="contact-email">mentorship@mitsgwalior.in</a></div>
             </div>
         </div>
-        
+
         ${this.generateFooter("Mentorship")}
     </div>
 </body>
@@ -791,7 +791,7 @@ class MentorshipEmailService {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
-        
+
         .header { background: linear-gradient(135deg, ${
           statusColors[newStatus]
         } 0%, ${statusColors[newStatus]}dd 50%, ${
@@ -804,7 +804,7 @@ class MentorshipEmailService {
         .college-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 1; }
         .welcome-title { color: white; font-size: 22px; font-weight: 700; margin: 20px 0 10px 0; position: relative; z-index: 1; letter-spacing: 0.5px; }
         .welcome-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 16px; position: relative; z-index: 1; }
-        
+
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
@@ -812,34 +812,34 @@ class MentorshipEmailService {
           statusColors[newStatus]
         }; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
-        
+
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
         .details-title { font-size: 20px; color: #2e7d32; margin-bottom: 20px; text-align: center; font-weight: 700; }
         .detail-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #4caf50; }
         .detail-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         .detail-value { color: #455a64; font-size: 15px; display: block; font-weight: 500; }
-        
+
         .status-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e1f5fe 100%); padding: 30px 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #1565c0; }
         .status-title { font-size: 18px; color: #0d47a1; margin-bottom: 22px; text-align: center; font-weight: 700; }
         .status-content { background: white; padding: 20px; border-radius: 8px; }
         .status-item { margin-bottom: 15px; }
         .status-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 5px; }
         .status-value { color: #455a64; }
-        
+
         .next-steps-section { background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%); padding: 20px; border-radius: 12px; margin: 25px 0; border: 2px solid #ffa000; }
         .next-steps-title { font-size: 16px; color: #ef6c00; margin-bottom: 12px; text-align: center; font-weight: 700; }
         .next-steps-item { color: #5d4037; font-size: 13px; line-height: 1.5; margin-bottom: 8px; padding-left: 15px; position: relative; }
         .next-steps-item::before { content: '•'; position: absolute; left: 0; color: #ef6c00; font-weight: bold; }
-        
+
         .help-section { text-align: center; padding: 28px 25px; background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); border-radius: 12px; margin: 30px 0; border-top: 3px solid #42a5f5; }
         .help-title { font-size: 17px; color: #0d47a1; margin-bottom: 12px; font-weight: 700; }
         .help-text { color: #455a64; font-size: 14px; margin-bottom: 10px; font-weight: 500; }
         .contact-email { color: #1565c0; font-weight: 700; text-decoration: none; border-bottom: 2px solid #1565c0; }
-        
+
         .footer { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 28px 20px; text-align: center; }
         .footer-text { font-size: 12px; line-height: 1.7; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
         .footer-text:last-child { margin-bottom: 0; opacity: 0.7; font-size: 11px; }
-        
+
         @media (max-width: 480px) {
             body { padding: 5px; }
             .header { padding: 30px 15px; }
@@ -858,7 +858,7 @@ class MentorshipEmailService {
           statusMessages[newStatus],
           `${mentorName} has ${newStatus} your request`
         )}
-        
+
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">${statusIcons[newStatus]}</div>
@@ -963,14 +963,14 @@ class MentorshipEmailService {
             `
                 : ""
             }
-            
+
             <div class="help-section">
                 <div class="help-title">❓ Need Assistance?</div>
                 <div class="help-text">Contact our mentorship coordination team</div>
                 <div class="help-text">Email: <a href="mailto:mentorship@mitsgwalior.in" class="contact-email">mentorship@mitsgwalior.in</a></div>
             </div>
         </div>
-        
+
         ${this.generateFooter("Mentorship")}
     </div>
 </body>
@@ -1001,7 +1001,7 @@ class MentorshipEmailService {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
-        
+
         .header { background: linear-gradient(135deg, #FF9800 0%, #F57C00 50%, #EF6C00 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
         .header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; z-index: 0; }
         .header::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; z-index: 0; }
@@ -1010,35 +1010,35 @@ class MentorshipEmailService {
         .college-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 1; }
         .welcome-title { color: white; font-size: 22px; font-weight: 700; margin: 20px 0 10px 0; position: relative; z-index: 1; letter-spacing: 0.5px; }
         .welcome-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 16px; position: relative; z-index: 1; }
-        
+
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
         .greeting { font-size: 26px; color: #F57C00; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
-        
+
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
         .details-title { font-size: 20px; color: #2e7d32; margin-bottom: 20px; text-align: center; font-weight: 700; }
         .detail-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #4caf50; }
         .detail-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         .detail-value { color: #455a64; font-size: 15px; display: block; font-weight: 500; }
-        
+
         .update-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e1f5fe 100%); padding: 30px 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #1565c0; }
         .update-title { font-size: 18px; color: #0d47a1; margin-bottom: 22px; text-align: center; font-weight: 700; }
         .update-content { background: white; padding: 20px; border-radius: 8px; }
         .update-item { margin-bottom: 15px; }
         .update-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 5px; }
         .update-value { color: #455a64; }
-        
+
         .help-section { text-align: center; padding: 28px 25px; background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); border-radius: 12px; margin: 30px 0; border-top: 3px solid #42a5f5; }
         .help-title { font-size: 17px; color: #0d47a1; margin-bottom: 12px; font-weight: 700; }
         .help-text { color: #455a64; font-size: 14px; margin-bottom: 10px; font-weight: 500; }
         .contact-email { color: #1565c0; font-weight: 700; text-decoration: none; border-bottom: 2px solid #1565c0; }
-        
+
         .footer { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 28px 20px; text-align: center; }
         .footer-text { font-size: 12px; line-height: 1.7; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
         .footer-text:last-child { margin-bottom: 0; opacity: 0.7; font-size: 11px; }
-        
+
         @media (max-width: 480px) {
             body { padding: 5px; }
             .header { padding: 30px 15px; }
@@ -1057,7 +1057,7 @@ class MentorshipEmailService {
           "Mentorship Session Updated",
           "Session details have been modified"
         )}
-        
+
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">📝</div>
@@ -1103,14 +1103,14 @@ class MentorshipEmailService {
                     </div>
                 </div>
             </div>
-            
+
             <div class="help-section">
                 <div class="help-title">❓ Need Assistance?</div>
                 <div class="help-text">Contact our mentorship coordination team</div>
                 <div class="help-text">Email: <a href="mailto:mentorship@mitsgwalior.in" class="contact-email">mentorship@mitsgwalior.in</a></div>
             </div>
         </div>
-        
+
         ${this.generateFooter("Mentorship")}
     </div>
 </body>
@@ -1141,7 +1141,7 @@ class MentorshipEmailService {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
-        
+
         .header { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 50%, #6A1B9A 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
         .header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; z-index: 0; }
         .header::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; z-index: 0; }
@@ -1150,40 +1150,40 @@ class MentorshipEmailService {
         .college-name { color: white; font-size: 18px; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 1; }
         .welcome-title { color: white; font-size: 22px; font-weight: 700; margin: 20px 0 10px 0; position: relative; z-index: 1; letter-spacing: 0.5px; }
         .welcome-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 16px; position: relative; z-index: 1; }
-        
+
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
         .greeting { font-size: 26px; color: #7B1FA2; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
-        
+
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
         .details-title { font-size: 20px; color: #2e7d32; margin-bottom: 20px; text-align: center; font-weight: 700; }
         .detail-item { background: white; padding: 15px; margin-bottom: 12px; border-radius: 8px; border-left: 4px solid #4caf50; }
         .detail-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; }
         .detail-value { color: #455a64; font-size: 15px; display: block; font-weight: 500; }
-        
+
         .update-section { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #e1f5fe 100%); padding: 30px 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #1565c0; }
         .update-title { font-size: 18px; color: #0d47a1; margin-bottom: 22px; text-align: center; font-weight: 700; }
         .update-content { background: white; padding: 20px; border-radius: 8px; }
         .update-item { margin-bottom: 15px; }
         .update-label { font-weight: 700; color: #1565c0; display: block; margin-bottom: 5px; }
         .update-value { color: #455a64; }
-        
+
         .instructions-section { background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%); padding: 20px; border-radius: 12px; margin: 25px 0; border: 2px solid #ffa000; }
         .instructions-title { font-size: 16px; color: #ef6c00; margin-bottom: 12px; text-align: center; font-weight: 700; }
         .instruction-item { color: #5d4037; font-size: 13px; line-height: 1.5; margin-bottom: 8px; padding-left: 15px; position: relative; }
         .instruction-item::before { content: '•'; position: absolute; left: 0; color: #ef6c00; font-weight: bold; }
-        
+
         .help-section { text-align: center; padding: 28px 25px; background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%); border-radius: 12px; margin: 30px 0; border-top: 3px solid #42a5f5; }
         .help-title { font-size: 17px; color: #0d47a1; margin-bottom: 12px; font-weight: 700; }
         .help-text { color: #455a64; font-size: 14px; margin-bottom: 10px; font-weight: 500; }
         .contact-email { color: #1565c0; font-weight: 700; text-decoration: none; border-bottom: 2px solid #1565c0; }
-        
+
         .footer { background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%); color: white; padding: 28px 20px; text-align: center; }
         .footer-text { font-size: 12px; line-height: 1.7; opacity: 0.9; margin-bottom: 6px; font-weight: 500; }
         .footer-text:last-child { margin-bottom: 0; opacity: 0.7; font-size: 11px; }
-        
+
         @media (max-width: 480px) {
             body { padding: 5px; }
             .header { padding: 30px 15px; }
@@ -1202,7 +1202,7 @@ class MentorshipEmailService {
           "Mentorship Session Updated",
           `${mentorName} has updated your session details`
         )}
-        
+
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">✏️</div>
@@ -1269,14 +1269,14 @@ class MentorshipEmailService {
                 <div class="instruction-item">Join the session 5 minutes before the scheduled time</div>
                 <div class="instruction-item">Keep your college ID ready for verification</div>
             </div>
-            
+
             <div class="help-section">
                 <div class="help-title">❓ Need Assistance?</div>
                 <div class="help-text">Contact our mentorship coordination team</div>
                 <div class="help-text">Email: <a href="mailto:mentorship@mitsgwalior.in" class="contact-email">mentorship@mitsgwalior.in</a></div>
             </div>
         </div>
-        
+
         ${this.generateFooter("Mentorship")}
     </div>
 </body>

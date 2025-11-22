@@ -1,85 +1,89 @@
-// models/Project.js
-import { DataTypes } from "sequelize";
-import sequelize from "../config/database.js";
+import mongoose from "mongoose";
 
-const Project = sequelize.define(
-  "Project",
+const ProjectSchema = new mongoose.Schema(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     title: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     shortDesc: {
-      type: DataTypes.TEXT,
-      allowNull: false,
+      type: String,
+      required: true,
     },
+
     detailedDesc: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      type: String,
     },
+
     techStack: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array,
+      default: [],
     },
+
     category: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
     },
+
     lookingForContributors: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+      type: Boolean,
+      default: true,
     },
+
     contributorsNeeded: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1,
+      type: Number,
+      default: 1,
     },
+
     roles: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array, // example: ["Frontend", "Backend", "UI/UX"]
+      default: [],
     },
+
     repoLink: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
     },
+
     contactLink: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
     },
+
     visibility: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      enum: ["public", "private"],
+      default: "public",
     },
+
     tags: {
-      type: DataTypes.JSON,
-      allowNull: true,
+      type: Array,
+      default: [],
     },
+
     thumbnail: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
     },
+
     guidelines: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      type: String,
     },
+
     email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: { isEmail: true },
+      type: String,
+      required: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email"],
     },
+
     userType: {
-      type: DataTypes.STRING,
-      allowNull: true,
+      type: String,
+      enum: ["student", "alumni", "admin"],
+    },
+
+    createdByUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student", // or "Alumni"
     },
   },
-  {
-    tableName: "projects",
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export default Project;
+export default mongoose.model("Project", ProjectSchema);

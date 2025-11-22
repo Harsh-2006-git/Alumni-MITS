@@ -91,9 +91,7 @@ export const createProject = async (req, res) => {
 // Get all projects
 export const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.findAll({
-      order: [["createdAt", "DESC"]],
-    });
+    const projects = await Project.find().sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -113,7 +111,7 @@ export const getAllProjects = async (req, res) => {
 export const getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
-    const project = await Project.findByPk(id);
+    const project = await Project.findById(id);
 
     if (!project) {
       return res.status(404).json({
@@ -160,7 +158,7 @@ export const updateProject = async (req, res) => {
       guidelines,
     } = req.body;
 
-    const project = await Project.findByPk(id);
+    const project = await Project.findById(id);
 
     if (!project) {
       return res.status(404).json({
@@ -178,27 +176,31 @@ export const updateProject = async (req, res) => {
     }
 
     // Update project with all fields (except email and userType which remain from original)
-    await project.update({
-      title,
-      shortDesc,
-      detailedDesc,
-      techStack,
-      category,
-      lookingForContributors,
-      contributorsNeeded,
-      roles,
-      repoLink,
-      contactLink,
-      visibility,
-      tags,
-      thumbnail,
-      guidelines,
-    });
+    const updatedProject = await Project.findByIdAndUpdate(
+      id,
+      {
+        title,
+        shortDesc,
+        detailedDesc,
+        techStack,
+        category,
+        lookingForContributors,
+        contributorsNeeded,
+        roles,
+        repoLink,
+        contactLink,
+        visibility,
+        tags,
+        thumbnail,
+        guidelines,
+      },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,
       message: "Project updated successfully",
-      data: project,
+      data: updatedProject,
     });
   } catch (error) {
     console.error("Error updating project:", error);
@@ -216,7 +218,7 @@ export const deleteProject = async (req, res) => {
     const { id } = req.params;
     const { email } = req.user; // Get email from token for authorization
 
-    const project = await Project.findByPk(id);
+    const project = await Project.findById(id);
 
     if (!project) {
       return res.status(404).json({
@@ -233,7 +235,7 @@ export const deleteProject = async (req, res) => {
       });
     }
 
-    await project.destroy();
+    await Project.findByIdAndDelete(id);
 
     res.status(200).json({
       success: true,
@@ -254,10 +256,10 @@ export const getMyProjects = async (req, res) => {
   try {
     const { email, userType } = req.user;
 
-    const projects = await Project.findAll({
-      where: { email, userType },
-      order: [["createdAt", "DESC"]],
-    });
+    const projects = await Project.find({
+      email,
+      userType,
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -276,12 +278,9 @@ export const getMyProjects = async (req, res) => {
 // Get projects looking for contributors
 export const getProjectsNeedingContributors = async (req, res) => {
   try {
-    const projects = await Project.findAll({
-      where: {
-        lookingForContributors: true,
-      },
-      order: [["createdAt", "DESC"]],
-    });
+    const projects = await Project.find({
+      lookingForContributors: true,
+    }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,

@@ -1,7 +1,12 @@
 import * as dotenv from "dotenv";
-import express, { json, response } from "express";
-import { connectDB, sequelize } from "./config/database.js";
+import express from "express";
+import helmet from "helmet";
+import cors from "cors";
+import path from "path";
 import errorHandler from "./middlewares/errorHandler.js";
+import connectDB from "./config/database.js"; // ✅ MongoDB connection
+
+// ✅ Import Routes
 import authRoute from "./routes/AuthRoutes.js";
 import messageRoute from "./routes/messageRoute.js";
 import AlumniRoute from "./routes/alumniRoutes.js";
@@ -9,20 +14,18 @@ import JobRoute from "./routes/JobRoutes.js";
 import eventRoutes from "./routes/eventRoutes.js";
 import campaignRoutes from "./routes/campaignRoutes.js";
 import ProjectRoute from "./routes/projectRoutes.js";
-import JobScheduler from "./services/jobScheduler.js";
 import autoJobRoutes from "./routes/autoJobRoutes.js";
 import MentorRoutes from "./routes/mentorRoutes.js";
 
-import helmet from "helmet";
-import cors from "cors";
-import path from "path";
+import JobScheduler from "./services/jobScheduler.js";
 
+// Load ENV
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS configuration - FIX 1: Specify exact origins
+// ✅ CORS
 app.use(
   cors({
     origin: [
@@ -30,7 +33,7 @@ app.use(
       "http://127.0.0.1:5500",
       "http://localhost:5173",
       "https://alumni-mits.vercel.app",
-    ], // Add your frontend URLs
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
@@ -43,20 +46,21 @@ app.use(
   })
 );
 
-// Middleware - FIX 2: Correct order
-app.use(json());
+// ✅ Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Move this up before routes
+app.use(express.urlencoded({ extended: true }));
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }, // FIX 3: Allow cross-origin resources
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
 
-// Routes
+// ✅ Home Route
 app.get("/", (req, res) => {
-  res.send("Alumni MITS Backed is running...");
+  res.send("✅ Alumni MITS Backend is running with MongoDB!");
 });
+
+// ✅ API Routes
 app.use("/auth", authRoute);
 app.use("/message", messageRoute);
 app.use("/alumni", AlumniRoute);
@@ -65,13 +69,11 @@ app.use("/event", eventRoutes);
 app.use("/campaign", campaignRoutes);
 app.use("/project", ProjectRoute);
 app.use("/mentor", MentorRoutes);
+app.use("/api/jobs", JobRoute);
+app.use("/api/auto-jobs", autoJobRoutes);
+
 // Start the automated scheduler
 JobScheduler.start();
-
-// Routes
-app.use("/api/jobs", JobRoute);
-app.use("/api/auto-jobs", autoJobRoutes); // For manual triggers
-
 // Graceful shutdown
 process.on("SIGTERM", () => {
   console.log("SIGTERM received, shutting down gracefully...");
@@ -84,27 +86,21 @@ process.on("SIGINT", () => {
   JobScheduler.stop();
   process.exit(0);
 });
-
-// Error handling middleware (should be last)
+// ✅ Global Error Handler
 app.use(errorHandler);
 
-// Clean server startup
+// ✅ Start Server
 const startServer = async () => {
   try {
     console.log("🔄 Starting server...");
 
-    // Connect to database
+    // ✅ Connect to MongoDB
     await connectDB();
-    //await seed();
 
-    // Sync database
-    await sequelize.sync({ alter: true });
-    //await sequelize.sync({ force: true });
-
-    // Start server
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
-      console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+      console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+      console.log("✅ MongoDB Connected");
+      console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
     });
   } catch (error) {
     console.error("❌ Failed to start server:", error.message);
