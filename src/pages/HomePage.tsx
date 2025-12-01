@@ -925,7 +925,7 @@ export default function AlumniHomePage({
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-8">
           {[
             {
               icon: Briefcase,
@@ -950,9 +950,9 @@ export default function AlumniHomePage({
               title: "Mentorship",
               description:
                 "Get guidance from experienced professionals in your field of interest.",
-              color: "from-white-500 to-emerald-500",
+              color: "from-green-500 to-emerald-500",
               image:
-                "https://www.cecmohali.org/public/images/pages/alumni/Connectivity%20Banner01.jpg",
+                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
             },
           ].map((item, idx) => (
             <motion.div
@@ -961,29 +961,31 @@ export default function AlumniHomePage({
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.6, delay: idx * 0.2 }}
               whileHover={{ scale: 1.05, y: -10 }}
-              className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${
+              className={`p-6 pt-8 rounded-2xl border transition-all hover:shadow-2xl overflow-hidden ${
                 isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200 shadow-lg"
               }`}
             >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                className="relative h-40 rounded-xl mb-4 overflow-hidden"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative mb-10">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="relative h-40 rounded-xl overflow-hidden"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-20`}
+                  ></div>
+                </motion.div>
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-20`}
-                ></div>
-              </motion.div>
-              <div
-                className={`w-14 h-14 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-4 shadow-lg -mt-12 relative z-10 mx-auto`}
-              >
-                <item.icon className="w-7 h-7 text-white" />
+                  className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg z-10`}
+                >
+                  <item.icon className="w-7 h-7 text-white" />
+                </div>
               </div>
               <h3
                 className={`text-xl font-bold mb-3 text-center ${

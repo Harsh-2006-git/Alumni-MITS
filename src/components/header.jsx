@@ -10,7 +10,6 @@ import {
   MessageCircle,
   ChevronDown,
 } from "lucide-react";
-import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
@@ -356,7 +355,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
       if (
         alumniDropdownRef.current &&
         !alumniDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
+        window.innerWidth >= 1250
       ) {
         setShowAlumniDropdown(false);
       }
@@ -364,7 +363,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
       if (
         eventsDropdownRef.current &&
         !eventsDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
+        window.innerWidth >= 1250
       ) {
         setShowEventsDropdown(false);
       }
@@ -372,7 +371,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
       if (
         jobsDropdownRef.current &&
         !jobsDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
+        window.innerWidth >= 1250
       ) {
         setShowJobsDropdown(false);
       }
@@ -380,7 +379,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
       if (
         campaignDropdownRef.current &&
         !campaignDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
+        window.innerWidth >= 1250
       ) {
         setShowCampaignDropdown(false);
       }
@@ -388,7 +387,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
       if (
         mentorDropdownRef.current &&
         !mentorDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768
+        window.innerWidth >= 1250
       ) {
         setShowMentorDropdown(false);
       }
@@ -401,11 +400,11 @@ export default function Header({ isDarkMode, toggleTheme }) {
       ) {
         setIsMenuOpen(false);
       }
-      // Update click outside handler for about dropdown - FIX THIS LINE
+      // Update click outside handler for about dropdown
       if (
         aboutDropdownRef.current &&
         !aboutDropdownRef.current.contains(event.target) &&
-        window.innerWidth >= 768 // ✅ Changed from windowWidth to window.innerWidth
+        window.innerWidth >= 1250
       ) {
         setShowAboutDropdown(false);
       }
@@ -442,7 +441,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
             : "bg-white/80 border-blue-200"
         }`}
       >
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
+        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex items-center justify-between h-16">
             <div
               className="flex items-center gap-3 cursor-pointer flex-shrink-0"
@@ -473,7 +472,8 @@ export default function Header({ isDarkMode, toggleTheme }) {
               </div>
             </div>
 
-            <nav className="hidden md:flex items-center justify-center flex-1 mx-4 gap-1 lg:gap-2 xl:gap-3">
+            {/* Desktop Navigation - Hidden below 1250px */}
+            <nav className="hidden xl:flex items-center justify-center flex-1 mx-4 gap-2 lg:gap-3">
               <button
                 onClick={() => handleNavClick("/")}
                 className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
@@ -868,10 +868,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
               {/* Messages Button - Only for authenticated users */}
               {auth && (
                 <>
-                  {/* Desktop Messages Button */}
+                  {/* Desktop Messages Button - Hidden below 1250px */}
                   <button
                     onClick={handleMessages}
-                    className={`hidden md:flex items-center gap-2 p-2 rounded-lg transition-all duration-300 ${
+                    className={`hidden xl:flex items-center gap-2 p-2 rounded-lg transition-all duration-300 ${
                       isDarkMode
                         ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
                         : "bg-blue-100 hover:bg-blue-200 text-blue-600"
@@ -881,10 +881,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                     <span className="text-sm font-medium">Messages</span>
                   </button>
 
-                  {/* Mobile Messages Button */}
+                  {/* Mobile Messages Button - Show below 1250px */}
                   <button
                     onClick={handleMessages}
-                    className={`md:hidden p-2 rounded-lg transition-all duration-300 ${
+                    className={`xl:hidden p-2 rounded-lg transition-all duration-300 ${
                       isDarkMode
                         ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
                         : "bg-blue-100 hover:bg-blue-200 text-blue-600"
@@ -906,7 +906,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                     }`}
                   >
                     <User className="w-5 h-5" />
-                    <span className="hidden md:inline text-sm font-medium">
+                    <span className="hidden xl:inline text-sm font-medium">
                       Profile
                     </span>
                   </button>
@@ -994,7 +994,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                         </button>
                         <button
                           onClick={handleMessages}
-                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer md:hidden ${
+                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer xl:hidden ${
                             isDarkMode
                               ? "text-gray-300 hover:bg-gray-700 hover:text-white"
                               : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
@@ -1022,7 +1022,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
               ) : (
                 <button
                   onClick={handleSignIn}
-                  className={`flex items-center gap-2 px-3 py-2 md:px-6 md:py-2.5 rounded-lg font-medium text-sm transition-all ${
+                  className={`flex items-center gap-2 px-3 py-2 xl:px-6 xl:py-2.5 rounded-lg font-medium text-sm transition-all ${
                     isDarkMode
                       ? "bg-white hover:bg-gray-100 text-gray-800 shadow-lg hover:shadow-xl"
                       : "bg-white hover:bg-gray-50 text-gray-800 shadow-lg hover:shadow-xl"
@@ -1031,7 +1031,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   }`}
                 >
                   <svg
-                    className="w-4 h-4 md:w-5 md:h-5"
+                    className="w-4 h-4 xl:w-5 xl:h-5"
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
@@ -1052,13 +1052,14 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                     />
                   </svg>
-                  <span className="hidden md:inline">Sign in with Google</span>
+                  <span className="hidden xl:inline">Sign in with Google</span>
                 </button>
               )}
 
+              {/* Mobile Menu Button - Show below 1250px */}
               <button
                 onClick={toggleMenu}
-                className={`md:hidden p-2 rounded-lg ${
+                className={`xl:hidden p-2 rounded-lg ${
                   isDarkMode ? "text-white" : "text-gray-700"
                 }`}
                 aria-label="Toggle menu"
@@ -1074,10 +1075,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
         </div>
       </header>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar - Show below 1250px */}
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-y-0 right-0 z-50 w-60 max-w-full transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed inset-y-0 right-0 z-50 w-80 max-w-full transform transition-transform duration-300 ease-in-out xl:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
