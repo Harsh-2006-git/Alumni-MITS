@@ -14,7 +14,6 @@ import {
   XCircle,
   Trash2,
   Download,
-  ChevronDown,
   LayoutDashboard,
   AlertCircle,
   CheckCircle,
@@ -38,7 +37,7 @@ import {
   BarChart3,
 } from "lucide-react";
 
-// Utility Components
+// ==================== UTILITY COMPONENTS ====================
 const Alert = ({ type = "success", message, onClose }) => {
   const styles = {
     success: "bg-green-50 border-green-200 text-green-800",
@@ -99,7 +98,77 @@ const Modal = ({ isOpen, onClose, title, children, size = "md" }) => {
   );
 };
 
-// Header Component
+const StatsCard = ({
+  icon: Icon,
+  label,
+  value,
+  gradient,
+  loading = false,
+  change,
+}) => {
+  return (
+    <div
+      className={`bg-gradient-to-br ${gradient} rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 group`}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-white/80 text-sm font-medium mb-1">{label}</p>
+          <p className="text-3xl font-bold">
+            {loading ? (
+              <Loader className="w-8 h-8 animate-spin text-white/70" />
+            ) : (
+              value
+            )}
+          </p>
+          {change && (
+            <p
+              className={`text-xs mt-1 ${
+                change > 0 ? "text-green-200" : "text-red-200"
+              }`}
+            >
+              {change > 0 ? "+" : ""}
+              {change}% from last month
+            </p>
+          )}
+        </div>
+        <div className="bg-white/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
+          <Icon className="w-8 h-8" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Helper Components for Alumni Details
+const InfoRow = ({ label, value }) => (
+  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+    <span className="font-medium text-gray-600">{label}:</span>
+    <span className="text-gray-900">{value || "N/A"}</span>
+  </div>
+);
+
+const SocialLinkRow = ({ icon: Icon, label, value }) => (
+  <div className="flex justify-between items-center py-2 border-b border-gray-100">
+    <span className="font-medium text-gray-600 flex items-center gap-2">
+      <Icon className="w-4 h-4" />
+      {label}:
+    </span>
+    {value ? (
+      <a
+        href={value}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-600 hover:underline"
+      >
+        View Profile
+      </a>
+    ) : (
+      <span className="text-gray-400">Not provided</span>
+    )}
+  </div>
+);
+
+// ==================== LAYOUT COMPONENTS ====================
 const Header = ({
   adminData,
   onLogout,
@@ -212,7 +281,69 @@ const Header = ({
   );
 };
 
-// Footer Component
+const Sidebar = ({ activeTab, onTabChange, isOpen, onClose }) => {
+  const menuItems = [
+    { id: 0, label: "Dashboard", icon: LayoutDashboard },
+    { id: 1, label: "Alumni's", icon: Users },
+    { id: 2, label: "Bulk Register", icon: Upload },
+    { id: 3, label: "Event ", icon: Calendar },
+    { id: 4, label: "Campaign ", icon: TrendingUp },
+  ];
+
+  return (
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed lg:sticky top-0 left-0 z-50 h-screen bg-white shadow-xl transition-transform duration-300 lg:translate-x-0 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } w-64`}
+      >
+        <div className="p-6 border-b flex items-center justify-between lg:justify-center">
+          <h2 className="text-xl font-bold text-gray-800">Admin Menu</h2>
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <nav className="p-4 space-y-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onTabChange(item.id);
+                  onClose();
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                  isActive
+                    ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="font-medium">{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
+  );
+};
+
 const Footer = () => {
   return (
     <footer className="bg-gray-800 text-white mt-auto">
@@ -300,121 +431,152 @@ const Footer = () => {
   );
 };
 
-// Enhanced Stats Card Component
-const StatsCard = ({
-  icon: Icon,
-  label,
-  value,
-  gradient,
-  loading = false,
-  change,
-}) => {
+// ==================== CONTENT PAGES ====================
+// Page 1: Dashboard Overview
+const DashboardOverview = ({ stats, loading, onTabChange }) => {
+  const recentActivities = [
+    {
+      type: "alumni",
+      message: "New alumni registration pending approval",
+      time: "2 minutes ago",
+    },
+    {
+      type: "event",
+      message: "New event created: Alumni Meet 2024",
+      time: "1 hour ago",
+    },
+    {
+      type: "campaign",
+      message: 'Campaign "Green Campus" reached 50% of goal',
+      time: "3 hours ago",
+    },
+  ];
+
   return (
-    <div
-      className={`bg-gradient-to-br ${gradient} rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all duration-300 group`}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-white/80 text-sm font-medium mb-1">{label}</p>
-          <p className="text-3xl font-bold">
-            {loading ? (
-              <Loader className="w-8 h-8 animate-spin text-white/70" />
-            ) : (
-              value
-            )}
-          </p>
-          {change && (
-            <p
-              className={`text-xs mt-1 ${
-                change > 0 ? "text-green-200" : "text-red-200"
-              }`}
+    <div className="space-y-6">
+      <h2 className="text-3xl font-bold text-gray-900">Dashboard Overview</h2>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatsCard
+          icon={Users}
+          label="Total Alumni"
+          value={stats.totalAlumni}
+          gradient="from-purple-500 to-indigo-600"
+          loading={loading}
+          change={12}
+        />
+        <StatsCard
+          icon={UserX}
+          label="Pending Verification"
+          value={stats.pendingAlumni}
+          gradient="from-orange-500 to-red-600"
+          loading={loading}
+          change={-5}
+        />
+        <StatsCard
+          icon={Calendar}
+          label="Active Events"
+          value={stats.activeEvents}
+          gradient="from-blue-500 to-cyan-600"
+          loading={loading}
+          change={8}
+        />
+        <StatsCard
+          icon={TrendingUp}
+          label="Running Campaigns"
+          value={stats.activeCampaigns}
+          gradient="from-green-500 to-emerald-600"
+          loading={loading}
+          change={15}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Quick Actions */}
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-xl font-bold mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button
+              onClick={() => onTabChange(1)}
+              className="p-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
             >
-              {change > 0 ? "+" : ""}
-              {change}% from last month
-            </p>
-          )}
+              <Users className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Manage Alumni</h4>
+              <p className="text-sm text-white/80">
+                View and verify alumni accounts
+              </p>
+            </button>
+            <button
+              onClick={() => onTabChange(2)}
+              className="p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
+            >
+              <Upload className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Bulk Register</h4>
+              <p className="text-sm text-white/80">
+                Upload multiple alumni at once
+              </p>
+            </button>
+            <button
+              onClick={() => onTabChange(3)}
+              className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
+            >
+              <Calendar className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Event Management</h4>
+              <p className="text-sm text-white/80">Manage campus events</p>
+            </button>
+            <button
+              onClick={() => onTabChange(4)}
+              className="p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
+            >
+              <TrendingUp className="w-8 h-8 mb-2" />
+              <h4 className="font-bold">Campaigns</h4>
+              <p className="text-sm text-white/80">
+                Oversee fundraising campaigns
+              </p>
+            </button>
+          </div>
         </div>
-        <div className="bg-white/20 p-3 rounded-lg group-hover:scale-110 transition-transform">
-          <Icon className="w-8 h-8" />
+
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h3 className="text-xl font-bold mb-4">Recent Activity</h3>
+          <div className="space-y-4">
+            {recentActivities.map((activity, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+              >
+                <div
+                  className={`w-2 h-2 mt-2 rounded-full ${
+                    activity.type === "alumni"
+                      ? "bg-purple-500"
+                      : activity.type === "event"
+                      ? "bg-blue-500"
+                      : "bg-green-500"
+                  }`}
+                ></div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">{activity.message}</p>
+                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-// Sidebar Component
-const Sidebar = ({ activeTab, onTabChange, isOpen, onClose }) => {
-  const menuItems = [
-    { id: 0, label: "Dashboard", icon: LayoutDashboard },
-    { id: 1, label: "Alumni's", icon: Users },
-    { id: 2, label: "Bulk Register", icon: Upload },
-    { id: 3, label: "Event ", icon: Calendar },
-    { id: 4, label: "Campaign ", icon: TrendingUp },
-  ];
-
-  return (
-    <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={onClose}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 h-screen bg-white shadow-xl transition-transform duration-300 lg:translate-x-0 ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } w-64`}
-      >
-        <div className="p-6 border-b flex items-center justify-between lg:justify-center">
-          <h2 className="text-xl font-bold text-gray-800">Admin Menu</h2>
-          <button
-            onClick={onClose}
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <nav className="p-4 space-y-2">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  onTabChange(item.id);
-                  onClose();
-                }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                  isActive
-                    ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
-    </>
-  );
-};
-
-// Enhanced Alumni Management Component
-const AlumniManagement = ({ onError, onSuccess }) => {
+// Page 2: Alumni Management
+const AlumniManagementPage = ({ onError, onSuccess }) => {
   const [alumni, setAlumni] = useState([]);
   const [nonVerifiedAlumni, setNonVerifiedAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");
@@ -688,7 +850,7 @@ const AlumniManagement = ({ onError, onSuccess }) => {
         </div>
       </div>
 
-      {/* Enhanced Alumni Details Modal */}
+      {/* Alumni Details Modal */}
       <Modal
         isOpen={!!selectedAlumni}
         onClose={() => setSelectedAlumni(null)}
@@ -697,7 +859,6 @@ const AlumniManagement = ({ onError, onSuccess }) => {
       >
         {selectedAlumni && (
           <div className="space-y-6">
-            {/* Header Section */}
             <div className="flex items-start gap-6">
               <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl flex items-center justify-center text-white font-bold text-2xl">
                 {selectedAlumni.name?.[0] || "A"}
@@ -740,7 +901,6 @@ const AlumniManagement = ({ onError, onSuccess }) => {
               </div>
             </div>
 
-            {/* Profile Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h4 className="font-bold text-lg text-purple-600 flex items-center gap-2">
@@ -794,7 +954,6 @@ const AlumniManagement = ({ onError, onSuccess }) => {
               </div>
             </div>
 
-            {/* Education Section */}
             {selectedAlumni.profile?.education &&
               selectedAlumni.profile.education.length > 0 && (
                 <div className="space-y-4">
@@ -824,7 +983,6 @@ const AlumniManagement = ({ onError, onSuccess }) => {
                 </div>
               )}
 
-            {/* Experience Section */}
             {selectedAlumni.profile?.experience &&
               selectedAlumni.profile.experience.length > 0 && (
                 <div className="space-y-4">
@@ -889,37 +1047,8 @@ const AlumniManagement = ({ onError, onSuccess }) => {
   );
 };
 
-// Helper Components for Alumni Details
-const InfoRow = ({ label, value }) => (
-  <div className="flex justify-between items-center py-2 border-b border-gray-100">
-    <span className="font-medium text-gray-600">{label}:</span>
-    <span className="text-gray-900">{value || "N/A"}</span>
-  </div>
-);
-
-const SocialLinkRow = ({ icon: Icon, label, value }) => (
-  <div className="flex justify-between items-center py-2 border-b border-gray-100">
-    <span className="font-medium text-gray-600 flex items-center gap-2">
-      <Icon className="w-4 h-4" />
-      {label}:
-    </span>
-    {value ? (
-      <a
-        href={value}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-blue-600 hover:underline"
-      >
-        View Profile
-      </a>
-    ) : (
-      <span className="text-gray-400">Not provided</span>
-    )}
-  </div>
-);
-
-// Bulk Register Component (Enhanced)
-const BulkRegister = ({ onError, onSuccess }) => {
+// Page 3: Bulk Register
+const BulkRegisterPage = ({ onError, onSuccess }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
@@ -1156,8 +1285,8 @@ Neha Verma,neha.verma@example.com,9876543215,Electrical Engineering,2021-2025,Pu
   );
 };
 
-// Enhanced Event Management Component
-const EventManagement = ({ onError, onSuccess }) => {
+// Page 4: Event Management
+const EventManagementPage = ({ onError, onSuccess }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -1441,8 +1570,8 @@ const EventManagement = ({ onError, onSuccess }) => {
   );
 };
 
-// Enhanced Campaign Management Component
-const CampaignManagement = ({ onError, onSuccess }) => {
+// Page 5: Campaign Management
+const CampaignManagementPage = ({ onError, onSuccess }) => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
@@ -1806,144 +1935,7 @@ const CampaignManagement = ({ onError, onSuccess }) => {
   );
 };
 
-// Dashboard Overview Component
-const DashboardOverview = ({ stats, loading, onTabChange }) => {
-  const recentActivities = [
-    {
-      type: "alumni",
-      message: "New alumni registration pending approval",
-      time: "2 minutes ago",
-    },
-    {
-      type: "event",
-      message: "New event created: Alumni Meet 2024",
-      time: "1 hour ago",
-    },
-    {
-      type: "campaign",
-      message: 'Campaign "Green Campus" reached 50% of goal',
-      time: "3 hours ago",
-    },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold text-gray-900">Dashboard Overview</h2>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          icon={Users}
-          label="Total Alumni"
-          value={stats.totalAlumni}
-          gradient="from-purple-500 to-indigo-600"
-          loading={loading}
-          change={12}
-        />
-        <StatsCard
-          icon={UserX}
-          label="Pending Verification"
-          value={stats.pendingAlumni}
-          gradient="from-orange-500 to-red-600"
-          loading={loading}
-          change={-5}
-        />
-        <StatsCard
-          icon={Calendar}
-          label="Active Events"
-          value={stats.activeEvents}
-          gradient="from-blue-500 to-cyan-600"
-          loading={loading}
-          change={8}
-        />
-        <StatsCard
-          icon={TrendingUp}
-          label="Running Campaigns"
-          value={stats.activeCampaigns}
-          gradient="from-green-500 to-emerald-600"
-          loading={loading}
-          change={15}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick Actions */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-bold mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button
-              onClick={() => onTabChange(1)}
-              className="p-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
-            >
-              <Users className="w-8 h-8 mb-2" />
-              <h4 className="font-bold">Manage Alumni</h4>
-              <p className="text-sm text-white/80">
-                View and verify alumni accounts
-              </p>
-            </button>
-            <button
-              onClick={() => onTabChange(2)}
-              className="p-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
-            >
-              <Upload className="w-8 h-8 mb-2" />
-              <h4 className="font-bold">Bulk Register</h4>
-              <p className="text-sm text-white/80">
-                Upload multiple alumni at once
-              </p>
-            </button>
-            <button
-              onClick={() => onTabChange(3)}
-              className="p-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
-            >
-              <Calendar className="w-8 h-8 mb-2" />
-              <h4 className="font-bold">Event Management</h4>
-              <p className="text-sm text-white/80">Manage campus events</p>
-            </button>
-            <button
-              onClick={() => onTabChange(4)}
-              className="p-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:shadow-lg transition-all text-left"
-            >
-              <TrendingUp className="w-8 h-8 mb-2" />
-              <h4 className="font-bold">Campaigns</h4>
-              <p className="text-sm text-white/80">
-                Oversee fundraising campaigns
-              </p>
-            </button>
-          </div>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-bold mb-4">Recent Activity</h3>
-          <div className="space-y-4">
-            {recentActivities.map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
-              >
-                <div
-                  className={`w-2 h-2 mt-2 rounded-full ${
-                    activity.type === "alumni"
-                      ? "bg-purple-500"
-                      : activity.type === "event"
-                      ? "bg-blue-500"
-                      : "bg-green-500"
-                  }`}
-                ></div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-900">{activity.message}</p>
-                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Main Dashboard Component
+// ==================== MAIN ADMIN DASHBOARD ====================
 const AdminDashboard = ({ setIsAuthenticated }) => {
   const [activeTab, setActiveTab] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -2050,6 +2042,42 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
     navigate("/");
   };
 
+  // Render the active content page
+  const renderContent = () => {
+    switch (activeTab) {
+      case 0:
+        return (
+          <DashboardOverview
+            stats={stats}
+            loading={statsLoading}
+            onTabChange={setActiveTab}
+          />
+        );
+      case 1:
+        return (
+          <AlumniManagementPage onError={setError} onSuccess={setSuccess} />
+        );
+      case 2:
+        return <BulkRegisterPage onError={setError} onSuccess={setSuccess} />;
+      case 3:
+        return (
+          <EventManagementPage onError={setError} onSuccess={setSuccess} />
+        );
+      case 4:
+        return (
+          <CampaignManagementPage onError={setError} onSuccess={setSuccess} />
+        );
+      default:
+        return (
+          <DashboardOverview
+            stats={stats}
+            loading={statsLoading}
+            onTabChange={setActiveTab}
+          />
+        );
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <style>{`
@@ -2069,6 +2097,7 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
         }
       `}</style>
 
+      {/* HEADER */}
       <Header
         adminData={adminData}
         onLogout={handleLogout}
@@ -2078,6 +2107,7 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
       />
 
       <div className="flex flex-1">
+        {/* SIDEBAR */}
         <Sidebar
           activeTab={activeTab}
           onTabChange={setActiveTab}
@@ -2085,8 +2115,10 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
           onClose={() => setSidebarOpen(false)}
         />
 
+        {/* MAIN CONTENT AREA */}
         <main className="flex-1 p-4 lg:p-8">
           <div className="max-w-7xl mx-auto">
+            {/* ALERTS */}
             {error && (
               <Alert
                 type="error"
@@ -2102,29 +2134,15 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
               />
             )}
 
-            {activeTab === 0 && (
-              <DashboardOverview
-                stats={stats}
-                loading={statsLoading}
-                onTabChange={setActiveTab}
-              />
-            )}
-            {activeTab === 1 && (
-              <AlumniManagement onError={setError} onSuccess={setSuccess} />
-            )}
-            {activeTab === 2 && (
-              <BulkRegister onError={setError} onSuccess={setSuccess} />
-            )}
-            {activeTab === 3 && (
-              <EventManagement onError={setError} onSuccess={setSuccess} />
-            )}
-            {activeTab === 4 && (
-              <CampaignManagement onError={setError} onSuccess={setSuccess} />
-            )}
+            {/* DYNAMIC CONTENT - This is where different pages render */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              {renderContent()}
+            </div>
           </div>
         </main>
       </div>
 
+      {/* FOOTER */}
       <Footer />
     </div>
   );

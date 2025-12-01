@@ -230,7 +230,7 @@ export default function AlumniMap({
               </p>
               <div style="margin-top: 12px; max-height: 200px; overflow-y: auto;" id="alumni-list-${city}">
                 ${alumni
-                  .slice(0, 5)
+
                   .map(
                     (a, idx) => `
                   <div 

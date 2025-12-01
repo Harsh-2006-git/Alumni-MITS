@@ -249,7 +249,7 @@ export default function AlumniHomePage({
 
         {/* Background Image with Parallax - Layer 2 */}
         <div
-          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 opacity-20`}
+          className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 opacity-30`}
           style={{
             backgroundImage: "url(/assets/images/bg.png)",
             transform: "translateZ(0) scale(1.1)",
@@ -941,7 +941,7 @@ export default function AlumniHomePage({
               title: "Alumni Network",
               description:
                 "Connect with a diverse community of successful graduates across industries.",
-              color: "from-purple-500 to-pink-500",
+              color: "from-purple-500 to-red-500",
               image:
                 "https://images.unsplash.com/photo-1559028012-481c04fa702d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
             },
@@ -950,9 +950,9 @@ export default function AlumniHomePage({
               title: "Mentorship",
               description:
                 "Get guidance from experienced professionals in your field of interest.",
-              color: "from-green-500 to-emerald-500",
+              color: "from-white-500 to-emerald-500",
               image:
-                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                "https://www.cecmohali.org/public/images/pages/alumni/Connectivity%20Banner01.jpg",
             },
           ].map((item, idx) => (
             <motion.div
