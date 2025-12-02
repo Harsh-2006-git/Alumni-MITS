@@ -1075,10 +1075,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
         </div>
       </header>
 
-      {/* Mobile Sidebar - Show below 1250px */}
+      {/* Mobile Sidebar - Show below 1250px - FIXED TO 50% WIDTH */}
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-y-0 right-0 z-50 w-80 max-w-full transform transition-transform duration-300 ease-in-out xl:hidden ${
+        className={`fixed inset-y-0 right-0 z-50 w-60/100 max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -1090,9 +1090,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
           />
         )}
 
-        {/* Sidebar Content */}
+        {/* Sidebar Content - 50% width */}
         <div
-          className={`relative h-full w-80 max-w-full flex flex-col z-50 shadow-2xl ${
+          className={`relative h-full w-full flex flex-col z-50 shadow-2xl ${
             isDarkMode ? "bg-gray-900" : "bg-white"
           }`}
         >
