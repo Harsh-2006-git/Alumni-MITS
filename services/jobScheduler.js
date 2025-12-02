@@ -352,10 +352,70 @@ class JobScheduler {
     console.log("🎯 Manual scraping triggered");
     return await this.runScraping();
   }
-
   async triggerCleanup() {
-    console.log("🧹 Manual cleanup triggered");
-    return await this.runCleanup();
+    const startTime = Date.now();
+    const timestamp = new Date();
+
+    try {
+      console.log("🧹 Starting expired job cleanup...");
+      console.log(`⏰ Started at: ${timestamp.toLocaleString()}`);
+
+      // FIRST: Mark expired jobs (for reporting)
+      const expiredResult = await Job.updateMany(
+        {
+          applicationDeadline: { $lt: new Date() },
+          isAutoPosted: true,
+          status: { $in: ["active", "expiring_soon"] },
+        },
+        { status: "expired" }
+      );
+
+      const expiredCount = expiredResult.modifiedCount;
+
+      // THEN: Delete them
+      const deleteResult = await Job.deleteMany({
+        applicationDeadline: { $lt: new Date() },
+        isAutoPosted: true,
+      });
+
+      const deletedCount = deleteResult.deletedCount;
+
+      this.stats.totalCleanups++;
+      this.stats.lastCleanupResults = {
+        timestamp,
+        expiredCount,
+        deletedCount,
+        duration: Date.now() - startTime,
+      };
+
+      console.log(`🗑️ Deleted ${deletedCount} expired auto jobs`);
+
+      // Log results
+      console.log("\n" + "=".repeat(50));
+      console.log("📊 Cleanup Results:");
+      console.log(`  ⏸️  Jobs Expired: ${expiredCount}`);
+      console.log(`  🗑️  Jobs Deleted: ${deletedCount}`);
+      console.log(
+        `  ⏱️  Duration: ${((Date.now() - startTime) / 1000).toFixed(2)}s`
+      );
+      console.log("=".repeat(50) + "\n");
+
+      return {
+        success: true,
+        message: `Marked ${expiredCount} as expired, deleted ${deletedCount} jobs`,
+        expiredCount,
+        deletedCount,
+        duration: Date.now() - startTime,
+      };
+    } catch (error) {
+      console.error("❌ Cleanup failed:", error.message);
+      return {
+        success: false,
+        message: "Cleanup failed",
+        error: error.message,
+        duration: Date.now() - startTime,
+      };
+    }
   }
 
   async triggerStatusUpdate() {

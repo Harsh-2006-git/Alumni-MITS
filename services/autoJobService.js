@@ -1032,33 +1032,21 @@ class AutoJobService {
     }
   }
 
-  async cleanupExpiredJobs(softDelete = false) {
+  async cleanupExpiredJobs() {
     try {
-      if (softDelete) {
-        const result = await Job.updateMany(
-          {
-            applicationDeadline: { $lt: new Date() },
-            status: { $in: ["active", "open"] },
-          },
-          { status: "expired" }
-        );
-        console.log(`🗑️ Marked ${result.modifiedCount} jobs as expired`);
-        return result.modifiedCount;
-      } else {
-        const result = await Job.deleteMany({
-          applicationDeadline: { $lt: new Date() },
-          status: { $ne: "closed" },
-          createdAt: { $lt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) },
-        });
-        console.log(`🗑️ Deleted ${result.deletedCount} expired jobs`);
-        return result.deletedCount;
-      }
+      // Simple: Delete auto-posted jobs past their 1-week deadline
+      const result = await Job.deleteMany({
+        applicationDeadline: { $lt: new Date() }, // Past deadline
+        isAutoPosted: true, // Only auto-posted jobs
+      });
+
+      console.log(`🗑️ Deleted ${result.deletedCount} expired auto jobs`);
+      return result.deletedCount;
     } catch (error) {
       console.error("Error cleaning up expired jobs:", error);
       throw error;
     }
   }
-
   async updateJobStatuses() {
     try {
       const now = new Date();
