@@ -1,63 +1,228 @@
 import Event from "../models/event.js";
 import EventRegistration from "../models/eventRegistration.js";
 import mongoose from "mongoose";
+import multer from "multer";
+import cloudinary from "cloudinary";
 
-export const addEvent = async (req, res) => {
-  try {
-    const { email, userType } = req.user;
-    const IsCollege = req.user.userType === "admin";
-    if (!email) {
-      return res
-        .status(400)
-        .json({ message: "Organizer email not found in token" });
+// ---------------------------------------------
+// Configure Multer for Memory Storage
+// ---------------------------------------------
+const storage = multer.memoryStorage(); // Store file in memory buffer
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Accept only images
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed!"), false);
+    }
+  },
+});
+
+// ---------------------------------------------
+// Cloudinary Upload Utility
+// ---------------------------------------------
+const uploadToCloudinary = (file) => {
+  return new Promise((resolve, reject) => {
+    if (
+      ![
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+        "image/webp",
+        "image/gif",
+      ].includes(file.mimetype)
+    ) {
+      return reject(
+        new Error("Only JPEG, JPG, PNG, WebP and GIF images are allowed")
+      );
     }
 
-    // ✅ Extract event details from request body
-    const {
-      title,
-      description,
-      date,
-      location,
-      price,
-      organizer,
-      category,
-      type,
-      maxAttendees,
-      image,
-    } = req.body;
+    const publicId = `events/${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(7)}`;
 
-    // ✅ Create new event
-    const event = await Event.create({
-      title,
-      description,
-      date,
-      location,
-      price,
-      organizer,
-      organizerEmail: email, // from token
-      category,
-      type,
-      maxAttendees,
-      isScheduled: IsCollege, // true if admin, false otherwise
-      image,
-      userType,
-    });
+    const stream = cloudinary.v2.uploader.upload_stream(
+      {
+        public_id: publicId,
+        folder: "events",
+        resource_type: "image",
+      },
+      (error, uploadResult) => {
+        if (error) {
+          console.error("❌ Cloudinary Upload Error:", error);
+          reject(new Error("Error uploading to Cloudinary"));
+        } else {
+          resolve(uploadResult.secure_url);
+        }
+      }
+    );
 
-    return res.status(201).json({
-      message: "Event created successfully",
-      event,
-    });
-  } catch (error) {
-    console.error("Error adding event:", error);
-    if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ message: "Invalid or expired token" });
-    }
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
-  }
+    stream.end(file.buffer);
+  });
 };
 
+// ---------------------------------------------
+// CREATE EVENT (with multer middleware)
+// ---------------------------------------------
+export const addEvent = [
+  upload.single("image"), // This middleware will parse the FormData and attach file to req.file
+  async (req, res) => {
+    try {
+      // Log the request body for debugging
+      console.log("Request body:", req.body);
+      console.log("File received:", req.file ? "Yes" : "No");
+
+      // Check if user is authenticated
+      if (!req.user || !req.user.email) {
+        return res.status(401).json({
+          message: "Authentication required. Please login again.",
+        });
+      }
+
+      const { email, userType } = req.user;
+
+      // Log the received data
+      console.log("User email from token:", email);
+      console.log("User type:", userType);
+
+      // Parse req.body fields (they come as strings from FormData)
+      const {
+        title,
+        description,
+        date,
+        location,
+        price,
+        organizer,
+        category,
+        type,
+        maxAttendees,
+      } = req.body;
+
+      // ---------------------------------------------
+      // Validate required fields
+      // ---------------------------------------------
+      if (!title || !date || !location || !organizer) {
+        return res.status(400).json({
+          message: "Title, date, location and organizer are required fields",
+          receivedData: {
+            title: !!title,
+            date: !!date,
+            location: !!location,
+            organizer: !!organizer,
+          },
+        });
+      }
+
+      // Parse numeric fields
+      const parsedPrice = price ? parseFloat(price) : 0;
+      const parsedMaxAttendees = maxAttendees ? parseInt(maxAttendees, 10) : 50;
+
+      // ---------------------------------------------
+      // Upload Event Image (if provided)
+      // ---------------------------------------------
+      let imageUrl = null;
+
+      if (req.file) {
+        try {
+          console.log("Uploading image to Cloudinary...");
+          imageUrl = await uploadToCloudinary(req.file);
+          console.log("Image uploaded successfully:", imageUrl);
+        } catch (uploadError) {
+          console.error("❌ Cloudinary upload error:", uploadError);
+          return res.status(500).json({
+            message: "Error uploading image to Cloudinary",
+            error: uploadError.message,
+          });
+        }
+      } else if (req.body.image && req.body.image.trim() !== "") {
+        // Use provided URL if no file uploaded
+        imageUrl = req.body.image.trim();
+      }
+
+      // ---------------------------------------------
+      // Create Event
+      // ---------------------------------------------
+      const isCollegeAdmin = userType === "admin";
+
+      console.log("Creating event with data:", {
+        title,
+        date,
+        location,
+        organizer,
+        organizerEmail: email,
+        isScheduled: isCollegeAdmin,
+      });
+
+      const event = await Event.create({
+        title: title.trim(),
+        description: description ? description.trim() : "",
+        date,
+        location: location.trim(),
+        price: parsedPrice,
+        organizer: organizer.trim(),
+        organizerEmail: email, // from token
+        category: category || "educational",
+        type: type || "in-person",
+        maxAttendees: parsedMaxAttendees,
+        image: imageUrl,
+        isScheduled: isCollegeAdmin, // auto approve for admin
+        userType,
+      });
+
+      console.log("✅ Event created successfully:", event._id);
+
+      return res.status(201).json({
+        message: "Event created successfully",
+        event: {
+          id: event._id,
+          title: event.title,
+          date: event.date,
+          location: event.location,
+          organizer: event.organizer,
+          image: event.image,
+          isScheduled: event.isScheduled,
+        },
+      });
+    } catch (error) {
+      console.error("❌ Error adding event:", error);
+      console.error("Error stack:", error.stack);
+
+      // Handle specific errors
+      if (
+        error.name === "JsonWebTokenError" ||
+        error.name === "TokenExpiredError"
+      ) {
+        return res.status(401).json({
+          message: "Invalid or expired token. Please login again.",
+        });
+      }
+
+      if (error.name === "ValidationError") {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: Object.values(error.errors).map((err) => err.message),
+        });
+      }
+
+      if (error.code === 11000) {
+        return res.status(400).json({
+          message: "Duplicate event detected",
+        });
+      }
+
+      return res.status(500).json({
+        message: "Server error while creating event",
+        error:
+          process.env.NODE_ENV === "development" ? error.message : undefined,
+      });
+    }
+  },
+];
 export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;
