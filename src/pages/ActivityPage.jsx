@@ -7,6 +7,9 @@ import {
   Target,
   X,
   Save,
+  MapPin,
+  DollarSign,
+  CheckCircle,
   Users,
   Mail,
   Phone,
@@ -16,9 +19,17 @@ import {
   Trophy,
   Heart,
   Star,
+  Building2,
   Award,
   Zap,
   Loader,
+  Image as ImageIcon,
+  Globe,
+  Tag,
+  User,
+  BriefcaseIcon,
+  TrendingUp,
+  Link,
 } from "lucide-react";
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -32,261 +43,300 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div
-        className={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto ${
+        className={`rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all ${
           isDarkMode
-            ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700"
-            : "bg-white border border-gray-200"
+            ? "bg-slate-900 border border-slate-700"
+            : "bg-white border border-gray-100"
         }`}
       >
         <div
-          className={`sticky top-0 border-b p-4 flex justify-between items-center ${
+          className={`sticky top-0 border-b px-6 py-5 flex justify-between items-center backdrop-blur-sm ${
             isDarkMode
-              ? "bg-slate-800 border-slate-700"
-              : "bg-white border-gray-200"
+              ? "bg-slate-900/95 border-slate-700"
+              : "bg-white/95 border-gray-200"
           }`}
         >
-          <h2
-            className={`text-xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
-            Edit Event
-          </h2>
+          <div>
+            <h2
+              className={`text-2xl font-semibold tracking-tight ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Edit Event
+            </h2>
+            <p
+              className={`text-sm mt-1 ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              Update event details and information
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className={`p-2 rounded transition ${
+            className={`p-2.5 rounded-xl transition-all hover:rotate-90 ${
               isDarkMode
-                ? "hover:bg-slate-700 text-gray-300"
-                : "hover:bg-gray-100 text-gray-600"
+                ? "hover:bg-slate-800 text-gray-400 hover:text-white"
+                : "hover:bg-gray-100 text-gray-500 hover:text-gray-900"
             }`}
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-4">
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Title
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleChange("title", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg h-24 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Date
-            </label>
-            <input
-              type="date"
-              value={formData.date ? formData.date.split("T")[0] : ""}
-              onChange={(e) => handleChange("date", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Location
-            </label>
-            <input
-              type="text"
-              value={formData.location}
-              onChange={(e) => handleChange("location", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="overflow-y-auto max-h-[calc(90vh-88px)]">
+          <div className="p-6 space-y-5">
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                className={`block text-sm font-semibold mb-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
                 }`}
               >
-                Price
+                Event Title
               </label>
               <input
-                type="number"
-                value={formData.price}
-                onChange={(e) => handleChange("price", Number(e.target.value))}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleChange("title", e.target.value)}
+                placeholder="Enter event title"
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
                   isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
                 }`}
               />
             </div>
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Max Attendees
-              </label>
-              <input
-                type="number"
-                value={formData.maxAttendees}
-                onChange={(e) =>
-                  handleChange("maxAttendees", Number(e.target.value))
-                }
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Organizer
-            </label>
-            <input
-              type="text"
-              value={formData.organizer}
-              onChange={(e) => handleChange("organizer", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Category
-              </label>
-              <select
-                value={formData.category}
-                onChange={(e) => handleChange("category", e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              >
-                <option value="educational">Educational</option>
-                <option value="networking">Networking</option>
-                <option value="cultural">Cultural</option>
-                <option value="sports">Sports</option>
-              </select>
-            </div>
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Type
-              </label>
-              <select
-                value={formData.type}
-                onChange={(e) => handleChange("type", e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              >
-                <option value="in-person">In-Person</option>
-                <option value="online">Online</option>
-                <option value="hybrid">Hybrid</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Image URL
-            </label>
-            <input
-              type="text"
-              value={formData.image}
-              onChange={(e) => handleChange("image", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              onClick={() => onSave(formData)}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center justify-center gap-2 font-semibold shadow-lg"
-            >
-              <Save size={18} /> Save Changes
-            </button>
-            <button
-              onClick={onClose}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                isDarkMode
-                  ? "bg-slate-700 text-gray-300 hover:bg-slate-600"
-                  : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+            <div>
+              <label
+                className={`block text-sm font-semibold mb-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+                placeholder="Describe your event"
+                className={`w-full px-4 py-3 rounded-xl border-2 h-28 resize-none transition-all focus:ring-4 focus:outline-none ${
+                  isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  <Calendar size={16} />
+                  Event Date
+                </label>
+                <input
+                  type="date"
+                  value={formData.date ? formData.date.split("T")[0] : ""}
+                  onChange={(e) => handleChange("date", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  <MapPin size={16} />
+                  Location
+                </label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => handleChange("location", e.target.value)}
+                  placeholder="Event location"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  <DollarSign size={16} />
+                  Price
+                </label>
+                <input
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) =>
+                    handleChange("price", Number(e.target.value))
+                  }
+                  placeholder="0"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  <Users size={16} />
+                  Max Attendees
+                </label>
+                <input
+                  type="number"
+                  value={formData.maxAttendees}
+                  onChange={(e) =>
+                    handleChange("maxAttendees", Number(e.target.value))
+                  }
+                  placeholder="100"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-semibold mb-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                Organizer
+              </label>
+              <input
+                type="text"
+                value={formData.organizer}
+                onChange={(e) => handleChange("organizer", e.target.value)}
+                placeholder="Organizer name"
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                  isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Category
+                </label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => handleChange("category", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                >
+                  <option value="educational">Educational</option>
+                  <option value="networking">Networking</option>
+                  <option value="cultural">Cultural</option>
+                  <option value="sports">Sports</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Event Type
+                </label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => handleChange("type", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                >
+                  <option value="in-person">In-Person</option>
+                  <option value="online">Online</option>
+                  <option value="hybrid">Hybrid</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-semibold mb-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                Image URL
+              </label>
+              <input
+                type="text"
+                value={formData.image}
+                onChange={(e) => handleChange("image", e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                  isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
+              />
+            </div>
+
+            <div
+              className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${
+                isDarkMode ? "border-slate-700" : "border-gray-200"
               }`}
             >
-              Cancel
-            </button>
+              <button
+                onClick={() => onSave(formData)}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              >
+                <Save size={18} /> Save Changes
+              </button>
+              <button
+                onClick={onClose}
+                className={`px-6 py-3.5 rounded-xl font-semibold transition-all hover:scale-[1.02] ${
+                  isDarkMode
+                    ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200"
+                }`}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -303,342 +353,408 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div
-        className={`rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto ${
+        className={`rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all ${
           isDarkMode
-            ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700"
-            : "bg-white border border-gray-200"
+            ? "bg-slate-900 border border-slate-700"
+            : "bg-white border border-gray-100"
         }`}
       >
         <div
-          className={`sticky top-0 border-b p-4 flex justify-between items-center ${
+          className={`sticky top-0 border-b px-6 py-5 flex justify-between items-center backdrop-blur-sm ${
             isDarkMode
-              ? "bg-slate-800 border-slate-700"
-              : "bg-white border-gray-200"
+              ? "bg-slate-900/95 border-slate-700"
+              : "bg-white/95 border-gray-200"
           }`}
         >
-          <h2
-            className={`text-xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
-            Edit Job
-          </h2>
+          <div>
+            <h2
+              className={`text-2xl font-semibold tracking-tight ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Edit Job Posting
+            </h2>
+            <p
+              className={`text-sm mt-1 ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              Update job listing information
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className={`p-2 rounded transition ${
+            className={`p-2.5 rounded-xl transition-all hover:rotate-90 ${
               isDarkMode
-                ? "hover:bg-slate-700 text-gray-300"
-                : "hover:bg-gray-100 text-gray-600"
+                ? "hover:bg-slate-800 text-gray-400 hover:text-white"
+                : "hover:bg-gray-100 text-gray-500 hover:text-gray-900"
             }`}
           >
             <X size={20} />
           </button>
         </div>
 
-        <div className="p-4 sm:p-6 space-y-4">
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Job Title
-            </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleChange("title", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Company
-            </label>
-            <input
-              type="text"
-              value={formData.company}
-              onChange={(e) => handleChange("company", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Company Logo URL
-            </label>
-            <input
-              type="text"
-              value={formData.companyLogo}
-              onChange={(e) => handleChange("companyLogo", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="overflow-y-auto max-h-[calc(90vh-88px)]">
+          <div className="p-6 space-y-5">
             <div>
               <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
                 }`}
               >
-                Job Type
-              </label>
-              <select
-                value={formData.type}
-                onChange={(e) => handleChange("type", e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              >
-                <option value="full-time">Full-time</option>
-                <option value="part-time">Part-time</option>
-                <option value="contract">Contract</option>
-                <option value="internship">Internship</option>
-              </select>
-            </div>
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => handleChange("status", e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              >
-                <option value="active">Active</option>
-                <option value="closed">Closed</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Location
-            </label>
-            <input
-              type="text"
-              value={formData.location}
-              onChange={(e) => handleChange("location", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Salary
+                <Briefcase size={16} />
+                Job Title
               </label>
               <input
                 type="text"
-                value={formData.salary}
-                onChange={(e) => handleChange("salary", e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                value={formData.title}
+                onChange={(e) => handleChange("title", e.target.value)}
+                placeholder="Enter job title"
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
                   isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                    : "bg-white border-gray-300 text-gray-900"
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
                 }`}
               />
             </div>
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Experience
-              </label>
-              <input
-                type="text"
-                value={formData.experience}
-                onChange={(e) => handleChange("experience", e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              />
-            </div>
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Description
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg h-24 focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Category
-            </label>
-            <input
-              type="text"
-              value={formData.category}
-              onChange={(e) => handleChange("category", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div>
-            <label
-              className={`block text-sm font-medium mb-1 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Company Website
-            </label>
-            <input
-              type="text"
-              value={formData.companyWebsite}
-              onChange={(e) => handleChange("companyWebsite", e.target.value)}
-              className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                isDarkMode
-                  ? "bg-slate-700 border-slate-600 text-white placeholder-gray-400"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Application Deadline
-              </label>
-              <input
-                type="date"
-                value={
-                  formData.applicationDeadline
-                    ? formData.applicationDeadline.split("T")[0]
-                    : ""
-                }
-                onChange={(e) =>
-                  handleChange("applicationDeadline", e.target.value)
-                }
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              />
-            </div>
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Closed Date
-              </label>
-              <input
-                type="date"
-                value={
-                  formData.closedDate ? formData.closedDate.split("T")[0] : ""
-                }
-                onChange={(e) => handleChange("closedDate", e.target.value)}
-                className={`w-full p-2 sm:p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? "bg-slate-700 border-slate-600 text-white"
-                    : "bg-white border-gray-300 text-gray-900"
-                }`}
-              />
-            </div>
-          </div>
-          <div>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.verified || false}
-                onChange={(e) => handleChange("verified", e.target.checked)}
-                className="w-4 h-4 text-blue-500 rounded focus:ring-blue-400"
-              />
-              <span
-                className={`text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                Verified
-              </span>
-            </label>
-          </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              onClick={() => onSave(formData)}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all flex items-center justify-center gap-2 font-semibold shadow-lg"
-            >
-              <Save size={18} /> Save Changes
-            </button>
-            <button
-              onClick={onClose}
-              className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                isDarkMode
-                  ? "bg-slate-700 text-gray-300 hover:bg-slate-600"
-                  : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  <Building2 size={16} />
+                  Company Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.company}
+                  onChange={(e) => handleChange("company", e.target.value)}
+                  placeholder="Company name"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Company Logo URL
+                </label>
+                <input
+                  type="text"
+                  value={formData.companyLogo}
+                  onChange={(e) => handleChange("companyLogo", e.target.value)}
+                  placeholder="Logo URL"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Job Type
+                </label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => handleChange("type", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                >
+                  <option value="full-time">Full-time</option>
+                  <option value="part-time">Part-time</option>
+                  <option value="contract">Contract</option>
+                  <option value="internship">Internship</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => handleChange("status", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                >
+                  <option value="active">Active</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                <MapPin size={16} />
+                Location
+              </label>
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => handleChange("location", e.target.value)}
+                placeholder="Job location"
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                  isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  <DollarSign size={16} />
+                  Salary Range
+                </label>
+                <input
+                  type="text"
+                  value={formData.salary}
+                  onChange={(e) => handleChange("salary", e.target.value)}
+                  placeholder="$50k - $80k"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  <Clock size={16} />
+                  Experience Required
+                </label>
+                <input
+                  type="text"
+                  value={formData.experience}
+                  onChange={(e) => handleChange("experience", e.target.value)}
+                  placeholder="2-5 years"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                className={`block text-sm font-semibold mb-2 ${
+                  isDarkMode ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                Job Description
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+                placeholder="Describe the role and responsibilities"
+                className={`w-full px-4 py-3 rounded-xl border-2 h-28 resize-none transition-all focus:ring-4 focus:outline-none ${
+                  isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                }`}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Category
+                </label>
+                <input
+                  type="text"
+                  value={formData.category}
+                  onChange={(e) => handleChange("category", e.target.value)}
+                  placeholder="e.g., Engineering"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Company Website
+                </label>
+                <input
+                  type="text"
+                  value={formData.companyWebsite}
+                  onChange={(e) =>
+                    handleChange("companyWebsite", e.target.value)
+                  }
+                  placeholder="https://company.com"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Application Deadline
+                </label>
+                <input
+                  type="date"
+                  value={
+                    formData.applicationDeadline
+                      ? formData.applicationDeadline.split("T")[0]
+                      : ""
+                  }
+                  onChange={(e) =>
+                    handleChange("applicationDeadline", e.target.value)
+                  }
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-semibold mb-2 ${
+                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+                >
+                  Closed Date
+                </label>
+                <input
+                  type="date"
+                  value={
+                    formData.closedDate ? formData.closedDate.split("T")[0] : ""
+                  }
+                  onChange={(e) => handleChange("closedDate", e.target.value)}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 transition-all ${
+                  isDarkMode
+                    ? "bg-slate-800 border-slate-700 hover:bg-slate-750"
+                    : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={formData.verified || false}
+                  onChange={(e) => handleChange("verified", e.target.checked)}
+                  className="w-5 h-5 text-blue-500 rounded focus:ring-2 focus:ring-blue-400"
+                />
+                <div className="flex items-center gap-2">
+                  <CheckCircle
+                    size={18}
+                    className={
+                      formData.verified
+                        ? "text-green-500"
+                        : isDarkMode
+                        ? "text-gray-500"
+                        : "text-gray-400"
+                    }
+                  />
+                  <span
+                    className={`text-sm font-semibold ${
+                      isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
+                  >
+                    Verified Job Posting
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            <div
+              className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${
+                isDarkMode ? "border-slate-700" : "border-gray-200"
               }`}
             >
-              Cancel
-            </button>
+              <button
+                onClick={() => onSave(formData)}
+                className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              >
+                <Save size={18} /> Save Changes
+              </button>
+              <button
+                onClick={onClose}
+                className={`px-6 py-3.5 rounded-xl font-semibold transition-all hover:scale-[1.02] ${
+                  isDarkMode
+                    ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200"
+                }`}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>

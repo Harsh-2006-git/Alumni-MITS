@@ -7,25 +7,26 @@ import {
   IndianRupee,
   Loader,
   Sparkles,
-  ArrowLeft,
   CheckCircle,
   AlertCircle,
   X,
   Plus,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 
 import Header from "../components/header";
 import Footer from "../components/footer";
 import AuthPopup from "../components/AuthPopup";
-
 const Message = ({ type, message, onClose }) => {
   if (!message) return null;
+
   return (
     <div
-      className={`fixed top-20 right-4 left-4 sm:right-6 sm:left-auto z-50 max-w-sm animate-fadeIn ${
+      className={`fixed top-20 right-4 sm:right-6 z-[100] max-w-sm w-[calc(100%-2rem)] sm:w-auto animate-slideIn ${
         type === "success"
-          ? "bg-green-50 border border-green-200"
-          : "bg-red-50 border border-red-200"
+          ? "bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200"
+          : "bg-gradient-to-r from-red-50 to-pink-50 border border-red-200"
       } rounded-lg shadow-lg p-4`}
     >
       <div className="flex items-start gap-3">
@@ -40,9 +41,9 @@ const Message = ({ type, message, onClose }) => {
             <AlertCircle className="w-5 h-5" />
           )}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p
-            className={`text-sm font-medium ${
+            className={`text-sm font-medium truncate ${
               type === "success" ? "text-green-800" : "text-red-800"
             }`}
           >
@@ -75,10 +76,13 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
     category: "educational",
     type: "in-person",
     maxAttendees: 50,
-    image: "",
   });
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [showMessage, setShowMessage] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showEventDialog, setShowEventDialog] = useState(false);
 
@@ -88,9 +92,20 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
     return authData && JSON.parse(authData).accessToken;
   };
 
-  const showMessage = (type, text) => {
+  const displayMessage = (type, text) => {
     setMessage({ type, text });
-    setTimeout(() => setMessage({ type: "", text: "" }), 5000);
+    setShowMessage(true);
+
+    // Clear message after 5 seconds
+    setTimeout(() => {
+      setShowMessage(false);
+      setMessage({ type: "", text: "" });
+    }, 5000);
+  };
+
+  const handleCloseMessage = () => {
+    setShowMessage(false);
+    setMessage({ type: "", text: "" });
   };
 
   const handleCreateEventClick = () => {
@@ -101,6 +116,47 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
     setShowEventDialog(true);
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!validTypes.includes(file.type)) {
+      displayMessage(
+        "error",
+        "Please upload a valid image file (JPEG, PNG, GIF, WebP)"
+      );
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      displayMessage("error", "Image size should be less than 5MB");
+      return;
+    }
+
+    setImageFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview("");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -109,24 +165,85 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
       const authData = localStorage.getItem("auth");
       const token = authData ? JSON.parse(authData).accessToken : null;
 
+      if (!token) {
+        displayMessage("error", "Please login again.");
+        setShowAuthPopup(true);
+        return;
+      }
+
+      // Validate required fields
+      if (
+        !formData.title ||
+        !formData.date ||
+        !formData.location ||
+        !formData.organizer
+      ) {
+        displayMessage("error", "Please fill all required fields (*).");
+        return;
+      }
+
+      // Validate date is not in the past
+      const selectedDate = new Date(formData.date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        displayMessage("error", "Event date cannot be in the past.");
+        return;
+      }
+
+      // Validate image
+      if (!imageFile && (!formData.image || formData.image.trim() === "")) {
+        displayMessage(
+          "error",
+          "Please upload an image or provide an image URL."
+        );
+        return;
+      }
+
+      // Create FormData object for file upload
+      const formDataToSend = new FormData();
+
+      // Append all form fields
+      Object.keys(formData).forEach((key) => {
+        formDataToSend.append(key, formData[key]);
+      });
+
+      // Append image file if exists
+      if (imageFile) {
+        formDataToSend.append("image", imageFile);
+      }
+
+      console.log("Sending FormData to server...");
+
       const response = await fetch(
         "https://alumni-mits-backend.onrender.com/event/add-event",
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(formData),
+          body: formDataToSend,
         }
       );
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type");
+      let data;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON response:", text);
+        throw new Error("Server returned non-JSON response");
+      }
+
       if (response.ok) {
-        showMessage(
+        displayMessage(
           "success",
           "🎉 Event created successfully! Your event is now under verification and will be visible soon."
         );
+
         // Reset form
         setFormData({
           title: "",
@@ -138,20 +255,22 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
           category: "educational",
           type: "in-person",
           maxAttendees: 50,
-          image: "",
         });
+        setImageFile(null);
+        setImagePreview("");
         setShowEventDialog(false);
       } else {
-        showMessage(
+        displayMessage(
           "error",
-          data.message || "Failed to create event. Please try again."
+          data.message || `Failed to create event (Status: ${response.status})`
         );
       }
     } catch (error) {
       console.error("Error creating event:", error);
-      showMessage(
+      displayMessage(
         "error",
-        "Error creating event. Please check your connection and try again."
+        error.message ||
+          "Error creating event. Please check your connection and try again."
       );
     } finally {
       setSubmitting(false);
@@ -292,6 +411,15 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
       }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+
+      {/* Global Message Display */}
+      {showMessage && (
+        <Message
+          type={message.type}
+          message={message.text}
+          onClose={handleCloseMessage}
+        />
+      )}
 
       {/* Auth Popup */}
       {showAuthPopup && (
@@ -457,12 +585,6 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
               </div>
 
               <div className="p-4 sm:p-6">
-                <Message
-                  type={message.type}
-                  message={message.text}
-                  onClose={() => setMessage({ type: "", text: "" })}
-                />
-
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Event Title */}
                   <div>
@@ -517,6 +639,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         value={formData.date}
                         onChange={handleChange}
                         required
+                        min={new Date().toISOString().split("T")[0]}
                         className={`w-full px-3 py-2 rounded-lg border text-sm ${
                           isDarkMode
                             ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
@@ -560,6 +683,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         onChange={handleChange}
                         required
                         min="0"
+                        step="0.01"
                         placeholder="0"
                         className={`w-full px-3 py-2 rounded-lg border text-sm ${
                           isDarkMode
@@ -636,7 +760,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                     </div>
                   </div>
 
-                  {/* Organizer & Image URL */}
+                  {/* Organizer & Image Upload */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block mb-2 font-semibold text-sm">
@@ -659,20 +783,106 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
 
                     <div>
                       <label className="block mb-2 font-semibold text-sm">
-                        Image URL
+                        <ImageIcon className="w-4 h-4 inline mr-1" />
+                        Event Image *
                       </label>
-                      <input
-                        type="url"
-                        name="image"
-                        value={formData.image}
-                        onChange={handleChange}
-                        placeholder="https://example.com/image.jpg"
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                      />
+                      <div className="space-y-2">
+                        <div
+                          className={`relative rounded-lg border-2 border-dashed ${
+                            isDarkMode
+                              ? "border-slate-600 hover:border-cyan-500"
+                              : "border-gray-300 hover:border-cyan-400"
+                          } transition-colors`}
+                        >
+                          <input
+                            type="file"
+                            id="image-upload"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          />
+                          <div className="p-4 text-center">
+                            <Upload
+                              className={`w-8 h-8 mx-auto mb-2 ${
+                                isDarkMode ? "text-slate-400" : "text-gray-400"
+                              }`}
+                            />
+                            <p
+                              className={`text-sm ${
+                                isDarkMode ? "text-slate-300" : "text-gray-600"
+                              }`}
+                            >
+                              Click to upload image
+                            </p>
+                            <p
+                              className={`text-xs mt-1 ${
+                                isDarkMode ? "text-slate-400" : "text-gray-500"
+                              }`}
+                            >
+                              JPEG, PNG, GIF, WebP (Max 5MB)
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Image Preview */}
+                        {imagePreview && (
+                          <div className="relative mt-2">
+                            <div className="flex items-center justify-between mb-2">
+                              <span
+                                className={`text-xs ${
+                                  isDarkMode
+                                    ? "text-slate-300"
+                                    : "text-gray-600"
+                                }`}
+                              >
+                                Preview:
+                              </span>
+                              <button
+                                type="button"
+                                onClick={removeImage}
+                                className={`text-xs flex items-center gap-1 px-2 py-1 rounded ${
+                                  isDarkMode
+                                    ? "text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                    : "text-red-500 hover:text-red-700 hover:bg-red-50"
+                                }`}
+                              >
+                                <X className="w-3 h-3" />
+                                Remove
+                              </button>
+                            </div>
+                            <div className="relative w-full h-48 rounded-lg overflow-hidden border border-gray-700">
+                              <img
+                                src={imagePreview}
+                                alt="Event preview"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Optional URL fallback */}
+                        <div className="mt-4">
+                          <p
+                            className={`text-xs mb-1 ${
+                              isDarkMode ? "text-slate-400" : "text-gray-500"
+                            }`}
+                          >
+                            Or provide an image URL (optional):
+                          </p>
+                          <input
+                            type="url"
+                            name="image"
+                            value={formData.image}
+                            onChange={handleChange}
+                            placeholder="https://example.com/image.jpg"
+                            className={`w-full px-3 py-2 rounded-lg border text-sm ${
+                              isDarkMode
+                                ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
+                                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
+                            } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -707,6 +917,19 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                       Cancel
                     </button>
                   </div>
+
+                  {/* Form Notes */}
+                  <div
+                    className={`text-xs mt-4 ${
+                      isDarkMode ? "text-slate-400" : "text-gray-500"
+                    }`}
+                  >
+                    <p className="mb-1">* Required fields</p>
+                    <p>
+                      Events will be reviewed before being published to ensure
+                      quality and relevance.
+                    </p>
+                  </div>
                 </form>
               </div>
             </div>
@@ -720,15 +943,18 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
         @keyframes fadeIn {
           from {
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-10px) translateX(-50%);
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) translateX(-50%);
           }
         }
         .animate-fadeIn {
           animation: fadeIn 0.3s ease-out;
+        }
+        .resize-vertical {
+          resize: vertical;
         }
       `}</style>
     </div>

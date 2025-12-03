@@ -491,7 +491,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
   const stats = [
     {
       label: "Total Alumni",
-      value: "1K+",
+      value: "5K+",
       icon: Users,
       color: "from-blue-500 to-cyan-500",
     },

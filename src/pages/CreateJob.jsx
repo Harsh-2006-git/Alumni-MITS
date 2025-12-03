@@ -5,18 +5,21 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import PostJobDialog from "../components/PostJobDialog";
 import Toast from "../components/Toast";
-import AuthPopup from "../components/AuthPopup"; // Import the auth popup
+import AuthPopup from "../components/AuthPopup";
 
 export default function CreateJobPage({ isDarkMode, toggleTheme }) {
   const [showPostJobDialog, setShowPostJobDialog] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [toast, setToast] = useState(null);
 
-  // Check if user is logged in
-  const isLoggedIn = () => {
+  // Check if user is logged in - returns boolean
+  const checkLoggedIn = () => {
     const authData = localStorage.getItem("auth");
-    return authData && JSON.parse(authData).accessToken;
+    return !!(authData && JSON.parse(authData).accessToken);
   };
+
+  // Get the logged in state
+  const isUserLoggedIn = checkLoggedIn();
 
   const showToast = (message, type = "info") => {
     setToast({ message, type });
@@ -28,7 +31,7 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
 
   // Handle post job button click
   const handlePostJobClick = () => {
-    if (!isLoggedIn()) {
+    if (!isUserLoggedIn) {
       setShowAuthPopup(true);
       return;
     }
@@ -84,6 +87,18 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
           </h1>
           <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
         </div>
+
+        {!isUserLoggedIn && (
+          <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 max-w-md mx-auto">
+            <p
+              className={`text-sm ${
+                isDarkMode ? "text-yellow-300" : "text-yellow-700"
+              }`}
+            >
+              💡 Please login to post jobs and access all features
+            </p>
+          </div>
+        )}
 
         <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
           Share Opportunities with the Community
@@ -187,7 +202,7 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
       <CreateJobHeroSection
         isDarkMode={isDarkMode}
         onPostJob={handlePostJobClick}
-        isUserLoggedIn={isLoggedIn()}
+        isUserLoggedIn={isUserLoggedIn}
       />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-12">
@@ -278,7 +293,7 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
             </div>
           </div>
 
-          {!isLoggedIn() && (
+          {!isUserLoggedIn && (
             <div className="mt-8 p-6 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 text-center">
               <h3 className="font-semibold mb-2 text-blue-400">
                 Ready to Post a Job?
