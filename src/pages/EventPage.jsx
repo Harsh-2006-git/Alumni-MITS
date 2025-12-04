@@ -358,7 +358,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
       const authData = localStorage.getItem("auth");
       const token = authData ? JSON.parse(authData).accessToken : null;
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/upcoming-event",
+        "https://alumni-mits-backend.onrender.com/event/upcoming-event",
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
@@ -384,7 +384,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         return;
       }
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/add-event",
+        "https://alumni-mits-backend.onrender.com/event/add-event",
         {
           method: "POST",
           headers: {
@@ -429,7 +429,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         return;
       }
       const response = await fetch(
-        "https://alumni-mits-l45r.onrender.com/event/registration",
+        "https://alumni-mits-backend.onrender.com/event/registration",
         {
           method: "POST",
           headers: {
