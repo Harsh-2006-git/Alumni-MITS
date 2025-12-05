@@ -35,6 +35,10 @@ export default function AlumniAuth({
   const [loading, setLoading] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
+  const [showYearPicker, setShowYearPicker] = useState(false);
+const [currentYearRange, setCurrentYearRange] = useState(
+  Math.floor(new Date().getFullYear() / 12) * 12
+);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -808,42 +812,167 @@ export default function AlumniAuth({
                           </div>
                         </div>
 
-                        <div>
-                          <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
-                          >
-                            Batch Year
-                          </label>
-                          <div className="relative">
-                            <Calendar
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
-                            />
-                            <input
-                              type="text"
-                              name="batchYear"
-                              value={formData.batchYear}
-                              onChange={handleChange}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
-                              placeholder="2020-2024"
-                              required
-                            />
-                          </div>
-                          <p
-                            className={`text-xs mt-1 ${
-                              isDarkMode ? "text-gray-400" : "text-gray-500"
-                            }`}
-                          >
-                            Format: YYYY-YYYY (e.g., 2020-2024)
-                          </p>
-                        </div>
+                     <div className="relative">
+  <label
+    className={`block text-sm font-medium mb-2 ${
+      isDarkMode ? "text-gray-300" : "text-gray-700"
+    }`}
+  >
+    Batch Year
+  </label>
+  
+  <div className="relative">
+    <Calendar
+      className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 z-10 ${
+        isDarkMode ? "text-gray-400" : "text-gray-500"
+      }`}
+    />
+    
+    {/* Calendar Year Picker Button */}
+    <button
+      type="button"
+      onClick={() => setShowYearPicker(!showYearPicker)}
+      className={`w-full pl-10 pr-4 py-3 rounded-lg outline-none transition-all duration-200 flex items-center justify-between ${
+        isDarkMode
+          ? "bg-gray-800 border border-gray-700 text-white hover:border-blue-500 focus:border-blue-500"
+          : "bg-white border border-gray-300 text-gray-900 hover:border-blue-500 focus:border-blue-500"
+      } ${showYearPicker ? "border-blue-500 ring-1 ring-blue-500" : ""}`}
+    >
+      <span className="text-sm font-medium truncate">
+        {formData.batchYear || "Select Batch Year"}
+      </span>
+      <svg
+        className={`w-4 h-4 transition-transform duration-200 ml-2 flex-shrink-0 ${
+          showYearPicker ? "rotate-180" : ""
+        } ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+    
+    {/* Hidden input for form submission */}
+    <input
+      type="hidden"
+      name="batchYear"
+      value={formData.batchYear}
+      required
+    />
+    
+    {/* Year Picker Dropdown - Compact Design */}
+    {showYearPicker && (
+      <div className={`absolute z-50 mt-1 w-full rounded-lg shadow-xl border overflow-hidden ${
+        isDarkMode 
+          ? "bg-gray-800 border-gray-700" 
+          : "bg-white border-gray-200"
+      }`}>
+        <div className="p-3">
+          {/* Header with navigation */}
+          <div className="flex justify-between items-center mb-3">
+            <button
+              type="button"
+              onClick={() => setCurrentYearRange(currentYearRange - 4)}
+              className={`p-2 rounded-md transition-colors ${
+                isDarkMode 
+                  ? "hover:bg-gray-700 text-gray-300" 
+                  : "hover:bg-gray-100 text-gray-700"
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <span className={`text-sm font-semibold px-2 ${
+              isDarkMode ? "text-gray-300" : "text-gray-800"
+            }`}>
+              {currentYearRange}-{currentYearRange + 3}
+            </span>
+            
+            <button
+              type="button"
+              onClick={() => setCurrentYearRange(currentYearRange + 4)}
+              className={`p-2 rounded-md transition-colors ${
+                isDarkMode 
+                  ? "hover:bg-gray-700 text-gray-300" 
+                  : "hover:bg-gray-100 text-gray-700"
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+          
+          {/* Compact 2x2 grid for year ranges */}
+          <div className="grid grid-cols-2 gap-2">
+            {Array.from({ length: 4 }, (_, i) => {
+              const startYear = currentYearRange + i;
+              const yearRange = `${startYear}-${startYear + 4}`;
+              const isSelected = formData.batchYear === yearRange;
+              return (
+                <button
+                  key={startYear}
+                  type="button"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      batchYear: yearRange
+                    });
+                    setShowYearPicker(false);
+                  }}
+                  className={`p-3 rounded-md transition-all duration-200 text-center min-w-0 ${
+                    isSelected
+                      ? isDarkMode
+                        ? "bg-blue-600 text-white shadow-md"
+                        : "bg-blue-500 text-white shadow-md"
+                      : isDarkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
+                        : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                  }`}
+                >
+                  <div className="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                    {startYear}-{startYear + 4}
+                  </div>
+                  <div className="text-xs opacity-90 mt-1 truncate">
+                    {startYear} batch
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+          
+          {/* Quick recent year button - Fixed logic */}
+          <button
+            type="button"
+            onClick={() => {
+              const currentYear = new Date().getFullYear();
+              // Calculate the most recent completed or ongoing batch
+              // If current year is 2024, recent batch would be 2020-2024 or 2021-2025 depending on time of year
+              const recentStartYear = currentYear - 4; // Show batch that ended recently
+              const yearRange = `${recentStartYear}-${recentStartYear + 4}`;
+              
+              setFormData({
+                ...formData,
+                batchYear: yearRange
+              });
+              setShowYearPicker(false);
+            }}
+            className={`w-full mt-3 py-2 px-3 text-sm rounded-md transition-colors ${
+              isDarkMode
+                ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+            }`}
+          >
+            Recent Batch 
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
 
                         <div>
                           <label
