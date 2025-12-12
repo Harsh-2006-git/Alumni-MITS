@@ -15,8 +15,9 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-const API_URL = "https://alumni-mits-backend.onrender.com/auth";
+const API_URL = `${BASE_URL}/auth`;
 
 export default function AdminLoginPage({
   setIsAuthenticated,

@@ -30,6 +30,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export default function AlumniAnalytics({
   isDarkMode,
@@ -45,7 +46,7 @@ export default function AlumniAnalytics({
     const fetchAlumni = async () => {
       try {
         const response = await fetch(
-          "https://alumni-mits-backend.onrender.com/alumni/all-alumni"
+          `${BASE_URL}/alumni/all-alumni`
         );
         const result = await response.json();
         if (result.success) {

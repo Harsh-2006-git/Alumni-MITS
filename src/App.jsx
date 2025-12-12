@@ -19,7 +19,7 @@ import ProfileAlumni from "./pages/ProfilePage-alumni";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLoginPage from "./pages/AdminLogin";
 import CampaignPage from "./pages/campaignPage";
-import OpenSourcePage from "./pages/OpenSource";
+
 import MyActivityPage from "./pages/ActivityPage";
 import MentorPage from "./pages/Mentor";
 import DistinguishedPage from "./pages/DistinguishAlumni";
@@ -35,6 +35,7 @@ import CreateCampaignPage from "./pages/CreateCampaign";
 import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorshipRequestsPage from "./pages/MentorshipRequestsPage";
 import ContactUsPage from "./pages/ContactUsPage";
+import CancerPage from "./pages/temp"
 
 import { Contact } from "lucide-react";
 
@@ -443,17 +444,17 @@ export default function App() {
               />
             }
           />
-          <Route
-            path="/opensource"
+           <Route
+            path="/cancer"
             element={
-              <OpenSourcePage
+              <CancerPage
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
                 isAuthenticated={isAuthenticated}
-                setIsAuthenticated={setIsAuthenticated}
               />
             }
           />
+          
 
           {/* Chat */}
           <Route

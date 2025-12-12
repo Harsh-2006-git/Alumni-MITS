@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Sparkles, Upload, Plus, Users } from "lucide-react";
-
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import PostJobDialog from "../components/PostJobDialog";
@@ -51,7 +51,7 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
       }
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/job/create-job",
+        `${BASE_URL}/job/create-job`,
         {
           method: "POST",
           headers: {

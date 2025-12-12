@@ -23,6 +23,7 @@ import {
   Calendar,
 } from "lucide-react";
 import ForgotPasswordPopup from "../components/ForgotPasswordPopup";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export default function AlumniAuth({
   setIsAuthenticated,
@@ -117,8 +118,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
 
     try {
       const endpoint = isLogin
-        ? "https://alumni-mits-backend.onrender.com/auth/login-alumni"
-        : "https://alumni-mits-backend.onrender.com/auth/register-alumni";
+        ? `${BASE_URL}/auth/login-alumni`
+        : `${BASE_URL}/auth/register-alumni`;
 
       const payload = isLogin
         ? { email: formData.email, password: formData.password }

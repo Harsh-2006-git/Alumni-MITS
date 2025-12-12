@@ -361,7 +361,7 @@ export function ScrollingAlumni({ isDarkMode }) {
         </div>
       </div>
 
-      <style jsx>{`
+      <style >{`
         @keyframes scroll {
           0% {
             transform: translateX(0);
@@ -451,28 +451,33 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("All");
 
-  const cities = useMemo(() => {
-    const citySet = new Set(alumni.map((a) => a.city));
-    return ["All", ...Array.from(citySet).sort()];
-  }, []);
+const cities = useMemo(() => {
+  const citySet = new Set(
+    alumni
+      .map((a) => a.city || "Unknown") // Handle missing cities
+      .filter(city => city && city.trim() !== "") // Filter out empty strings
+  );
+  return ["All", ...Array.from(citySet).sort()];
+}, []);
 
   const citiesCount = useMemo(() => {
     return new Set(alumni.map((a) => a.city)).size;
   }, []);
 
-  const filteredAlumni = useMemo(() => {
-    return alumni.filter((alumnus) => {
-      const matchesSearch =
-        alumnus.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        alumnus.post.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        alumnus.description.toLowerCase().includes(searchQuery.toLowerCase());
+ const filteredAlumni = useMemo(() => {
+  return alumni.filter((alumnus) => {
+    const matchesSearch =
+      alumnus.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      alumnus.post.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      alumnus.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesCity =
-        selectedCity === "All" || alumnus.city === selectedCity;
+    const matchesCity =
+      selectedCity === "All" || 
+      (alumnus.city || "Unknown") === selectedCity;
 
-      return matchesSearch && matchesCity;
-    });
-  }, [searchQuery, selectedCity]);
+    return matchesSearch && matchesCity;
+  });
+}, [searchQuery, selectedCity]);
 
   const totalAlumni = alumni.length;
 
@@ -601,20 +606,20 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
 
             {/* City Filter */}
             <select
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-              className={`px-3 py-2 rounded-lg border-2 transition-colors text-sm ${
-                isDarkMode
-                  ? "bg-slate-800 border-blue-600/20 text-white focus:border-cyan-400"
-                  : "bg-white border-blue-200 text-gray-900 focus:border-blue-500"
-              } focus:outline-none cursor-pointer`}
-            >
-              {cities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+  value={selectedCity}
+  onChange={(e) => setSelectedCity(e.target.value)}
+  className={`px-3 py-2 rounded-lg border-2 transition-colors text-sm ${
+    isDarkMode
+      ? "bg-slate-800 border-blue-600/20 text-white focus:border-cyan-400"
+      : "bg-white border-blue-200 text-gray-900 focus:border-blue-500"
+  } focus:outline-none cursor-pointer`}
+>
+  {cities.map((city) => (
+    <option key={city} value={city}>
+      {city}
+    </option>
+  ))}
+</select>
           </div>
 
           {/* Results Count */}

@@ -115,7 +115,8 @@ const MentorshipRequestsPage = ({
     mentor_notes: "",
   });
 
-  const API_BASE = "https://alumni-mits-backend.onrender.com/mentor";
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+  const API_BASE = `${BASE_URL}/mentor`;
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");

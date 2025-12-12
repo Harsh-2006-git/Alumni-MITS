@@ -38,8 +38,10 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     fees: "",
     available: true,
   });
+  
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-  const API_BASE = "https://alumni-mits-backend.onrender.com/mentor";
+  const API_BASE = `${BASE_URL}/mentor`;
 
   // Show notification helper
   const showNotification = (message, type = "success") => {

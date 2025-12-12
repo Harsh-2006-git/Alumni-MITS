@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import Header from "../components/header";
 import Footer from "../components/footer";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export default function CampaignPage({ isDarkMode, toggleTheme }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -83,7 +84,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/campaign/get-approve-campaign"
+        `${BASE_URL}/campaign/get-approve-campaign`
       );
       const data = await response.json();
       if (response.ok) {
@@ -179,7 +180,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
       });
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/campaign/create-campaign",
+        `${BASE_URL}/campaign/create-campaign`,
         {
           method: "POST",
           headers: {

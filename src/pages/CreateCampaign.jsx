@@ -16,6 +16,7 @@ export default function CreateCampaignPage({
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showCampaignDialog, setShowCampaignDialog] = useState(false);
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -177,7 +178,7 @@ export default function CreateCampaignPage({
       });
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/campaign/create-campaign",
+        `${BASE_URL}/campaign/create-campaign`,
         {
           method: "POST",
           headers: {

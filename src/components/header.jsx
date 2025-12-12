@@ -23,6 +23,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const [showCampaignDropdown, setShowCampaignDropdown] = useState(false);
   const [showMentorDropdown, setShowMentorDropdown] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   const [auth, setAuth] = useState(null);
   const dropdownRef = useRef(null);
@@ -60,7 +61,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
     console.log("Refreshing token:", refreshToken);
     try {
       const res = await fetch(
-        "https://alumni-mits-backend.onrender.com/auth/refresh",
+        `${BASE_URL}/auth/refresh`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

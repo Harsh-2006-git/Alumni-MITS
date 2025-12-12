@@ -27,6 +27,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import SkillAnalysisPopup from "../components/SkillAnalysisPopup";
 import Toast from "../components/Toast";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 // Enhanced Hero Section
 const HeroSection = ({
@@ -653,6 +654,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
     category: "all",
     experience: "all",
   });
+  
 
   const showToast = (message, type = "info") => {
     setToast({ message, type });
@@ -680,7 +682,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/job/all-jobs"
+        `${BASE_URL}/job/all-jobs`
       );
 
       if (!response.ok) {

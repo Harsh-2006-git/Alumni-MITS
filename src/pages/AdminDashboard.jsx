@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 import {
   Menu,
   X,
@@ -571,6 +572,7 @@ const DashboardOverview = ({ stats, loading, onTabChange }) => {
 
 // Page 2: Alumni Management
 const AlumniManagementPage = ({ onError, onSuccess }) => {
+  
   const [alumni, setAlumni] = useState([]);
   const [nonVerifiedAlumni, setNonVerifiedAlumni] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -589,11 +591,11 @@ const AlumniManagementPage = ({ onError, onSuccess }) => {
       if (!token) throw new Error("Authentication token not found");
 
       const [verifiedResponse, nonVerifiedResponse] = await Promise.all([
-        fetch("https://alumni-mits-backend.onrender.com/alumni/all-alumni", {
+        fetch(`${BASE_URL}/alumni/all-alumni`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(
-          "https://alumni-mits-backend.onrender.com/alumni/all-nonvarified-alumni",
+          `${BASE_URL}/alumni/all-nonvarified-alumni`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -624,7 +626,7 @@ const AlumniManagementPage = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://alumni-mits-backend.onrender.com/alumni/${alumniId}/verify`,
+        `${BASE_URL}/alumni/${alumniId}/verify`,
         {
           method: "PATCH",
           headers: {
@@ -649,7 +651,7 @@ const AlumniManagementPage = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        `https://alumni-mits-backend.onrender.com/alumni/delete/${alumniId}`,
+        `${BASE_URL}/alumni/delete/${alumniId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
@@ -1097,7 +1099,7 @@ const BulkRegisterPage = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/auth/bulk-register-alumni",
+        `${BASE_URL}/auth/bulk-register-alumni`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -1300,7 +1302,7 @@ const EventManagementPage = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/event/all-event",
+        `${BASE_URL}/event/all-event`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -1327,7 +1329,7 @@ const EventManagementPage = ({ onError, onSuccess }) => {
 
       if (action === "delete") {
         const response = await fetch(
-          `https://alumni-mits-backend.onrender.com/event/delete/${eventId}`,
+          `${BASE_URL}/event/delete/${eventId}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
@@ -1338,7 +1340,7 @@ const EventManagementPage = ({ onError, onSuccess }) => {
         onSuccess("Event deleted successfully");
       } else {
         const response = await fetch(
-          `https://alumni-mits-backend.onrender.com/event/review/${eventId}`,
+          `${BASE_URL}/event/review/${eventId}`,
           {
             method: "PUT",
             headers: {
@@ -1585,7 +1587,7 @@ const CampaignManagementPage = ({ onError, onSuccess }) => {
     try {
       const token = getAuthToken();
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/campaign/all-campaign",
+       `${BASE_URL}/campaign/all-campaign`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -1616,7 +1618,7 @@ const CampaignManagementPage = ({ onError, onSuccess }) => {
 
       if (action === "delete") {
         const response = await fetch(
-          `https://alumni-mits-backend.onrender.com/campaign/delete/${campaignId}`,
+          `${BASE_URL}/campaign/delete/${campaignId}`,
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
@@ -1627,7 +1629,7 @@ const CampaignManagementPage = ({ onError, onSuccess }) => {
         onSuccess("Campaign deleted successfully");
       } else if (action === "approve") {
         const response = await fetch(
-          `https://alumni-mits-backend.onrender.com/campaign/${campaignId}/approval`,
+          `${BASE_URL}/campaign/${campaignId}/approval`,
           {
             method: "PATCH",
             headers: {
@@ -1975,20 +1977,20 @@ const AdminDashboard = ({ setIsAuthenticated }) => {
         eventsResponse,
         campaignsResponse,
       ] = await Promise.all([
-        fetch("https://alumni-mits-backend.onrender.com/alumni/all-alumni", {
+        fetch(`${BASE_URL}/alumni/all-alumni`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(
-          "https://alumni-mits-backend.onrender.com/alumni/all-nonvarified-alumni",
+          `${BASE_URL}/alumni/all-nonvarified-alumni`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         ),
-        fetch("https://alumni-mits-backend.onrender.com/event/all-event", {
+        fetch(`${BASE_URL}/event/all-event`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(
-          "https://alumni-mits-backend.onrender.com/campaign/all-campaign",
+          `${BASE_URL}/campaign/all-campaign`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

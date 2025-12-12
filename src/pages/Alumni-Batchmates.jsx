@@ -35,13 +35,14 @@ export default function BatchmatesFinder({
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [expandedBatch, setExpandedBatch] = useState(null);
   const [viewMode, setViewMode] = useState("batches");
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   // Fetch alumni data from API
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
         const response = await fetch(
-          "https://alumni-mits-backend.onrender.com/alumni/all-alumni"
+          `${BASE_URL}/alumni/all-alumni`
         );
         const result = await response.json();
         if (result.success) {

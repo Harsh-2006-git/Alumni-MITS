@@ -18,6 +18,7 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 import AuthPopup from "../components/AuthPopup";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 const Message = ({ type, message, onClose }) => {
   if (!message) return null;
 
@@ -217,7 +218,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
       console.log("Sending FormData to server...");
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/event/add-event",
+        `${BASE_URL}/event/add-event`,
         {
           method: "POST",
           headers: {

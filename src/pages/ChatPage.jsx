@@ -33,6 +33,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL ;
+  
+  console.log("BASE_URL from env:", BASE_URL);
+
+  // Helper function to generate unique keys
+  const getPersonKey = (person, prefix = "") => {
+    return `${prefix}${person.userType}-${person.phone}-${person.email || "no-email"}-${person.id || Date.now()}`;
+  };
 
   useEffect(() => {
     const initAuth = async () => {
@@ -45,7 +53,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
           try {
             const response = await fetch(
-              "https://alumni-mits-backend.onrender.com/message/people",
+              `${BASE_URL}/message/people`,
               {
                 headers: {
                   Authorization: `Bearer ${parsedAuth.accessToken}`,
@@ -56,7 +64,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
             if (response.ok) {
               const data = await response.json();
-              const currentUserData = data.data.find(
+              const currentUserData = data.data?.find(
                 (p) => p.email === parsedAuth.userEmail
               );
 
@@ -97,7 +105,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
     };
 
     initAuth();
-  }, []);
+  }, [BASE_URL]);
 
   useEffect(() => {
     if (currentUser && !isInitializing) {
@@ -117,7 +125,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
       return () => clearInterval(interval);
     }
-  }, [selectedUser]);
+  }, [selectedUser, currentUser]);
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");
@@ -151,7 +159,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("Fetching people...");
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/message/people",
+        `${BASE_URL}/message/people`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -177,13 +185,13 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("People data received:", data);
 
       if (data.success && currentUser) {
-        const filteredPeople = data.data.filter(
+        const filteredPeople = data.data?.filter(
           (p) => p.phone !== currentUser.phone && p.email !== currentUser.email
-        );
+        ) || [];
         setPeople(filteredPeople);
 
         const messagesResponse = await fetch(
-          "https://alumni-mits-backend.onrender.com/message/my",
+         `${BASE_URL}/message/my`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -203,18 +211,18 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         if (messagesData.success) {
           const uniquePhones = new Set();
 
-          messagesData.data.forEach((msg) => {
+          messagesData.data?.forEach((msg) => {
             if (
-              msg.sender.phone !== currentUser.phone &&
-              msg.sender.email !== currentUser.email
+              msg.sender?.phone !== currentUser.phone &&
+              msg.sender?.email !== currentUser.email
             ) {
-              uniquePhones.add(msg.sender.phone);
+              uniquePhones.add(msg.sender?.phone);
             }
             if (
-              msg.receiver.phone !== currentUser.phone &&
-              msg.receiver.email !== currentUser.email
+              msg.receiver?.phone !== currentUser.phone &&
+              msg.receiver?.email !== currentUser.email
             ) {
-              uniquePhones.add(msg.receiver.phone);
+              uniquePhones.add(msg.receiver?.phone);
             }
           });
 
@@ -235,7 +243,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   };
 
   const fetchMessages = async () => {
-    if (!selectedUser) return;
+    if (!selectedUser || !currentUser) return;
     try {
       const token = getAuthToken();
       if (!token) {
@@ -248,7 +256,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("Selected user phone:", selectedUser.phone);
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/message/my",
+       `${BASE_URL}/message/my`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -266,13 +274,13 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("All messages received:", data.data);
 
       if (data.success) {
-        const filtered = data.data.filter(
+        const filtered = data.data?.filter(
           (msg) =>
-            (msg.sender.phone === selectedUser.phone &&
-              msg.receiver.phone === currentUser.phone) ||
-            (msg.receiver.phone === selectedUser.phone &&
-              msg.sender.phone === currentUser.phone)
-        );
+            (msg.sender?.phone === selectedUser.phone &&
+              msg.receiver?.phone === currentUser.phone) ||
+            (msg.receiver?.phone === selectedUser.phone &&
+              msg.sender?.phone === currentUser.phone)
+        ) || [];
         console.log("Filtered messages:", filtered);
         setMessages(filtered);
       }
@@ -293,7 +301,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       }
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/message/send",
+       `${BASE_URL}/message/send`,
         {
           method: "POST",
           headers: {
@@ -338,8 +346,8 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   };
 
   const scrollToBottom = () => {
-    if (!isUserScrolling) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!isUserScrolling && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -367,14 +375,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
   const filteredPeople = people.filter(
     (person) =>
-      person.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      person.email.toLowerCase().includes(searchQuery.toLowerCase())
+      person.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      person.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const filteredChats = recentChats.filter(
     (person) =>
-      person.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      person.email.toLowerCase().includes(searchQuery.toLowerCase())
+      person.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      person.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const formatTime = (timestamp) =>
@@ -508,7 +516,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   ) : (
                     filteredChats.map((person) => (
                       <div
-                        key={`${person.userType}-${person.phone}-${person.id}`}
+                        key={getPersonKey(person, "mobile-chat-")}
                         onClick={() => setSelectedUser(person)}
                         className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
                           isDarkMode
@@ -566,7 +574,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                     )
                     .map((person) => (
                       <div
-                        key={`${person.userType}-${person.phone}-${person.id}`}
+                        key={getPersonKey(person, "mobile-person-")}
                         onClick={() => setSelectedUser(person)}
                         className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
                           isDarkMode
@@ -704,10 +712,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                 ) : (
                   <>
                     {messages.map((msg) => {
-                      const isSent = msg.sender.phone === currentUser?.phone;
+                      const isSent = msg.sender?.phone === currentUser?.phone;
                       return (
                         <div
-                          key={msg.id}
+                          key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
                           className={`mb-4 flex ${
                             isSent ? "justify-end" : "justify-start"
                           }`}
@@ -829,7 +837,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
               ) : (
                 filteredChats.map((person) => (
                   <div
-                    key={`${person.userType}-${person.phone}-${person.id}`}
+                    key={getPersonKey(person, "desktop-chat-")}
                     onClick={() => setSelectedUser(person)}
                     className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
                       selectedUser?.phone === person.phone
@@ -978,10 +986,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   ) : (
                     <>
                       {messages.map((msg) => {
-                        const isSent = msg.sender.phone === currentUser?.phone;
+                        const isSent = msg.sender?.phone === currentUser?.phone;
                         return (
                           <div
-                            key={msg.id}
+                            key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
                             className={`mb-4 flex ${
                               isSent ? "justify-end" : "justify-start"
                             }`}
@@ -1128,7 +1136,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                 .filter((p) => !recentChats.find((rc) => rc.phone === p.phone))
                 .map((person) => (
                   <div
-                    key={`${person.userType}-${person.phone}-${person.id}`}
+                    key={getPersonKey(person, "sidebar-person-")}
                     onClick={() => setSelectedUser(person)}
                     className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
                       isDarkMode

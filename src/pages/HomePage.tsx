@@ -36,6 +36,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ScrollingAlumni } from "./DistinguishAlumni";
 
+
 import Header from "../components/header";
 import Footer from "../components/footer";
 interface HomePageProps {

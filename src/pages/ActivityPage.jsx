@@ -763,6 +763,7 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
 };
 
 const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
   const [activeTab, setActiveTab] = useState("events");
   const [events, setEvents] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -773,6 +774,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
     campaigns: false,
     all: true,
   });
+  
   const [showRegistrationsModal, setShowRegistrationsModal] = useState(false);
   const [registrations, setRegistrations] = useState([]);
   const [loadingRegistrations, setLoadingRegistrations] = useState(false);
@@ -803,7 +805,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
     try {
       // Fetch events
       const eventsPromise = fetch(
-        "https://alumni-mits-backend.onrender.com/event/my-events",
+       `${BASE_URL}/event/my-events`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -814,7 +816,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
       // Fetch jobs
       const jobsPromise = fetch(
-        "https://alumni-mits-backend.onrender.com/job/my-jobs",
+        `${BASE_URL}/job/my-jobs`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -825,7 +827,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
       // Fetch campaigns
       const campaignsPromise = fetch(
-        "https://alumni-mits-backend.onrender.com/campaign/get-my-campaigns",
+        `${BASE_URL}/campaign/get-my-campaigns`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -871,16 +873,16 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
       let url, dataKey;
       switch (section) {
         case "events":
-          url = "https://alumni-mits-backend.onrender.com/event/my-events";
+          url = `${BASE_URL}/event/my-events`;
           dataKey = "events";
           break;
         case "jobs":
-          url = "https://alumni-mits-backend.onrender.com/job/my-jobs";
+          url = `${BASE_URL}/job/my-jobs`;
           dataKey = "data";
           break;
         case "campaigns":
           url =
-            "https://alumni-mits-backend.onrender.com/campaign/get-my-campaigns";
+           `${BASE_URL}/campaign/get-my-campaigns`;
           dataKey = "campaigns";
           break;
         default:
@@ -927,9 +929,9 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     const token = getAuthToken();
     const endpoints = {
-      events: `https://alumni-mits-backend.onrender.com/event/delete/${id}`,
-      jobs: `https://alumni-mits-backend.onrender.com/job/delete/${id}`,
-      campaigns: `https://alumni-mits-backend.onrender.com/campaign/delete/${id}`,
+      events: `${BASE_URL}/event/delete/${id}`,
+      jobs: `${BASE_URL}/job/delete/${id}`,
+      campaigns: `${BASE_URL}/campaign/delete/${id}`,
     };
 
     try {
@@ -969,7 +971,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `https://alumni-mits-backend.onrender.com/event/update/${formData.id}`,
+        `${BASE_URL}/event/update/${formData.id}`,
         {
           method: "PUT",
           headers: {
@@ -1014,7 +1016,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `https://alumni-mits-backend.onrender.com/job/update/${formData.id}`,
+        `${BASE_URL}/job/update/${formData.id}`,
         {
           method: "PUT",
           headers: {
@@ -1043,7 +1045,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
     try {
       const res = await fetch(
-        `https://alumni-mits-backend.onrender.com/event/event-registrations/${eventId}`,
+        `${BASE_URL}/event/event-registrations/${eventId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1064,7 +1066,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
   const downloadExcel = (eventId, eventTitle) => {
     const token = getAuthToken();
     fetch(
-      `https://alumni-mits-backend.onrender.com/event/download-registrations/${eventId}`,
+      `${BASE_URL}/event/download-registrations/${eventId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -1292,18 +1294,18 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
       {job.requiredSkills && job.requiredSkills.length > 0 && (
         <div className="flex flex-wrap gap-1 sm:gap-2 mt-3">
-          {job.requiredSkills.slice(0, 4).map((skill, i) => (
-            <span
-              key={i}
-              className={`px-2 py-1 rounded-lg text-xs ${
-                isDarkMode
-                  ? "bg-slate-700 text-gray-300"
-                  : "bg-gray-100 text-gray-700"
-              }`}
-            >
-              {skill}
-            </span>
-          ))}
+        {job.requiredSkills.slice(0, 4).map((skill, i) => (
+  <span
+    key={i} // Add key here
+    className={`px-2 py-1 rounded-lg text-xs ${
+      isDarkMode
+        ? "bg-slate-700 text-gray-300"
+        : "bg-gray-100 text-gray-700"
+    }`}
+  >
+    {skill}
+  </span>
+))}
           {job.requiredSkills.length > 4 && (
             <span
               className={`px-2 py-1 rounded-lg text-xs ${
@@ -1540,77 +1542,85 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
       ></div>
     </div>
   );
+const renderContent = () => {
+  
 
-  const renderContent = () => {
-    if (loading.all) {
-      return <LoadingSpinner />;
-    }
+  if (loading.all) {
+    return <LoadingSpinner key="loading-all" />;
+  }
 
-    const sectionLoading = loading[activeTab];
+  const sectionLoading = loading[activeTab];
 
-    if (sectionLoading) {
-      return <LoadingSpinner size="small" />;
-    }
+  if (sectionLoading) {
+    return <LoadingSpinner key="loading-section" size="small" />;
+  }
 
-    const items = {
-      events: events,
-      jobs: jobs,
-      campaigns: campaigns,
+  const items = {
+    events: events,
+    jobs: jobs,
+    campaigns: campaigns,
+  };
+
+  const currentItems = items[activeTab];
+
+  if (!currentItems || currentItems.length === 0) {
+    const emptyStates = {
+      events: {
+        icon: Calendar,
+        text: "No events found",
+        subtext: "Create your first event to get started",
+      },
+      jobs: {
+        icon: Briefcase,
+        text: "No jobs found",
+        subtext: "Post your first job opportunity",
+      },
+      campaigns: {
+        icon: Target,
+        text: "No campaigns found",
+        subtext: "Launch your first fundraising campaign",
+      },
     };
 
-    const currentItems = items[activeTab];
+    const EmptyIcon = emptyStates[activeTab].icon;
 
-    if (!currentItems || currentItems.length === 0) {
-      const emptyStates = {
-        events: {
-          icon: Calendar,
-          text: "No events found",
-          subtext: "Create your first event to get started",
-        },
-        jobs: {
-          icon: Briefcase,
-          text: "No jobs found",
-          subtext: "Post your first job opportunity",
-        },
-        campaigns: {
-          icon: Target,
-          text: "No campaigns found",
-          subtext: "Launch your first fundraising campaign",
-        },
-      };
+    return (
+      <div
+        key="empty-state"
+        className={`text-center py-20 rounded-2xl ${
+          isDarkMode
+            ? "bg-slate-800/50 text-gray-400"
+            : "bg-white text-gray-500"
+        }`}
+      >
+        <EmptyIcon size={64} className="mx-auto mb-4 opacity-50" />
+        <p className="text-xl">{emptyStates[activeTab].text}</p>
+        <p className="text-sm mt-2">{emptyStates[activeTab].subtext}</p>
+      </div>
+    );
+  }
 
-      const EmptyIcon = emptyStates[activeTab].icon;
-
-      return (
-        <div
-          className={`text-center py-20 rounded-2xl ${
-            isDarkMode
-              ? "bg-slate-800/50 text-gray-400"
-              : "bg-white text-gray-500"
-          }`}
-        >
-          <EmptyIcon size={64} className="mx-auto mb-4 opacity-50" />
-          <p className="text-xl">{emptyStates[activeTab].text}</p>
-          <p className="text-sm mt-2">{emptyStates[activeTab].subtext}</p>
-        </div>
-      );
-    }
-
-    switch (activeTab) {
-      case "events":
-        return events.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ));
-      case "jobs":
-        return jobs.map((job) => <JobCard key={job.id} job={job} />);
-      case "campaigns":
-        return campaigns.map((campaign) => (
-          <CampaignCard key={campaign.id} campaign={campaign} />
-        ));
-      default:
-        return null;
-    }
-  };
+  // Add React Fragment with key
+  return (
+    <React.Fragment key={`fragment-${activeTab}`}>
+      {activeTab === "events" &&
+        events.map((event, index) => (
+          <EventCard key={event.id || event._id || `event-${index}`} event={event} />
+        ))}
+      {activeTab === "jobs" &&
+        jobs.map((job, index) => {
+          // Try multiple possible ID fields
+          const jobKey = job._id || job.jobId || job.id || `job-${index}`;
+          console.log(`Job ${index} key:`, jobKey);
+          return <JobCard key={jobKey} job={job} />;
+        })}
+      {activeTab === "campaigns" &&
+        campaigns.map((campaign, index) => (
+          <CampaignCard key={campaign.id || campaign._id || `campaign-${index}`} campaign={campaign} />
+        ))}
+    </React.Fragment>
+  );
+};
 
   return (
     <div
@@ -1767,7 +1777,8 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
                   {registrations.map((reg, index) => (
                     <div
-                      key={index}
+                      
+    key={reg.id || reg.userId || `reg-${index}`} // Add key here
                       className={`rounded-xl p-4 sm:p-6 border-2 transition-all hover:scale-105 ${
                         isDarkMode
                           ? "bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600 hover:border-green-400"

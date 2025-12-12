@@ -22,26 +22,23 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface Props {
-  setIsAuthenticated: (value: boolean) => void;
-  isDarkMode: boolean;
-  toggleTheme: () => void;
-}
-
-const API_URL = "https://alumni-mits-backend.onrender.com/auth";
+// Use the environment variable - this will work in JSX without TypeScript errors
+const API_URL = import.meta.env.VITE_API_BASE_URL 
+  ? `${import.meta.env.VITE_API_BASE_URL}/auth`
+  : "http://localhost:3001/auth";
 
 export default function LoginPage({
   setIsAuthenticated,
   isDarkMode,
   toggleTheme,
-}: Props) {
+}) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
 
-  const handleAuthError = (errorType: string) => {
+  const handleAuthError = (errorType) => {
     switch (errorType) {
       case "unauthorized_domain":
         setError(

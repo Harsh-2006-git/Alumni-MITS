@@ -17,6 +17,7 @@ const SkillAnalysisPopup = ({ job, isOpen, onClose, isDarkMode }) => {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   useEffect(() => {
     if (isOpen && job) {
@@ -53,7 +54,7 @@ const SkillAnalysisPopup = ({ job, isOpen, onClose, isDarkMode }) => {
       console.log("Sending skill analysis request:", payload);
 
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/alumni/analyze",
+        `${BASE_URL}/alumni/analyze`,
         {
           method: "POST",
           headers: {

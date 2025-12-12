@@ -40,103 +40,35 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-interface Education {
-  type: string;
-  stream: string;
-  institution: string;
-  from: string;
-  to: string;
-  gpa: string;
-}
-
-interface Experience {
-  designation: string;
-  company: string;
-  from: string;
-  to: string | null;
-  current: boolean;
-  location: string;
-  description: string;
-}
-
-interface Profile {
-  id?: number;
-  alumniId?: number;
-  location?: string;
-  branch?: string;
-  about?: string;
-  skills?: string[];
-  achievements?: string[];
-  linkedin?: string;
-  github?: string;
-  twitter?: string;
-  portfolio?: string;
-  education?: Education[];
-  experience?: Experience[];
-  resume?: string; // Add this line
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface UserData {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  userType: string;
-  isVerified: boolean;
-  profile?: Profile;
-  profilePhoto?: string;
-  resume?: string;
-}
-
-interface EditModalState {
-  isOpen: boolean;
-  section: string | null;
-}
-
-interface FormData {
-  about?: string;
-  skills?: string[];
-  achievements?: string[];
-  linkedin?: string;
-  github?: string;
-  twitter?: string;
-  portfolio?: string;
-  experience?: Experience[];
-  education?: Education[];
-  location?: string;
-  branch?: string;
-}
-
 export default function AlumniProfilePage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");
   const [isLoading, setIsLoading] = useState(true);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [editModal, setEditModal] = useState<EditModalState>({
+  const [userData, setUserData] = useState(null);
+  const [editModal, setEditModal] = useState({
     isOpen: false,
     section: null,
   });
-  const [uploadingResume, setUploadingResume] = useState(false);
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const [showResumeModal, setShowResumeModal] = useState(false);
-  const [formData, setFormData] = useState<FormData>({});
+  const [formData, setFormData] = useState({});
   const [tempSkill, setTempSkill] = useState("");
   const [tempAchievement, setTempAchievement] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoFile, setPhotoFile] = useState(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [showResumeModal, setShowResumeModal] = useState(false);
 
-  const API_BASE_URL = "https://alumni-mits-backend.onrender.com";
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   useEffect(() => {
     fetchUserData();
   }, []);
 
-  const getAuthToken = (): string | null => {
+  const getAuthToken = () => {
     const authData = localStorage.getItem("auth");
     if (authData) {
       try {
@@ -148,65 +80,8 @@ export default function AlumniProfilePage() {
     }
     return null;
   };
-  const handleResumeUpload = async (file: File): Promise<void> => {
-    try {
-      setUploadingResume(true);
-      const token = getAuthToken();
 
-      if (!token) {
-        console.error("No authentication token found");
-        alert("Please log in again");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("resume", file); // Changed from "file" to "resume" to match multer configuration
-
-      const response = await fetch(`${API_BASE_URL}/alumni/upload-resume`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          // Don't set Content-Type for FormData, let browser set it with boundary
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Resume upload successful:", result);
-
-        // Update user data with the new resume URL
-        if (userData && result.resumeUrl) {
-          setUserData({
-            ...userData,
-            resume: result.resumeUrl,
-          });
-        }
-
-        setShowResumeModal(false);
-        setResumeFile(null);
-        await fetchUserData(); // Refresh user data
-
-        alert("Resume uploaded successfully!");
-      } else {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-    } catch (error) {
-      console.error("Error uploading resume:", error);
-      alert(
-        `Failed to upload resume: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
-    } finally {
-      setUploadingResume(false);
-    }
-  };
-
-  const fetchUserData = async (): Promise<void> => {
+  const fetchUserData = async () => {
     try {
       setIsLoading(true);
       const token = getAuthToken();
@@ -216,10 +91,9 @@ export default function AlumniProfilePage() {
         setIsLoading(false);
         return;
       }
-      console.log("✅ Access Token:", token);
 
       const response = await fetch(
-        `${API_BASE_URL}/alumni/get-profile-student`,
+        `${API_BASE_URL}/alumni/get-profile-alumni`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -241,7 +115,7 @@ export default function AlumniProfilePage() {
 
       const data = await response.json();
       console.log(data);
-      setUserData(data.student);
+      setUserData(data.alumni);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -249,348 +123,6 @@ export default function AlumniProfilePage() {
     }
   };
 
-  const updateProfile = async (updates: Partial<Profile>): Promise<void> => {
-    try {
-      if (!userData) {
-        console.error("No user data available");
-        return;
-      }
-
-      const token = getAuthToken();
-      if (!token) {
-        console.error("No authentication token found");
-        return;
-      }
-
-      const response = await fetch(`${API_BASE_URL}/alumni/profile-student`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          alumniId: userData.id,
-          ...updates,
-        }),
-      });
-
-      if (response.status === 401) {
-        console.error("Token expired or invalid");
-        localStorage.removeItem("auth");
-        window.location.href = "/login";
-        return;
-      }
-
-      if (response.ok) {
-        await fetchUserData();
-        setEditModal({ isOpen: false, section: null });
-        setTempSkill("");
-        setTempAchievement("");
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    }
-  };
-
-  const openEditModal = (section: string): void => {
-    const profile = userData?.profile || {};
-    const formDataMap: { [key: string]: FormData } = {
-      about: { about: profile.about || "" },
-      skills: { skills: profile.skills || [] },
-      achievements: { achievements: profile.achievements || [] },
-      social: {
-        linkedin: profile.linkedin || "",
-        github: profile.github || "",
-        twitter: profile.twitter || "",
-        portfolio: profile.portfolio || "",
-      },
-      experience: { experience: profile.experience || [] },
-      education: { education: profile.education || [] },
-      location: {
-        location: profile.location || "",
-        branch: profile.branch || "",
-      },
-      full: {
-        about: profile.about || "",
-        skills: profile.skills || [],
-        achievements: profile.achievements || [],
-        linkedin: profile.linkedin || "",
-        github: profile.github || "",
-        twitter: profile.twitter || "",
-        portfolio: profile.portfolio || "",
-        experience: profile.experience || [],
-        education: profile.education || [],
-        location: profile.location || "",
-        branch: profile.branch || "",
-      },
-    };
-
-    setFormData(formDataMap[section] || {});
-    setEditModal({ isOpen: true, section });
-  };
-
-  const handlePhotoUpload = async (file: File): Promise<void> => {
-    try {
-      setUploadingPhoto(true);
-      const token = getAuthToken();
-
-      if (!token) {
-        console.error("No authentication token found");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("profilePhoto", file);
-
-      const response = await fetch(`${API_BASE_URL}/alumni/upload`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Upload successful:", result);
-
-        // Update userData immediately with the new photo URL
-        if (userData && result.imageUrl) {
-          setUserData({
-            ...userData,
-            profilePhoto: result.imageUrl,
-          });
-        }
-
-        setShowPhotoModal(false);
-        setPhotoFile(null);
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-    } catch (error) {
-      console.error("Error uploading photo:", error);
-    } finally {
-      setUploadingPhoto(false);
-    }
-  };
-
-  const handleSubmit = (): void => {
-    updateProfile(formData);
-  };
-
-  const addSkill = (): void => {
-    if (tempSkill.trim()) {
-      setFormData({
-        ...formData,
-        skills: [...(formData.skills || []), tempSkill.trim()],
-      });
-      setTempSkill("");
-    }
-  };
-
-  const removeSkill = (index: number): void => {
-    setFormData({
-      ...formData,
-      skills: (formData.skills || []).filter((_, i) => i !== index),
-    });
-  };
-
-  const addAchievement = (): void => {
-    if (tempAchievement.trim()) {
-      setFormData({
-        ...formData,
-        achievements: [
-          ...(formData.achievements || []),
-          tempAchievement.trim(),
-        ],
-      });
-      setTempAchievement("");
-    }
-  };
-
-  const removeAchievement = (index: number): void => {
-    setFormData({
-      ...formData,
-      achievements: (formData.achievements || []).filter((_, i) => i !== index),
-    });
-  };
-
-  const addArrayItem = (field: "experience" | "education"): void => {
-    if (field === "experience") {
-      setFormData({
-        ...formData,
-        experience: [
-          ...(formData.experience || []),
-          {
-            designation: "",
-            company: "",
-            from: "",
-            to: null,
-            current: false,
-            location: "",
-            description: "",
-          },
-        ],
-      });
-    } else if (field === "education") {
-      setFormData({
-        ...formData,
-        education: [
-          ...(formData.education || []),
-          { type: "", stream: "", institution: "", from: "", to: "", gpa: "" },
-        ],
-      });
-    }
-  };
-
-  const removeArrayItem = (
-    field: "experience" | "education",
-    index: number
-  ): void => {
-    const currentArray = formData[field];
-    if (!currentArray) return;
-
-    setFormData({
-      ...formData,
-      [field]: currentArray.filter((_: any, i: number) => i !== index),
-    });
-  };
-
-  const updateArrayItem = (
-    field: "experience" | "education",
-    index: number,
-    key: string,
-    value: any
-  ): void => {
-    const currentArray = formData[field];
-    if (!currentArray || index >= currentArray.length) return;
-
-    const updated = [...currentArray];
-    updated[index] = { ...updated[index], [key]: value };
-    setFormData({ ...formData, [field]: updated });
-  };
-
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const renderPhotoUploadModal = () => {
-    if (!showPhotoModal) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div
-          className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-3xl p-8 shadow-2xl transform transition-all ${
-            isDarkMode
-              ? "bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"
-              : "bg-gradient-to-br from-white via-blue-50 to-indigo-50"
-          }`}
-        >
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Update Profile Photo
-            </h2>
-            <button
-              onClick={() => {
-                setShowPhotoModal(false);
-                setPhotoFile(null);
-              }}
-              className={`p-2 rounded-xl transition-all ${
-                isDarkMode ? "hover:bg-white/10" : "hover:bg-gray-200"
-              }`}
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-
-          <div className="space-y-6">
-            {photoFile ? (
-              <div className="text-center">
-                <img
-                  src={URL.createObjectURL(photoFile)}
-                  alt="Preview"
-                  className="w-40 h-40 mx-auto rounded-2xl object-cover border-4 border-blue-500/30 shadow-xl"
-                />
-                <p
-                  className={`mt-3 text-sm ${
-                    isDarkMode ? "text-gray-300" : "text-gray-600"
-                  }`}
-                >
-                  {photoFile.name}
-                </p>
-              </div>
-            ) : (
-              <label
-                className={`block w-full p-12 border-3 border-dashed rounded-2xl cursor-pointer transition-all hover:scale-105 ${
-                  isDarkMode
-                    ? "border-blue-500/50 bg-blue-900/20 hover:bg-blue-900/40"
-                    : "border-blue-400 bg-blue-50 hover:bg-blue-100"
-                }`}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) setPhotoFile(file);
-                  }}
-                  className="hidden"
-                />
-                <div className="text-center">
-                  <User
-                    className={`w-16 h-16 mx-auto mb-4 ${
-                      isDarkMode ? "text-blue-400" : "text-blue-600"
-                    }`}
-                  />
-                  <p
-                    className={`font-medium ${
-                      isDarkMode ? "text-gray-200" : "text-gray-800"
-                    }`}
-                  >
-                    Click to upload photo
-                  </p>
-                  <p
-                    className={`text-sm mt-2 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    PNG, JPG up to 5MB
-                  </p>
-                </div>
-              </label>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowPhotoModal(false);
-                  setPhotoFile(null);
-                }}
-                className={`flex-1 py-3 rounded-xl font-medium transition-all ${
-                  isDarkMode
-                    ? "bg-slate-800 hover:bg-slate-700"
-                    : "bg-gray-200 hover:bg-gray-300"
-                }`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => photoFile && handlePhotoUpload(photoFile)}
-                disabled={!photoFile || uploadingPhoto}
-                className={`flex-1 py-3 rounded-xl font-medium transition-all ${
-                  photoFile && !uploadingPhoto
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                    : "bg-gray-600 text-gray-400 cursor-not-allowed"
-                }`}
-              >
-                {uploadingPhoto ? "Uploading..." : "Upload"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
   const renderResumeUploadModal = () => {
     if (!showResumeModal) return null;
 
@@ -790,6 +322,400 @@ export default function AlumniProfilePage() {
       </div>
     );
   };
+  
+  const handleResumeUpload = async (file) => {
+    try {
+      setUploadingResume(true);
+      const token = getAuthToken();
+
+      if (!token) {
+        console.error("No authentication token found");
+        alert("Please log in again");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("resume", file);
+
+      const response = await fetch(`${API_BASE_URL}/alumni/upload-resume`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Resume upload successful:", result);
+
+        // Update user data with the new resume URL
+        if (userData && result.resumeUrl) {
+          setUserData({
+            ...userData,
+            resume: result.resumeUrl,
+          });
+        }
+
+        setShowResumeModal(false);
+        setResumeFile(null);
+        await fetchUserData(); // Refresh user data
+
+        alert("Resume uploaded successfully!");
+      } else {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+    } catch (error) {
+      console.error("Error uploading resume:", error);
+      alert(
+        `Failed to upload resume: ${
+          error.message ? error.message : "Unknown error"
+        }`
+      );
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  const updateProfile = async (updates) => {
+    try {
+      if (!userData) {
+        console.error("No user data available");
+        return;
+      }
+
+      const token = getAuthToken();
+      if (!token) {
+        console.error("No authentication token found");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/alumni/profile-alumni`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          alumniId: userData.id,
+          ...updates,
+        }),
+      });
+
+      if (response.status === 401) {
+        console.error("Token expired or invalid");
+        localStorage.removeItem("auth");
+        window.location.href = "/login";
+        return;
+      }
+
+      if (response.ok) {
+        await fetchUserData();
+        setEditModal({ isOpen: false, section: null });
+        setTempSkill("");
+        setTempAchievement("");
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
+
+  const openEditModal = (section) => {
+    const profile = userData?.profile || {};
+    const formDataMap = {
+      about: { about: profile.about || "" },
+      skills: { skills: profile.skills || [] },
+      achievements: { achievements: profile.achievements || [] },
+      social: {
+        linkedin: profile.linkedin || "",
+        github: profile.github || "",
+        twitter: profile.twitter || "",
+        portfolio: profile.portfolio || "",
+      },
+      experience: { experience: profile.experience || [] },
+      education: { education: profile.education || [] },
+      location: {
+        location: profile.location || "",
+        branch: profile.branch || "",
+      },
+      full: {
+        about: profile.about || "",
+        skills: profile.skills || [],
+        achievements: profile.achievements || [],
+        linkedin: profile.linkedin || "",
+        github: profile.github || "",
+        twitter: profile.twitter || "",
+        portfolio: profile.portfolio || "",
+        experience: profile.experience || [],
+        education: profile.education || [],
+        location: profile.location || "",
+        branch: profile.branch || "",
+      },
+    };
+
+    setFormData(formDataMap[section] || {});
+    setEditModal({ isOpen: true, section });
+  };
+
+  const handlePhotoUpload = async (file) => {
+    try {
+      setUploadingPhoto(true);
+      const token = getAuthToken();
+
+      if (!token) {
+        console.error("No authentication token found");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("profilePhoto", file);
+
+      const response = await fetch(`${API_BASE_URL}/alumni/upload`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Upload successful:", result);
+
+        // Update userData immediately with the new photo URL
+        if (userData && result.imageUrl) {
+          setUserData({
+            ...userData,
+            profilePhoto: result.imageUrl,
+          });
+        }
+
+        setShowPhotoModal(false);
+        setPhotoFile(null);
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Error uploading photo:", error);
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleSubmit = () => {
+    updateProfile(formData);
+  };
+
+  const addSkill = () => {
+    if (tempSkill.trim()) {
+      setFormData({
+        ...formData,
+        skills: [...(formData.skills || []), tempSkill.trim()],
+      });
+      setTempSkill("");
+    }
+  };
+
+  const removeSkill = (index) => {
+    setFormData({
+      ...formData,
+      skills: (formData.skills || []).filter((_, i) => i !== index),
+    });
+  };
+
+  const addAchievement = () => {
+    if (tempAchievement.trim()) {
+      setFormData({
+        ...formData,
+        achievements: [
+          ...(formData.achievements || []),
+          tempAchievement.trim(),
+        ],
+      });
+      setTempAchievement("");
+    }
+  };
+
+  const removeAchievement = (index) => {
+    setFormData({
+      ...formData,
+      achievements: (formData.achievements || []).filter((_, i) => i !== index),
+    });
+  };
+
+  const addArrayItem = (field) => {
+    if (field === "experience") {
+      setFormData({
+        ...formData,
+        experience: [
+          ...(formData.experience || []),
+          {
+            designation: "",
+            company: "",
+            from: "",
+            to: null,
+            current: false,
+            location: "",
+            description: "",
+          },
+        ],
+      });
+    } else if (field === "education") {
+      setFormData({
+        ...formData,
+        education: [
+          ...(formData.education || []),
+          { type: "", stream: "", institution: "", from: "", to: "", gpa: "" },
+        ],
+      });
+    }
+  };
+
+  const removeArrayItem = (field, index) => {
+    const currentArray = formData[field];
+    if (!currentArray) return;
+
+    setFormData({
+      ...formData,
+      [field]: currentArray.filter((_, i) => i !== index),
+    });
+  };
+
+  const updateArrayItem = (field, index, key, value) => {
+    const currentArray = formData[field];
+    if (!currentArray || index >= currentArray.length) return;
+
+    const updated = [...currentArray];
+    updated[index] = { ...updated[index], [key]: value };
+    setFormData({ ...formData, [field]: updated });
+  };
+
+  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  
+  const renderPhotoUploadModal = () => {
+    if (!showPhotoModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div
+          className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-3xl p-8 shadow-2xl transform transition-all ${
+            isDarkMode
+              ? "bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"
+              : "bg-gradient-to-br from-white via-blue-50 to-indigo-50"
+          }`}
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+              Update Profile Photo
+            </h2>
+            <button
+              onClick={() => {
+                setShowPhotoModal(false);
+                setPhotoFile(null);
+              }}
+              className={`p-2 rounded-xl transition-all ${
+                isDarkMode ? "hover:bg-white/10" : "hover:bg-gray-200"
+              }`}
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            {photoFile ? (
+              <div className="text-center">
+                <img
+                  src={URL.createObjectURL(photoFile)}
+                  alt="Preview"
+                  className="w-40 h-40 mx-auto rounded-2xl object-cover border-4 border-blue-500/30 shadow-xl"
+                />
+                <p
+                  className={`mt-3 text-sm ${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
+                >
+                  {photoFile.name}
+                </p>
+              </div>
+            ) : (
+              <label
+                className={`block w-full p-12 border-3 border-dashed rounded-2xl cursor-pointer transition-all hover:scale-105 ${
+                  isDarkMode
+                    ? "border-blue-500/50 bg-blue-900/20 hover:bg-blue-900/40"
+                    : "border-blue-400 bg-blue-50 hover:bg-blue-100"
+                }`}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setPhotoFile(file);
+                  }}
+                  className="hidden"
+                />
+                <div className="text-center">
+                  <User
+                    className={`w-16 h-16 mx-auto mb-4 ${
+                      isDarkMode ? "text-blue-400" : "text-blue-600"
+                    }`}
+                  />
+                  <p
+                    className={`font-medium ${
+                      isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
+                  >
+                    Click to upload photo
+                  </p>
+                  <p
+                    className={`text-sm mt-2 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
+                    PNG, JPG up to 5MB
+                  </p>
+                </div>
+              </label>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowPhotoModal(false);
+                  setPhotoFile(null);
+                }}
+                className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+                  isDarkMode
+                    ? "bg-slate-800 hover:bg-slate-700"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => photoFile && handlePhotoUpload(photoFile)}
+                disabled={!photoFile || uploadingPhoto}
+                className={`flex-1 py-3 rounded-xl font-medium transition-all ${
+                  photoFile && !uploadingPhoto
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    : "bg-gray-600 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                {uploadingPhoto ? "Uploading..." : "Upload"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderEditModal = () => {
     if (!editModal.isOpen) return null;
 
@@ -861,7 +787,7 @@ export default function AlumniProfilePage() {
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {(formData.skills || []).map((skill: string, idx: number) => (
+                  {(formData.skills || []).map((skill, idx) => (
                     <span
                       key={idx}
                       className="px-3 py-1 rounded-lg bg-blue-600 text-white flex items-center gap-2"
@@ -900,7 +826,7 @@ export default function AlumniProfilePage() {
                 </div>
                 <div className="space-y-2">
                   {(formData.achievements || []).map(
-                    (achievement: string, idx: number) => (
+                    (achievement, idx) => (
                       <div
                         key={idx}
                         className={`p-3 rounded-lg flex justify-between items-center ${
@@ -1076,7 +1002,7 @@ export default function AlumniProfilePage() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {(formData.skills || []).map(
-                      (skill: string, idx: number) => (
+                      (skill, idx) => (
                         <span
                           key={idx}
                           className="px-3 py-1 rounded-lg bg-blue-600 text-white flex items-center gap-2"
@@ -1115,7 +1041,7 @@ export default function AlumniProfilePage() {
                   </div>
                   <div className="space-y-2">
                     {(formData.achievements || []).map(
-                      (achievement: string, idx: number) => (
+                      (achievement, idx) => (
                         <div
                           key={idx}
                           className={`p-3 rounded-lg flex justify-between items-center ${
@@ -1203,7 +1129,7 @@ export default function AlumniProfilePage() {
                   </div>
                   <div className="space-y-4">
                     {(formData.experience || []).map(
-                      (exp: Experience, idx: number) => (
+                      (exp, idx) => (
                         <div
                           key={idx}
                           className={`p-4 rounded-lg border-2 ${
@@ -1351,7 +1277,7 @@ export default function AlumniProfilePage() {
                   </div>
                   <div className="space-y-4">
                     {(formData.education || []).map(
-                      (edu: Education, idx: number) => (
+                      (edu, idx) => (
                         <div
                           key={idx}
                           className={`p-4 rounded-lg border-2 ${
@@ -1526,7 +1452,7 @@ export default function AlumniProfilePage() {
 
   const profile = userData.profile || {};
 
-  const safeDateParse = (dateString: string | null): Date | null => {
+  const safeDateParse = (dateString) => {
     if (!dateString) return null;
     try {
       const date = new Date(dateString);
@@ -1585,7 +1511,7 @@ export default function AlumniProfilePage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {(profile.skills || []).length > 0 ? (
-                  (profile.skills || []).map((skill: string, idx: number) => (
+                  (profile.skills || []).map((skill, idx) => (
                     <span
                       key={idx}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all hover:scale-105 ${
@@ -1626,7 +1552,7 @@ export default function AlumniProfilePage() {
               <div className="space-y-3">
                 {(profile.achievements || []).length > 0 ? (
                   (profile.achievements || []).map(
-                    (achievement: string, idx: number) => (
+                    (achievement, idx) => (
                       <div key={idx} className="flex items-start gap-3">
                         <Award
                           className={`w-5 h-5 mt-0.5 ${
@@ -1653,7 +1579,219 @@ export default function AlumniProfilePage() {
             </div>
           </div>
         );
-      // Update the resume section to check both locations
+
+      case "experience":
+        return (
+          <div className="space-y-4">
+            {(profile.experience || []).length > 0 ? (
+              (profile.experience || []).map((exp, idx) => {
+                const fromDate = safeDateParse(exp.from);
+                const toDate = safeDateParse(exp.to);
+
+                return (
+                  <div
+                    key={idx}
+                    className={`p-6 rounded-xl border-2 transition-all hover:scale-[1.02] ${
+                      isDarkMode
+                        ? "bg-slate-800/50 border-blue-600/30"
+                        : "bg-white border-blue-200 shadow-lg"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
+                        }`}
+                      >
+                        <Building
+                          className={`w-6 h-6 ${
+                            isDarkMode ? "text-blue-400" : "text-blue-600"
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4
+                          className={`text-lg font-bold ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {exp.designation}
+                        </h4>
+                        <p
+                          className={`text-sm font-medium ${
+                            isDarkMode ? "text-blue-400" : "text-blue-600"
+                          }`}
+                        >
+                          {exp.company}
+                        </p>
+                        <div className="flex items-center gap-4 mt-2 text-sm flex-wrap">
+                          <span
+                            className={`flex items-center gap-1 ${
+                              isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                          >
+                            <Calendar className="w-4 h-4" />
+                            {fromDate
+                              ? fromDate.toLocaleDateString()
+                              : "N/A"} -{" "}
+                            {exp.current
+                              ? "Present"
+                              : toDate
+                              ? toDate.toLocaleDateString()
+                              : "N/A"}
+                          </span>
+                          <span
+                            className={`flex items-center gap-1 ${
+                              isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                          >
+                            <MapPin className="w-4 h-4" />
+                            {exp.location}
+                          </span>
+                        </div>
+                        <p
+                          className={`mt-3 ${
+                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                        >
+                          {exp.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div
+                className={`p-12 rounded-xl border-2 text-center ${
+                  isDarkMode
+                    ? "bg-slate-800/50 border-blue-600/30"
+                    : "bg-white border-blue-200"
+                }`}
+              >
+                <Briefcase
+                  className={`w-16 h-16 mx-auto mb-4 ${
+                    isDarkMode ? "text-gray-600" : "text-gray-400"
+                  }`}
+                />
+                <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
+                  No experience added yet. Click the edit button to add your
+                  work experience.
+                </p>
+                <button
+                  onClick={() => openEditModal("full")}
+                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Add Experience
+                </button>
+              </div>
+            )}
+          </div>
+        );
+
+      case "education":
+        return (
+          <div className="space-y-4">
+            {(profile.education || []).length > 0 ? (
+              (profile.education || []).map((edu, idx) => {
+                const fromDate = safeDateParse(edu.from);
+                const toDate = safeDateParse(edu.to);
+
+                return (
+                  <div
+                    key={idx}
+                    className={`p-6 rounded-xl border-2 transition-all hover:scale-[1.02] ${
+                      isDarkMode
+                        ? "bg-slate-800/50 border-emerald-600/30"
+                        : "bg-white border-emerald-200 shadow-lg"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                          isDarkMode ? "bg-emerald-900/50" : "bg-emerald-100"
+                        }`}
+                      >
+                        <GraduationCap
+                          className={`w-6 h-6 ${
+                            isDarkMode ? "text-emerald-400" : "text-emerald-600"
+                          }`}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4
+                          className={`text-lg font-bold ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {edu.type}
+                        </h4>
+                        <p
+                          className={`text-sm font-medium ${
+                            isDarkMode ? "text-emerald-400" : "text-emerald-600"
+                          }`}
+                        >
+                          {edu.stream}
+                        </p>
+                        <p
+                          className={`text-sm ${
+                            isDarkMode ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          {edu.institution}
+                        </p>
+                        <div className="flex items-center gap-4 mt-2 text-sm flex-wrap">
+                          <span
+                            className={`flex items-center gap-1 ${
+                              isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                          >
+                            <Calendar className="w-4 h-4" />
+                            {fromDate
+                              ? fromDate.toLocaleDateString()
+                              : "N/A"} -{" "}
+                            {toDate ? toDate.toLocaleDateString() : "N/A"}
+                          </span>
+                          <span
+                            className={`${
+                              isDarkMode ? "text-green-400" : "text-green-600"
+                            } font-medium`}
+                          >
+                            GPA: {edu.gpa || "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div
+                className={`p-12 rounded-xl border-2 text-center ${
+                  isDarkMode
+                    ? "bg-slate-800/50 border-emerald-600/30"
+                    : "bg-white border-emerald-200"
+                }`}
+              >
+                <GraduationCap
+                  className={`w-16 h-16 mx-auto mb-4 ${
+                    isDarkMode ? "text-gray-600" : "text-gray-400"
+                  }`}
+                />
+                <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
+                  No education added yet. Click the edit button to add your
+                  educational background.
+                </p>
+                <button
+                  onClick={() => openEditModal("full")}
+                  className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                >
+                  Add Education
+                </button>
+              </div>
+            )}
+          </div>
+        );
       case "resume":
         console.log("🎯 Rendering resume section");
         console.log("📄 Current resume in userData:", userData?.resume);
@@ -1786,7 +1924,7 @@ export default function AlumniProfilePage() {
                           onError={(e) => {
                             console.error("PDF iframe error:", e);
                             // Fallback to direct PDF
-                            (e.target as HTMLIFrameElement).src = resumeUrl;
+                            e.target.src = resumeUrl;
                           }}
                         />
                       </div>
@@ -2042,219 +2180,6 @@ export default function AlumniProfilePage() {
           </div>
         );
 
-      case "experience":
-        return (
-          <div className="space-y-4">
-            {(profile.experience || []).length > 0 ? (
-              (profile.experience || []).map((exp: Experience, idx: number) => {
-                const fromDate = safeDateParse(exp.from);
-                const toDate = safeDateParse(exp.to);
-
-                return (
-                  <div
-                    key={idx}
-                    className={`p-6 rounded-xl border-2 transition-all hover:scale-[1.02] ${
-                      isDarkMode
-                        ? "bg-slate-800/50 border-blue-600/30"
-                        : "bg-white border-blue-200 shadow-lg"
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                          isDarkMode ? "bg-blue-900/50" : "bg-blue-100"
-                        }`}
-                      >
-                        <Building
-                          className={`w-6 h-6 ${
-                            isDarkMode ? "text-blue-400" : "text-blue-600"
-                          }`}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4
-                          className={`text-lg font-bold ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {exp.designation}
-                        </h4>
-                        <p
-                          className={`text-sm font-medium ${
-                            isDarkMode ? "text-blue-400" : "text-blue-600"
-                          }`}
-                        >
-                          {exp.company}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2 text-sm flex-wrap">
-                          <span
-                            className={`flex items-center gap-1 ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
-                          >
-                            <Calendar className="w-4 h-4" />
-                            {fromDate
-                              ? fromDate.toLocaleDateString()
-                              : "N/A"} -{" "}
-                            {exp.current
-                              ? "Present"
-                              : toDate
-                              ? toDate.toLocaleDateString()
-                              : "N/A"}
-                          </span>
-                          <span
-                            className={`flex items-center gap-1 ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
-                          >
-                            <MapPin className="w-4 h-4" />
-                            {exp.location}
-                          </span>
-                        </div>
-                        <p
-                          className={`mt-3 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-600"
-                          }`}
-                        >
-                          {exp.description}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div
-                className={`p-12 rounded-xl border-2 text-center ${
-                  isDarkMode
-                    ? "bg-slate-800/50 border-blue-600/30"
-                    : "bg-white border-blue-200"
-                }`}
-              >
-                <Briefcase
-                  className={`w-16 h-16 mx-auto mb-4 ${
-                    isDarkMode ? "text-gray-600" : "text-gray-400"
-                  }`}
-                />
-                <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
-                  No experience added yet. Click the edit button to add your
-                  work experience.
-                </p>
-                <button
-                  onClick={() => openEditModal("full")}
-                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Add Experience
-                </button>
-              </div>
-            )}
-          </div>
-        );
-
-      case "education":
-        return (
-          <div className="space-y-4">
-            {(profile.education || []).length > 0 ? (
-              (profile.education || []).map((edu: Education, idx: number) => {
-                const fromDate = safeDateParse(edu.from);
-                const toDate = safeDateParse(edu.to);
-
-                return (
-                  <div
-                    key={idx}
-                    className={`p-6 rounded-xl border-2 transition-all hover:scale-[1.02] ${
-                      isDarkMode
-                        ? "bg-slate-800/50 border-emerald-600/30"
-                        : "bg-white border-emerald-200 shadow-lg"
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div
-                        className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                          isDarkMode ? "bg-emerald-900/50" : "bg-emerald-100"
-                        }`}
-                      >
-                        <GraduationCap
-                          className={`w-6 h-6 ${
-                            isDarkMode ? "text-emerald-400" : "text-emerald-600"
-                          }`}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4
-                          className={`text-lg font-bold ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {edu.type}
-                        </h4>
-                        <p
-                          className={`text-sm font-medium ${
-                            isDarkMode ? "text-emerald-400" : "text-emerald-600"
-                          }`}
-                        >
-                          {edu.stream}
-                        </p>
-                        <p
-                          className={`text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          {edu.institution}
-                        </p>
-                        <div className="flex items-center gap-4 mt-2 text-sm flex-wrap">
-                          <span
-                            className={`flex items-center gap-1 ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
-                          >
-                            <Calendar className="w-4 h-4" />
-                            {fromDate
-                              ? fromDate.toLocaleDateString()
-                              : "N/A"} -{" "}
-                            {toDate ? toDate.toLocaleDateString() : "N/A"}
-                          </span>
-                          <span
-                            className={`${
-                              isDarkMode ? "text-green-400" : "text-green-600"
-                            } font-medium`}
-                          >
-                            GPA: {edu.gpa || "N/A"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div
-                className={`p-12 rounded-xl border-2 text-center ${
-                  isDarkMode
-                    ? "bg-slate-800/50 border-emerald-600/30"
-                    : "bg-white border-emerald-200"
-                }`}
-              >
-                <GraduationCap
-                  className={`w-16 h-16 mx-auto mb-4 ${
-                    isDarkMode ? "text-gray-600" : "text-gray-400"
-                  }`}
-                />
-                <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
-                  No education added yet. Click the edit button to add your
-                  educational background.
-                </p>
-                <button
-                  onClick={() => openEditModal("full")}
-                  className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                >
-                  Add Education
-                </button>
-              </div>
-            )}
-          </div>
-        );
-
       default:
         return null;
     }
@@ -2269,9 +2194,9 @@ export default function AlumniProfilePage() {
       }`}
     >
       {renderPhotoUploadModal()}
-
       {renderEditModal()}
       {renderResumeUploadModal()}
+
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
       {/* Hero Banner */}
@@ -2498,7 +2423,6 @@ export default function AlumniProfilePage() {
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="mt-6">{renderContent()}</div>
       </div>
 

@@ -21,6 +21,7 @@ import {
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const Message = ({ type, message, onClose }) => {
   if (!message) return null;
@@ -358,7 +359,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
       const authData = localStorage.getItem("auth");
       const token = authData ? JSON.parse(authData).accessToken : null;
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/event/upcoming-event",
+        `${BASE_URL}/event/upcoming-event`,
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         }
@@ -384,7 +385,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         return;
       }
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/event/add-event",
+        `${BASE_URL}/event/add-event`,
         {
           method: "POST",
           headers: {
@@ -429,7 +430,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         return;
       }
       const response = await fetch(
-        "https://alumni-mits-backend.onrender.com/event/registration",
+        `${BASE_URL}/event/registration`,
         {
           method: "POST",
           headers: {

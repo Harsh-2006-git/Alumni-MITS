@@ -27,6 +27,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [notification, setNotification] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   // Show notification helper
   const showNotification = (message, type = "success") => {
@@ -40,7 +42,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
     session_time: "",
   });
 
-  const API_BASE = "https://alumni-mits-backend.onrender.com/mentor";
+  const API_BASE = `${BASE_URL}/mentor`;
 
   const getAuthToken = () => {
     const authData = localStorage.getItem("auth");
