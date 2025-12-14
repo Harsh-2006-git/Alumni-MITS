@@ -676,34 +676,45 @@ const [currentYearRange, setCurrentYearRange] = useState(
                         </div>
 
                         <div>
-                          <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
-                          >
-                            Email Address
-                          </label>
-                          <div className="relative">
-                            <Mail
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
-                            />
-                            <input
-                              type="email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleChange}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
-                              placeholder="you@example.com"
-                              required
-                            />
-                          </div>
-                        </div>
+  <label
+    className={`block text-sm font-medium mb-2 ${
+      isDarkMode ? "text-gray-300" : "text-gray-700"
+    }`}
+  >
+    Email Address
+  </label>
+
+  <div className="relative">
+    <Mail
+      className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+        isDarkMode ? "text-gray-500" : "text-gray-400"
+      }`}
+    />
+
+    <input
+      type="email"
+      name="email"
+      value={formData.email}
+      onChange={handleChange}
+      onInput={(e) => {
+        const value = e.target.value.toLowerCase();
+        if (value.endsWith("@mitsgwl.ac.in")) {
+          e.target.setCustomValidity("Institute email is not allowed");
+        } else {
+          e.target.setCustomValidity("");
+        }
+      }}
+      className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
+        isDarkMode
+          ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+          : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+      }`}
+      placeholder="you@example.com"
+      required
+    />
+  </div>
+</div>
+
 
                         <div>
                           <label

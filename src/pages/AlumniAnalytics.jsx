@@ -10,6 +10,8 @@ import {
   Map as MapIcon,
   Calendar,
   GraduationCap,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -30,6 +32,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export default function AlumniAnalytics({
@@ -39,21 +42,37 @@ export default function AlumniAnalytics({
 }) {
   const [alumniData, setAlumniData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState("all"); // all, 1year, 5years
+  const [timeRange, setTimeRange] = useState("all");
+
+  // Initialize with default empty data to prevent errors
+  const defaultChartData = {
+    growthData: [],
+    branchChartData: [],
+    locationChartData: [],
+    companyChartData: [],
+    experienceChartData: [],
+    monthlyTrendData: [],
+  };
+
+  const [chartData, setChartData] = useState(defaultChartData);
 
   // Fetch alumni data from API
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
-        const response = await fetch(
-          `${BASE_URL}/alumni/all-alumni`
-        );
+        const response = await fetch(`${BASE_URL}/alumni/all-alumni`);
         const result = await response.json();
-        if (result.success) {
+        if (result.success && result.data) {
           setAlumniData(result.data);
+          processChartData(result.data);
+        } else {
+          setAlumniData([]);
+          setChartData(defaultChartData);
         }
       } catch (error) {
         console.error("Error fetching alumni:", error);
+        setAlumniData([]);
+        setChartData(defaultChartData);
       } finally {
         setLoading(false);
       }
@@ -63,12 +82,15 @@ export default function AlumniAnalytics({
   }, []);
 
   // Process data for charts
-  const processChartData = () => {
-    if (!alumniData.length) return {};
+  const processChartData = (data) => {
+    if (!data || data.length === 0) {
+      setChartData(defaultChartData);
+      return;
+    }
 
     // Year-wise growth data
     const yearCounts = {};
-    alumniData.forEach((alumni) => {
+    data.forEach((alumni) => {
       const year = new Date(alumni.createdAt || Date.now()).getFullYear();
       yearCounts[year] = (yearCounts[year] || 0) + 1;
     });
@@ -84,7 +106,7 @@ export default function AlumniAnalytics({
       }));
 
     // Branch distribution
-    const branchData = alumniData.reduce((acc, alumni) => {
+    const branchData = data.reduce((acc, alumni) => {
       const branch = alumni.profile?.branch || "Unknown";
       acc[branch] = (acc[branch] || 0) + 1;
       return acc;
@@ -95,7 +117,7 @@ export default function AlumniAnalytics({
       .sort((a, b) => b.value - a.value);
 
     // Location distribution
-    const locationData = alumniData.reduce((acc, alumni) => {
+    const locationData = data.reduce((acc, alumni) => {
       const location = alumni.profile?.location || "Unknown";
       acc[location] = (acc[location] || 0) + 1;
       return acc;
@@ -104,11 +126,11 @@ export default function AlumniAnalytics({
     const locationChartData = Object.entries(locationData)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, 10); // Top 10 locations
+      .slice(0, 10);
 
     // Company distribution
     const companyData = {};
-    alumniData.forEach((alumni) => {
+    data.forEach((alumni) => {
       const experiences = alumni.profile?.experience || [];
       experiences.forEach((exp) => {
         if (exp.company) {
@@ -120,7 +142,7 @@ export default function AlumniAnalytics({
     const companyChartData = Object.entries(companyData)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, 10); // Top 10 companies
+      .slice(0, 10);
 
     // Experience level distribution
     const experienceData = {
@@ -130,7 +152,7 @@ export default function AlumniAnalytics({
       "10+ years": 0,
     };
 
-    alumniData.forEach((alumni) => {
+    data.forEach((alumni) => {
       const experiences = alumni.profile?.experience || [];
       let totalExperience = 0;
 
@@ -165,7 +187,7 @@ export default function AlumniAnalytics({
       monthlyData[key] = 0;
     }
 
-    alumniData.forEach((alumni) => {
+    data.forEach((alumni) => {
       const date = new Date(alumni.createdAt || Date.now());
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
         2,
@@ -183,17 +205,15 @@ export default function AlumniAnalytics({
       })
     );
 
-    return {
+    setChartData({
       growthData,
       branchChartData,
       locationChartData,
       companyChartData,
       experienceChartData,
       monthlyTrendData,
-    };
+    });
   };
-
-  const chartData = processChartData();
 
   // Colors for charts
   const colors = {
@@ -217,6 +237,26 @@ export default function AlumniAnalytics({
     "#d0ed57",
   ];
 
+  const CustomTooltip = ({ active, payload, label, isDarkMode }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div
+          className={`p-3 rounded-lg shadow-lg ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
+          } border ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}
+        >
+          <p className="font-semibold">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={index} style={{ color: entry.color }}>
+              {entry.name}: {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (loading) {
     return (
       <div
@@ -229,7 +269,7 @@ export default function AlumniAnalytics({
         <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <Loader2 className="w-16 h-16 animate-spin text-blue-500 mx-auto mb-4" />
             <p
               className={
                 isDarkMode ? "text-white text-lg" : "text-gray-900 text-lg"
@@ -243,6 +283,124 @@ export default function AlumniAnalytics({
     );
   }
 
+  // No alumni data found
+  if (alumniData.length === 0) {
+    return (
+      <div
+        className={`min-h-screen transition-colors duration-500 ${
+          isDarkMode
+            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+            : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
+      >
+        <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <TrendingUp className="w-8 h-8 text-cyan-400" />
+              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
+                Alumni Analytics
+              </h1>
+            </div>
+            <p
+              className={`text-lg ${
+                isDarkMode ? "text-gray-300" : "text-gray-600"
+              } max-w-2xl mx-auto`}
+            >
+              Comprehensive insights and trends about our alumni community
+            </p>
+          </div>
+
+          {/* No Data Found */}
+          <div
+            className={`max-w-2xl mx-auto p-8 rounded-2xl border text-center ${
+              isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200 shadow-lg"
+            }`}
+          >
+            <AlertCircle className="w-16 h-16 mx-auto mb-4 text-blue-500" />
+            <h2 className="text-2xl font-bold mb-2">No Alumni Found for Analysis</h2>
+            <p className={`mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+              Start by adding alumni profiles to view analytics and insights about your community.
+            </p>
+            <button
+              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                isDarkMode
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-blue-500 hover:bg-blue-600 text-white"
+              }`}
+            >
+              Add First Alumni
+            </button>
+          </div>
+
+          {/* Empty Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+            {[
+              {
+                label: "Total Alumni",
+                value: "0",
+                icon: Users,
+                color: "from-blue-500 to-cyan-500",
+              },
+              {
+                label: "Branches",
+                value: "0",
+                icon: GraduationCap,
+                color: "from-purple-500 to-pink-500",
+              },
+              {
+                label: "Cities",
+                value: "0",
+                icon: MapPin,
+                color: "from-green-500 to-emerald-500",
+              },
+              {
+                label: "Companies",
+                value: "0",
+                icon: Building2,
+                color: "from-orange-500 to-red-500",
+              },
+            ].map((stat, idx) => (
+              <div
+                key={idx}
+                className={`p-6 rounded-2xl border transition-all ${
+                  isDarkMode
+                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                    : "bg-white border-blue-200 shadow-lg"
+                }`}
+              >
+                <div
+                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}
+                >
+                  <stat.icon className="w-6 h-6 text-white" />
+                </div>
+                <p
+                  className={`text-3xl font-bold mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                >
+                  {stat.value}
+                </p>
+                <p
+                  className={`text-sm ${
+                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <Footer isDarkMode={isDarkMode} />
+      </div>
+    );
+  }
+
+  // Main analytics with data
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${
@@ -348,7 +506,7 @@ export default function AlumniAnalytics({
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData.growthData}>
+                <AreaChart data={chartData.growthData || []}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke={isDarkMode ? "#374151" : "#e5e7eb"}
@@ -359,11 +517,7 @@ export default function AlumniAnalytics({
                   />
                   <YAxis stroke={isDarkMode ? "#9ca3af" : "#6b7280"} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-                      borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-                      color: isDarkMode ? "#ffffff" : "#000000",
-                    }}
+                    content={<CustomTooltip isDarkMode={isDarkMode} />}
                   />
                   <Area
                     type="monotone"
@@ -399,7 +553,7 @@ export default function AlumniAnalytics({
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
                   <Pie
-                    data={chartData.branchChartData}
+                    data={chartData.branchChartData || []}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -410,7 +564,7 @@ export default function AlumniAnalytics({
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {chartData.branchChartData.map((entry, index) => (
+                    {(chartData.branchChartData || []).map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={pieColors[index % pieColors.length]}
@@ -418,11 +572,7 @@ export default function AlumniAnalytics({
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-                      borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-                      color: isDarkMode ? "#ffffff" : "#000000",
-                    }}
+                    content={<CustomTooltip isDarkMode={isDarkMode} />}
                   />
                 </RechartsPieChart>
               </ResponsiveContainer>
@@ -443,7 +593,7 @@ export default function AlumniAnalytics({
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData.locationChartData}>
+                <BarChart data={chartData.locationChartData || []}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke={isDarkMode ? "#374151" : "#e5e7eb"}
@@ -457,11 +607,7 @@ export default function AlumniAnalytics({
                   />
                   <YAxis stroke={isDarkMode ? "#9ca3af" : "#6b7280"} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-                      borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-                      color: isDarkMode ? "#ffffff" : "#000000",
-                    }}
+                    content={<CustomTooltip isDarkMode={isDarkMode} />}
                   />
                   <Bar
                     dataKey="value"
@@ -487,7 +633,7 @@ export default function AlumniAnalytics({
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData.companyChartData}>
+                <BarChart data={chartData.companyChartData || []}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke={isDarkMode ? "#374151" : "#e5e7eb"}
@@ -501,11 +647,7 @@ export default function AlumniAnalytics({
                   />
                   <YAxis stroke={isDarkMode ? "#9ca3af" : "#6b7280"} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-                      borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-                      color: isDarkMode ? "#ffffff" : "#000000",
-                    }}
+                    content={<CustomTooltip isDarkMode={isDarkMode} />}
                   />
                   <Bar
                     dataKey="value"
@@ -531,7 +673,7 @@ export default function AlumniAnalytics({
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData.experienceChartData}>
+                <BarChart data={chartData.experienceChartData || []}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke={isDarkMode ? "#374151" : "#e5e7eb"}
@@ -542,11 +684,7 @@ export default function AlumniAnalytics({
                   />
                   <YAxis stroke={isDarkMode ? "#9ca3af" : "#6b7280"} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-                      borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-                      color: isDarkMode ? "#ffffff" : "#000000",
-                    }}
+                    content={<CustomTooltip isDarkMode={isDarkMode} />}
                   />
                   <Bar
                     dataKey="value"
@@ -572,7 +710,7 @@ export default function AlumniAnalytics({
             </div>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData.monthlyTrendData}>
+                <LineChart data={chartData.monthlyTrendData || []}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke={isDarkMode ? "#374151" : "#e5e7eb"}
@@ -583,11 +721,7 @@ export default function AlumniAnalytics({
                   />
                   <YAxis stroke={isDarkMode ? "#9ca3af" : "#6b7280"} />
                   <Tooltip
-                    contentStyle={{
-                      backgroundColor: isDarkMode ? "#1f2937" : "#ffffff",
-                      borderColor: isDarkMode ? "#374151" : "#e5e7eb",
-                      color: isDarkMode ? "#ffffff" : "#000000",
-                    }}
+                    content={<CustomTooltip isDarkMode={isDarkMode} />}
                   />
                   <Line
                     type="monotone"
@@ -598,6 +732,71 @@ export default function AlumniAnalytics({
                   />
                 </LineChart>
               </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Summary Statistics */}
+        <div
+          className={`p-6 rounded-2xl border mb-8 ${
+            isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+          }`}
+        >
+          <h3 className="text-lg font-semibold mb-4">Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4">
+              <div
+                className={`text-2xl font-bold mb-1 ${
+                  isDarkMode ? "text-blue-400" : "text-blue-600"
+                }`}
+              >
+                {alumniData.length}
+              </div>
+              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Total Alumni
+              </div>
+            </div>
+            <div className="text-center p-4">
+              <div
+                className={`text-2xl font-bold mb-1 ${
+                  isDarkMode ? "text-green-400" : "text-green-600"
+                }`}
+              >
+                {new Set(alumniData.map(a => a.profile?.location)).size}
+              </div>
+              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Cities Covered
+              </div>
+            </div>
+            <div className="text-center p-4">
+              <div
+                className={`text-2xl font-bold mb-1 ${
+                  isDarkMode ? "text-purple-400" : "text-purple-600"
+                }`}
+              >
+                {new Set(
+                  alumniData.flatMap(
+                    (a) => a.profile?.experience?.map((exp) => exp.company) || []
+                  )
+                ).size}
+              </div>
+              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Companies
+              </div>
+            </div>
+            <div className="text-center p-4">
+              <div
+                className={`text-2xl font-bold mb-1 ${
+                  isDarkMode ? "text-orange-400" : "text-orange-600"
+                }`}
+              >
+                {new Set(alumniData.map(a => a.profile?.branch)).size}
+              </div>
+              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Branches
+              </div>
             </div>
           </div>
         </div>

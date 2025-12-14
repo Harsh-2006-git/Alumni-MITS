@@ -37,9 +37,101 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   
   console.log("BASE_URL from env:", BASE_URL);
 
-  // Helper function to generate unique keys
+  // Update the helper function to ensure uniqueness
   const getPersonKey = (person, prefix = "") => {
-    return `${prefix}${person.userType}-${person.phone}-${person.email || "no-email"}-${person.id || Date.now()}`;
+    const baseKey = `${prefix}${person.userType}-${person.phone}-${person.email || "no-email"}`;
+    
+    if (person.id) {
+      return `${baseKey}-${person.id}`;
+    }
+    
+    const hash = `${person.name || ""}${person.phone}${person.email || ""}`;
+    return `${baseKey}-${hash}`;
+  };
+
+  // Date formatting helper functions
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // Reset time part for comparison
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    yesterday.setHours(0, 0, 0, 0);
+
+    if (compareDate.getTime() === today.getTime()) {
+      return "Today";
+    } else if (compareDate.getTime() === yesterday.getTime()) {
+      return "Yesterday";
+    } else if (date.getFullYear() === new Date().getFullYear()) {
+      // Same year, show month and day
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    } else {
+      // Different year, show full date
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+  };
+
+  const formatTime = (timestamp) =>
+    new Date(timestamp).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+
+  // Function to group messages by date
+  const groupMessagesByDate = (messages) => {
+    if (!messages || messages.length === 0) return [];
+    
+    const grouped = [];
+    let currentDate = null;
+    let currentGroup = [];
+    
+    // Sort messages by date (oldest to newest)
+    const sortedMessages = [...messages].sort((a, b) => 
+      new Date(a.createdAt) - new Date(b.createdAt)
+    );
+    
+    sortedMessages.forEach((msg, index) => {
+      const messageDate = formatDate(msg.createdAt);
+      
+      if (messageDate !== currentDate) {
+        // If we have a current group, add it to grouped array
+        if (currentGroup.length > 0) {
+          grouped.push({
+            date: currentDate,
+            messages: currentGroup
+          });
+        }
+        
+        // Start new group
+        currentDate = messageDate;
+        currentGroup = [msg];
+      } else {
+        // Add to current group
+        currentGroup.push(msg);
+      }
+      
+      // Add the last group
+      if (index === sortedMessages.length - 1) {
+        grouped.push({
+          date: currentDate,
+          messages: currentGroup
+        });
+      }
+    });
+    
+    return grouped;
   };
 
   useEffect(() => {
@@ -385,12 +477,6 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       person.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const formatTime = (timestamp) =>
-    new Date(timestamp).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-
   if (isInitializing) {
     return (
       <div
@@ -711,42 +797,58 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   </div>
                 ) : (
                   <>
-                    {messages.map((msg) => {
-                      const isSent = msg.sender?.phone === currentUser?.phone;
-                      return (
-                        <div
-                          key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
-                          className={`mb-4 flex ${
-                            isSent ? "justify-end" : "justify-start"
-                          }`}
-                        >
-                          <div className="max-w-xs">
-                            <div
-                              className={`rounded-2xl px-4 py-2.5 ${
-                                isSent
-                                  ? "bg-purple-500 text-white rounded-br-sm"
-                                  : isDarkMode
-                                  ? "bg-slate-800 text-white rounded-bl-sm"
-                                  : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
-                              }`}
-                            >
-                              <p className="text-sm whitespace-pre-wrap">
-                                {msg.text}
-                              </p>
-                            </div>
-                            <p
-                              className={`text-xs mt-1 ${
-                                isSent ? "text-right" : "text-left"
-                              } ${
-                                isDarkMode ? "text-gray-500" : "text-gray-500"
-                              }`}
-                            >
-                              {formatTime(msg.createdAt)}
-                            </p>
+                    {groupMessagesByDate(messages).map((group, groupIndex) => (
+                      <div key={`group-${groupIndex}`}>
+                        {/* Date Separator */}
+                        <div className="flex items-center justify-center my-6">
+                          <div className={`px-3 py-1 rounded-full text-xs ${
+                            isDarkMode 
+                              ? "bg-slate-800 text-gray-400" 
+                              : "bg-gray-200 text-gray-600"
+                          }`}>
+                            {group.date}
                           </div>
                         </div>
-                      );
-                    })}
+                        
+                        {/* Messages for this date */}
+                        {group.messages.map((msg) => {
+                          const isSent = msg.sender?.phone === currentUser?.phone;
+                          return (
+                            <div
+                              key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
+                              className={`mb-4 flex ${
+                                isSent ? "justify-end" : "justify-start"
+                              }`}
+                            >
+                              <div className="max-w-xs">
+                                <div
+                                  className={`rounded-2xl px-4 py-2.5 ${
+                                    isSent
+                                      ? "bg-purple-500 text-white rounded-br-sm"
+                                      : isDarkMode
+                                      ? "bg-slate-800 text-white rounded-bl-sm"
+                                      : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
+                                  }`}
+                                >
+                                  <p className="text-sm whitespace-pre-wrap">
+                                    {msg.text}
+                                  </p>
+                                </div>
+                                <p
+                                  className={`text-xs mt-1 ${
+                                    isSent ? "text-right" : "text-left"
+                                  } ${
+                                    isDarkMode ? "text-gray-500" : "text-gray-500"
+                                  }`}
+                                >
+                                  {formatTime(msg.createdAt)}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
                     <div ref={messagesEndRef} />
                   </>
                 )}
@@ -985,42 +1087,58 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                     </div>
                   ) : (
                     <>
-                      {messages.map((msg) => {
-                        const isSent = msg.sender?.phone === currentUser?.phone;
-                        return (
-                          <div
-                            key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
-                            className={`mb-4 flex ${
-                              isSent ? "justify-end" : "justify-start"
-                            }`}
-                          >
-                            <div className="max-w-md">
-                              <div
-                                className={`rounded-2xl px-4 py-2.5 ${
-                                  isSent
-                                    ? "bg-purple-500 text-white rounded-br-sm"
-                                    : isDarkMode
-                                    ? "bg-slate-800 text-white rounded-bl-sm"
-                                    : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
-                                }`}
-                              >
-                                <p className="text-sm whitespace-pre-wrap">
-                                  {msg.text}
-                                </p>
-                              </div>
-                              <p
-                                className={`text-xs mt-1 ${
-                                  isSent ? "text-right" : "text-left"
-                                } ${
-                                  isDarkMode ? "text-gray-500" : "text-gray-500"
-                                }`}
-                              >
-                                {formatTime(msg.createdAt)}
-                              </p>
+                      {groupMessagesByDate(messages).map((group, groupIndex) => (
+                        <div key={`group-${groupIndex}`}>
+                          {/* Date Separator */}
+                          <div className="flex items-center justify-center my-8">
+                            <div className={`px-4 py-1.5 rounded-full text-sm ${
+                              isDarkMode 
+                                ? "bg-slate-800 text-gray-400" 
+                                : "bg-gray-200 text-gray-600"
+                            }`}>
+                              {group.date}
                             </div>
                           </div>
-                        );
-                      })}
+                          
+                          {/* Messages for this date */}
+                          {group.messages.map((msg) => {
+                            const isSent = msg.sender?.phone === currentUser?.phone;
+                            return (
+                              <div
+                                key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
+                                className={`mb-4 flex ${
+                                  isSent ? "justify-end" : "justify-start"
+                                }`}
+                              >
+                                <div className="max-w-md">
+                                  <div
+                                    className={`rounded-2xl px-4 py-2.5 ${
+                                      isSent
+                                        ? "bg-purple-500 text-white rounded-br-sm"
+                                        : isDarkMode
+                                        ? "bg-slate-800 text-white rounded-bl-sm"
+                                        : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
+                                    }`}
+                                  >
+                                    <p className="text-sm whitespace-pre-wrap">
+                                      {msg.text}
+                                    </p>
+                                  </div>
+                                  <p
+                                    className={`text-xs mt-1 ${
+                                      isSent ? "text-right" : "text-left"
+                                    } ${
+                                      isDarkMode ? "text-gray-500" : "text-gray-500"
+                                    }`}
+                                  >
+                                    {formatTime(msg.createdAt)}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
                       <div ref={messagesEndRef} />
                     </>
                   )}

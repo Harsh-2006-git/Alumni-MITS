@@ -27,8 +27,9 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [notification, setNotification] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [myMentorships, setMyMentorships] = useState([]);
   
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   // Show notification helper
   const showNotification = (message, type = "success") => {
@@ -70,9 +71,30 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   const authToken = getAuthToken();
 
+  // Load user's existing mentorship requests
+  const loadMyMentorships = async () => {
+    if (!currentUser?.isLoggedIn || currentUser?.userType !== "student") return;
+    
+    try {
+      const response = await axios.get(`${API_BASE}/student/mentorships`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      setMyMentorships(response.data.data || []);
+    } catch (error) {
+      console.error("Error loading mentorships:", error);
+    }
+  };
+
   useEffect(() => {
     loadMentors();
-    setCurrentUser(getCurrentUser());
+    const user = getCurrentUser();
+    setCurrentUser(user);
+    
+    if (user?.isLoggedIn && user?.userType === "student") {
+      loadMyMentorships();
+    }
   }, []);
 
   const loadMentors = async () => {
@@ -100,6 +122,29 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
     }
   };
 
+  // Helper function to check if user already has a request with a mentor
+  const hasExistingMentorship = (mentorId) => {
+    return myMentorships.some(mentorship => 
+      mentorship.mentor_id === mentorId || 
+      mentorship.mentor?.id === mentorId
+    );
+  };
+
+  const getExistingMentorshipStatus = (mentorId) => {
+    const existing = myMentorships.find(mentorship => 
+      mentorship.mentor_id === mentorId || 
+      mentorship.mentor?.id === mentorId
+    );
+    return existing ? existing.status : null;
+  };
+
+  const getExistingMentorship = (mentorId) => {
+    return myMentorships.find(mentorship => 
+      mentorship.mentor_id === mentorId || 
+      mentorship.mentor?.id === mentorId
+    );
+  };
+
   const sendMentorshipRequest = async (e) => {
     e.preventDefault();
 
@@ -111,6 +156,13 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
     if (currentUser.userType !== "student") {
       showNotification("Only students can send mentorship requests.", "error");
+      return;
+    }
+
+    // Check if there's already an existing request
+    const existingStatus = getExistingMentorshipStatus(selectedMentor.id);
+    if (existingStatus) {
+      showExistingMentorshipDetails(selectedMentor.id);
       return;
     }
 
@@ -126,6 +178,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
           },
         }
       );
+      
       setShowRequestForm(false);
       setSelectedMentor(null);
       setRequestForm({
@@ -133,12 +186,104 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
         session_date: "",
         session_time: "",
       });
+      
+      // Refresh the mentorship list
+      await loadMyMentorships();
+      
       showNotification("🚀 Mentorship request sent successfully!", "success");
     } catch (error) {
       console.error("Error sending mentorship request:", error);
-      showNotification("Failed to send mentorship request.", "error");
+      
+      let errorMessage = "Failed to send mentorship request.";
+      let errorType = "error";
+      
+      if (error.response && error.response.data) {
+        if (error.response.data.message && error.response.data.message.includes("already exists")) {
+          errorType = "info";
+          const statusMatch = error.response.data.message.match(/status: (\w+)/);
+          
+          if (statusMatch) {
+            const status = statusMatch[1];
+            const mentorName = selectedMentor?.name || "this mentor";
+            
+            switch(status) {
+              case "active":
+                errorMessage = `You already have an active mentorship session with ${mentorName}.`;
+                break;
+              case "pending":
+                errorMessage = `You have already sent a mentorship request to ${mentorName}. Your request is currently pending approval.`;
+                break;
+              case "cancelled":
+                errorMessage = `Your previous mentorship request to ${mententorName} was cancelled. Please refresh the page to see updated status.`;
+                break;
+              default:
+                errorMessage = error.response.data.message;
+            }
+          } else {
+            errorMessage = error.response.data.message;
+          }
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+      
+      showNotification(errorMessage, errorType);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Function to show existing mentorship details
+  const showExistingMentorshipDetails = (mentorId) => {
+    const existingMentorship = getExistingMentorship(mentorId);
+    const mentor = mentors.find(m => m.id === mentorId);
+    
+    if (existingMentorship) {
+      const statusMessages = {
+        active: {
+          title: "✨ Active Mentorship",
+          message: `You have an active mentorship session with ${mentor?.name}.`
+        },
+        pending: {
+          title: "⏳ Request Pending",
+          message: `Your request to ${mentor?.name} is pending approval.`
+        },
+        cancelled: {
+          title: "❌ Request Cancelled",
+          message: `Your previous request to ${mentor?.name} was cancelled.`
+        },
+        completed: {
+          title: "✅ Mentorship Completed",
+          message: `Your mentorship with ${mentor?.name} has been successfully completed.`
+        }
+      };
+      
+      const statusInfo = statusMessages[existingMentorship.status] || {
+        title: "📋 Request Status",
+        message: `Your request to ${mentor?.name} has status: ${existingMentorship.status}`
+      };
+      
+      let details = `${statusInfo.title}\n${statusInfo.message}`;
+      
+      // Add request message if available
+      if (existingMentorship.request_message) {
+        details += `\n\nYour message: "${existingMentorship.request_message}"`;
+      }
+      
+      // Add session details if available
+      if (existingMentorship.session_date) {
+        details += `\n\nScheduled session: ${existingMentorship.session_date}`;
+        if (existingMentorship.session_time) {
+          details += ` at ${existingMentorship.session_time}`;
+        }
+      }
+      
+      // Add request date if available
+      if (existingMentorship.request_date) {
+        details += `\nRequested on: ${existingMentorship.request_date}`;
+      }
+      
+      showNotification(details, "info");
     }
   };
 
@@ -151,6 +296,13 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
     if (currentUser.userType !== "student") {
       showNotification("Only students can send mentorship requests.", "error");
+      return;
+    }
+
+    // Check if there's already a mentorship with this mentor
+    const existingStatus = getExistingMentorshipStatus(mentor.id);
+    if (existingStatus) {
+      showExistingMentorshipDetails(mentor.id);
       return;
     }
 
@@ -246,30 +398,34 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      {/* Notification Toast */}
+      {/* Notification Toast - Enhanced for longer messages */}
       {notification && (
-        <div className="fixed top-20 right-4 z-[60] animate-in slide-in-from-right duration-300">
+        <div className="fixed top-20 right-4 z-[60] animate-in slide-in-from-right duration-300 max-w-md">
           <div
-            className={`rounded-xl shadow-2xl p-4 sm:p-5 max-w-sm border-2 backdrop-blur-lg ${
+            className={`rounded-xl shadow-2xl p-4 sm:p-5 border-2 backdrop-blur-lg whitespace-pre-line ${
               notification.type === "success"
                 ? "bg-gradient-to-r from-green-500/90 to-emerald-500/90 border-green-400 text-white"
                 : notification.type === "error"
                 ? "bg-gradient-to-r from-red-500/90 to-pink-500/90 border-red-400 text-white"
-                : "bg-gradient-to-r from-blue-500/90 to-purple-500/90 border-blue-400 text-white"
+                : notification.type === "info"
+                ? "bg-gradient-to-r from-blue-500/90 to-purple-500/90 border-blue-400 text-white"
+                : "bg-gradient-to-r from-yellow-500/90 to-amber-500/90 border-yellow-400 text-white"
             }`}
           >
-            <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
                 {notification.type === "success" ? (
-                  <CheckCircle className="w-6 h-6" />
+                  <CheckCircle className="w-5 h-5" />
                 ) : notification.type === "error" ? (
-                  <XCircle className="w-6 h-6" />
+                  <XCircle className="w-5 h-5" />
+                ) : notification.type === "info" ? (
+                  <Clock className="w-5 h-5" />
                 ) : (
-                  <Send className="w-6 h-6" />
+                  <Send className="w-5 h-5" />
                 )}
               </div>
-              <div className="flex-1">
-                <p className="font-semibold text-sm sm:text-base">
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm sm:text-base leading-relaxed">
                   {notification.message}
                 </p>
               </div>
@@ -360,8 +516,8 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
             />
             <StatCard
               icon={GraduationCap}
-              label="Active Sessions"
-              value={mentors.filter((m) => m.available).length}
+              label="My Requests"
+              value={myMentorships.length}
               color="indigo"
             />
           </div>
@@ -395,201 +551,251 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {mentors
                 .filter((mentor) => mentor.available)
-                .map((mentor) => (
-                  <div
-                    key={mentor.id}
-                    className={`rounded-xl sm:rounded-2xl border-2 p-4 sm:p-6 transition-all duration-300 hover:scale-105 ${
-                      isDarkMode
-                        ? "bg-gradient-to-br from-slate-800/70 via-blue-900/20 to-indigo-900/20 border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20"
-                        : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-blue-300 hover:shadow-2xl hover:shadow-cyan-500/20"
-                    }`}
-                  >
-                    {/* Mentor Header */}
-                    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
-                      <img
-                        src={
-                          mentor.alumni?.profilePhoto ||
-                          "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
-                        }
-                        alt={mentor.name}
-                        className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h3
-                          className={`font-bold text-base sm:text-lg truncate ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
-                        >
-                          {mentor.name}
-                        </h3>
-                        <p
-                          className={`text-xs sm:text-sm flex items-center gap-1 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          <Briefcase size={12} className="sm:w-3.5 sm:h-3.5" />
-                          <span className="truncate">
-                            {mentor.current_position} at {mentor.company}
-                          </span>
-                        </p>
-                        <p
-                          className={`text-xs flex items-center gap-1 mt-1 ${
-                            isDarkMode ? "text-gray-400" : "text-gray-600"
-                          }`}
-                        >
-                          <GraduationCap
-                            size={12}
-                            className="sm:w-3.5 sm:h-3.5"
-                          />
-                          Batch {mentor.batch_year} • {mentor.branch}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Expertise */}
-                    <div className="mb-3 sm:mb-4">
-                      <p
-                        className={`text-xs sm:text-sm line-clamp-2 ${
-                          isDarkMode ? "text-gray-200" : "text-gray-800"
-                        }`}
-                      >
-                        {mentor.expertise}
-                      </p>
-                    </div>
-
-                    {/* Topics */}
-                    <div className="mb-3 sm:mb-4">
-                      <div className="flex flex-wrap gap-1 sm:gap-2">
-                        {mentor.topics.slice(0, 3).map((topic, index) => (
-                          <span
-                            key={index}
-                            className={`px-2 py-1 text-xs rounded-full font-medium border ${
-                              isDarkMode
-                                ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
-                                : "bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 border-cyan-300"
+                .map((mentor) => {
+                  const existingStatus = getExistingMentorshipStatus(mentor.id);
+                  
+                  return (
+                    <div
+                      key={mentor.id}
+                      className={`rounded-xl sm:rounded-2xl border-2 p-4 sm:p-6 transition-all duration-300 ${
+                        existingStatus ? 'hover:scale-[1.02]' : 'hover:scale-105'
+                      } ${
+                        isDarkMode
+                          ? existingStatus
+                            ? "bg-gradient-to-br from-slate-800/50 via-blue-900/10 to-indigo-900/10 border-blue-500/20"
+                            : "bg-gradient-to-br from-slate-800/70 via-blue-900/20 to-indigo-900/20 border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/20"
+                          : existingStatus
+                          ? "bg-gradient-to-br from-white/70 via-cyan-50/20 to-blue-50/20 border-blue-200"
+                          : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-blue-300 hover:shadow-2xl hover:shadow-cyan-500/20"
+                      }`}
+                    >
+                      {/* Mentor Header */}
+                      <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <img
+                          src={
+                            mentor.alumni?.profilePhoto ||
+                            "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
+                          }
+                          alt={mentor.name}
+                          className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h3
+                            className={`font-bold text-base sm:text-lg truncate ${
+                              isDarkMode ? "text-white" : "text-gray-900"
                             }`}
                           >
-                            {topic}
-                          </span>
-                        ))}
-                        {mentor.topics.length > 3 && (
-                          <span
-                            className={`px-2 py-1 text-xs rounded-full border ${
-                              isDarkMode
-                                ? "bg-gray-700/50 text-gray-300 border-gray-600/40"
-                                : "bg-gray-200 text-gray-700 border-gray-400"
+                            {mentor.name}
+                          </h3>
+                          <p
+                            className={`text-xs sm:text-sm flex items-center gap-1 ${
+                              isDarkMode ? "text-gray-300" : "text-gray-700"
                             }`}
                           >
-                            +{mentor.topics.length - 3}
-                          </span>
-                        )}
+                            <Briefcase size={12} className="sm:w-3.5 sm:h-3.5" />
+                            <span className="truncate">
+                              {mentor.current_position} at {mentor.company}
+                            </span>
+                          </p>
+                          <p
+                            className={`text-xs flex items-center gap-1 mt-1 ${
+                              isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                          >
+                            <GraduationCap
+                              size={12}
+                              className="sm:w-3.5 sm:h-3.5"
+                            />
+                            Batch {mentor.batch_year} • {mentor.branch}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Time Slots */}
-                    <div className="mb-3 sm:mb-4">
-                      <div className="flex items-center gap-1 mb-2">
-                        <Clock size={12} className="text-cyan-400" />
-                        <span
-                          className={`text-xs font-medium ${
-                            isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                      {/* Expertise */}
+                      <div className="mb-3 sm:mb-4">
+                        <p
+                          className={`text-xs sm:text-sm line-clamp-2 ${
+                            isDarkMode ? "text-gray-200" : "text-gray-800"
                           }`}
                         >
-                          Available Time Slots
-                        </span>
+                          {mentor.expertise}
+                        </p>
                       </div>
-                      <div className="space-y-1">
-                        {Object.entries(mentor.availability)
-                          .slice(0, 2)
-                          .map(([day, slots]) => (
-                            <div
-                              key={day}
-                              className="flex justify-between items-center text-xs"
+
+                      {/* Topics */}
+                      <div className="mb-3 sm:mb-4">
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
+                          {mentor.topics.slice(0, 3).map((topic, index) => (
+                            <span
+                              key={index}
+                              className={`px-2 py-1 text-xs rounded-full font-medium border ${
+                                isDarkMode
+                                  ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
+                                  : "bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 border-cyan-300"
+                              }`}
                             >
+                              {topic}
+                            </span>
+                          ))}
+                          {mentor.topics.length > 3 && (
+                            <span
+                              className={`px-2 py-1 text-xs rounded-full border ${
+                                isDarkMode
+                                  ? "bg-gray-700/50 text-gray-300 border-gray-600/40"
+                                  : "bg-gray-200 text-gray-700 border-gray-400"
+                              }`}
+                            >
+                              +{mentor.topics.length - 3}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Time Slots */}
+                      <div className="mb-3 sm:mb-4">
+                        <div className="flex items-center gap-1 mb-2">
+                          <Clock size={12} className="text-cyan-400" />
+                          <span
+                            className={`text-xs font-medium ${
+                              isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                            }`}
+                          >
+                            Available Time Slots
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          {Object.entries(mentor.availability)
+                            .slice(0, 2)
+                            .map(([day, slots]) => (
+                              <div
+                                key={day}
+                                className="flex justify-between items-center text-xs"
+                              >
+                                <span
+                                  className={
+                                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                                  }
+                                >
+                                  {getDayDisplayName(day)}
+                                </span>
+                                <span
+                                  className={`font-medium ${
+                                    isDarkMode ? "text-gray-200" : "text-gray-800"
+                                  }`}
+                                >
+                                  {formatTimeSlot(slots[0])}
+                                </span>
+                              </div>
+                            ))}
+                          {Object.keys(mentor.availability).length > 2 && (
+                            <div className="text-xs text-center pt-1">
                               <span
                                 className={
-                                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                                  isDarkMode ? "text-cyan-300" : "text-cyan-600"
                                 }
                               >
-                                {getDayDisplayName(day)}
-                              </span>
-                              <span
-                                className={`font-medium ${
-                                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                                }`}
-                              >
-                                {formatTimeSlot(slots[0])}
+                                +{Object.keys(mentor.availability).length - 2}{" "}
+                                more days
                               </span>
                             </div>
-                          ))}
-                        {Object.keys(mentor.availability).length > 2 && (
-                          <div className="text-xs text-center pt-1">
-                            <span
-                              className={
-                                isDarkMode ? "text-cyan-300" : "text-cyan-600"
-                              }
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Fees & Availability */}
+                      <div className="flex justify-between items-center mb-4 sm:mb-4">
+                        <div className="flex items-center gap-1 text-orange-400 font-bold text-sm sm:text-base">
+                          <DollarSign size={14} className="sm:w-4 sm:h-4" />
+                          <span>₹{mentor.fees}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-green-400 text-xs sm:text-sm font-medium">
+                          <Clock size={12} className="sm:w-3.5 sm:h-3.5" />
+                          <span>Available</span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openProfilePopup(mentor)}
+                          className={`flex-1 border-2 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${
+                            isDarkMode
+                              ? "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20"
+                              : "border-cyan-300 text-cyan-700 hover:bg-cyan-50"
+                          }`}
+                        >
+                          <ExternalLink size={12} className="sm:w-3.5 sm:h-3.5" />
+                          Details
+                        </button>
+
+                        {/* Conditionally render Request/Status button */}
+                        {canRequestMentorship ? (
+                          existingStatus ? (
+                            <button
+                              onClick={() => showExistingMentorshipDetails(mentor.id)}
+                              className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${
+                                existingStatus === "active"
+                                  ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/30"
+                                  : existingStatus === "pending"
+                                  ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-white hover:shadow-lg hover:shadow-yellow-500/30"
+                                  : existingStatus === "cancelled"
+                                  ? "bg-gradient-to-r from-gray-500 to-slate-600 text-white hover:shadow-lg hover:shadow-gray-500/30"
+                                  : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/30"
+                              }`}
                             >
-                              +{Object.keys(mentor.availability).length - 2}{" "}
-                              more days
-                            </span>
-                          </div>
+                              {existingStatus === "active" && (
+                                <>
+                                  <CheckCircle size={12} className="sm:w-3.5 sm:h-3.5" />
+                                  Active
+                                </>
+                              )}
+                              {existingStatus === "pending" && (
+                                <>
+                                  <Clock size={12} className="sm:w-3.5 sm:h-3.5" />
+                                  Pending
+                                </>
+                              )}
+                              {existingStatus === "cancelled" && (
+                                <>
+                                  <XCircle size={12} className="sm:w-3.5 sm:h-3.5" />
+                                  Cancelled
+                                </>
+                              )}
+                              {!["active", "pending", "cancelled"].includes(existingStatus) && (
+                                <>
+                                  <CheckCircle size={12} className="sm:w-3.5 sm:h-3.5" />
+                                  {existingStatus.charAt(0).toUpperCase() + existingStatus.slice(1)}
+                                </>
+                              )}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => openRequestForm(mentor)}
+                              className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-2 rounded-lg font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm"
+                            >
+                              <Send size={12} className="sm:w-3.5 sm:h-3.5" />
+                              Request
+                            </button>
+                          )
+                        ) : (
+                          <button
+                            disabled
+                            className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${
+                              isDarkMode
+                                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                          >
+                            <Send size={12} className="sm:w-3.5 sm:h-3.5" />
+                            {!currentUser?.isLoggedIn
+                              ? "Login to Request"
+                              : "Students Only"}
+                          </button>
                         )}
                       </div>
                     </div>
-
-                    {/* Fees & Availability */}
-                    <div className="flex justify-between items-center mb-4 sm:mb-4">
-                      <div className="flex items-center gap-1 text-orange-400 font-bold text-sm sm:text-base">
-                        <DollarSign size={14} className="sm:w-4 sm:h-4" />
-                        <span>₹{mentor.fees}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-green-400 text-xs sm:text-sm font-medium">
-                        <Clock size={12} className="sm:w-3.5 sm:h-3.5" />
-                        <span>Available</span>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => openProfilePopup(mentor)}
-                        className={`flex-1 border-2 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${
-                          isDarkMode
-                            ? "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20"
-                            : "border-cyan-300 text-cyan-700 hover:bg-cyan-50"
-                        }`}
-                      >
-                        <ExternalLink size={12} className="sm:w-3.5 sm:h-3.5" />
-                        Details
-                      </button>
-
-                      {/* Conditionally render Request button */}
-                      {canRequestMentorship ? (
-                        <button
-                          onClick={() => openRequestForm(mentor)}
-                          className="flex-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-2 rounded-lg font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm"
-                        >
-                          <Send size={12} className="sm:w-3.5 sm:h-3.5" />
-                          Request
-                        </button>
-                      ) : (
-                        <button
-                          disabled
-                          className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${
-                            isDarkMode
-                              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          }`}
-                        >
-                          <Send size={12} className="sm:w-3.5 sm:h-3.5" />
-                          {!currentUser?.isLoggedIn
-                            ? "Login to Request"
-                            : "Students Only"}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
             </div>
 
             {mentors.filter((m) => m.available).length === 0 && (
@@ -857,16 +1063,66 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
                 }`}
               >
                 {canRequestMentorship ? (
-                  <button
-                    onClick={() => {
-                      setShowProfilePopup(false);
-                      openRequestForm(selectedMentor);
-                    }}
-                    className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
-                  >
-                    <Send size={16} />
-                    Request Mentorship
-                  </button>
+                  (() => {
+                    const existingStatus = getExistingMentorshipStatus(selectedMentor.id);
+                    if (existingStatus) {
+                      return (
+                        <button
+                          onClick={() => {
+                            setShowProfilePopup(false);
+                            showExistingMentorshipDetails(selectedMentor.id);
+                          }}
+                          className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                            existingStatus === "active"
+                              ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/30"
+                              : existingStatus === "pending"
+                              ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-white hover:shadow-lg hover:shadow-yellow-500/30"
+                              : existingStatus === "cancelled"
+                              ? "bg-gradient-to-r from-gray-500 to-slate-600 text-white hover:shadow-lg hover:shadow-gray-500/30"
+                              : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/30"
+                          }`}
+                        >
+                          {existingStatus === "active" && (
+                            <>
+                              <CheckCircle size={16} />
+                              View Active Mentorship
+                            </>
+                          )}
+                          {existingStatus === "pending" && (
+                            <>
+                              <Clock size={16} />
+                              View Pending Request
+                            </>
+                          )}
+                          {existingStatus === "cancelled" && (
+                            <>
+                              <XCircle size={16} />
+                              View Cancelled Request
+                            </>
+                          )}
+                          {!["active", "pending", "cancelled"].includes(existingStatus) && (
+                            <>
+                              <CheckCircle size={16} />
+                              View {existingStatus.charAt(0).toUpperCase() + existingStatus.slice(1)} Request
+                            </>
+                          )}
+                        </button>
+                      );
+                    } else {
+                      return (
+                        <button
+                          onClick={() => {
+                            setShowProfilePopup(false);
+                            openRequestForm(selectedMentor);
+                          }}
+                          className="w-full bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
+                        >
+                          <Send size={16} />
+                          Request Mentorship
+                        </button>
+                      );
+                    }
+                  })()
                 ) : (
                   <button
                     disabled

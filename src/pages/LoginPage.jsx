@@ -17,6 +17,9 @@ import {
   ArrowRight,
   Award,
   UserCheck,
+  X,
+  HelpCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -27,6 +30,260 @@ const API_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/auth`
   : "http://localhost:3001/auth";
 
+// Extra Email Popup Component
+const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) {
+      return "Please enter a valid email address";
+    }
+    
+    // Check if email is from mitsgwl.ac.in domain
+    if (email.toLowerCase().endsWith("@mitsgwl.ac.in")) {
+      return "Please use a personal email address (not @mitsgwl.ac.in). After graduation, your institute email will no longer work.";
+    }
+    
+    return null;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      setError("Personal email is required to continue");
+      return;
+    }
+
+    const validationError = validateEmail(email);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_URL}/update-extra-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.accessToken}`
+        },
+        body: JSON.stringify({
+          userId: userData.userId,
+          extraEmail: email.trim()
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSuccess(true);
+        // Add extra email to user data and save
+        const updatedUserData = {
+          ...userData,
+          extraEmail: email.trim(),
+          hasExtraEmail: true
+        };
+        
+        setTimeout(() => {
+          onSave(updatedUserData);
+          onClose();
+        }, 1500);
+      } else {
+        if (data.data?.hasExtraEmail) {
+          // User already has extra email, proceed with login
+          setSuccess(true);
+          setTimeout(() => {
+            onSave({
+              ...userData,
+              extraEmail: data.data.existingExtraEmail,
+              hasExtraEmail: true
+            });
+            onClose();
+          }, 1500);
+        } else {
+          setError(data.message || "Failed to save email. Please try again.");
+        }
+      }
+    } catch (err) {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className={`rounded-2xl shadow-2xl w-full max-w-md p-6 ${
+        isDarkMode ? "bg-slate-900" : "bg-white"
+      }`}>
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className={`text-xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}>
+                Personal Email Required
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowInfo(!showInfo)}
+                className={`p-1 rounded-lg ${
+                  isDarkMode 
+                    ? "hover:bg-gray-800 text-blue-400" 
+                    : "hover:bg-gray-100 text-blue-600"
+                }`}
+                title="Why is this required?"
+              >
+                <HelpCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <p className={`text-sm ${
+              isDarkMode ? "text-gray-400" : "text-gray-600"
+            }`}>
+              Please provide a personal email to continue
+            </p>
+            
+            {showInfo && (
+              <div className={`mt-4 p-4 rounded-lg border ${
+                isDarkMode
+                  ? "bg-blue-900/20 border-blue-800"
+                  : "bg-blue-50 border-blue-200"
+              }`}>
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className={`w-5 h-5 mt-0.5 ${
+                    isDarkMode ? "text-blue-400" : "text-blue-600"
+                  }`} />
+                  <div>
+                    <p className={`text-sm font-medium ${
+                      isDarkMode ? "text-blue-300" : "text-blue-900"
+                    }`}>
+                      Why is this required?
+                    </p>
+                    <p className={`text-xs mt-1 ${
+                      isDarkMode ? "text-blue-200" : "text-blue-700"
+                    }`}>
+                      After successfully completing your degree, you will automatically become an alumni. 
+                      Your @mitsgwl.ac.in email will no longer work after graduation, so we need your 
+                      personal email for future communications and account access.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-6">
+            <label className={`block text-sm font-medium mb-2 ${
+              isDarkMode ? "text-gray-300" : "text-gray-700"
+            }`}>
+              Personal Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
+              placeholder="example@gmail.com"
+              className={`w-full px-4 py-3 rounded-lg border ${
+                isDarkMode
+                  ? "border-gray-700 bg-gray-800 text-white placeholder-gray-500"
+                  : "border-gray-300 bg-transparent text-gray-900 placeholder-gray-400"
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition`}
+              disabled={loading || success}
+              autoFocus
+            />
+            <p className={`text-xs mt-2 ${
+              isDarkMode ? "text-gray-400" : "text-gray-500"
+            }`}>
+                </p>
+          </div>
+
+          {error && (
+            <div className={`mb-4 p-3 rounded-lg border ${
+              isDarkMode
+                ? "bg-red-900/20 border-red-800"
+                : "bg-red-50 border-red-200"
+            }`}>
+              <div className="flex items-start gap-3">
+                <AlertCircle className={`w-5 h-5 mt-0.5 ${
+                  isDarkMode ? "text-red-400" : "text-red-600"
+                }`} />
+                <p className={`text-sm ${
+                  isDarkMode ? "text-red-400" : "text-red-600"
+                }`}>
+                  {error}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {success && (
+            <div className={`mb-4 p-3 rounded-lg border ${
+              isDarkMode
+                ? "bg-green-900/20 border-green-800"
+                : "bg-green-50 border-green-200"
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className="w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className={`text-sm ${
+                  isDarkMode ? "text-green-400" : "text-green-600"
+                }`}>
+                  Email saved successfully! Redirecting...
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <button
+              type="submit"
+              disabled={loading || success || !email.trim()}
+              className={`w-full px-4 py-3 rounded-lg font-medium transition ${
+                loading || success || !email.trim()
+                  ? "bg-blue-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700"
+              } text-white`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Saving...
+                </span>
+              ) : success ? (
+                "Saved!"
+              ) : (
+                "Save Email & Continue"
+              )}
+            </button>
+            
+            <div className={`text-xs text-center ${
+              isDarkMode ? "text-gray-500" : "text-gray-600"
+            }`}>
+              <p>You must provide a personal email to access the portal</p>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default function LoginPage({
   setIsAuthenticated,
   isDarkMode,
@@ -35,7 +292,8 @@ export default function LoginPage({
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const [showExtraEmailPopup, setShowExtraEmailPopup] = useState(false);
+  const [tempUserData, setTempUserData] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
   const handleAuthError = (errorType) => {
@@ -70,6 +328,64 @@ export default function LoginPage({
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const completeLogin = (userData) => {
+    console.log("✅ Access Token:", userData.accessToken);
+    console.log("🔄 Refresh Token:", userData.refreshToken);
+    console.log("Storing auth data:", userData);
+    
+    // Only store in localStorage if user has extra email
+    if (userData.hasExtraEmail || userData.extraEmail) {
+      localStorage.setItem("auth", JSON.stringify(userData));
+      setIsAuthenticated(true);
+      window.location.href = "/";
+    } else {
+      console.error("Cannot login: User does not have extra email");
+      setError("Personal email is required to access the portal. Please try logging in again.");
+      setIsLoading(false);
+    }
+  };
+
+  const handleExtraEmailSave = (userData) => {
+    completeLogin(userData);
+  };
+
+  const checkIfNeedsExtraEmail = async (userData) => {
+    try {
+      const response = await fetch(`${API_URL}/check-extra-email-status/${userData.userId}`, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${userData.accessToken}`
+        }
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        if (data.data.needsExtraEmail) {
+          // Show popup for extra email (COMPULSORY)
+          setTempUserData(userData);
+          setShowExtraEmailPopup(true);
+        } else {
+          // User already has extra email, proceed with login
+          completeLogin({
+            ...userData,
+            extraEmail: data.data.extraEmail,
+            hasExtraEmail: true
+          });
+        }
+      } else {
+        // If API fails, show error
+        console.error("Failed to check extra email status:", data.message);
+        setError("Unable to verify your account. Please try again.");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error checking extra email status:", error);
+      setError("Network error. Please check your connection and try again.");
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -124,12 +440,9 @@ export default function LoginPage({
         userType: "student",
         expiry: Date.now() + 1000 * 60 * 60,
       };
-      console.log("✅ Access Token:", accessToken);
-      console.log("🔄 Refresh Token:", refreshToken);
-      console.log("Storing auth data:", userData);
-      localStorage.setItem("auth", JSON.stringify(userData));
-      setIsAuthenticated(true);
-      window.location.href = "/";
+
+      // Check if user needs extra email from backend
+      checkIfNeedsExtraEmail(userData);
     }
   }, [setIsAuthenticated]);
 
@@ -249,464 +562,488 @@ export default function LoginPage({
         userId: userIdParam || "",
       };
 
-      console.log("Storing auth data:", userData);
-      localStorage.setItem("auth", JSON.stringify(userData));
-      setIsAuthenticated(true);
-      window.location.href = "/";
+      // Check if user needs extra email from backend
+      checkIfNeedsExtraEmail({
+        ...userData,
+        userType: "student",
+        expiry: Date.now() + 1000 * 60 * 60,
+      });
     }
   };
 
-  return (
-    <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
-      }`}
-    >
-      {/* Animated Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl animate-blob"></div>
-        <div
-          className="absolute top-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-blob"
-          style={{ animationDelay: "2s" }}
-        ></div>
-        <div
-          className="absolute bottom-20 left-1/3 w-96 h-96 bg-cyan-500/10 rounded-full filter blur-3xl animate-blob"
-          style={{ animationDelay: "4s" }}
-        ></div>
-      </div>
+  // User cannot skip - they must enter email
+  const handleClosePopup = () => {
+    // Don't allow closing without entering email
+    // Just show a message that it's required
+    setError("Personal email is required to access the portal.");
+    // Keep the popup open
+  };
 
-      {/* Theme Toggle */}
-      <button
-        onClick={toggleTheme}
-        className={`fixed top-6 right-6 z-50 p-3 rounded-xl shadow-xl transition-all duration-300 hover:scale-110 ${
+  return (
+    <>
+      <ExtraEmailPopup
+        isOpen={showExtraEmailPopup}
+        onClose={handleClosePopup}
+        userData={tempUserData}
+        onSave={handleExtraEmailSave}
+        isDarkMode={isDarkMode}
+      />
+
+      <div
+        className={`min-h-screen transition-colors duration-500 ${
           isDarkMode
-            ? "bg-slate-800 hover:bg-slate-700 text-yellow-400"
-            : "bg-white hover:bg-gray-50 text-blue-600 border border-blue-200"
+            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
+            : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
         }`}
       >
-        {isDarkMode ? (
-          <Sun className="w-5 h-5" />
-        ) : (
-          <Moon className="w-5 h-5" />
-        )}
-      </button>
+        {/* Animated Background */}
+        <div className="fixed inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-blue-500/10 rounded-full filter blur-3xl animate-blob"></div>
+          <div
+            className="absolute top-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full filter blur-3xl animate-blob"
+            style={{ animationDelay: "2s" }}
+          ></div>
+          <div
+            className="absolute bottom-20 left-1/3 w-96 h-96 bg-cyan-500/10 rounded-full filter blur-3xl animate-blob"
+            style={{ animationDelay: "4s" }}
+          ></div>
+        </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-6xl">
-          {/* Mobile Header - Only on small screens */}
-          <div className="lg:hidden text-center mb-8">
-            <div className="flex items-center gap-3 justify-center mb-4">
-              <div
-                className={`w-12 h-12 rounded-xl p-2 ${
-                  isDarkMode
-                    ? "bg-white/10 backdrop-blur-sm"
-                    : "bg-white shadow-xl"
-                }`}
-              >
-                <img
-                  src="/assets/images/mits-logo.png"
-                  alt="MITS Logo"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div>
-                <h1
-                  className={`text-2xl font-black ${
-                    isDarkMode ? "text-white" : "text-gray-900"
+        {/* Theme Toggle */}
+        <button
+          onClick={toggleTheme}
+          className={`fixed top-6 right-6 z-50 p-3 rounded-xl shadow-xl transition-all duration-300 hover:scale-110 ${
+            isDarkMode
+              ? "bg-slate-800 hover:bg-slate-700 text-yellow-400"
+              : "bg-white hover:bg-gray-50 text-blue-600 border border-blue-200"
+          }`}
+        >
+          {isDarkMode ? (
+            <Sun className="w-5 h-5" />
+          ) : (
+            <Moon className="w-5 h-5" />
+          )}
+        </button>
+
+        {/* Main Content */}
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12">
+          <div className="w-full max-w-6xl">
+            {/* Mobile Header - Only on small screens */}
+            <div className="lg:hidden text-center mb-8">
+              <div className="flex items-center gap-3 justify-center mb-4">
+                <div
+                  className={`w-12 h-12 rounded-xl p-2 ${
+                    isDarkMode
+                      ? "bg-white/10 backdrop-blur-sm"
+                      : "bg-white shadow-xl"
                   }`}
                 >
-                  MITS ALUMNI
-                </h1>
-                <p
-                  className={`text-xs ${
-                    isDarkMode ? "text-blue-400" : "text-blue-600"
-                  }`}
-                >
-                  Student Portal
-                </p>
-              </div>
-            </div>
-
-            <h2
-              className={`text-3xl font-bold leading-tight mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Welcome Back,
-              <br />
-              <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Future Alumni
-              </span>
-            </h2>
-            <p
-              className={`text-base ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              Connect with your campus community
-            </p>
-          </div>
-
-          {/* Desktop & Mobile Grid */}
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            {/* Left Side - Desktop Only */}
-            <div className="hidden lg:block space-y-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <div
-                    className={`w-16 h-16 rounded-2xl p-3 ${
-                      isDarkMode
-                        ? "bg-white/10 backdrop-blur-sm"
-                        : "bg-white shadow-xl"
+                  <img
+                    src="/assets/images/mits-logo.png"
+                    alt="MITS Logo"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div>
+                  <h1
+                    className={`text-2xl font-black ${
+                      isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    <img
-                      src="/assets/images/mits-logo.png"
-                      alt="MITS Logo"
-                      className="w-full h-full object-contain"
-                    />
+                    MITS ALUMNI
+                  </h1>
+                  <p
+                    className={`text-xs ${
+                      isDarkMode ? "text-blue-400" : "text-blue-600"
+                    }`}
+                  >
+                    Student Portal
+                  </p>
+                </div>
+              </div>
+
+              <h2
+                className={`text-3xl font-bold leading-tight mb-2 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Welcome Back,
+                <br />
+                <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                  Future Alumni
+                </span>
+              </h2>
+              <p
+                className={`text-base ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                Connect with your campus community
+              </p>
+            </div>
+
+            {/* Desktop & Mobile Grid */}
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              {/* Left Side - Desktop Only */}
+              <div className="hidden lg:block space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-16 h-16 rounded-2xl p-3 ${
+                        isDarkMode
+                          ? "bg-white/10 backdrop-blur-sm"
+                          : "bg-white shadow-xl"
+                      }`}
+                    >
+                      <img
+                        src="/assets/images/mits-logo.png"
+                        alt="MITS Logo"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <div>
+                      <h1
+                        className={`text-3xl font-black ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        MITS ALUMNI
+                      </h1>
+                      <p
+                        className={`text-sm ${
+                          isDarkMode ? "text-blue-400" : "text-blue-600"
+                        }`}
+                      >
+                        Student Portal
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h1
-                      className={`text-3xl font-black ${
+
+                  <div className="space-y-3">
+                    <h2
+                      className={`text-5xl font-bold leading-tight ${
                         isDarkMode ? "text-white" : "text-gray-900"
                       }`}
                     >
-                      MITS ALUMNI
-                    </h1>
+                      Welcome Back,
+                      <br />
+                      <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        Future Alumni
+                      </span>
+                    </h2>
                     <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-blue-400" : "text-blue-600"
+                      className={`text-lg ${
+                        isDarkMode ? "text-gray-300" : "text-gray-600"
                       }`}
                     >
-                      Student Portal
+                      Connect with your campus community and explore endless
+                      opportunities
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <h2
-                    className={`text-5xl font-bold leading-tight ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    Welcome Back,
-                    <br />
-                    <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                      Future Alumni
-                    </span>
-                  </h2>
-                  <p
-                    className={`text-lg ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
-                    }`}
-                  >
-                    Connect with your campus community and explore endless
-                    opportunities
-                  </p>
+                  {[
+                    {
+                      icon: UserCheck, // represents verified alumni
+                      title: "Verified Alumni",
+                      desc: "Connect only with genuine MITS graduates",
+                    },
+                    {
+                      icon: Users, // represents networking and connections
+                      title: "Career Networking",
+                      desc: "Build professional connections and mentorship",
+                    },
+                    {
+                      icon: Award, // represents exclusive benefits/resources
+                      title: "Alumni Exclusive",
+                      desc: "Access resources and events only for MITS alumni",
+                    },
+                    {
+                      icon: Mail, // represents personal email requirement
+                      title: "Personal Email Required",
+                      desc: "Required for future alumni access after graduation",
+                    },
+                  ].map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm transition-all hover:translate-x-2 ${
+                        isDarkMode
+                          ? "bg-white/5 border border-white/10"
+                          : "bg-white/60 border border-blue-200"
+                      }`}
+                    >
+                      <div
+                        className={`p-2 rounded-lg ${
+                          isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
+                        }`}
+                      >
+                        <item.icon
+                          className={`w-4 h-4 ${
+                            isDarkMode ? "text-blue-400" : "text-blue-600"
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <h3
+                          className={`font-semibold text-sm ${
+                            isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
+                        >
+                          {item.title}
+                        </h3>
+                        <p
+                          className={`text-xs ${
+                            isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
+                        >
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="space-y-3">
-                {[
-                  {
-                    icon: UserCheck, // represents verified alumni
-                    title: "Verified Alumni",
-                    desc: "Connect only with genuine MITS graduates",
-                  },
-                  {
-                    icon: Users, // represents networking and connections
-                    title: "Career Networking",
-                    desc: "Build professional connections and mentorship",
-                  },
-                  {
-                    icon: Award, // represents exclusive benefits/resources
-                    title: "Alumni Exclusive",
-                    desc: "Access resources and events only for MITS alumni",
-                  },
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm transition-all hover:translate-x-2 ${
-                      isDarkMode
-                        ? "bg-white/5 border border-white/10"
-                        : "bg-white/60 border border-blue-200"
-                    }`}
-                  >
+              {/* Right Side - Login Form */}
+              <div className="w-full max-w-md mx-auto lg:mx-0">
+                <div
+                  className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${
+                    isDarkMode
+                      ? "bg-slate-900/80 border-slate-700/50"
+                      : "bg-white/90 border-blue-200"
+                  }`}
+                >
+                  <div className="text-center mb-6">
                     <div
-                      className={`p-2 rounded-lg ${
-                        isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${
+                        isDarkMode
+                          ? "bg-blue-500/10 border border-blue-500/20"
+                          : "bg-blue-50 border border-blue-200"
                       }`}
                     >
-                      <item.icon
+                      <GraduationCap
                         className={`w-4 h-4 ${
                           isDarkMode ? "text-blue-400" : "text-blue-600"
                         }`}
                       />
+                      <span
+                        className={`text-xs font-medium ${
+                          isDarkMode ? "text-blue-400" : "text-blue-600"
+                        }`}
+                      >
+                        Student Login
+                      </span>
                     </div>
-                    <div>
+                    <h2
+                      className={`text-3xl font-bold mb-2 ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      Sign In
+                    </h2>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      Use your institute email to continue
+                    </p>
+                  </div>
+
+                  {error && (
+                    <div
+                      className={`mb-6 p-4 rounded-xl border-l-4 border-red-500 ${
+                        isDarkMode ? "bg-red-900/20" : "bg-red-50"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <h3
+                            className={`font-semibold text-sm mb-1 ${
+                              isDarkMode ? "text-red-400" : "text-red-800"
+                            }`}
+                          >
+                            Authentication Error
+                          </h3>
+                          <p
+                            className={`text-xs ${
+                              isDarkMode ? "text-red-300" : "text-red-700"
+                            }`}
+                          >
+                            {error}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleGoogleLogin}
+                    disabled={isLoading}
+                    className={`w-full rounded-xl px-6 py-4 flex items-center justify-center gap-3 transition-all duration-300 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed group ${
+                      isDarkMode
+                        ? "bg-white text-gray-900 hover:bg-gray-100"
+                        : "bg-white text-gray-900 hover:bg-gray-50"
+                    } shadow-[0_0_20px_rgba(0,0,0,0.15)] hover:shadow-[0_0_30px_rgba(0,0,0,0.25)] hover:scale-[1.02]`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+                        <span>Connecting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          />
+                        </svg>
+                        <span>Continue with Google</span>
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </button>
+                  <div
+                    className={`mt-6 p-4 rounded-xl border hidden md:block ${
+                      isDarkMode
+                        ? "bg-blue-500/10 border-blue-500/20"
+                        : "bg-blue-50 border-blue-200"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`p-2 rounded-lg flex-shrink-0 ${
+                          isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
+                        }`}
+                      >
+                        <AlertTriangle
+                          className={`w-4 h-4 ${
+                            isDarkMode ? "text-blue-400" : "text-blue-600"
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <h3
+                          className={`font-semibold text-sm mb-1 ${
+                            isDarkMode ? "text-blue-300" : "text-blue-900"
+                          }`}
+                        >
+                          Institute Email Required
+                        </h3>
+                        <p
+                          className={`text-xs ${
+                            isDarkMode ? "text-blue-200" : "text-blue-700"
+                          }`}
+                        >
+                          Only @mitsgwl.ac.in email addresses are allowed
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 text-center">
+                    <p
+                      className={`text-sm mb-3 ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      Already graduated?
+                    </p>
+                    <button
+                      onClick={() => navigate("/login-alumni")}
+                      className={`w-full px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 ${
+                        isDarkMode
+                          ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                          : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                      } shadow-lg hover:shadow-xl flex items-center gap-2 justify-center mx-auto`}
+                    >
+                      Login as Alumni
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  className={`mt-6 rounded-xl p-6 backdrop-blur-xl border flex justify-center items-center ${
+                    isDarkMode
+                      ? "bg-slate-900/50 border-slate-700/50"
+                      : "bg-white/80 border-blue-200"
+                  }`}
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="relative flex-shrink-0">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50"></div>
+                      <img
+                        src="/assets/images/harsh.png"
+                        alt="Harsh Manmode"
+                        className="w-20 h-23 rounded-full border-2 border-blue-500 relative z-10"
+                      />
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <p
+                        className={`text-xs font-semibold tracking-wider mb-2 ${
+                          isDarkMode ? "text-gray-500" : "text-blue-600/60"
+                        }`}
+                      >
+                        DEVELOPED BY
+                      </p>
                       <h3
-                        className={`font-semibold text-sm ${
+                        className={`text-lg font-bold ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
-                        {item.title}
+                        Harsh Manmode
                       </h3>
                       <p
                         className={`text-xs ${
                           isDarkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                       >
-                        {item.desc}
+                        Information Technology, II Year
                       </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right Side - Login Form */}
-            <div className="w-full max-w-md mx-auto lg:mx-0">
-              <div
-                className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${
-                  isDarkMode
-                    ? "bg-slate-900/80 border-slate-700/50"
-                    : "bg-white/90 border-blue-200"
-                }`}
-              >
-                <div className="text-center mb-6">
-                  <div
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${
-                      isDarkMode
-                        ? "bg-blue-500/10 border border-blue-500/20"
-                        : "bg-blue-50 border border-blue-200"
-                    }`}
-                  >
-                    <GraduationCap
-                      className={`w-4 h-4 ${
-                        isDarkMode ? "text-blue-400" : "text-blue-600"
-                      }`}
-                    />
-                    <span
-                      className={`text-xs font-medium ${
-                        isDarkMode ? "text-blue-400" : "text-blue-600"
-                      }`}
-                    >
-                      Student Login
-                    </span>
-                  </div>
-                  <h2
-                    className={`text-3xl font-bold mb-2 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                  >
-                    Sign In
-                  </h2>
-                  <p
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Use your institute email to continue
-                  </p>
-                </div>
-
-                {error && (
-                  <div
-                    className={`mb-6 p-4 rounded-xl border-l-4 border-red-500 ${
-                      isDarkMode ? "bg-red-900/20" : "bg-red-50"
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <h3
-                          className={`font-semibold text-sm mb-1 ${
-                            isDarkMode ? "text-red-400" : "text-red-800"
-                          }`}
-                        >
-                          Authentication Error
-                        </h3>
-                        <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-red-300" : "text-red-700"
-                          }`}
-                        >
-                          {error}
-                        </p>
+                      <div className="flex gap-2 mt-2 justify-center">
+                        {[
+                          {
+                            icon: Github,
+                            href: "https://github.com/Harsh-2006-git",
+                          },
+                          {
+                            icon: Linkedin,
+                            href: "https://www.linkedin.com/in/harsh-manmode-2a0b91325/",
+                          },
+                          {
+                            icon: Twitter,
+                            href: "https://www.linkedin.com/in/harsh-manmode-2a0b91325/",
+                          },
+                        ].map((social, idx) => (
+                          <a
+                            key={idx}
+                            href={social.href}
+                            className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
+                              isDarkMode
+                                ? "bg-slate-800 hover:bg-slate-700 text-gray-400 hover:text-white"
+                                : "bg-blue-100 hover:bg-blue-200 text-blue-600"
+                            }`}
+                          >
+                            <social.icon className="w-4 h-4" />
+                          </a>
+                        ))}
                       </div>
-                    </div>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleGoogleLogin}
-                  disabled={isLoading}
-                  className={`w-full rounded-xl px-6 py-4 flex items-center justify-center gap-3 transition-all duration-300 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed group ${
-                    isDarkMode
-                      ? "bg-white text-gray-900 hover:bg-gray-100"
-                      : "bg-white text-gray-900 hover:bg-gray-50"
-                  } shadow-[0_0_20px_rgba(0,0,0,0.15)] hover:shadow-[0_0_30px_rgba(0,0,0,0.25)] hover:scale-[1.02]`}
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-                      <span>Connecting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" viewBox="0 0 24 24">
-                        <path
-                          fill="#4285F4"
-                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                        />
-                        <path
-                          fill="#34A853"
-                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                        />
-                        <path
-                          fill="#FBBC05"
-                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                        />
-                        <path
-                          fill="#EA4335"
-                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                        />
-                      </svg>
-                      <span>Continue with Google</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-                <div
-                  className={`mt-6 p-4 rounded-xl border hidden md:block ${
-                    isDarkMode
-                      ? "bg-blue-500/10 border-blue-500/20"
-                      : "bg-blue-50 border-blue-200"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`p-2 rounded-lg flex-shrink-0 ${
-                        isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
-                      }`}
-                    >
-                      <Mail
-                        className={`w-4 h-4 ${
-                          isDarkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
-                      />
-                    </div>
-                    <div>
-                      <h3
-                        className={`font-semibold text-sm mb-1 ${
-                          isDarkMode ? "text-blue-300" : "text-blue-900"
-                        }`}
-                      >
-                        Institute Email Required
-                      </h3>
-                      <p
-                        className={`text-xs ${
-                          isDarkMode ? "text-blue-200" : "text-blue-700"
-                        }`}
-                      >
-                        Only <strong>@mitsgwl.ac.in</strong> email addresses are
-                        allowed
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 text-center">
-                  <p
-                    className={`text-sm mb-3 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Already graduated?
-                  </p>
-                  <button
-                    onClick={() => navigate("/login-alumni")}
-                    className={`w-full px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 ${
-                      isDarkMode
-                        ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                    } shadow-lg hover:shadow-xl flex items-center gap-2 justify-center mx-auto`}
-                  >
-                    Login as Alumni
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              <div
-                className={`mt-6 rounded-xl p-6 backdrop-blur-xl border flex justify-center items-center ${
-                  isDarkMode
-                    ? "bg-slate-900/50 border-slate-700/50"
-                    : "bg-white/80 border-blue-200"
-                }`}
-              >
-                <div className="flex items-center gap-6">
-                  <div className="relative flex-shrink-0">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50"></div>
-                    <img
-                      src="/assets/images/harsh.png"
-                      alt="Harsh Manmode"
-                      className="w-20 h-23 rounded-full border-2 border-blue-500 relative z-10"
-                    />
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <p
-                      className={`text-xs font-semibold tracking-wider mb-2 ${
-                        isDarkMode ? "text-gray-500" : "text-blue-600/60"
-                      }`}
-                    >
-                      DEVELOPED BY
-                    </p>
-                    <h3
-                      className={`text-lg font-bold ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      Harsh Manmode
-                    </h3>
-                    <p
-                      className={`text-xs ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      Information Technology, II Year
-                    </p>
-                    <div className="flex gap-2 mt-2 justify-center">
-                      {[
-                        {
-                          icon: Github,
-                          href: "https://github.com/Harsh-2006-git",
-                        },
-                        {
-                          icon: Linkedin,
-                          href: "https://www.linkedin.com/in/harsh-manmode-2a0b91325/",
-                        },
-                        {
-                          icon: Twitter,
-                          href: "https://www.linkedin.com/in/harsh-manmode-2a0b91325/",
-                        },
-                      ].map((social, idx) => (
-                        <a
-                          key={idx}
-                          href={social.href}
-                          className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
-                            isDarkMode
-                              ? "bg-slate-800 hover:bg-slate-700 text-gray-400 hover:text-white"
-                              : "bg-blue-100 hover:bg-blue-200 text-blue-600"
-                          }`}
-                        >
-                          <social.icon className="w-4 h-4" />
-                        </a>
-                      ))}
                     </div>
                   </div>
                 </div>
@@ -714,18 +1051,18 @@ export default function LoginPage({
             </div>
           </div>
         </div>
-      </div>
 
-      <style>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-      `}</style>
-    </div>
+        <style>{`
+          @keyframes blob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+          }
+          .animate-blob {
+            animation: blob 7s infinite;
+          }
+        `}</style>
+      </div>
+    </>
   );
 }
