@@ -920,3 +920,112 @@ export const checkAlumniEmail = async (req, res) => {
     });
   }
 };
+// Update this controller in your authController.js
+export const updateExtraEmail = async (req, res) => {
+  try {
+    const { userId, extraEmail } = req.body;
+    
+    if (!userId || !extraEmail) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "User ID and extra email are required" 
+      });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+
+    // Check if user already has extra email
+    if (user.extraEmail) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Extra email already exists for this user",
+        data: {
+          hasExtraEmail: true,
+          existingExtraEmail: user.extraEmail
+        }
+      });
+    }
+
+    // Check if extra email already exists for another user
+    const existingUserWithExtraEmail = await User.findOne({ 
+      extraEmail: extraEmail.trim().toLowerCase(),
+      _id: { $ne: userId }
+    });
+    
+    if (existingUserWithExtraEmail) {
+      return res.status(409).json({ 
+        success: false, 
+        message: "This email is already registered as an extra email for another user" 
+      });
+    }
+
+    // Update extra email
+    user.extraEmail = extraEmail.trim().toLowerCase();
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Extra email saved successfully",
+      data: {
+        extraEmail: user.extraEmail,
+        hasExtraEmail: true
+      }
+    });
+    
+  } catch (error) {
+    console.error("Update extra email error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Server error" 
+    });
+  }
+};
+
+// Add this new endpoint to check if user needs extra email
+export const checkExtraEmailStatus = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    if (!userId) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "User ID is required" 
+      });
+    }
+
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "User not found" 
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        needsExtraEmail: !user.extraEmail,
+        hasExtraEmail: !!user.extraEmail,
+        extraEmail: user.extraEmail || null,
+        email: user.email,
+        name: user.name
+      }
+    });
+    
+  } catch (error) {
+    console.error("Check extra email status error:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Server error" 
+    });
+  }
+};

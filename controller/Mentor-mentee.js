@@ -3,6 +3,7 @@ import Mentor from "../models/mentor.js";
 import Alumni from "../models/alumni.js";
 import Student from "../models/user.js";
 import MentorStudent from "../models/mentee.js";
+
 import MentorshipEmailService from "../services/MentorshipEmailService.js";
 import mongoose from "mongoose";
 
@@ -1034,6 +1035,169 @@ export const updateMentorshipStatus = async (req, res) => {
       success: false,
       message: "Internal server error",
       error: error.message,
+    });
+  }
+};
+
+
+// controllers/mentorChatController.js
+
+
+
+// Get mentor (for students) or mentees (for alumni) for chat
+export const getMentorMenteesForChat = async (req, res) => {
+  try {
+    const { userId, userType } = req.user;
+    let result = [];
+
+    if (userType === 'student') {
+      // Find all mentor relationships for this student (any status)
+      const mentorRelationships = await MentorStudent.find({
+        student_id: userId
+      })
+      .populate({
+        path: 'mentor_id',
+        select: 'name email phone alumni_id batch_year branch',
+        populate: {
+          path: 'alumni_id',
+          select: 'name email phone'
+        }
+      })
+      .sort({ updatedAt: -1 }); // Most recent first
+
+      mentorRelationships.forEach(relation => {
+        if (relation.mentor_id) {
+          result.push({
+            id: relation.mentor_id._id,
+            name: relation.mentor_id.name,
+            email: relation.mentor_id.email,
+            phone: relation.mentor_id.phone,
+            userType: 'alumni',
+            alumni_id: relation.mentor_id.alumni_id,
+            relationship: 'Mentor',
+            status: relation.status, // Include status
+            request_date: relation.request_date,
+            session_date: relation.session_date
+          });
+        }
+      });
+
+    } else if (userType === 'alumni') {
+      // Find mentor profile for this alumni
+      const mentor = await Mentor.findOne({ alumni_id: userId });
+      
+      if (mentor) {
+        // Get all mentee relationships for this mentor (any status)
+        const menteeRelationships = await MentorStudent.find({
+          mentor_id: mentor._id
+        })
+        .populate('student_id', 'name email phone')
+        .sort({ updatedAt: -1 }); // Most recent first
+
+        menteeRelationships.forEach(relation => {
+          if (relation.student_id) {
+            result.push({
+              id: relation.student_id._id,
+              name: relation.student_id.name,
+              email: relation.student_id.email,
+              phone: relation.student_id.phone,
+              userType: 'student',
+              relationship: 'Mentee',
+              status: relation.status, // Include status
+              request_date: relation.request_date,
+              session_date: relation.session_date
+            });
+          }
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result,
+      count: result.length,
+      userType: userType,
+      message: userType === 'student' 
+        ? `Found ${result.length} mentor(s)` 
+        : `Found ${result.length} mentee(s)`
+    });
+  } catch (error) {
+    console.error('Error fetching mentor/mentee data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching mentor/mentee data',
+      error: error.message
+    });
+  }
+};
+
+// Check relationship between current user and another user
+export const checkRelationshipWithUser = async (req, res) => {
+  try {
+    const { userId, userType } = req.user;
+    const { targetPhone } = req.params;
+
+    let relationship = null;
+    let relationshipData = null;
+
+    if (userType === 'student') {
+      // Check if this student has any mentor relationship with alumni who has this phone
+      const mentorRelationships = await MentorStudent.find({
+        student_id: userId
+      })
+      .populate({
+        path: 'mentor_id',
+        match: { phone: targetPhone }
+      });
+
+      const foundRelation = mentorRelationships.find(rel => rel.mentor_id);
+      if (foundRelation) {
+        relationship = 'Mentor';
+        relationshipData = {
+          status: foundRelation.status,
+          request_date: foundRelation.request_date,
+          session_date: foundRelation.session_date
+        };
+      }
+
+    } else if (userType === 'alumni') {
+      // Check if this alumni has any mentee relationship with student who has this phone
+      const mentor = await Mentor.findOne({ alumni_id: userId });
+      if (mentor) {
+        const menteeRelationships = await MentorStudent.find({
+          mentor_id: mentor._id
+        })
+        .populate({
+          path: 'student_id',
+          match: { phone: targetPhone }
+        });
+
+        const foundRelation = menteeRelationships.find(rel => rel.student_id);
+        if (foundRelation) {
+          relationship = 'Mentee';
+          relationshipData = {
+            status: foundRelation.status,
+            request_date: foundRelation.request_date,
+            session_date: foundRelation.session_date
+          };
+        }
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        hasRelationship: !!relationship,
+        relationship: relationship,
+        relationshipData: relationshipData
+      }
+    });
+  } catch (error) {
+    console.error('Error checking relationship:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error checking relationship',
+      error: error.message
     });
   }
 };

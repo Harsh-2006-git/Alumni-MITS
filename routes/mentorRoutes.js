@@ -12,6 +12,8 @@ import {
   getStudentMentorships,
   updateMentorshipStatus,
   updateSessionDetails,
+  getMentorMenteesForChat,
+  checkRelationshipWithUser
 } from "../controller/Mentor-mentee.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -55,5 +57,11 @@ router.put(
   authMiddleware,
   updateSessionDetails
 );
+
+// Get mentor (for students) or mentees (for alumni)
+router.get('/mentor-mentees', authMiddleware, getMentorMenteesForChat);
+
+// Check relationship with specific user by phone
+router.get('/check-relationship/:targetPhone', authMiddleware, checkRelationshipWithUser);
 
 export default router;

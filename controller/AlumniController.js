@@ -273,23 +273,40 @@ export const getAllAlumni = async (req, res) => {
       profileMap.set(profile.alumniId.toString(), profile);
     });
 
+    // Check if user is logged in (adjust based on your auth implementation)
+   const isLoggedIn = req.isAuthenticated === true;
     // Combine alumni with their profiles
     const formattedAlumni = alumniList.map((alumni) => {
       const profile = profileMap.get(alumni._id.toString());
-      return {
+      
+      // Common fields for both logged in and not logged in
+      const commonData = {
         id: alumni._id,
         name: alumni.name,
-        email: alumni.email,
-        phone: alumni.phone,
-        isVerified: alumni.isVerified,
-        userType: alumni.userType,
         profilePhoto: alumni.profilePhoto || null,
-        alumniResume: alumni.resume || null,
-        profileResume: profile?.resume || null,
-        batch: profile?.batch || null,
-        batch: alumni.batch || null,
-        profile: profile || {},
+        batch: profile?.batch || alumni.batch || null, // Merged duplicate batch fields
+        // Extract location and branch from profile if available
+        location: profile?.location || profile?.currentLocation || profile?.address || null,
+        branch: profile?.branch || profile?.department || profile?.course || null,
+        year: profile?.yearOfPassing || profile?.graduationYear || alumni.year || null,
       };
+
+      // If logged in, return all fields
+      if (isLoggedIn) {
+        return {
+          ...commonData,
+          email: alumni.email,
+          phone: alumni.phone,
+          isVerified: alumni.isVerified,
+          userType: alumni.userType,
+          alumniResume: alumni.resume || null,
+          profileResume: profile?.resume || null,
+          profile: profile || {},
+        };
+      }
+
+      // If not logged in, return only limited fields
+      return commonData;
     });
 
     res.status(200).json({

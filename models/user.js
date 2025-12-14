@@ -46,6 +46,17 @@ const studentSchema = new mongoose.Schema(
     resume: {
       type: String,
     },
+   
+       extraEmail: {
+      type: String,
+      required: false,
+      validate: {
+        validator: function (v) {
+          return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        },
+      },
+    },
+
   },
   {
     timestamps: true,

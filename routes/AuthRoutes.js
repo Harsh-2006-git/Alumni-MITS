@@ -11,6 +11,8 @@ import {
   adminLogin,
   checkAlumniEmail,
   handleForgotPassword,
+  updateExtraEmail,
+  checkExtraEmailStatus
 } from "../controller/AuthController.js";
 
 // Change this import - use default import instead of named import
@@ -51,5 +53,9 @@ router.post("/login-alumni", loginAlumni);
 
 router.post("/forgot-password", handleForgotPassword);
 router.post("/check", checkAlumniEmail);
+
+// Add this route
+router.get("/check-extra-email-status/:userId", checkExtraEmailStatus);
+router.post("/update-extra-email", updateExtraEmail);
 
 export default router;

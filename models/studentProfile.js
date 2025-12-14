@@ -32,6 +32,7 @@ const StudentProfile = mongoose.model(
         //   { designation: "Senior Engineer", company: "Meta", from: "2022-07-01", to: null, current: true, location: "CA", description: "Leading Y project" }
         // ]
       },
+      
     },
     {
       timestamps: true,

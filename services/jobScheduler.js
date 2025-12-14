@@ -190,52 +190,48 @@ class JobScheduler {
     }
   }
 
-  async runCleanup() {
-    if (this.isCleaning) {
-      console.log("⏳ Cleanup already in progress, skipping...");
-      return { success: false, message: "Already running" };
-    }
-
-    this.isCleaning = true;
-    const startTime = Date.now();
-
-    try {
-      console.log("🧹 Starting expired jobs cleanup...");
-      console.log(`⏰ Started at: ${new Date().toLocaleString("en-IN")}`);
-
-      // Soft delete first (mark as expired)
-      const expiredCount = await AutoJobService.cleanupExpiredJobs(true);
-
-      // Hard delete very old jobs (>90 days expired)
-      const deletedCount = await AutoJobService.cleanupExpiredJobs(false);
-
-      // Update stats
-      this.stats.lastCleanupTime = new Date();
-      this.stats.totalCleanupRuns++;
-
-      const duration = Date.now() - startTime;
-      console.log("\n" + "=".repeat(50));
-      console.log("📊 Cleanup Results:");
-      console.log(`  ⏸️  Jobs Expired: ${expiredCount}`);
-      console.log(`  🗑️  Jobs Deleted: ${deletedCount}`);
-      console.log(`  ⏱️  Duration: ${(duration / 1000).toFixed(2)}s`);
-      console.log("=".repeat(50) + "\n");
-
-      return {
-        success: true,
-        expiredCount,
-        deletedCount,
-        duration,
-      };
-    } catch (error) {
-      console.error("❌ Cleanup failed:", error.message);
-      this.logError("Cleanup", error);
-      return { success: false, error: error.message };
-    } finally {
-      this.isCleaning = false;
-    }
+ async runCleanup() {
+  if (this.isCleaning) {
+    console.log("⏳ Cleanup already in progress, skipping...");
+    return { success: false, message: "Already running" };
   }
 
+  this.isCleaning = true;
+  const startTime = Date.now();
+
+  try {
+    console.log("🧹 Starting expired jobs cleanup...");
+    console.log(`⏰ Started at: ${new Date().toLocaleString("en-IN")}`);
+    console.log(`📅 Current UTC time: ${new Date().toISOString()}`);
+
+    // Direct delete approach
+    const deletedCount = await AutoJobService.cleanupExpiredJobs();
+
+    // Update stats
+    this.stats.lastCleanupTime = new Date();
+    this.stats.totalCleanupRuns++;
+
+    const duration = Date.now() - startTime;
+    console.log("\n" + "=".repeat(50));
+    console.log("📊 Cleanup Results:");
+    console.log(`  🗑️  Jobs Deleted: ${deletedCount}`);
+    console.log(`  ⏱️  Duration: ${(duration / 1000).toFixed(2)}s`);
+    console.log("=".repeat(50) + "\n");
+
+    return {
+      success: true,
+      deletedCount,
+      duration,
+    };
+  } catch (error) {
+    console.error("❌ Cleanup failed:", error.message);
+    this.logError("Cleanup", error);
+    return { success: false, error: error.message };
+  } finally {
+    this.isCleaning = false;
+  }
+}
+ 
   async runStatusUpdate() {
     if (this.isUpdating) {
       console.log("⏳ Status update already in progress, skipping...");
@@ -352,71 +348,72 @@ class JobScheduler {
     console.log("🎯 Manual scraping triggered");
     return await this.runScraping();
   }
-  async triggerCleanup() {
-    const startTime = Date.now();
-    const timestamp = new Date();
+async triggerCleanup() {
+  const startTime = Date.now();
 
-    try {
-      console.log("🧹 Starting expired job cleanup...");
-      console.log(`⏰ Started at: ${timestamp.toLocaleString()}`);
-
-      // FIRST: Mark expired jobs (for reporting)
-      const expiredResult = await Job.updateMany(
-        {
-          applicationDeadline: { $lt: new Date() },
-          isAutoPosted: true,
-          status: { $in: ["active", "expiring_soon"] },
-        },
-        { status: "expired" }
-      );
-
-      const expiredCount = expiredResult.modifiedCount;
-
-      // THEN: Delete them
-      const deleteResult = await Job.deleteMany({
-        applicationDeadline: { $lt: new Date() },
-        isAutoPosted: true,
-      });
-
-      const deletedCount = deleteResult.deletedCount;
-
-      this.stats.totalCleanups++;
-      this.stats.lastCleanupResults = {
-        timestamp,
-        expiredCount,
-        deletedCount,
-        duration: Date.now() - startTime,
-      };
-
-      console.log(`🗑️ Deleted ${deletedCount} expired auto jobs`);
-
-      // Log results
-      console.log("\n" + "=".repeat(50));
-      console.log("📊 Cleanup Results:");
-      console.log(`  ⏸️  Jobs Expired: ${expiredCount}`);
-      console.log(`  🗑️  Jobs Deleted: ${deletedCount}`);
-      console.log(
-        `  ⏱️  Duration: ${((Date.now() - startTime) / 1000).toFixed(2)}s`
-      );
-      console.log("=".repeat(50) + "\n");
-
-      return {
-        success: true,
-        message: `Marked ${expiredCount} as expired, deleted ${deletedCount} jobs`,
-        expiredCount,
-        deletedCount,
-        duration: Date.now() - startTime,
-      };
-    } catch (error) {
-      console.error("❌ Cleanup failed:", error.message);
-      return {
-        success: false,
-        message: "Cleanup failed",
-        error: error.message,
-        duration: Date.now() - startTime,
-      };
+  try {
+    console.log("🧹 Starting expired job cleanup...");
+    
+    const currentDate = new Date(); // Current date/time
+    console.log(`⏰ Current UTC time: ${currentDate.toISOString()}`);
+    
+    // First, find expired jobs
+    const expiredJobs = await Job.find({
+      $and: [
+        { isAutoPosted: true },
+        { applicationDeadline: { $lt: currentDate } }, // Deadline has passed
+      
+      ]
+    });
+    
+    console.log(`🔍 Found ${expiredJobs.length} expired jobs to delete:`);
+    
+    // Show details of some expired jobs
+    expiredJobs.slice(0, 5).forEach((job, index) => {
+      const deadline = job.applicationDeadline;
+      const daysAgo = Math.floor((currentDate - deadline) / (1000 * 60 * 60 * 24));
+      console.log(`  ${index + 1}. "${job.title}" at ${job.company}`);
+      console.log(`     Deadline: ${deadline.toISOString()} (${daysAgo} days ago)`);
+    });
+    
+    if (expiredJobs.length > 5) {
+      console.log(`  ... and ${expiredJobs.length - 5} more expired jobs`);
     }
+    
+    // Delete expired jobs
+    const deleteResult = await Job.deleteMany({
+      $and: [
+        { isAutoPosted: true },
+        { applicationDeadline: { $lt: currentDate } } // Only expired jobs
+      ]
+    });
+
+    const deletedCount = deleteResult.deletedCount;
+
+    console.log("\n" + "=".repeat(50));
+    console.log("📊 Cleanup Results:");
+    console.log(`  🗑️  Expired Jobs Deleted: ${deletedCount}`);
+    console.log(`  ⏱️  Duration: ${((Date.now() - startTime) / 1000).toFixed(2)}s`);
+    console.log("=".repeat(50) + "\n");
+
+    return {
+      success: true,
+      message: "Cleanup completed successfully",
+      data: {
+        deletedCount: deletedCount
+      },
+      duration: Date.now() - startTime,
+    };
+  } catch (error) {
+    console.error("❌ Cleanup failed:", error.message);
+    return {
+      success: false,
+      message: "Cleanup failed",
+      error: error.message,
+      duration: Date.now() - startTime,
+    };
   }
+}
 
   async triggerStatusUpdate() {
     console.log("📋 Manual status update triggered");

@@ -1032,21 +1032,26 @@ class AutoJobService {
     }
   }
 
-  async cleanupExpiredJobs() {
-    try {
-      // Simple: Delete auto-posted jobs past their 1-week deadline
-      const result = await Job.deleteMany({
-        applicationDeadline: { $lt: new Date() }, // Past deadline
-        isAutoPosted: true, // Only auto-posted jobs
-      });
-
-      console.log(`🗑️ Deleted ${result.deletedCount} expired auto jobs`);
-      return result.deletedCount;
-    } catch (error) {
-      console.error("Error cleaning up expired jobs:", error);
-      throw error;
-    }
+async cleanupExpiredJobs() {
+  try {
+    const now = new Date();
+    
+    // Direct delete: Remove all auto-posted jobs with expired deadlines
+    const deleteResult = await Job.deleteMany({
+      $and: [
+        { isAutoPosted: true },
+        { applicationDeadline: { $lt: now } } // Deadline is in the past
+      ]
+    });
+    
+    console.log(`🗑️ Deleted ${deleteResult.deletedCount} expired auto jobs`);
+    return deleteResult.deletedCount;
+    
+  } catch (error) {
+    console.error("Error cleaning up expired jobs:", error);
+    throw error;
   }
+}
   async updateJobStatuses() {
     try {
       const now = new Date();
