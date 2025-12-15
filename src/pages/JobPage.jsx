@@ -27,9 +27,11 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import SkillAnalysisPopup from "../components/SkillAnalysisPopup";
 import Toast from "../components/Toast";
+import AuthPopup from "../components/AuthPopup"; // Import the AuthPopup
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-// Enhanced Hero Section
+// Enhanced Hero Section (keep this component as is)
 const HeroSection = ({
   isDarkMode,
   onRefreshJobs,
@@ -655,6 +657,26 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
     experience: "all",
   });
   
+  // Add authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+
+  // Check authentication on component mount
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
+  const checkAuthentication = () => {
+    // Check for token in localStorage
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    
+    if (token && user) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  };
 
   const showToast = (message, type = "info") => {
     setToast({ message, type });
@@ -665,6 +687,12 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
   };
 
   const toggleBookmark = (jobId) => {
+    // Check authentication for bookmarking
+    if (!isAuthenticated) {
+      setShowAuthPopup(true);
+      return;
+    }
+    
     const newBookmarks = new Set(bookmarkedJobs);
     if (newBookmarks.has(jobId)) {
       newBookmarks.delete(jobId);
@@ -677,7 +705,6 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
   };
 
   // Fetch jobs from API
-  // JobsPage.jsx - Fetch only auto-posted jobs
   const fetchJobs = async () => {
     try {
       setLoading(true);
@@ -713,8 +740,15 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
       setLoading(false);
     }
   };
+
   // Apply for job
   const applyForJob = (jobId) => {
+    // Check authentication before applying
+    if (!isAuthenticated) {
+      setShowAuthPopup(true);
+      return;
+    }
+    
     // Redirect directly to Internshala internships page
     window.open("https://internshala.com/internships", "_blank");
   };
@@ -746,12 +780,26 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
   });
 
   const openJobModal = (job) => {
+    // Check authentication before opening job modal
+    if (!isAuthenticated) {
+      setSelectedJob(job);
+      setShowAuthPopup(true);
+      return;
+    }
+    
     setSelectedJob(job);
     setShowModal(true);
     document.body.style.overflow = "hidden";
   };
 
   const openSkillAnalysis = (job) => {
+    // Check authentication before opening skill analysis
+    if (!isAuthenticated) {
+      setSelectedJob(job);
+      setShowAuthPopup(true);
+      return;
+    }
+    
     setSelectedJob(job);
     setShowSkillAnalysis(true);
     document.body.style.overflow = "hidden";
@@ -767,6 +815,11 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
     setShowSkillAnalysis(false);
     setSelectedJob(null);
     document.body.style.overflow = "unset";
+  };
+
+  const closeAuthPopup = () => {
+    setShowAuthPopup(false);
+    setSelectedJob(null);
   };
 
   const clearFilters = () => {
@@ -1368,6 +1421,14 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
           isDarkMode={isDarkMode}
         />
       )}
+
+      {/* Auth Popup */}
+      <AuthPopup
+        isOpen={showAuthPopup}
+        onClose={closeAuthPopup}
+        isDarkMode={isDarkMode}
+        isAuthenticated={isAuthenticated}
+      />
 
       {toast && (
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />

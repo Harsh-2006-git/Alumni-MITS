@@ -97,13 +97,13 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
       },
       {
         name: "Student Portal IMS (MITS Institute)",
-        url: "portal.college.mits",
-        link: "https://portal.college.mits",
+        url: "ims.mitsgwalior.in",
+        link: "https://ims.mitsgwalior.in",
       },
       {
         name: "Student Portal IUMS (MITS-DU)",
-        url: "portal.college.mits",
-        link: "https://portal.college.mits",
+        url: "iums.mitsgwalior.in",
+        link: "https://iums.mitsgwalior.in",
       },
     ],
   };

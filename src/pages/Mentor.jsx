@@ -19,11 +19,15 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
+// Import or define AuthPopup component
+import AuthPopup from "../components/AuthPopup"; // Make sure this path is correct
+
 const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [notification, setNotification] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -214,7 +218,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
                 errorMessage = `You have already sent a mentorship request to ${mentorName}. Your request is currently pending approval.`;
                 break;
               case "cancelled":
-                errorMessage = `Your previous mentorship request to ${mententorName} was cancelled. Please refresh the page to see updated status.`;
+                errorMessage = `Your previous mentorship request to ${mentorName} was cancelled. Please refresh the page to see updated status.`;
                 break;
               default:
                 errorMessage = error.response.data.message;
@@ -311,6 +315,14 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
   };
 
   const openProfilePopup = (mentor) => {
+    // Check if user is logged in
+    if (!currentUser?.isLoggedIn) {
+      // Show auth popup instead of profile popup
+      setSelectedMentor(mentor);
+      setShowAuthPopup(true);
+      return;
+    }
+    
     setSelectedMentor(mentor);
     setShowProfilePopup(true);
   };
@@ -1302,6 +1314,28 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => {} }) => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Auth Popup for non-logged in users */}
+      {showAuthPopup && selectedMentor && (
+        <AuthPopup
+          isOpen={showAuthPopup}
+          onClose={() => {
+            setShowAuthPopup(false);
+            setSelectedMentor(null);
+          }}
+          isDarkMode={isDarkMode}
+          isAuthenticated={currentUser?.isLoggedIn || false}
+          onLoginSuccess={() => {
+            if (selectedMentor) {
+              // Store mentor info to open profile after login
+              localStorage.setItem('pendingProfileView', JSON.stringify({
+                mentorId: selectedMentor.id,
+                timestamp: Date.now()
+              }));
+            }
+          }}
+        />
       )}
     </div>
   );
