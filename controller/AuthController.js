@@ -177,6 +177,153 @@ export const googleCallback = (req, res, next) => {
   })(req, res, next);
 };
 
+// ===================== GOOGLE OAUTH FOR ALUMNI =====================
+passport.use(
+  "google-alumni",
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: CALLBACK_URL, // Use same callback as students
+      state: false,
+      proxy: true,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const email = profile.emails[0].value;
+
+        // Check if alumni exists with this email
+        let alumni = await Alumni.findOne({ email: email.toLowerCase() });
+
+        if (!alumni) {
+          return done(null, false, { message: "alumni_not_registered" });
+        }
+
+        // Check if alumni is verified
+        if (!alumni.isVerified) {
+          return done(null, false, { message: "alumni_not_verified" });
+        }
+
+        // Alumni is registered and verified, proceed with login
+        return done(null, alumni);
+      } catch (err) {
+        return done(err, null);
+      }
+    }
+  )
+);
+
+export const googleAuthAlumni = (req, res, next) => {
+  passport.authenticate("google-alumni", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+    accessType: "offline",
+    state: "alumni",
+  })(req, res, next);
+};
+
+export const googleCallbackAlumni = (req, res, next) => {
+  passport.authenticate("google-alumni", { session: false }, (err, user, info) => {
+    if (err || !user) {
+      const error = info?.message || "unauthorized";
+      console.error("❌ Alumni OAuth Error:", error, info);
+      return res.redirect(`${FRONTEND_URL}/auth-alumni?error=${error}`);
+    }
+
+    console.log("✅ Alumni OAuth Success - User:", { id: user.id, email: user.email, name: user.name });
+
+    const { accessToken, refreshToken } = generateTokens(user);
+
+    console.log("🔑 Generated Tokens:", {
+      accessToken: accessToken.substring(0, 20) + "...",
+      refreshToken: refreshToken.substring(0, 20) + "..."
+    });
+
+    const redirectUrl = new URL(`${FRONTEND_URL}/auth-alumni`);
+    redirectUrl.searchParams.set("accessToken", accessToken);
+    redirectUrl.searchParams.set("refreshToken", refreshToken);
+    redirectUrl.searchParams.set("name", encodeURIComponent(user.name));
+    redirectUrl.searchParams.set("email", user.email);
+    redirectUrl.searchParams.set("id", user.id.toString());
+    redirectUrl.searchParams.set("userType", user.userType);
+
+    console.log("🔄 Redirecting to:", redirectUrl.toString().substring(0, 100) + "...");
+    res.redirect(redirectUrl.toString());
+  })(req, res, next);
+};
+
+// ===================== GOOGLE OAUTH FOR ALUMNI REGISTRATION =====================
+passport.use(
+  "google-register",
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: CALLBACK_URL,
+      passReqToCallback: true,
+    },
+    async (req, accessToken, refreshToken, profile, done) => {
+      try {
+        // For registration, we just want the profile data
+        // We will validate if the email already exists in the controller callback logic or frontend
+        return done(null, profile);
+      } catch (err) {
+        return done(err, null);
+      }
+    }
+  )
+);
+
+export const googleAuthAlumniRegister = (req, res, next) => {
+  passport.authenticate("google-register", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+    accessType: "offline",
+    state: "alumni-register",
+  })(req, res, next);
+};
+
+export const googleCallbackAlumniRegister = (req, res, next) => {
+  // Use the google-register strategy
+  passport.authenticate("google-register", { session: false }, async (err, user, info) => {
+    if (err) {
+      console.error("❌ Alumni OAuth Registration Error:", err);
+      return res.redirect(`${FRONTEND_URL}/auth-alumni?error=oauth_failed`);
+    }
+
+    // user is the profile object returned from the strategy
+    const email = user?.emails?.[0]?.value;
+    const name = user?.displayName;
+
+    if (!email) {
+      return res.redirect(`${FRONTEND_URL}/auth-alumni?error=no_email`);
+    }
+
+    console.log("✅ Google OAuth Registration - Email:", email, "Name:", name);
+
+    // Initial check if email is already taken (backend side check)
+    // We can do this here to give immediate feedback or let the frontend handle it
+    // Let's do a quick check to fail fast if it's an existing ALUMNI
+    const existingAlumni = await Alumni.findOne({ email });
+    if (existingAlumni) {
+      console.log("⚠️ Email already registered as Alumni:", email);
+      return res.redirect(`${FRONTEND_URL}/auth-alumni?error=email_exists`);
+    }
+
+    // Redirect to registration form with pre-filled data
+    const redirectUrl = new URL(`${FRONTEND_URL}/auth-alumni`);
+    redirectUrl.searchParams.set("register", "true");
+    redirectUrl.searchParams.set("googleEmail", encodeURIComponent(email));
+    redirectUrl.searchParams.set("googleName", encodeURIComponent(name || ""));
+
+    // Generate a temporary verification token (optional, but good for security)
+    // For now, we trust the redirect parameters as they come from this successful callback
+
+    console.log("🔄 Redirecting to registration form");
+    res.redirect(redirectUrl.toString());
+  })(req, res, next);
+};
+
 // ===================== REGISTER / LOGIN STUDENT =====================
 export const register = async (req, res) => {
   try {
@@ -319,6 +466,14 @@ export const registerAlumni = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid email format",
+      });
+    }
+
+    // Block college emails for alumni registration
+    if (email.toLowerCase().endsWith("@mitsgwl.ac.in")) {
+      return res.status(400).json({
+        success: false,
+        message: "College email (@mitsgwl.ac.in) is not allowed for alumni registration. Please use your personal email.",
       });
     }
 
@@ -924,28 +1079,28 @@ export const checkAlumniEmail = async (req, res) => {
 export const updateExtraEmail = async (req, res) => {
   try {
     const { userId, extraEmail } = req.body;
-    
+
     if (!userId || !extraEmail) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "User ID and extra email are required" 
+      return res.status(400).json({
+        success: false,
+        message: "User ID and extra email are required"
       });
     }
 
     // Find user
     const user = await User.findById(userId);
-    
+
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" 
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
       });
     }
 
     // Check if user already has extra email
     if (user.extraEmail) {
-      return res.status(400).json({ 
-        success: false, 
+      return res.status(400).json({
+        success: false,
         message: "Extra email already exists for this user",
         data: {
           hasExtraEmail: true,
@@ -955,15 +1110,15 @@ export const updateExtraEmail = async (req, res) => {
     }
 
     // Check if extra email already exists for another user
-    const existingUserWithExtraEmail = await User.findOne({ 
+    const existingUserWithExtraEmail = await User.findOne({
       extraEmail: extraEmail.trim().toLowerCase(),
       _id: { $ne: userId }
     });
-    
+
     if (existingUserWithExtraEmail) {
-      return res.status(409).json({ 
-        success: false, 
-        message: "This email is already registered as an extra email for another user" 
+      return res.status(409).json({
+        success: false,
+        message: "This email is already registered as an extra email for another user"
       });
     }
 
@@ -979,12 +1134,12 @@ export const updateExtraEmail = async (req, res) => {
         hasExtraEmail: true
       }
     });
-    
+
   } catch (error) {
     console.error("Update extra email error:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Server error" 
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
     });
   }
 };
@@ -993,20 +1148,20 @@ export const updateExtraEmail = async (req, res) => {
 export const checkExtraEmailStatus = async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     if (!userId) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "User ID is required" 
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required"
       });
     }
 
     const user = await User.findById(userId);
-    
+
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" 
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
       });
     }
 
@@ -1020,12 +1175,12 @@ export const checkExtraEmailStatus = async (req, res) => {
         name: user.name
       }
     });
-    
+
   } catch (error) {
     console.error("Check extra email status error:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Server error" 
+    return res.status(500).json({
+      success: false,
+      message: "Server error"
     });
   }
 };

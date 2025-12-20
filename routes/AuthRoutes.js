@@ -4,6 +4,10 @@ import {
   login,
   googleAuth,
   googleCallback,
+  googleAuthAlumni,
+  googleCallbackAlumni,
+  googleAuthAlumniRegister,
+  googleCallbackAlumniRegister,
   refreshAccessToken,
   logout,
   registerAlumni,
@@ -31,7 +35,23 @@ router.post("/admin-login", adminLogin);
 
 // ========== GOOGLE OAUTH ROUTES ==========
 router.get("/google", googleAuth);
-router.get("/google/callback", googleCallback);
+router.get("/google/callback", (req, res, next) => {
+  // Check the state parameter to determine the flow
+  const state = req.query.state;
+
+  if (state === "alumni") {
+    return googleCallbackAlumni(req, res, next);
+  } else if (state === "alumni-register") {
+    return googleCallbackAlumniRegister(req, res, next);
+  }
+  // Default to student login
+  return googleCallback(req, res, next);
+});
+
+// ========== GOOGLE OAUTH ROUTES FOR ALUMNI ==========
+router.get("/google-alumni", googleAuthAlumni);
+router.get("/google-alumni-register", googleAuthAlumniRegister);
+// Alumni uses same callback as students, differentiated by state parameter
 
 // ========== TOKEN MANAGEMENT ==========
 router.post("/refresh", refreshAccessToken);
