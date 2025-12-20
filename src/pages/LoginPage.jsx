@@ -26,7 +26,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Use the environment variable - this will work in JSX without TypeScript errors
-const API_URL = import.meta.env.VITE_API_BASE_URL 
+const API_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/auth`
   : "http://localhost:3001/auth";
 
@@ -43,18 +43,18 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
     if (!regex.test(email)) {
       return "Please enter a valid email address";
     }
-    
+
     // Check if email is from mitsgwl.ac.in domain
     if (email.toLowerCase().endsWith("@mitsgwl.ac.in")) {
       return "Please use a personal email address (not @mitsgwl.ac.in). After graduation, your institute email will no longer work.";
     }
-    
+
     return null;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!email.trim()) {
       setError("Personal email is required to continue");
       return;
@@ -92,7 +92,7 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
           extraEmail: email.trim(),
           hasExtraEmail: true
         };
-        
+
         setTimeout(() => {
           onSave(updatedUserData);
           onClose();
@@ -124,57 +124,49 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className={`rounded-2xl shadow-2xl w-full max-w-md p-6 ${
-        isDarkMode ? "bg-slate-900" : "bg-white"
-      }`}>
+      <div className={`rounded-2xl shadow-2xl w-full max-w-md p-6 ${isDarkMode ? "bg-slate-900" : "bg-white"
+        }`}>
         <div className="flex justify-between items-start mb-6">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h3 className={`text-xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}>
+              <h3 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}>
                 Personal Email Required
               </h3>
               <button
                 type="button"
                 onClick={() => setShowInfo(!showInfo)}
-                className={`p-1 rounded-lg ${
-                  isDarkMode 
-                    ? "hover:bg-gray-800 text-blue-400" 
-                    : "hover:bg-gray-100 text-blue-600"
-                }`}
+                className={`p-1 rounded-lg ${isDarkMode
+                  ? "hover:bg-gray-800 text-blue-400"
+                  : "hover:bg-gray-100 text-blue-600"
+                  }`}
                 title="Why is this required?"
               >
                 <HelpCircle className="w-5 h-5" />
               </button>
             </div>
-            <p className={`text-sm ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}>
+            <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}>
               Please provide a personal email to continue
             </p>
-            
+
             {showInfo && (
-              <div className={`mt-4 p-4 rounded-lg border ${
-                isDarkMode
-                  ? "bg-blue-900/20 border-blue-800"
-                  : "bg-blue-50 border-blue-200"
-              }`}>
+              <div className={`mt-4 p-4 rounded-lg border ${isDarkMode
+                ? "bg-blue-900/20 border-blue-800"
+                : "bg-blue-50 border-blue-200"
+                }`}>
                 <div className="flex items-start gap-3">
-                  <AlertTriangle className={`w-5 h-5 mt-0.5 ${
-                    isDarkMode ? "text-blue-400" : "text-blue-600"
-                  }`} />
+                  <AlertTriangle className={`w-5 h-5 mt-0.5 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                    }`} />
                   <div>
-                    <p className={`text-sm font-medium ${
-                      isDarkMode ? "text-blue-300" : "text-blue-900"
-                    }`}>
+                    <p className={`text-sm font-medium ${isDarkMode ? "text-blue-300" : "text-blue-900"
+                      }`}>
                       Why is this required?
                     </p>
-                    <p className={`text-xs mt-1 ${
-                      isDarkMode ? "text-blue-200" : "text-blue-700"
-                    }`}>
-                      After successfully completing your degree, you will automatically become an alumni. 
-                      Your @mitsgwl.ac.in email will no longer work after graduation, so we need your 
+                    <p className={`text-xs mt-1 ${isDarkMode ? "text-blue-200" : "text-blue-700"
+                      }`}>
+                      After successfully completing your degree, you will automatically become an alumni.
+                      Your @mitsgwl.ac.in email will no longer work after graduation, so we need your
                       personal email for future communications and account access.
                     </p>
                   </div>
@@ -182,14 +174,13 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
               </div>
             )}
           </div>
-          
+
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
-            <label className={`block text-sm font-medium mb-2 ${
-              isDarkMode ? "text-gray-300" : "text-gray-700"
-            }`}>
+            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}>
               Personal Email Address
             </label>
             <input
@@ -200,33 +191,28 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
                 setError("");
               }}
               placeholder="example@gmail.com"
-              className={`w-full px-4 py-3 rounded-lg border ${
-                isDarkMode
-                  ? "border-gray-700 bg-gray-800 text-white placeholder-gray-500"
-                  : "border-gray-300 bg-transparent text-gray-900 placeholder-gray-400"
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition`}
+              className={`w-full px-4 py-3 rounded-lg border ${isDarkMode
+                ? "border-gray-700 bg-gray-800 text-white placeholder-gray-500"
+                : "border-gray-300 bg-transparent text-gray-900 placeholder-gray-400"
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition`}
               disabled={loading || success}
               autoFocus
             />
-            <p className={`text-xs mt-2 ${
-              isDarkMode ? "text-gray-400" : "text-gray-500"
-            }`}>
-                </p>
+            <p className={`text-xs mt-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}>
+            </p>
           </div>
 
           {error && (
-            <div className={`mb-4 p-3 rounded-lg border ${
-              isDarkMode
-                ? "bg-red-900/20 border-red-800"
-                : "bg-red-50 border-red-200"
-            }`}>
+            <div className={`mb-4 p-3 rounded-lg border ${isDarkMode
+              ? "bg-red-900/20 border-red-800"
+              : "bg-red-50 border-red-200"
+              }`}>
               <div className="flex items-start gap-3">
-                <AlertCircle className={`w-5 h-5 mt-0.5 ${
-                  isDarkMode ? "text-red-400" : "text-red-600"
-                }`} />
-                <p className={`text-sm ${
-                  isDarkMode ? "text-red-400" : "text-red-600"
-                }`}>
+                <AlertCircle className={`w-5 h-5 mt-0.5 ${isDarkMode ? "text-red-400" : "text-red-600"
+                  }`} />
+                <p className={`text-sm ${isDarkMode ? "text-red-400" : "text-red-600"
+                  }`}>
                   {error}
                 </p>
               </div>
@@ -234,16 +220,14 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
           )}
 
           {success && (
-            <div className={`mb-4 p-3 rounded-lg border ${
-              isDarkMode
-                ? "bg-green-900/20 border-green-800"
-                : "bg-green-50 border-green-200"
-            }`}>
+            <div className={`mb-4 p-3 rounded-lg border ${isDarkMode
+              ? "bg-green-900/20 border-green-800"
+              : "bg-green-50 border-green-200"
+              }`}>
               <div className="flex items-center gap-3">
                 <div className="w-5 h-5 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className={`text-sm ${
-                  isDarkMode ? "text-green-400" : "text-green-600"
-                }`}>
+                <p className={`text-sm ${isDarkMode ? "text-green-400" : "text-green-600"
+                  }`}>
                   Email saved successfully! Redirecting...
                 </p>
               </div>
@@ -254,11 +238,10 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
             <button
               type="submit"
               disabled={loading || success || !email.trim()}
-              className={`w-full px-4 py-3 rounded-lg font-medium transition ${
-                loading || success || !email.trim()
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              } text-white`}
+              className={`w-full px-4 py-3 rounded-lg font-medium transition ${loading || success || !email.trim()
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+                } text-white`}
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -271,10 +254,9 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
                 "Save Email & Continue"
               )}
             </button>
-            
-            <div className={`text-xs text-center ${
-              isDarkMode ? "text-gray-500" : "text-gray-600"
-            }`}>
+
+            <div className={`text-xs text-center ${isDarkMode ? "text-gray-500" : "text-gray-600"
+              }`}>
               <p>You must provide a personal email to access the portal</p>
             </div>
           </div>
@@ -333,7 +315,7 @@ export default function LoginPage({
     console.log("✅ Access Token:", userData.accessToken);
     console.log("🔄 Refresh Token:", userData.refreshToken);
     console.log("Storing auth data:", userData);
-    
+
     // Only store in localStorage if user has extra email
     if (userData.hasExtraEmail || userData.extraEmail) {
       localStorage.setItem("auth", JSON.stringify(userData));
@@ -360,7 +342,7 @@ export default function LoginPage({
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         if (data.data.needsExtraEmail) {
           // Show popup for extra email (COMPULSORY)
@@ -488,7 +470,7 @@ export default function LoginPage({
     if (isEmbeddedBrowser) {
       setError(
         "Please open this page in your regular browser (Chrome, Safari, etc.) instead of social media apps. " +
-          "Copy the URL and paste it in your browser to continue."
+        "Copy the URL and paste it in your browser to continue."
       );
       setIsLoading(false);
       return;
@@ -590,11 +572,10 @@ export default function LoginPage({
       />
 
       <div
-        className={`min-h-screen transition-colors duration-500 ${
-          isDarkMode
-            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
-            : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
-        }`}
+        className={`min-h-screen transition-colors duration-500 ${isDarkMode
+          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
+          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+          }`}
       >
         {/* Animated Background */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -612,11 +593,10 @@ export default function LoginPage({
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className={`fixed top-6 right-6 z-50 p-3 rounded-xl shadow-xl transition-all duration-300 hover:scale-110 ${
-            isDarkMode
-              ? "bg-slate-800 hover:bg-slate-700 text-yellow-400"
-              : "bg-white hover:bg-gray-50 text-blue-600 border border-blue-200"
-          }`}
+          className={`fixed top-6 right-6 z-50 p-3 rounded-xl shadow-xl transition-all duration-300 hover:scale-110 ${isDarkMode
+            ? "bg-slate-800 hover:bg-slate-700 text-yellow-400"
+            : "bg-white hover:bg-gray-50 text-blue-600 border border-blue-200"
+            }`}
         >
           {isDarkMode ? (
             <Sun className="w-5 h-5" />
@@ -632,11 +612,10 @@ export default function LoginPage({
             <div className="lg:hidden text-center mb-8">
               <div className="flex items-center gap-3 justify-center mb-4">
                 <div
-                  className={`w-12 h-12 rounded-xl p-2 ${
-                    isDarkMode
-                      ? "bg-white/10 backdrop-blur-sm"
-                      : "bg-white shadow-xl"
-                  }`}
+                  className={`w-12 h-12 rounded-xl p-2 ${isDarkMode
+                    ? "bg-white/10 backdrop-blur-sm"
+                    : "bg-white shadow-xl"
+                    }`}
                 >
                   <img
                     src="/assets/images/mits-logo.png"
@@ -646,16 +625,14 @@ export default function LoginPage({
                 </div>
                 <div>
                   <h1
-                    className={`text-2xl font-black ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
+                    className={`text-2xl font-black ${isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
                   >
                     MITS ALUMNI
                   </h1>
                   <p
-                    className={`text-xs ${
-                      isDarkMode ? "text-blue-400" : "text-blue-600"
-                    }`}
+                    className={`text-xs ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
                   >
                     Student Portal
                   </p>
@@ -663,9 +640,8 @@ export default function LoginPage({
               </div>
 
               <h2
-                className={`text-3xl font-bold leading-tight mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-3xl font-bold leading-tight mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 Welcome Back,
                 <br />
@@ -674,9 +650,8 @@ export default function LoginPage({
                 </span>
               </h2>
               <p
-                className={`text-base ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-base ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
                 Connect with your campus community
               </p>
@@ -689,11 +664,10 @@ export default function LoginPage({
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-16 h-16 rounded-2xl p-3 ${
-                        isDarkMode
-                          ? "bg-white/10 backdrop-blur-sm"
-                          : "bg-white shadow-xl"
-                      }`}
+                      className={`w-16 h-16 rounded-2xl p-3 ${isDarkMode
+                        ? "bg-white/10 backdrop-blur-sm"
+                        : "bg-white shadow-xl"
+                        }`}
                     >
                       <img
                         src="/assets/images/mits-logo.png"
@@ -703,16 +677,14 @@ export default function LoginPage({
                     </div>
                     <div>
                       <h1
-                        className={`text-3xl font-black ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`text-3xl font-black ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         MITS ALUMNI
                       </h1>
                       <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
+                        className={`text-sm ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                          }`}
                       >
                         Student Portal
                       </p>
@@ -721,9 +693,8 @@ export default function LoginPage({
 
                   <div className="space-y-3">
                     <h2
-                      className={`text-5xl font-bold leading-tight ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-5xl font-bold leading-tight ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       Welcome Back,
                       <br />
@@ -732,9 +703,8 @@ export default function LoginPage({
                       </span>
                     </h2>
                     <p
-                      className={`text-lg ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
+                      className={`text-lg ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
                     >
                       Connect with your campus community and explore endless
                       opportunities
@@ -767,35 +737,30 @@ export default function LoginPage({
                   ].map((item, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm transition-all hover:translate-x-2 ${
-                        isDarkMode
-                          ? "bg-white/5 border border-white/10"
-                          : "bg-white/60 border border-blue-200"
-                      }`}
+                      className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm transition-all hover:translate-x-2 ${isDarkMode
+                        ? "bg-white/5 border border-white/10"
+                        : "bg-white/60 border border-blue-200"
+                        }`}
                     >
                       <div
-                        className={`p-2 rounded-lg ${
-                          isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
-                        }`}
+                        className={`p-2 rounded-lg ${isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
+                          }`}
                       >
                         <item.icon
-                          className={`w-4 h-4 ${
-                            isDarkMode ? "text-blue-400" : "text-blue-600"
-                          }`}
+                          className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                            }`}
                         />
                       </div>
                       <div>
                         <h3
-                          className={`font-semibold text-sm ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
+                          className={`font-semibold text-sm ${isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
                         >
                           {item.title}
                         </h3>
                         <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-400" : "text-gray-600"
-                          }`}
+                          className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
                         >
                           {item.desc}
                         </p>
@@ -808,44 +773,38 @@ export default function LoginPage({
               {/* Right Side - Login Form */}
               <div className="w-full max-w-md mx-auto lg:mx-0">
                 <div
-                  className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${
-                    isDarkMode
-                      ? "bg-slate-900/80 border-slate-700/50"
-                      : "bg-white/90 border-blue-200"
-                  }`}
+                  className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${isDarkMode
+                    ? "bg-slate-900/80 border-slate-700/50"
+                    : "bg-white/90 border-blue-200"
+                    }`}
                 >
                   <div className="text-center mb-6">
                     <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${
-                        isDarkMode
-                          ? "bg-blue-500/10 border border-blue-500/20"
-                          : "bg-blue-50 border border-blue-200"
-                      }`}
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${isDarkMode
+                        ? "bg-blue-500/10 border border-blue-500/20"
+                        : "bg-blue-50 border border-blue-200"
+                        }`}
                     >
                       <GraduationCap
-                        className={`w-4 h-4 ${
-                          isDarkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
+                        className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                          }`}
                       />
                       <span
-                        className={`text-xs font-medium ${
-                          isDarkMode ? "text-blue-400" : "text-blue-600"
-                        }`}
+                        className={`text-xs font-medium ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                          }`}
                       >
                         Student Login
                       </span>
                     </div>
                     <h2
-                      className={`text-3xl font-bold mb-2 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-3xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       Sign In
                     </h2>
                     <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       Use your institute email to continue
                     </p>
@@ -853,24 +812,21 @@ export default function LoginPage({
 
                   {error && (
                     <div
-                      className={`mb-6 p-4 rounded-xl border-l-4 border-red-500 ${
-                        isDarkMode ? "bg-red-900/20" : "bg-red-50"
-                      }`}
+                      className={`mb-6 p-4 rounded-xl border-l-4 border-red-500 ${isDarkMode ? "bg-red-900/20" : "bg-red-50"
+                        }`}
                     >
                       <div className="flex items-start gap-3">
                         <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
                         <div>
                           <h3
-                            className={`font-semibold text-sm mb-1 ${
-                              isDarkMode ? "text-red-400" : "text-red-800"
-                            }`}
+                            className={`font-semibold text-sm mb-1 ${isDarkMode ? "text-red-400" : "text-red-800"
+                              }`}
                           >
                             Authentication Error
                           </h3>
                           <p
-                            className={`text-xs ${
-                              isDarkMode ? "text-red-300" : "text-red-700"
-                            }`}
+                            className={`text-xs ${isDarkMode ? "text-red-300" : "text-red-700"
+                              }`}
                           >
                             {error}
                           </p>
@@ -882,11 +838,10 @@ export default function LoginPage({
                   <button
                     onClick={handleGoogleLogin}
                     disabled={isLoading}
-                    className={`w-full rounded-xl px-6 py-4 flex items-center justify-center gap-3 transition-all duration-300 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed group ${
-                      isDarkMode
-                        ? "bg-white text-gray-900 hover:bg-gray-100"
-                        : "bg-white text-gray-900 hover:bg-gray-50"
-                    } shadow-[0_0_20px_rgba(0,0,0,0.15)] hover:shadow-[0_0_30px_rgba(0,0,0,0.25)] hover:scale-[1.02]`}
+                    className={`w-full rounded-xl px-6 py-4 flex items-center justify-center gap-3 transition-all duration-300 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed group ${isDarkMode
+                      ? "bg-white text-gray-900 hover:bg-gray-100"
+                      : "bg-white text-gray-900 hover:bg-gray-50"
+                      } shadow-[0_0_20px_rgba(0,0,0,0.15)] hover:shadow-[0_0_30px_rgba(0,0,0,0.25)] hover:scale-[1.02]`}
                   >
                     {isLoading ? (
                       <>
@@ -919,36 +874,31 @@ export default function LoginPage({
                     )}
                   </button>
                   <div
-                    className={`mt-6 p-4 rounded-xl border hidden md:block ${
-                      isDarkMode
-                        ? "bg-blue-500/10 border-blue-500/20"
-                        : "bg-blue-50 border-blue-200"
-                    }`}
+                    className={`mt-6 p-4 rounded-xl border hidden md:block ${isDarkMode
+                      ? "bg-blue-500/10 border-blue-500/20"
+                      : "bg-blue-50 border-blue-200"
+                      }`}
                   >
                     <div className="flex items-start gap-3">
                       <div
-                        className={`p-2 rounded-lg flex-shrink-0 ${
-                          isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
-                        }`}
+                        className={`p-2 rounded-lg flex-shrink-0 ${isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
+                          }`}
                       >
                         <AlertTriangle
-                          className={`w-4 h-4 ${
-                            isDarkMode ? "text-blue-400" : "text-blue-600"
-                          }`}
+                          className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                            }`}
                         />
                       </div>
                       <div>
                         <h3
-                          className={`font-semibold text-sm mb-1 ${
-                            isDarkMode ? "text-blue-300" : "text-blue-900"
-                          }`}
+                          className={`font-semibold text-sm mb-1 ${isDarkMode ? "text-blue-300" : "text-blue-900"
+                            }`}
                         >
                           Institute Email Required
                         </h3>
                         <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-blue-200" : "text-blue-700"
-                          }`}
+                          className={`text-xs ${isDarkMode ? "text-blue-200" : "text-blue-700"
+                            }`}
                         >
                           Only @mitsgwl.ac.in email addresses are allowed
                         </p>
@@ -958,19 +908,17 @@ export default function LoginPage({
 
                   <div className="mt-6 text-center">
                     <p
-                      className={`text-sm mb-3 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-sm mb-3 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       Already graduated?
                     </p>
                     <button
                       onClick={() => navigate("/login-alumni")}
-                      className={`w-full px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 ${
-                        isDarkMode
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                          : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                      } shadow-lg hover:shadow-xl flex items-center gap-2 justify-center mx-auto`}
+                      className={`w-full px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 ${isDarkMode
+                        ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                        } shadow-lg hover:shadow-xl flex items-center gap-2 justify-center mx-auto`}
                     >
                       Login as Alumni
                       <ArrowRight className="w-4 h-4" />
@@ -979,11 +927,10 @@ export default function LoginPage({
                 </div>
 
                 <div
-                  className={`mt-6 rounded-xl p-6 backdrop-blur-xl border flex justify-center items-center ${
-                    isDarkMode
-                      ? "bg-slate-900/50 border-slate-700/50"
-                      : "bg-white/80 border-blue-200"
-                  }`}
+                  className={`mt-6 rounded-xl p-6 backdrop-blur-xl border flex justify-center items-center ${isDarkMode
+                    ? "bg-slate-900/50 border-slate-700/50"
+                    : "bg-white/80 border-blue-200"
+                    }`}
                 >
                   <div className="flex items-center gap-6">
                     <div className="relative flex-shrink-0">
@@ -996,23 +943,20 @@ export default function LoginPage({
                     </div>
                     <div className="flex flex-col items-center">
                       <p
-                        className={`text-xs font-semibold tracking-wider mb-2 ${
-                          isDarkMode ? "text-gray-500" : "text-blue-600/60"
-                        }`}
+                        className={`text-xs font-semibold tracking-wider mb-2 ${isDarkMode ? "text-gray-500" : "text-blue-600/60"
+                          }`}
                       >
                         DEVELOPED BY
                       </p>
                       <h3
-                        className={`text-lg font-bold ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         Harsh Manmode
                       </h3>
                       <p
-                        className={`text-xs ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
+                        className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
                       >
                         Information Technology, II Year
                       </p>
@@ -1034,11 +978,10 @@ export default function LoginPage({
                           <a
                             key={idx}
                             href={social.href}
-                            className={`p-1.5 rounded-lg transition-all hover:scale-110 ${
-                              isDarkMode
-                                ? "bg-slate-800 hover:bg-slate-700 text-gray-400 hover:text-white"
-                                : "bg-blue-100 hover:bg-blue-200 text-blue-600"
-                            }`}
+                            className={`p-1.5 rounded-lg transition-all hover:scale-110 ${isDarkMode
+                              ? "bg-slate-800 hover:bg-slate-700 text-gray-400 hover:text-white"
+                              : "bg-blue-100 hover:bg-blue-200 text-blue-600"
+                              }`}
                           >
                             <social.icon className="w-4 h-4" />
                           </a>

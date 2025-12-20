@@ -146,6 +146,22 @@ export default function App() {
             }
           />
 
+          {/* Alumni Auth (OAuth callback route) */}
+          <Route
+            path="/auth-alumni"
+            element={
+              isAuthenticated ? (
+                <Navigate to="/" replace />
+              ) : (
+                <AlumniAuth
+                  setIsAuthenticated={setIsAuthenticated}
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
+                />
+              )
+            }
+          />
+
           {/* Admin Login */}
           <Route
             path="/login-admin"
@@ -444,8 +460,8 @@ export default function App() {
               />
             }
           />
-           
-          
+
+
 
           {/* Chat */}
           <Route

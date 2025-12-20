@@ -23,7 +23,10 @@ import {
   Calendar,
 } from "lucide-react";
 import ForgotPasswordPopup from "../components/ForgotPasswordPopup";
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+import VerificationPendingPopup from "../components/VerificationPendingPopup";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}/auth`
+  : "http://localhost:3001/auth";
 
 export default function AlumniAuth({
   setIsAuthenticated,
@@ -34,12 +37,14 @@ export default function AlumniAuth({
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleVerified, setGoogleVerified] = useState(false);
+  const [showVerificationPopup, setShowVerificationPopup] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
   const [showYearPicker, setShowYearPicker] = useState(false);
-const [currentYearRange, setCurrentYearRange] = useState(
-  Math.floor(new Date().getFullYear() / 12) * 12
-);
+  const [currentYearRange, setCurrentYearRange] = useState(
+    Math.floor(new Date().getFullYear() / 12) * 12
+  );
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -77,6 +82,113 @@ const [currentYearRange, setCurrentYearRange] = useState(
     }
   }, [showMessage]);
 
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get("accessToken");
+    const refreshToken = params.get("refreshToken");
+    const userName = params.get("name");
+    const userEmail = params.get("email");
+    const userId = params.get("id");
+    const errorType = params.get("error");
+
+    if (errorType) {
+      setLoading(false);
+      switch (errorType) {
+        case "alumni_not_registered":
+          setError(
+            "This email is not registered as an alumni. Please register first."
+          );
+          break;
+        case "alumni_not_verified":
+          setError(
+            "Your account is under verification. Please wait for approval."
+          );
+          break;
+        case "unauthorized":
+          setError("Authentication failed. Please try again.");
+          break;
+        case "email_exists":
+          setError("This email is already registered. Please login instead.");
+          break;
+        default:
+          setError("An error occurred during login. Please try again.");
+      }
+      setShowMessage(true);
+      window.history.replaceState({}, "", "/auth-alumni");
+      return;
+    }
+
+    if (accessToken && refreshToken) {
+      console.log("✅ OAuth Success - Tokens received:", { accessToken, refreshToken, userName, userEmail, userId });
+
+      const userData = {
+        accessToken,
+        refreshToken,
+        userName: decodeURIComponent(userName || ""),
+        userEmail: userEmail || "",
+        userId: userId || "",
+        userType: "alumni",
+        expiry: Date.now() + 1000 * 60 * 60,
+      };
+
+      console.log("💾 Storing auth data in localStorage:", userData);
+      localStorage.setItem("auth", JSON.stringify(userData));
+
+      // Verify it was stored
+      const stored = localStorage.getItem("auth");
+      console.log("✅ Verified localStorage:", stored ? "Data saved successfully" : "❌ Failed to save");
+
+      setSuccessMessage("Login successful! Redirecting...");
+      setShowMessage(true);
+      setLoading(false);
+
+      // Wait a bit to ensure localStorage is fully written
+      setTimeout(() => {
+        console.log("🔄 Setting authentication and navigating...");
+        setIsAuthenticated(true);
+        navigate("/");
+      }, 500);
+
+      window.history.replaceState({}, "", "/auth-alumni");
+    }
+  }, [setIsAuthenticated, navigate]);
+
+  // Handle Google OAuth registration callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const registerWithGoogle = params.get("register");
+    const googleEmail = params.get("googleEmail");
+    const googleName = params.get("googleName");
+
+    if (registerWithGoogle === "true" && googleEmail && googleName) {
+      const decodedEmail = decodeURIComponent(googleEmail);
+
+      // Block college emails
+      if (decodedEmail.toLowerCase().endsWith("@mitsgwl.ac.in")) {
+        setError("College email (@mitsgwl.ac.in) is not allowed for alumni registration. Please use your personal email.");
+        setShowMessage(true);
+        setIsLogin(false);
+        window.history.replaceState({}, "", "/auth-alumni");
+        return;
+      }
+
+      // Pre-fill the registration form with Google data
+      setFormData(prev => ({
+        ...prev,
+        email: decodedEmail,
+        name: decodeURIComponent(googleName),
+      }));
+      setGoogleVerified(true);
+      setIsLogin(false); // Switch to registration form
+      setSuccessMessage("Email verified with Google! Please complete your registration.");
+      setShowMessage(true);
+
+      // Clean up URL
+      window.history.replaceState({}, "", "/auth-alumni");
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -111,15 +223,22 @@ const [currentYearRange, setCurrentYearRange] = useState(
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setSuccessMessage("");
-    setShowMessage(false);
+    setLoading(true);
+
+    // Validate email for alumni registration
+    if (!isLogin && formData.email.toLowerCase().endsWith("@mitsgwl.ac.in")) {
+      setError("College email (@mitsgwl.ac.in) is not allowed for alumni registration. Please use your personal email.");
+      setShowMessage(true);
+      setLoading(false);
+      return;
+    }
 
     try {
       const endpoint = isLogin
-        ? `${BASE_URL}/auth/login-alumni`
-        : `${BASE_URL}/auth/register-alumni`;
+        ? `${BASE_URL}/login-alumni`
+        : `${BASE_URL}/register-alumni`;
 
       const payload = isLogin
         ? { email: formData.email, password: formData.password }
@@ -138,7 +257,14 @@ const [currentYearRange, setCurrentYearRange] = useState(
       console.log("API Response:", data);
 
       if (!response.ok) {
-        throw new Error(data.message || "Authentication failed");
+        // Handle specific error messages
+        if (data.message?.includes("Email already exists") || data.message?.includes("email already exists")) {
+          throw new Error("This email is already registered. Please use a different email or try logging in.");
+        } else if (data.message?.includes("Phone") && data.message?.includes("already exists")) {
+          throw new Error("This phone number is already registered. Please use a different phone number.");
+        } else {
+          throw new Error(data.message || "Authentication failed");
+        }
       }
 
       if (isLogin) {
@@ -171,25 +297,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
           navigate("/");
         }, 100);
       } else {
-        setSuccessMessage(
-          data.message ||
-            "Registration successful! Your account is under verification."
-        );
-        setShowMessage(true);
-
-        setTimeout(() => {
-          setIsLogin(true);
-          setFormData({
-            name: "",
-            email: "",
-            password: "",
-            phone: "",
-            branch: "",
-            batchYear: "",
-            location: "",
-            linkedinUrl: "",
-          });
-        }, 2000);
+        // Show verification popup instead of simple message
+        setShowVerificationPopup(true);
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -203,13 +312,18 @@ const [currentYearRange, setCurrentYearRange] = useState(
     }
   };
 
+  const handleGoogleLogin = () => {
+    setError("");
+    setLoading(true);
+    window.location.href = `${BASE_URL}/google-alumni`;
+  };
+
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+        }`}
     >
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -227,11 +341,10 @@ const [currentYearRange, setCurrentYearRange] = useState(
       {/* Theme Toggle */}
       <button
         onClick={toggleTheme}
-        className={`fixed top-6 right-6 z-50 p-3 rounded-xl shadow-xl transition-all duration-300 hover:scale-110 ${
-          isDarkMode
-            ? "bg-slate-800 hover:bg-slate-700 text-yellow-400"
-            : "bg-white hover:bg-gray-50 text-blue-600 border border-blue-200"
-        }`}
+        className={`fixed top-6 right-6 z-50 p-3 rounded-xl shadow-xl transition-all duration-300 hover:scale-110 ${isDarkMode
+          ? "bg-slate-800 hover:bg-slate-700 text-yellow-400"
+          : "bg-white hover:bg-gray-50 text-blue-600 border border-blue-200"
+          }`}
       >
         {isDarkMode ? (
           <Sun className="w-5 h-5" />
@@ -240,31 +353,19 @@ const [currentYearRange, setCurrentYearRange] = useState(
         )}
       </button>
 
-      {/* Student Login Button - Moved to top left */}
-      <button
-        onClick={() => navigate("/login")}
-        className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl transition-all duration-300 hover:scale-105 ${
-          isDarkMode
-            ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-            : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-        }`}
-      >
-        <span className="text-sm font-semibold">Student Login</span>
-        <ArrowRight className="w-4 h-4" />
-      </button>
+
 
       {/* Message Toast */}
       {(error || successMessage) && showMessage && (
         <div
-          className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-xl backdrop-blur-xl border shadow-2xl transition-all duration-300 ${
-            error
-              ? isDarkMode
-                ? "bg-red-500/10 border-red-500/20 text-red-300"
-                : "bg-red-100 border-red-200 text-red-700"
-              : isDarkMode
+          className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-xl backdrop-blur-xl border shadow-2xl transition-all duration-300 ${error
+            ? isDarkMode
+              ? "bg-red-500/10 border-red-500/20 text-red-300"
+              : "bg-red-100 border-red-200 text-red-700"
+            : isDarkMode
               ? "bg-green-500/10 border-green-500/20 text-green-300"
               : "bg-green-100 border-green-200 text-green-700"
-          }`}
+            }`}
         >
           {error ? (
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -281,15 +382,14 @@ const [currentYearRange, setCurrentYearRange] = useState(
           </div>
           <button
             onClick={closeMessage}
-            className={`p-1 rounded-lg transition-colors ${
-              error
-                ? isDarkMode
-                  ? "hover:bg-red-500/20"
-                  : "hover:bg-red-200"
-                : isDarkMode
+            className={`p-1 rounded-lg transition-colors ${error
+              ? isDarkMode
+                ? "hover:bg-red-500/20"
+                : "hover:bg-red-200"
+              : isDarkMode
                 ? "hover:bg-green-500/20"
                 : "hover:bg-green-200"
-            }`}
+              }`}
           >
             <X className="w-4 h-4" />
           </button>
@@ -303,11 +403,10 @@ const [currentYearRange, setCurrentYearRange] = useState(
           <div className="lg:hidden text-center mb-8">
             <div className="flex items-center gap-3 justify-center mb-4">
               <div
-                className={`w-12 h-12 rounded-xl p-2 ${
-                  isDarkMode
-                    ? "bg-white/10 backdrop-blur-sm"
-                    : "bg-white shadow-xl"
-                }`}
+                className={`w-12 h-12 rounded-xl p-2 ${isDarkMode
+                  ? "bg-white/10 backdrop-blur-sm"
+                  : "bg-white shadow-xl"
+                  }`}
               >
                 <img
                   src="/assets/images/mits-logo.png"
@@ -317,16 +416,14 @@ const [currentYearRange, setCurrentYearRange] = useState(
               </div>
               <div>
                 <h1
-                  className={`text-2xl font-black ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`text-2xl font-black ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   MITS ALUMNI
                 </h1>
                 <p
-                  className={`text-xs ${
-                    isDarkMode ? "text-purple-400" : "text-purple-600"
-                  }`}
+                  className={`text-xs ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                    }`}
                 >
                   Alumni Portal
                 </p>
@@ -334,9 +431,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
             </div>
 
             <h2
-              className={`text-3xl font-bold leading-tight mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-3xl font-bold leading-tight mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               Welcome Back,
               <br />
@@ -345,9 +441,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
               </span>
             </h2>
             <p
-              className={`text-base ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
-              }`}
+              className={`text-base ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
             >
               Reconnect with your alma mater
             </p>
@@ -362,11 +457,10 @@ const [currentYearRange, setCurrentYearRange] = useState(
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <div
-                      className={`w-16 h-16 rounded-2xl p-3 ${
-                        isDarkMode
-                          ? "bg-white/10 backdrop-blur-sm"
-                          : "bg-white shadow-xl"
-                      }`}
+                      className={`w-16 h-16 rounded-2xl p-3 ${isDarkMode
+                        ? "bg-white/10 backdrop-blur-sm"
+                        : "bg-white shadow-xl"
+                        }`}
                     >
                       <img
                         src="/assets/images/mits-logo.png"
@@ -376,16 +470,14 @@ const [currentYearRange, setCurrentYearRange] = useState(
                     </div>
                     <div>
                       <h1
-                        className={`text-3xl font-black ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`text-3xl font-black ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         MITS ALUMNI
                       </h1>
                       <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-purple-400" : "text-purple-600"
-                        }`}
+                        className={`text-sm ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                          }`}
                       >
                         Alumni Portal
                       </p>
@@ -394,9 +486,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
 
                   <div className="space-y-3">
                     <h2
-                      className={`text-5xl font-bold leading-tight ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-5xl font-bold leading-tight ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       Welcome Back,
                       <br />
@@ -405,9 +496,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
                       </span>
                     </h2>
                     <p
-                      className={`text-lg ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
+                      className={`text-lg ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
                     >
                       Reconnect with your alma mater and guide the next
                       generation
@@ -435,35 +525,30 @@ const [currentYearRange, setCurrentYearRange] = useState(
                   ].map((item, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm transition-all hover:translate-x-2 ${
-                        isDarkMode
-                          ? "bg-white/5 border border-white/10"
-                          : "bg-white/60 border border-purple-200"
-                      }`}
+                      className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm transition-all hover:translate-x-2 ${isDarkMode
+                        ? "bg-white/5 border border-white/10"
+                        : "bg-white/60 border border-purple-200"
+                        }`}
                     >
                       <div
-                        className={`p-2 rounded-lg ${
-                          isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
-                        }`}
+                        className={`p-2 rounded-lg ${isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
+                          }`}
                       >
                         <item.icon
-                          className={`w-4 h-4 ${
-                            isDarkMode ? "text-purple-400" : "text-purple-600"
-                          }`}
+                          className={`w-4 h-4 ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                            }`}
                         />
                       </div>
                       <div>
                         <h3
-                          className={`font-semibold text-sm ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
+                          className={`font-semibold text-sm ${isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
                         >
                           {item.title}
                         </h3>
                         <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-400" : "text-gray-600"
-                          }`}
+                          className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
                         >
                           {item.desc}
                         </p>
@@ -478,11 +563,10 @@ const [currentYearRange, setCurrentYearRange] = useState(
                 <div className="space-y-4">
                   <div className="flex items-center gap-4 mb-6">
                     <div
-                      className={`w-16 h-16 rounded-2xl p-3 ${
-                        isDarkMode
-                          ? "bg-white/10 backdrop-blur-sm"
-                          : "bg-white shadow-xl"
-                      }`}
+                      className={`w-16 h-16 rounded-2xl p-3 ${isDarkMode
+                        ? "bg-white/10 backdrop-blur-sm"
+                        : "bg-white shadow-xl"
+                        }`}
                     >
                       <img
                         src="/assets/images/mits-logo.png"
@@ -492,16 +576,14 @@ const [currentYearRange, setCurrentYearRange] = useState(
                     </div>
                     <div>
                       <h1
-                        className={`text-3xl font-black ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`text-3xl font-black ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         MITS ALUMNI
                       </h1>
                       <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-purple-400" : "text-purple-600"
-                        }`}
+                        className={`text-sm ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                          }`}
                       >
                         Join Our Network
                       </p>
@@ -510,9 +592,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
 
                   <div className="space-y-3">
                     <h2
-                      className={`text-4xl font-bold leading-tight ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-4xl font-bold leading-tight ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       Join the
                       <br />
@@ -521,9 +602,8 @@ const [currentYearRange, setCurrentYearRange] = useState(
                       </span>
                     </h2>
                     <p
-                      className={`text-base ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
+                      className={`text-base ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
                     >
                       Connect with fellow graduates and create lasting impact
                     </p>
@@ -550,35 +630,30 @@ const [currentYearRange, setCurrentYearRange] = useState(
                   ].map((item, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm ${
-                        isDarkMode
-                          ? "bg-white/5 border border-white/10"
-                          : "bg-white/60 border border-purple-200"
-                      }`}
+                      className={`flex items-center gap-3 p-3 rounded-lg backdrop-blur-sm ${isDarkMode
+                        ? "bg-white/5 border border-white/10"
+                        : "bg-white/60 border border-purple-200"
+                        }`}
                     >
                       <div
-                        className={`p-2 rounded-lg ${
-                          isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
-                        }`}
+                        className={`p-2 rounded-lg ${isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
+                          }`}
                       >
                         <item.icon
-                          className={`w-4 h-4 ${
-                            isDarkMode ? "text-purple-400" : "text-purple-600"
-                          }`}
+                          className={`w-4 h-4 ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                            }`}
                         />
                       </div>
                       <div>
                         <h3
-                          className={`font-semibold text-sm ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
+                          className={`font-semibold text-sm ${isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
                         >
                           {item.title}
                         </h3>
                         <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-400" : "text-gray-600"
-                          }`}
+                          className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
                         >
                           {item.desc}
                         </p>
@@ -589,55 +664,222 @@ const [currentYearRange, setCurrentYearRange] = useState(
               </div>
             )}
 
-            {/* Right Side - Auth Form */}
             <div
-              className={`w-full ${
-                isLogin ? "max-w-md mx-auto lg:mx-0" : "max-w-4xl mx-auto"
-              }`}
+              className={`w-full ${!googleVerified ? "max-w-md mx-auto" : "max-w-4xl mx-auto"
+                }`}
             >
-              {!isLogin ? (
-                // Registration - Split Form
+              {!googleVerified ? (
+                // Clean Entry Card - Two Buttons Only
                 <div
-                  className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${
-                    isDarkMode
-                      ? "bg-slate-900/80 border-slate-700/50"
-                      : "bg-white/90 border-purple-200"
-                  }`}
+                  className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${isDarkMode
+                    ? "bg-slate-900/80 border-slate-700/50"
+                    : "bg-white/90 border-purple-200"
+                    }`}
                 >
-                  <div className="text-center mb-6">
+                  <div className="text-center mb-8">
                     <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${
-                        isDarkMode
-                          ? "bg-purple-500/10 border border-purple-500/20"
-                          : "bg-purple-50 border border-purple-200"
-                      }`}
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${isDarkMode
+                        ? "bg-purple-500/10 border border-purple-500/20"
+                        : "bg-purple-50 border border-purple-200"
+                        }`}
                     >
                       <Award
-                        className={`w-4 h-4 ${
-                          isDarkMode ? "text-purple-400" : "text-purple-600"
-                        }`}
+                        className={`w-4 h-4 ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                          }`}
                       />
                       <span
-                        className={`text-xs font-medium ${
-                          isDarkMode ? "text-purple-400" : "text-purple-600"
-                        }`}
+                        className={`text-xs font-medium ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                          }`}
                       >
-                        Alumni Registration
+                        Alumni Portal
                       </span>
                     </div>
                     <h2
-                      className={`text-3xl font-bold mb-2 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-3xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
-                      Create Your Account
+                      Welcome Back
                     </h2>
                     <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-base mx-auto ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
-                      Join our exclusive alumni network
+                      Choose how you would like to continue
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Primary Action: Google Login */}
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={handleGoogleLogin}
+                        disabled={loading}
+                        className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 ${isDarkMode
+                          ? "bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+                          : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
+                          } shadow-sm hover:shadow transition-transform hover:scale-[1.01]`}
+                      >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          />
+                        </svg>
+                        Sign in with Google
+                      </button>
+                      <p className={`text-xs text-center ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
+                        Use your registered Google account
+                      </p>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="relative py-2">
+                      <div className="absolute inset-0 flex items-center">
+                        <div
+                          className={`w-full border-t ${isDarkMode ? "border-slate-700" : "border-gray-200"
+                            }`}
+                        ></div>
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase tracking-wider">
+                        <span
+                          className={`px-4 ${isDarkMode
+                            ? "bg-slate-900/80 text-gray-500"
+                            : "bg-white/90 text-gray-400"
+                            }`}
+                        >
+                          New Here?
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Alumni Register Card */}
+                    {/* Alumni Register Card */}
+                    <div
+                      className={`relative p-8 rounded-3xl border overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl
+  ${isDarkMode
+                          ? "bg-gradient-to-br from-slate-900/80 via-slate-800/60 to-slate-900/80 border-slate-700"
+                          : "bg-gradient-to-br from-purple-50 via-white to-indigo-50 border-purple-200"
+                        }`}
+                    >
+                      {/* Soft Glow */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 blur-2xl opacity-70"></div>
+
+                      <div className="relative text-center mb-8">
+                        <h3
+                          className={`text-2xl font-bold tracking-tight mb-3
+      ${isDarkMode ? "text-white" : "text-gray-900"}`}
+                        >
+                          Become a MITS Alumni
+                        </h3>
+
+                        <p
+                          className={`text-sm leading-relaxed max-w-sm mx-auto
+      ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
+                        >
+                          Connect with legends. Access exclusive opportunities, events,
+                          networks, and lifetime alumni privileges.
+                        </p>
+                      </div>
+                      {/* Mobile-optimized wide button */}
+                      <div className="w-full sm:max-w-xl sm:mx-auto">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.location.href = `${BASE_URL}/google-alumni-register`;
+                          }}
+                          disabled={loading}
+                          className={`group relative z-10
+    w-full
+    px-7 sm:px-6
+    py-3 sm:py-2.5
+    rounded-2xl sm:rounded-xl
+    font-bold text-base sm:text-sm
+    transition-all duration-300
+    disabled:opacity-50 disabled:cursor-not-allowed
+    flex items-center justify-center gap-3 sm:gap-2
+    hover:shadow-xl hover:scale-[1.03]
+    ${isDarkMode
+                              ? "bg-slate-800 hover:bg-slate-700 text-white border border-slate-600"
+                              : "bg-white text-purple-700 border-2 border-purple-200 hover:border-purple-400"
+                            }`}
+                        >
+                          <span className="flex items-center justify-center w-8 h-8 sm:w-7 sm:h-7 rounded-full shadow-sm">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24">
+                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22z" />
+                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                            </svg>
+                          </span>
+
+
+                          <span className="text-sm sm:text-base font-normal leading-tight whitespace-nowrap transition-all">
+                            Join Alumni with Google
+                          </span>
+
+                        </button>
+                      </div>
+
+
+                      <p className={`mt-4 text-xs text-center ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
+                        One click. Lifetime access.
+                      </p>
+                    </div>
+
+
+                  </div>
+                </div>
+              ) : (
+                // Registration Form (Only shown after Google Verify)
+                <div
+                  className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${isDarkMode
+                    ? "bg-slate-900/80 border-slate-700/50"
+                    : "bg-white/90 border-purple-200"
+                    }`}
+                >
+
+                  <div className="text-center mb-6">
+                    <div
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${isDarkMode
+                        ? "bg-green-500/10 border border-green-500/20"
+                        : "bg-green-50 border border-green-200"
+                        }`}
+                    >
+                      <CheckCircle
+                        className={`w-4 h-4 ${isDarkMode ? "text-green-400" : "text-green-600"
+                          }`}
+                      />
+                      <span
+                        className={`text-xs font-medium ${isDarkMode ? "text-green-400" : "text-green-600"
+                          }`}
+                      >
+                        Email Verified
+                      </span>
+                    </div>
+                    <h2
+                      className={`text-3xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                    >
+                      Complete Your Profile
+                    </h2>
+                    <p
+                      className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                    >
+                      Please provide accurate information for verification
                     </p>
                   </div>
 
@@ -647,28 +889,25 @@ const [currentYearRange, setCurrentYearRange] = useState(
                       <div className="space-y-4">
                         <div>
                           <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             Full Name
                           </label>
                           <div className="relative">
                             <User
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                }`}
                             />
                             <input
                               type="text"
                               name="name"
                               value={formData.name}
                               onChange={handleChange}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
+                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                                ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                }`}
                               placeholder="John Doe"
                               required
                             />
@@ -676,70 +915,65 @@ const [currentYearRange, setCurrentYearRange] = useState(
                         </div>
 
                         <div>
-  <label
-    className={`block text-sm font-medium mb-2 ${
-      isDarkMode ? "text-gray-300" : "text-gray-700"
-    }`}
-  >
-    Email Address
-  </label>
+                          <label
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
+                          >
+                            Email Address
+                          </label>
 
-  <div className="relative">
-    <Mail
-      className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-        isDarkMode ? "text-gray-500" : "text-gray-400"
-      }`}
-    />
+                          <div className="relative">
+                            <Mail
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                }`}
+                            />
 
-    <input
-      type="email"
-      name="email"
-      value={formData.email}
-      onChange={handleChange}
-      onInput={(e) => {
-        const value = e.target.value.toLowerCase();
-        if (value.endsWith("@mitsgwl.ac.in")) {
-          e.target.setCustomValidity("Institute email is not allowed");
-        } else {
-          e.target.setCustomValidity("");
-        }
-      }}
-      className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-        isDarkMode
-          ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-          : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-      }`}
-      placeholder="you@example.com"
-      required
-    />
-  </div>
-</div>
+                            <input
+                              type="email"
+                              name="email"
+                              value={formData.email}
+                              onChange={handleChange}
+                              onInput={(e) => {
+                                const value = e.target.value.toLowerCase();
+                                if (value.endsWith("@mitsgwl.ac.in")) {
+                                  e.target.setCustomValidity("Institute email is not allowed");
+                                } else {
+                                  e.target.setCustomValidity("");
+                                }
+                              }}
+                              readOnly={googleVerified}
+                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                                ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                } ${googleVerified ? "opacity-75 cursor-not-allowed" : ""}`}
+                              placeholder="you@example.com"
+                              required
+                            />
+                          </div>
+                        </div>
 
 
                         <div>
                           <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             Phone Number
                           </label>
                           <div className="relative">
                             <Phone
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                }`}
                             />
                             <input
                               type="tel"
                               name="phone"
                               value={formData.phone}
                               onChange={handleChange}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
+                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                                ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                }`}
                               placeholder="+91 1234567890"
                               required
                             />
@@ -748,39 +982,35 @@ const [currentYearRange, setCurrentYearRange] = useState(
 
                         <div>
                           <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             Password
                           </label>
                           <div className="relative">
                             <Lock
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                }`}
                             />
                             <input
                               type={showPassword ? "text" : "password"}
                               name="password"
                               value={formData.password}
                               onChange={handleChange}
-                              className={`w-full pl-11 pr-12 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
+                              className={`w-full pl-11 pr-12 py-3 rounded-xl outline-none transition ${isDarkMode
+                                ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                }`}
                               placeholder="••••••••"
                               required
                             />
                             <button
                               type="button"
                               onClick={() => setShowPassword(!showPassword)}
-                              className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                                isDarkMode
-                                  ? "text-gray-500 hover:text-gray-300"
-                                  : "text-gray-400 hover:text-gray-600"
-                              }`}
+                              className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isDarkMode
+                                ? "text-gray-500 hover:text-gray-300"
+                                : "text-gray-400 hover:text-gray-600"
+                                }`}
                             >
                               {showPassword ? (
                                 <EyeOff className="w-5 h-5" />
@@ -796,220 +1026,204 @@ const [currentYearRange, setCurrentYearRange] = useState(
                       <div className="space-y-4">
                         <div>
                           <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             Branch
                           </label>
                           <div className="relative">
                             <GraduationCap
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                }`}
                             />
                             <input
                               type="text"
                               name="branch"
                               value={formData.branch}
                               onChange={handleChange}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
+                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                                ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                }`}
                               placeholder="Computer Science Engineering"
                               required
                             />
                           </div>
                         </div>
 
-                     <div className="relative">
-  <label
-    className={`block text-sm font-medium mb-2 ${
-      isDarkMode ? "text-gray-300" : "text-gray-700"
-    }`}
-  >
-    Batch Year
-  </label>
-  
-  <div className="relative">
-    <Calendar
-      className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 z-10 ${
-        isDarkMode ? "text-gray-400" : "text-gray-500"
-      }`}
-    />
-    
-    {/* Calendar Year Picker Button */}
-    <button
-      type="button"
-      onClick={() => setShowYearPicker(!showYearPicker)}
-      className={`w-full pl-10 pr-4 py-3 rounded-lg outline-none transition-all duration-200 flex items-center justify-between ${
-        isDarkMode
-          ? "bg-gray-800 border border-gray-700 text-white hover:border-blue-500 focus:border-blue-500"
-          : "bg-white border border-gray-300 text-gray-900 hover:border-blue-500 focus:border-blue-500"
-      } ${showYearPicker ? "border-blue-500 ring-1 ring-blue-500" : ""}`}
-    >
-      <span className="text-sm font-medium truncate">
-        {formData.batchYear || "Select Batch Year"}
-      </span>
-      <svg
-        className={`w-4 h-4 transition-transform duration-200 ml-2 flex-shrink-0 ${
-          showYearPicker ? "rotate-180" : ""
-        } ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
-    
-    {/* Hidden input for form submission */}
-    <input
-      type="hidden"
-      name="batchYear"
-      value={formData.batchYear}
-      required
-    />
-    
-    {/* Year Picker Dropdown - Compact Design */}
-    {showYearPicker && (
-      <div className={`absolute z-50 mt-1 w-full rounded-lg shadow-xl border overflow-hidden ${
-        isDarkMode 
-          ? "bg-gray-800 border-gray-700" 
-          : "bg-white border-gray-200"
-      }`}>
-        <div className="p-3">
-          {/* Header with navigation */}
-          <div className="flex justify-between items-center mb-3">
-            <button
-              type="button"
-              onClick={() => setCurrentYearRange(currentYearRange - 4)}
-              className={`p-2 rounded-md transition-colors ${
-                isDarkMode 
-                  ? "hover:bg-gray-700 text-gray-300" 
-                  : "hover:bg-gray-100 text-gray-700"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <span className={`text-sm font-semibold px-2 ${
-              isDarkMode ? "text-gray-300" : "text-gray-800"
-            }`}>
-              {currentYearRange}-{currentYearRange + 3}
-            </span>
-            
-            <button
-              type="button"
-              onClick={() => setCurrentYearRange(currentYearRange + 4)}
-              className={`p-2 rounded-md transition-colors ${
-                isDarkMode 
-                  ? "hover:bg-gray-700 text-gray-300" 
-                  : "hover:bg-gray-100 text-gray-700"
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-          
-          {/* Compact 2x2 grid for year ranges */}
-          <div className="grid grid-cols-2 gap-2">
-            {Array.from({ length: 4 }, (_, i) => {
-              const startYear = currentYearRange + i;
-              const yearRange = `${startYear}-${startYear + 4}`;
-              const isSelected = formData.batchYear === yearRange;
-              return (
-                <button
-                  key={startYear}
-                  type="button"
-                  onClick={() => {
-                    setFormData({
-                      ...formData,
-                      batchYear: yearRange
-                    });
-                    setShowYearPicker(false);
-                  }}
-                  className={`p-3 rounded-md transition-all duration-200 text-center min-w-0 ${
-                    isSelected
-                      ? isDarkMode
-                        ? "bg-blue-600 text-white shadow-md"
-                        : "bg-blue-500 text-white shadow-md"
-                      : isDarkMode
-                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
-                        : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900"
-                  }`}
-                >
-                  <div className="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                    {startYear}-{startYear + 4}
-                  </div>
-                  <div className="text-xs opacity-90 mt-1 truncate">
-                    {startYear} batch
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          
-          {/* Quick recent year button - Fixed logic */}
-          <button
-            type="button"
-            onClick={() => {
-              const currentYear = new Date().getFullYear();
-              // Calculate the most recent completed or ongoing batch
-              // If current year is 2024, recent batch would be 2020-2024 or 2021-2025 depending on time of year
-              const recentStartYear = currentYear - 4; // Show batch that ended recently
-              const yearRange = `${recentStartYear}-${recentStartYear + 4}`;
-              
-              setFormData({
-                ...formData,
-                batchYear: yearRange
-              });
-              setShowYearPicker(false);
-            }}
-            className={`w-full mt-3 py-2 px-3 text-sm rounded-md transition-colors ${
-              isDarkMode
-                ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
-                : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-            }`}
-          >
-            Recent Batch 
-          </button>
-        </div>
-      </div>
-    )}
-  </div>
-</div>
+                        <div className="relative">
+                          <label
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
+                          >
+                            Batch Year
+                          </label>
+
+                          <div className="relative">
+                            <Calendar
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 z-10 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
+                            />
+
+                            {/* Calendar Year Picker Button */}
+                            <button
+                              type="button"
+                              onClick={() => setShowYearPicker(!showYearPicker)}
+                              className={`w-full pl-10 pr-4 py-3 rounded-lg outline-none transition-all duration-200 flex items-center justify-between ${isDarkMode
+                                ? "bg-gray-800 border border-gray-700 text-white hover:border-blue-500 focus:border-blue-500"
+                                : "bg-white border border-gray-300 text-gray-900 hover:border-blue-500 focus:border-blue-500"
+                                } ${showYearPicker ? "border-blue-500 ring-1 ring-blue-500" : ""}`}
+                            >
+                              <span className="text-sm font-medium truncate">
+                                {formData.batchYear || "Select Batch Year"}
+                              </span>
+                              <svg
+                                className={`w-4 h-4 transition-transform duration-200 ml-2 flex-shrink-0 ${showYearPicker ? "rotate-180" : ""
+                                  } ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            </button>
+
+                            {/* Hidden input for form submission */}
+                            <input
+                              type="hidden"
+                              name="batchYear"
+                              value={formData.batchYear}
+                              required
+                            />
+
+                            {/* Year Picker Dropdown - Compact Design */}
+                            {showYearPicker && (
+                              <div className={`absolute z-50 mt-1 w-full rounded-lg shadow-xl border overflow-hidden ${isDarkMode
+                                ? "bg-gray-800 border-gray-700"
+                                : "bg-white border-gray-200"
+                                }`}>
+                                <div className="p-3">
+                                  {/* Header with navigation */}
+                                  <div className="flex justify-between items-center mb-3">
+                                    <button
+                                      type="button"
+                                      onClick={() => setCurrentYearRange(currentYearRange - 4)}
+                                      className={`p-2 rounded-md transition-colors ${isDarkMode
+                                        ? "hover:bg-gray-700 text-gray-300"
+                                        : "hover:bg-gray-100 text-gray-700"
+                                        }`}
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                      </svg>
+                                    </button>
+
+                                    <span className={`text-sm font-semibold px-2 ${isDarkMode ? "text-gray-300" : "text-gray-800"
+                                      }`}>
+                                      {currentYearRange}-{currentYearRange + 3}
+                                    </span>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => setCurrentYearRange(currentYearRange + 4)}
+                                      className={`p-2 rounded-md transition-colors ${isDarkMode
+                                        ? "hover:bg-gray-700 text-gray-300"
+                                        : "hover:bg-gray-100 text-gray-700"
+                                        }`}
+                                    >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                      </svg>
+                                    </button>
+                                  </div>
+
+                                  {/* Compact 2x2 grid for year ranges */}
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {Array.from({ length: 4 }, (_, i) => {
+                                      const startYear = currentYearRange + i;
+                                      const yearRange = `${startYear}-${startYear + 4}`;
+                                      const isSelected = formData.batchYear === yearRange;
+                                      return (
+                                        <button
+                                          key={startYear}
+                                          type="button"
+                                          onClick={() => {
+                                            setFormData({
+                                              ...formData,
+                                              batchYear: yearRange
+                                            });
+                                            setShowYearPicker(false);
+                                          }}
+                                          className={`p-3 rounded-md transition-all duration-200 text-center min-w-0 ${isSelected
+                                            ? isDarkMode
+                                              ? "bg-blue-600 text-white shadow-md"
+                                              : "bg-blue-500 text-white shadow-md"
+                                            : isDarkMode
+                                              ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
+                                              : "bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                                            }`}
+                                        >
+                                          <div className="font-medium text-sm whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {startYear}-{startYear + 4}
+                                          </div>
+                                          <div className="text-xs opacity-90 mt-1 truncate">
+                                            {startYear} batch
+                                          </div>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+
+                                  {/* Quick recent year button - Fixed logic */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const currentYear = new Date().getFullYear();
+                                      // Calculate the most recent completed or ongoing batch
+                                      // If current year is 2024, recent batch would be 2020-2024 or 2021-2025 depending on time of year
+                                      const recentStartYear = currentYear - 4; // Show batch that ended recently
+                                      const yearRange = `${recentStartYear}-${recentStartYear + 4}`;
+
+                                      setFormData({
+                                        ...formData,
+                                        batchYear: yearRange
+                                      });
+                                      setShowYearPicker(false);
+                                    }}
+                                    className={`w-full mt-3 py-2 px-3 text-sm rounded-md transition-colors ${isDarkMode
+                                      ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
+                                      : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                                      }`}
+                                  >
+                                    Recent Batch
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
                         <div>
                           <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             Location
                           </label>
                           <div className="relative">
                             <MapPin
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                }`}
                             />
                             <input
                               type="text"
                               name="location"
                               value={formData.location}
                               onChange={handleChange}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
+                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                                ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                }`}
                               placeholder="City, Country"
                               required
                             />
@@ -1018,28 +1232,25 @@ const [currentYearRange, setCurrentYearRange] = useState(
 
                         <div>
                           <label
-                            className={`block text-sm font-medium mb-2 ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             LinkedIn Profile URL
                           </label>
                           <div className="relative">
                             <Link
-                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                                isDarkMode ? "text-gray-500" : "text-gray-400"
-                              }`}
+                              className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                }`}
                             />
                             <input
                               type="url"
                               name="linkedinUrl"
                               value={formData.linkedinUrl}
                               onChange={handleChange}
-                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                                isDarkMode
-                                  ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                                  : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              }`}
+                              className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                                ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                                }`}
                               placeholder="https://linkedin.com/in/yourprofile"
                               required
                             />
@@ -1051,11 +1262,10 @@ const [currentYearRange, setCurrentYearRange] = useState(
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`w-full py-4 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group ${
-                        isDarkMode
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                          : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                      } shadow-xl hover:shadow-2xl hover:scale-[1.02]`}
+                      className={`w-full py-4 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group ${isDarkMode
+                        ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                        : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                        } shadow-xl hover:shadow-2xl hover:scale-[1.02]`}
                     >
                       {loading ? (
                         <span className="flex items-center justify-center">
@@ -1068,17 +1278,19 @@ const [currentYearRange, setCurrentYearRange] = useState(
                     </button>
                   </form>
 
+
+
                   <div className="mt-6 text-center">
                     <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       Already have an alumni account?{" "}
                       <button
                         type="button"
                         onClick={() => {
                           setIsLogin(true);
+                          setGoogleVerified(false);
                           setError("");
                           setSuccessMessage("");
                           setShowMessage(false);
@@ -1093,218 +1305,12 @@ const [currentYearRange, setCurrentYearRange] = useState(
                             linkedinUrl: "",
                           });
                         }}
-                        className={`font-semibold ${
-                          isDarkMode
-                            ? "text-purple-400 hover:text-purple-300"
-                            : "text-purple-600 hover:text-purple-700"
-                        }`}
+                        className={`font-semibold ${isDarkMode
+                          ? "text-purple-400 hover:text-purple-300"
+                          : "text-purple-600 hover:text-purple-700"
+                          }`}
                       >
                         Sign In
-                      </button>
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                // Login - Single Column Form
-                <div
-                  className={`rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-xl border ${
-                    isDarkMode
-                      ? "bg-slate-900/80 border-slate-700/50"
-                      : "bg-white/90 border-purple-200"
-                  }`}
-                >
-                  <div className="text-center mb-6">
-                    <div
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 ${
-                        isDarkMode
-                          ? "bg-purple-500/10 border border-purple-500/20"
-                          : "bg-purple-50 border border-purple-200"
-                      }`}
-                    >
-                      <Award
-                        className={`w-4 h-4 ${
-                          isDarkMode ? "text-purple-400" : "text-purple-600"
-                        }`}
-                      />
-                      <span
-                        className={`text-xs font-medium ${
-                          isDarkMode ? "text-purple-400" : "text-purple-600"
-                        }`}
-                      >
-                        Alumni Login
-                      </span>
-                    </div>
-                    <h2
-                      className={`text-3xl font-bold mb-2 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      Sign In
-                    </h2>
-                    <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      Access your alumni account
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label
-                        className={`block text-sm font-medium mb-2 ${
-                          isDarkMode ? "text-gray-300" : "text-gray-700"
-                        }`}
-                      >
-                        Email Address
-                      </label>
-                      <div className="relative">
-                        <Mail
-                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                            isDarkMode ? "text-gray-500" : "text-gray-400"
-                          }`}
-                        />
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                            isDarkMode
-                              ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                          }`}
-                          placeholder="you@example.com"
-                          required
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                        className={`block text-sm font-medium mb-2 ${
-                          isDarkMode ? "text-gray-300" : "text-gray-700"
-                        }`}
-                      >
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Lock
-                          className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                            isDarkMode ? "text-gray-500" : "text-gray-400"
-                          }`}
-                        />
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          className={`w-full pl-11 pr-12 py-3 rounded-xl outline-none transition ${
-                            isDarkMode
-                              ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                              : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                          }`}
-                          placeholder="••••••••"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                            isDarkMode
-                              ? "text-gray-500 hover:text-gray-300"
-                              : "text-gray-400 hover:text-gray-600"
-                          }`}
-                        >
-                          {showPassword ? (
-                            <EyeOff className="w-5 h-5" />
-                          ) : (
-                            <Eye className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-sm">
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
-                        />
-                        <span
-                          className={`ml-2 ${
-                            isDarkMode ? "text-gray-400" : "text-gray-600"
-                          }`}
-                        >
-                          Remember me
-                        </span>
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setShowForgotPassword(true)}
-                        className={`font-medium ${
-                          isDarkMode
-                            ? "text-purple-400 hover:text-purple-300"
-                            : "text-purple-600 hover:text-purple-700"
-                        }`}
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className={`w-full py-4 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group ${
-                        isDarkMode
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
-                          : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                      } shadow-xl hover:shadow-2xl hover:scale-[1.02]`}
-                    >
-                      {loading ? (
-                        <span className="flex items-center justify-center">
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                          Signing In...
-                        </span>
-                      ) : (
-                        "Sign In to Alumni Network"
-                      )}
-                    </button>
-                  </form>
-
-                  <div className="mt-6 text-center">
-                    <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
-                    >
-                      Don't have an alumni account?{" "}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsLogin(false);
-                          setError("");
-                          setSuccessMessage("");
-                          setShowMessage(false);
-                          setFormData({
-                            name: "",
-                            email: "",
-                            password: "",
-                            phone: "",
-                            branch: "",
-                            batchYear: "",
-                            location: "",
-                            linkedinUrl: "",
-                          });
-                        }}
-                        className={`font-semibold ${
-                          isDarkMode
-                            ? "text-purple-400 hover:text-purple-300"
-                            : "text-purple-600 hover:text-purple-700"
-                        }`}
-                      >
-                        Sign Up
                       </button>
                     </p>
                   </div>
@@ -1314,6 +1320,7 @@ const [currentYearRange, setCurrentYearRange] = useState(
           </div>
         </div>
       </div>
+
 
       <style>{`
         @keyframes blob {
@@ -1330,6 +1337,11 @@ const [currentYearRange, setCurrentYearRange] = useState(
         onClose={() => setShowForgotPassword(false)}
         isDarkMode={isDarkMode}
       />
-    </div>
+      <VerificationPendingPopup
+        isOpen={showVerificationPopup}
+        onClose={() => navigate("/")}
+        isDarkMode={isDarkMode}
+      />
+    </div >
   );
 }
