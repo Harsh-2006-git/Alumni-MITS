@@ -37,55 +37,54 @@ import MentorshipRequestsPage from "./pages/MentorshipRequestsPage";
 import ContactUsPage from "./pages/ContactUsPage";
 
 
+import ProfilePhotoUpload from "./components/ProfilePhotoUpload";
 import { Contact } from "lucide-react";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showPhotoUpload, setShowPhotoUpload] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Check auth on app load and listen for storage changes
+  // Simple auth check
+  const checkAuth = () => {
+    const auth = JSON.parse(localStorage.getItem("auth") || "null");
+    if (auth && auth.accessToken && auth.expiry > Date.now()) {
+      setIsAuthenticated(true);
+      setCurrentUser(auth);
+    } else {
+      setIsAuthenticated(false);
+      setCurrentUser(null);
+    }
+  };
+
   useEffect(() => {
-    const checkAuth = () => {
-      const authData = localStorage.getItem("auth");
-
-      if (authData) {
-        try {
-          const parsedAuth = JSON.parse(authData);
-
-          if (
-            parsedAuth.accessToken &&
-            parsedAuth.expiry &&
-            Date.now() < parsedAuth.expiry
-          ) {
-            setIsAuthenticated(true);
-          } else {
-            localStorage.removeItem("auth");
-            setIsAuthenticated(false);
-          }
-        } catch (error) {
-          console.error("Error parsing auth data:", error);
-          localStorage.removeItem("auth");
-          setIsAuthenticated(false);
-        }
-      } else {
-        setIsAuthenticated(false);
-      }
-    };
-
     checkAuth();
     setIsLoading(false);
-
-    // Listen for storage changes (login/logout from other tabs/pages)
-    const handleStorageChange = () => checkAuth();
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => window.removeEventListener("storage", handleStorageChange);
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
   }, []);
+
+  // Simple, direct profile photo check
+  useEffect(() => {
+    if (isAuthenticated && currentUser?.userType === "alumni") {
+      const hasPhoto = currentUser.user?.profilePhoto || currentUser.profilePhoto;
+      const hasSkipped = sessionStorage.getItem("skippedPhotoUpload");
+
+      if (!hasPhoto && !hasSkipped) {
+        setShowPhotoUpload(true);
+      } else {
+        setShowPhotoUpload(false);
+      }
+    } else {
+      setShowPhotoUpload(false);
+    }
+  }, [isAuthenticated, currentUser]);
 
   if (isLoading) {
     return (
@@ -500,6 +499,26 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
+
+      <ProfilePhotoUpload
+        isOpen={showPhotoUpload}
+        token={currentUser?.accessToken}
+        onComplete={(newPhotoUrl) => {
+          setShowPhotoUpload(false);
+          // Update local storage so it doesn't pop up again
+          const authData = localStorage.getItem("auth");
+          if (authData) {
+            const parsed = JSON.parse(authData);
+            parsed.user.profilePhoto = newPhotoUrl;
+            localStorage.setItem("auth", JSON.stringify(parsed));
+          }
+        }}
+        onSkip={() => {
+          setShowPhotoUpload(false);
+          sessionStorage.setItem("skippedPhotoUpload", "true");
+        }}
+        isDarkMode={isDarkMode}
+      />
     </div>
   );
 }

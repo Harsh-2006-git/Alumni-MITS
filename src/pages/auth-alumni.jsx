@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import ForgotPasswordPopup from "../components/ForgotPasswordPopup";
 import VerificationPendingPopup from "../components/VerificationPendingPopup";
+import ProfilePhotoUpload from "../components/ProfilePhotoUpload";
+import { cityCoordinates } from "../data/cities";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/auth`
   : "http://localhost:3001/auth";
@@ -39,12 +41,15 @@ export default function AlumniAuth({
   const [loading, setLoading] = useState(false);
   const [googleVerified, setGoogleVerified] = useState(false);
   const [showVerificationPopup, setShowVerificationPopup] = useState(false);
+  const [showUploadPopup, setShowUploadPopup] = useState(false);
+  const [tempAuthToken, setTempAuthToken] = useState(null);
 
   const [isMobile, setIsMobile] = useState(false);
   const [showYearPicker, setShowYearPicker] = useState(false);
   const [currentYearRange, setCurrentYearRange] = useState(
     Math.floor(new Date().getFullYear() / 12) * 12
   );
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -120,6 +125,8 @@ export default function AlumniAuth({
     }
 
     if (accessToken && refreshToken) {
+      const userProfilePhoto = params.get("profilePhoto");
+
       console.log("✅ OAuth Success - Tokens received:", { accessToken, refreshToken, userName, userEmail, userId });
 
       const userData = {
@@ -129,6 +136,13 @@ export default function AlumniAuth({
         userEmail: userEmail || "",
         userId: userId || "",
         userType: "alumni",
+        user: {
+          id: userId || "",
+          name: decodeURIComponent(userName || ""),
+          email: userEmail || "",
+          userType: "alumni",
+          profilePhoto: userProfilePhoto ? decodeURIComponent(userProfilePhoto) : null,
+        },
         expiry: Date.now() + 1000 * 60 * 60,
       };
 
@@ -297,7 +311,7 @@ export default function AlumniAuth({
           navigate("/");
         }, 100);
       } else {
-        // Show verification popup instead of simple message
+        // Registration Successful - Show verification pending popup
         setShowVerificationPopup(true);
       }
     } catch (err) {
@@ -765,81 +779,101 @@ export default function AlumniAuth({
                       </div>
                     </div>
 
-                    {/* Alumni Register Card */}
-                    {/* Alumni Register Card */}
+                    {/* Alumni Register Card - Reduced Height */}
                     <div
-                      className={`relative p-8 rounded-3xl border overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl
-  ${isDarkMode
-                          ? "bg-gradient-to-br from-slate-900/80 via-slate-800/60 to-slate-900/80 border-slate-700"
-                          : "bg-gradient-to-br from-purple-50 via-white to-indigo-50 border-purple-200"
+                      className={`relative p-6 rounded-3xl border overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl
+${isDarkMode
+                          ? "bg-gradient-to-br from-slate-800/60 via-purple-900/20 to-slate-800/60 border-purple-500/30"
+                          : "bg-white border-gray-200 shadow-lg"
                         }`}
                     >
-                      {/* Soft Glow */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-pink-500/10 blur-2xl opacity-70"></div>
+                      {/* Subtle Background Gradient - Only in Dark Mode */}
+                      {isDarkMode && (
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-amber-500/10 opacity-50"></div>
+                      )}
 
-                      <div className="relative text-center mb-8">
-                        <h3
-                          className={`text-2xl font-bold tracking-tight mb-3
-      ${isDarkMode ? "text-white" : "text-gray-900"}`}
-                        >
-                          Become a MITS Alumni
-                        </h3>
+                      <div className="relative">
+                        <div className="text-center mb-5">
+                          {/* Icon Badge */}
+                          <div className="flex items-center justify-center mb-3">
+                            <div className={`p-2 rounded-xl ${isDarkMode ? "bg-purple-500/20" : "bg-purple-100"}`}>
+                              <GraduationCap className={`w-6 h-6 ${isDarkMode ? "text-purple-400" : "text-purple-600"}`} />
+                            </div>
+                          </div>
 
-                        <p
-                          className={`text-sm leading-relaxed max-w-sm mx-auto
-      ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
-                        >
-                          Connect with legends. Access exclusive opportunities, events,
-                          networks, and lifetime alumni privileges.
-                        </p>
-                      </div>
-                      {/* Mobile-optimized wide button */}
-                      <div className="w-full sm:max-w-xl sm:mx-auto">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            window.location.href = `${BASE_URL}/google-alumni-register`;
-                          }}
-                          disabled={loading}
-                          className={`group relative z-10
-    w-full
-    px-7 sm:px-6
-    py-3 sm:py-2.5
-    rounded-2xl sm:rounded-xl
-    font-bold text-base sm:text-sm
-    transition-all duration-300
-    disabled:opacity-50 disabled:cursor-not-allowed
-    flex items-center justify-center gap-3 sm:gap-2
-    hover:shadow-xl hover:scale-[1.03]
-    ${isDarkMode
-                              ? "bg-slate-800 hover:bg-slate-700 text-white border border-slate-600"
-                              : "bg-white text-purple-700 border-2 border-purple-200 hover:border-purple-400"
-                            }`}
-                        >
-                          <span className="flex items-center justify-center w-8 h-8 sm:w-7 sm:h-7 rounded-full shadow-sm">
-                            <svg className="w-4 h-4" viewBox="0 0 24 24">
-                              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22z" />
-                              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                          <h3
+                            className={`text-2xl font-bold tracking-tight mb-2
+${isDarkMode ? "text-white" : "text-gray-900"}`}
+                          >
+                            Become a MITS Alumni
+                          </h3>
+
+                          <p
+                            className={`text-sm leading-relaxed
+${isDarkMode ? "text-gray-400" : "text-gray-600"}`}
+                          >
+                            Connect with legends. Access exclusive opportunities and lifetime alumni privileges.
+                          </p>
+                        </div>
+
+                        {/* Features Grid - More Compact */}
+                        <div className="grid grid-cols-3 gap-2 mb-5">
+                          {[
+                            { icon: Trophy, label: "Network" },
+                            { icon: Users, label: "Mentor" },
+                            { icon: BookOpen, label: "Grow" },
+                          ].map((item, idx) => (
+                            <div
+                              key={idx}
+                              className={`flex flex-col items-center p-2 rounded-lg transition-colors ${isDarkMode
+                                ? "bg-slate-700/50"
+                                : "bg-gray-50 hover:bg-gray-100"
+                                }`}
+                            >
+                              <item.icon
+                                className={`w-4 h-4 mb-1 ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                                  }`}
+                              />
+                              <span
+                                className={`text-xs font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                                  }`}
+                              >
+                                {item.label}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Button - More Compact */}
+                        <div className="w-full">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.location.href = `${BASE_URL}/google-alumni-register`;
+                            }}
+                            disabled={loading}
+                            className={`group relative w-full px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 overflow-hidden
+${isDarkMode
+                                ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg hover:shadow-xl"
+                                : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl"
+                              } hover:scale-[1.02]`}
+                          >
+                            {/* Button Shimmer Effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+
+                            <svg className="w-4 h-4 relative z-10" viewBox="0 0 24 24">
+                              <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                              <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                              <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22z" />
+                              <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                             </svg>
-                          </span>
+                            <span className="relative z-10">Register with Google</span>
+                          </button>
+                        </div>
 
 
-                          <span className="text-sm sm:text-base font-normal leading-tight whitespace-nowrap transition-all">
-                            Join Alumni with Google
-                          </span>
-
-                        </button>
                       </div>
-
-
-                      <p className={`mt-4 text-xs text-center ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
-                        One click. Lifetime access.
-                      </p>
                     </div>
-
-
                   </div>
                 </div>
               ) : (
@@ -1219,14 +1253,52 @@ export default function AlumniAuth({
                               type="text"
                               name="location"
                               value={formData.location}
-                              onChange={handleChange}
+                              onChange={(e) => {
+                                handleChange(e);
+                                setShowLocationDropdown(true);
+                              }}
+                              onFocus={() => setShowLocationDropdown(true)}
+                              onBlur={() => setTimeout(() => setShowLocationDropdown(false), 200)}
                               className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
                                 ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
                                 : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
                                 }`}
                               placeholder="City, Country"
+                              autoComplete="off"
                               required
                             />
+                            {showLocationDropdown && (
+                              <div className={`absolute left-0 right-0 mt-2 rounded-xl shadow-xl border z-50 max-h-60 overflow-y-auto ${isDarkMode
+                                ? "bg-slate-800 border-slate-700"
+                                : "bg-white border-gray-100"
+                                }`}>
+                                {Object.keys(cityCoordinates)
+                                  .filter(city => city.toLowerCase().includes(formData.location.toLowerCase()))
+                                  .sort()
+                                  .map((city) => (
+                                    <button
+                                      key={city}
+                                      type="button"
+                                      onClick={() => {
+                                        setFormData({ ...formData, location: city });
+                                        setShowLocationDropdown(false);
+                                      }}
+                                      className={`w-full text-left px-4 py-3 transition-colors flex items-center gap-2 ${isDarkMode
+                                        ? "hover:bg-slate-700 text-gray-200"
+                                        : "hover:bg-purple-50 text-gray-700"
+                                        }`}
+                                    >
+                                      <MapPin className="w-4 h-4 opacity-50" />
+                                      {city}
+                                    </button>
+                                  ))}
+                                {Object.keys(cityCoordinates).filter(city => city.toLowerCase().includes(formData.location.toLowerCase())).length === 0 && (
+                                  <div className={`px-4 py-3 text-sm ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+                                    No cities found matching "{formData.location}"
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
 
@@ -1340,6 +1412,22 @@ export default function AlumniAuth({
       <VerificationPendingPopup
         isOpen={showVerificationPopup}
         onClose={() => navigate("/")}
+        isDarkMode={isDarkMode}
+      />
+
+      <ProfilePhotoUpload
+        isOpen={showUploadPopup}
+        token={tempAuthToken}
+        onComplete={() => {
+          setShowUploadPopup(false);
+          setTempAuthToken(null);
+          setShowVerificationPopup(true);
+        }}
+        onSkip={() => {
+          setShowUploadPopup(false);
+          setTempAuthToken(null);
+          setShowVerificationPopup(true);
+        }}
         isDarkMode={isDarkMode}
       />
     </div >

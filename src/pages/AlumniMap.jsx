@@ -4,6 +4,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import AuthPopup from "../components/AuthPopup";
 import AlumniProfileModal from "../components/AlumniProfileModal";
+import { cityCoordinates } from "../data/cities";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 export default function AlumniMap({
   isDarkMode,
@@ -80,39 +81,7 @@ export default function AlumniMap({
     setSelectedAlumni(null);
   };
 
-  // City coordinates for India
-  const cityCoordinates = {
-    Mumbai: [19.076, 72.8777],
-    Delhi: [28.7041, 77.1025],
-    Bangalore: [12.9716, 77.5946],
-    Hyderabad: [17.385, 78.4867],
-    Chennai: [13.0827, 80.2707],
-    Kolkata: [22.5726, 88.3639],
-    Pune: [18.5204, 73.8567],
-    Ahmedabad: [23.0225, 72.5714],
-    Jaipur: [26.9124, 75.7873],
-    Lucknow: [26.8467, 80.9462],
-    Chandigarh: [30.7333, 76.7794],
-    Bhopal: [23.2599, 77.4126],
-    Indore: [22.7196, 75.8577],
-    Nagpur: [21.1458, 79.0882],
-    Kochi: [9.9312, 76.2673],
-    Gurgaon: [28.4595, 77.0266],
-    Noida: [28.5355, 77.391],
-    Goa: [15.2993, 74.124],
-    Surat: [21.1702, 72.8311],
-    Visakhapatnam: [17.6868, 83.2185],
-    Gwalior: [26.2183, 78.1828],
-    Kanpur: [26.4499, 80.3319],
-    Patna: [25.5941, 85.1376],
-    Vadodara: [22.3072, 73.1812],
-    Coimbatore: [11.0168, 76.9558],
-    Thiruvananthapuram: [8.5241, 76.9366],
-    Mysore: [12.2958, 76.6394],
-    Ranchi: [23.3441, 85.3096],
-    Jabalpur: [23.1815, 79.9864],
-    Raipur: [21.2514, 81.6296],
-  };
+
 
   // Group alumni by location
   const getAlumniByLocation = () => {
@@ -224,15 +193,14 @@ export default function AlumniMap({
                 background-clip: text;
               ">${city}</h3>
               <p style="margin: 8px 0; font-size: 14px; font-weight: 600;">
-                <span style="color: #8b5cf6;">${
-                  alumni.length
-                }</span> Alumni Found
+                <span style="color: #8b5cf6;">${alumni.length
+              }</span> Alumni Found
               </p>
               <div style="margin-top: 12px; max-height: 200px; overflow-y: auto;" id="alumni-list-${city}">
                 ${alumni
 
-                  .map(
-                    (a, idx) => `
+                .map(
+                  (a, idx) => `
                   <div 
                     data-alumni-index="${idx}" 
                     style="
@@ -245,37 +213,30 @@ export default function AlumniMap({
                       transition: all 0.2s;
                     " 
                     class="alumni-card-item"
-                    onmouseover="this.style.background='${
-                      isDarkMode ? "#475569" : "#e2e8f0"
+                    onmouseover="this.style.background='${isDarkMode ? "#475569" : "#e2e8f0"
                     }'; this.style.transform='scale(1.02)'"
-                    onmouseout="this.style.background='${
-                      isDarkMode ? "#334155" : "#f1f5f9"
+                    onmouseout="this.style.background='${isDarkMode ? "#334155" : "#f1f5f9"
                     }'; this.style.transform='scale(1)'"
                   >
-                    <div style="font-weight: bold; margin-bottom: 4px;">${
-                      a.name
+                    <div style="font-weight: bold; margin-bottom: 4px;">${a.name
                     }</div>
-                    <div style="opacity: 0.8; font-size: 12px;">${
-                      a.profile?.branch || "N/A"
+                    <div style="opacity: 0.8; font-size: 12px;">${a.profile?.branch || "N/A"
                     }</div>
-                    ${
-                      getCurrentCompany(a) !== "Not Currently Employed"
-                        ? `<div style="opacity: 0.7; font-size: 11px; margin-top: 4px;">@ ${getCurrentCompany(
-                            a
-                          )}</div>`
-                        : ""
+                    ${getCurrentCompany(a) !== "Not Currently Employed"
+                      ? `<div style="opacity: 0.7; font-size: 11px; margin-top: 4px;">@ ${getCurrentCompany(
+                        a
+                      )}</div>`
+                      : ""
                     }
                   </div>
                 `
-                  )
-                  .join("")}
-                ${
-                  alumni.length > 5
-                    ? `<div style="text-align: center; margin-top: 8px; font-size: 12px; opacity: 0.7; font-weight: 600;">+${
-                        alumni.length - 5
-                      } more alumni</div>`
-                    : ""
-                }
+                )
+                .join("")}
+                ${alumni.length > 5
+                ? `<div style="text-align: center; margin-top: 8px; font-size: 12px; opacity: 0.7; font-weight: 600;">+${alumni.length - 5
+                } more alumni</div>`
+                : ""
+              }
               </div>
             `;
 
@@ -327,11 +288,10 @@ export default function AlumniMap({
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
@@ -352,9 +312,8 @@ export default function AlumniMap({
                   Discover our alumni network across
                 </p>
                 <p
-                  className={`text-sm sm:text-base lg:text-xl block lg:inline lg:ml-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`text-sm sm:text-base lg:text-xl block lg:inline lg:ml-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   {citiesCount} cities worldwide
                 </p>
@@ -379,17 +338,15 @@ export default function AlumniMap({
             </div>
           ) : (
             <div
-              className={`rounded-2xl border p-4 mb-6 ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200 shadow-lg"
-              }`}
+              className={`rounded-2xl border p-4 mb-6 ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200 shadow-lg"
+                }`}
             >
               <div className="flex items-center justify-between mb-4">
                 <h2
-                  className={`text-xl font-bold ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   Alumni Map
                 </h2>

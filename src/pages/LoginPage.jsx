@@ -20,10 +20,18 @@ import {
   X,
   HelpCircle,
   AlertTriangle,
+  MapPin,
+  Calendar,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import ProfilePhotoUpload from "../components/ProfilePhotoUpload";
+import { cityCoordinates } from "../data/cities";
 
 // Use the environment variable - this will work in JSX without TypeScript errors
 const API_URL = import.meta.env.VITE_API_BASE_URL
@@ -266,6 +274,401 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
   );
 };
 
+// Student Registration Popup Component
+const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) => {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    extraEmail: userData?.userEmail || "",
+    phone: "",
+    linkedin: "",
+    location: "",
+    branch: "",
+    batch: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+
+  const branches = [
+    "Computer Science Engineering",
+    "Information Technology",
+    "Electronics Engineering",
+    "Electrical Engineering",
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "Chemical Engineering",
+    "Architecture",
+    "Internet of Things",
+    "Artificial Intelligence & Data Science",
+  ];
+
+  const years = Array.from({ length: 15 }, (_, i) => (new Date().getFullYear() + 4 - i).toString());
+
+  const handleNext = (e) => {
+    e.preventDefault();
+    if (step === 1) {
+      if (!formData.extraEmail || !formData.phone || !formData.location) {
+        setError("Please fill all required fields");
+        return;
+      }
+
+      if (formData.extraEmail.toLowerCase().endsWith("@mitsgwl.ac.in")) {
+        setError("Please provide a personal email address (not your institute ID)");
+        return;
+      }
+
+      setError("");
+      setStep(2);
+    }
+  };
+
+  const handleBack = () => {
+    setStep(1);
+    setError("");
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.branch || !formData.batch) {
+      setError("Please select your branch and batch");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_URL}/register-student`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userData.accessToken}`
+        },
+        body: JSON.stringify({
+          userId: userData.userId,
+          ...formData
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        onComplete(data);
+      } else {
+        setError(data.message || "Registration failed. Please try again.");
+      }
+    } catch (err) {
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  const filteredCities = Object.keys(cityCoordinates).filter(city =>
+    city.toLowerCase().includes(formData.location.toLowerCase())
+  ).slice(0, 5);
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+      >
+        <motion.div
+          initial={{ scale: 0.9, y: 20, opacity: 0 }}
+          animate={{ scale: 1, y: 0, opacity: 1 }}
+          exit={{ scale: 0.9, y: 20, opacity: 0 }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className={`relative rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-lg overflow-hidden ${isDarkMode ? "bg-slate-900/90 border border-white/10" : "bg-white/95 border border-gray-200"
+            }`}
+        >
+          {/* Decorative background elements */}
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
+          <div className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`} />
+          <div className={`absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-20 ${isDarkMode ? "bg-purple-500" : "bg-purple-400"}`} />
+
+          <div className="relative p-8">
+            {/* Progress header */}
+            <div className="flex items-center justify-between mb-10 px-4">
+              {[1, 2, 3].map((s) => (
+                <div key={s} className="flex items-center flex-1 last:flex-none">
+                  <div className="relative">
+                    <motion.div
+                      animate={{
+                        backgroundColor: step >= s ? "#2563eb" : (isDarkMode ? "#1e293b" : "#f1f5f9"),
+                        scale: step === s ? 1.1 : 1
+                      }}
+                      className={`w-10 h-10 rounded-2xl flex items-center justify-center text-sm font-bold shadow-lg transition-colors duration-500 ${step >= s ? "text-white" : isDarkMode ? "text-slate-400" : "text-gray-400"
+                        }`}
+                    >
+                      {step > s ? "✓" : s}
+                    </motion.div>
+                    {step === s && (
+                      <motion.div
+                        layoutId="activeStep"
+                        className="absolute inset-0 rounded-2xl border-2 border-blue-500/50 -m-1"
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </div>
+                  {s < 3 && (
+                    <div className="flex-1 mx-4 h-1 rounded-full overflow-hidden bg-slate-800">
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: step > s ? "100%" : "0%" }}
+                        className="h-full bg-gradient-to-r from-blue-600 to-indigo-600"
+                        transition={{ duration: 0.5 }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mb-8">
+              <motion.h3
+                key={step}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`text-3xl font-extrabold tracking-tight mb-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                {step === 1 ? "Connect with Us" : "MITS Roots"}
+              </motion.h3>
+              <motion.p
+                key={`desc-${step}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className={`text-sm tracking-wide uppercase font-semibold ${isDarkMode ? "text-slate-400" : "text-gray-500"}`}>
+                {step === 1 ? "Official details & Socials" : "Define your academic journey"}
+              </motion.p>
+            </div>
+
+            <form onSubmit={step === 1 ? handleNext : handleSubmit} className="space-y-6">
+              <AnimatePresence mode="wait">
+                {step === 1 ? (
+                  <motion.div
+                    key="step1"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="space-y-5"
+                  >
+                    <div className="group">
+                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Personal Email</label>
+                      <div className="relative">
+                        <div className={`absolute left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
+                          <Mail className="w-4 h-4" />
+                        </div>
+                        <input
+                          type="email"
+                          value={formData.extraEmail}
+                          onChange={(e) => setFormData({ ...formData, extraEmail: e.target.value })}
+                          className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50 focus:bg-slate-800" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500 focus:bg-white"} outline-none`}
+                          placeholder="Your personal email address"
+                          required
+                        />
+                      </div>
+                      <p className={`mt-1.5 text-[10px] italic pl-1 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Important: Personal email only. @mitsgwl.ac.in is restricted.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="group">
+                        <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Phone Number</label>
+                        <div className="relative">
+                          <div className={`absolute left-4 top-1/2 -translate-y-1/2 font-bold text-sm ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>+91</div>
+                          <input
+                            type="tel"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                            className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-bold tracking-widest ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
+                            placeholder="00000 00000"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="group">
+                        <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>LinkedIn URL</label>
+                        <div className="relative">
+                          <div className={`absolute left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
+                            <Linkedin className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="url"
+                            value={formData.linkedin}
+                            onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                            className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
+                            placeholder="Professional profile"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative group">
+                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Current Location</label>
+                      <div className="relative">
+                        <div className={`absolute left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
+                          <MapPin className="w-4 h-4" />
+                        </div>
+                        <input
+                          type="text"
+                          value={formData.location}
+                          onChange={(e) => {
+                            setFormData({ ...formData, location: e.target.value });
+                            setShowLocationDropdown(true);
+                          }}
+                          onFocus={() => setShowLocationDropdown(true)}
+                          className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
+                          placeholder="Where are you currently based?"
+                          required
+                        />
+                        {showLocationDropdown && formData.location && filteredCities.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className={`absolute bottom-full left-0 right-0 mb-3 rounded-2xl shadow-2xl border-2 overflow-hidden z-[70] p-1.5 ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-100"}`}
+                          >
+                            {filteredCities.map((city) => (
+                              <button
+                                key={city}
+                                type="button"
+                                onClick={() => {
+                                  setFormData({ ...formData, location: city });
+                                  setShowLocationDropdown(false);
+                                }}
+                                className={`w-full px-4 py-3 text-left text-sm font-semibold flex items-center gap-3 rounded-xl transition-all ${isDarkMode ? "text-slate-300 hover:bg-blue-600 hover:text-white" : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"}`}
+                              >
+                                <span className={`p-1 rounded-md ${isDarkMode ? "bg-slate-800" : "bg-gray-100"}`}><MapPin className="w-3.5 h-3.5" /></span>
+                                {city}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-6"
+                  >
+                    <div className="group">
+                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Engineering Branch</label>
+                      <div className="relative">
+                        <select
+                          value={formData.branch}
+                          onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
+                          className={`w-full px-5 py-4 rounded-2xl border-2 transition-all appearance-none font-bold ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500 focus:bg-white"} outline-none`}
+                          required
+                        >
+                          <option value="">Select your discipline</option>
+                          {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                        </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                          <ChevronDown className={`w-5 h-5 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="group">
+                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Graduation Year</label>
+                      <div className="relative">
+                        <select
+                          value={formData.batch}
+                          onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                          className={`w-full px-5 py-4 rounded-2xl border-2 transition-all appearance-none font-bold tracking-wider ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500 focus:bg-white"} outline-none`}
+                          required
+                        >
+                          <option value="">Year of Graduation</option>
+                          {years.map(y => <option key={y} value={y}>{y}</option>)}
+                        </select>
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                          <Calendar className={`w-5 h-5 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`} />
+                        </div>
+                      </div>
+                    </div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`p-5 rounded-2xl border flex gap-4 ${isDarkMode ? "bg-blue-600/5 border-blue-500/20" : "bg-blue-50/50 border-blue-100"}`}
+                    >
+                      <div className={`p-2 rounded-xl h-fit ${isDarkMode ? "bg-blue-500/20 text-blue-400" : "bg-blue-100 text-blue-600"}`}>
+                        <Sparkles className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className={`text-sm font-bold mb-1 ${isDarkMode ? "text-blue-300" : "text-blue-800"}`}>Expert Profile Setup</h4>
+                        <p className={`text-[11px] leading-relaxed ${isDarkMode ? "text-slate-400" : "text-gray-600"}`}>
+                          We'll automatically configure your MITS educational history using these details to match our community standards.
+                        </p>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="p-4 rounded-2xl bg-rose-600/10 border border-rose-500/20 text-rose-500 text-xs font-bold flex items-center gap-3 backdrop-blur-sm"
+                >
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  {error}
+                </motion.div>
+              )}
+
+              <div className="flex gap-4 pt-4">
+                {step === 2 && (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="button"
+                    onClick={handleBack}
+                    className={`flex-1 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 ${isDarkMode ? "bg-slate-800/80 text-white hover:bg-slate-800" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Back
+                  </motion.button>
+                )}
+                <motion.button
+                  whileHover={{ scale: 1.02, boxShadow: "0 10px 25px -5px rgba(37, 99, 235, 0.4)" }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={loading}
+                  className={`flex-[2] py-4 rounded-2xl font-black text-sm tracking-widest uppercase text-white shadow-xl transition-all relative overflow-hidden group ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-3">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Finalizing...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      {step === 1 ? (
+                        <>Continue to Education <ChevronRight className="w-4 h-4" /></>
+                      ) : (
+                        <>Complete Profile <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" /></>
+                      )}
+                    </span>
+                  )}
+                </motion.button>
+              </div>
+            </form>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+
 export default function LoginPage({
   setIsAuthenticated,
   isDarkMode,
@@ -275,10 +678,14 @@ export default function LoginPage({
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showExtraEmailPopup, setShowExtraEmailPopup] = useState(false);
+  const [showRegistrationPopup, setShowRegistrationPopup] = useState(false);
+  const [showPhotoUploadPopup, setShowPhotoUploadPopup] = useState(false);
   const [tempUserData, setTempUserData] = useState(null);
+  const [registrationUserData, setRegistrationUserData] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
 
   const handleAuthError = (errorType) => {
+    setIsLoading(false);
     switch (errorType) {
       case "unauthorized_domain":
         setError(
@@ -312,20 +719,30 @@ export default function LoginPage({
   }, []);
 
   const completeLogin = (userData) => {
-    console.log("✅ Access Token:", userData.accessToken);
-    console.log("🔄 Refresh Token:", userData.refreshToken);
-    console.log("Storing auth data:", userData);
+    console.log("✅ Final Login:", userData);
+    localStorage.setItem("auth", JSON.stringify(userData));
+    setIsAuthenticated(true);
+    window.location.href = "/";
+  };
 
-    // Only store in localStorage if user has extra email
-    if (userData.hasExtraEmail || userData.extraEmail) {
-      localStorage.setItem("auth", JSON.stringify(userData));
-      setIsAuthenticated(true);
-      window.location.href = "/";
-    } else {
-      console.error("Cannot login: User does not have extra email");
-      setError("Personal email is required to access the portal. Please try logging in again.");
-      setIsLoading(false);
-    }
+  const handleRegistrationComplete = (data) => {
+    setShowRegistrationPopup(false);
+    // After registration, we must do photo upload
+    setRegistrationUserData(data);
+    setShowPhotoUploadPopup(true);
+  };
+
+  const handlePhotoUploadComplete = (photoUrl) => {
+    setShowPhotoUploadPopup(false);
+    const finalData = {
+      ...registrationUserData.user,
+      accessToken: registrationUserData.accessToken,
+      refreshToken: registrationUserData.refreshToken,
+      profilePhoto: photoUrl,
+      userType: "student",
+      expiry: Date.now() + 1000 * 60 * 60,
+    };
+    completeLogin(finalData);
   };
 
   const handleExtraEmailSave = (userData) => {
@@ -373,38 +790,30 @@ export default function LoginPage({
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get("accessToken");
     const refreshToken = params.get("refreshToken");
+    const needsRegistration = params.get("needsRegistration");
     const userNameParam = params.get("name");
     const userEmailParam = params.get("email");
-    const userPhone = params.get("phone");
     const userIdParam = params.get("id");
     const errorType = params.get("error");
 
-    if (accessToken || refreshToken || errorType) {
+    if (accessToken || refreshToken || errorType || needsRegistration) {
       window.history.replaceState({}, "", "/login");
     }
 
     if (errorType) {
+      handleAuthError(errorType);
+      return;
+    }
+
+    if (needsRegistration === "true") {
       setIsLoading(false);
-      switch (errorType) {
-        case "unauthorized_domain":
-          setError(
-            "Only @mitsgwl.ac.in email addresses are allowed. Please use your institute email."
-          );
-          break;
-        case "login_failed":
-          setError("Google login failed. Please try again.");
-          break;
-        case "unauthorized":
-          setError("Authentication failed. Please try again.");
-          break;
-        case "embedded_browser":
-          setError(
-            "Please open this page in Chrome or Safari browser instead of social media in-app browsers."
-          );
-          break;
-        default:
-          setError("An error occurred during login. Please try again.");
-      }
+      setTempUserData({
+        accessToken,
+        userId: userIdParam,
+        userName: decodeURIComponent(userNameParam || ""),
+        userEmail: userEmailParam || ""
+      });
+      setShowRegistrationPopup(true);
       return;
     }
 
@@ -417,7 +826,6 @@ export default function LoginPage({
         refreshToken,
         userName: decodedName,
         userEmail: userEmailParam || "",
-        userPhone: userPhone || "",
         userId: userIdParam || "",
         userType: "student",
         expiry: Date.now() + 1000 * 60 * 60,
@@ -569,6 +977,22 @@ export default function LoginPage({
         userData={tempUserData}
         onSave={handleExtraEmailSave}
         isDarkMode={isDarkMode}
+      />
+
+      <StudentRegistrationPopup
+        isOpen={showRegistrationPopup}
+        userData={tempUserData}
+        onComplete={handleRegistrationComplete}
+        isDarkMode={isDarkMode}
+      />
+
+      <ProfilePhotoUpload
+        isOpen={showPhotoUploadPopup}
+        token={registrationUserData?.accessToken}
+        onComplete={handlePhotoUploadComplete}
+        onSkip={() => { }} // Should not be accessible since canSkip={false}
+        isDarkMode={isDarkMode}
+        canSkip={false}
       />
 
       <div
