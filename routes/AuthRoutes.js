@@ -13,10 +13,11 @@ import {
   registerAlumni,
   loginAlumni,
   adminLogin,
-  checkAlumniEmail,
   handleForgotPassword,
+  checkAlumniEmail,
   updateExtraEmail,
-  checkExtraEmailStatus
+  checkExtraEmailStatus,
+  registerStudent
 } from "../controller/AuthController.js";
 
 // Change this import - use default import instead of named import
@@ -29,6 +30,7 @@ const router = express.Router();
 // ========== TRADITIONAL AUTH ROUTES ==========
 router.post("/register", register);
 router.post("/login", login);
+router.post("/register-student", registerStudent);
 
 // ====admin login =======
 router.post("/admin-login", adminLogin);

@@ -16,7 +16,6 @@ const AlumniSchema = new mongoose.Schema(
     },
     recoveryEmail: {
       type: String,
-      required: true,
       required: false,
       default: null,
       match: [/^\S+@\S+\.\S+$/, "Invalid email format"],

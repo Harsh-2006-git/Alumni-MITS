@@ -5,10 +5,12 @@ import bcrypt from "bcrypt";
 import User from "../models/user.js"; // User = Student
 import Alumni from "../models/alumni.js";
 import AlumniProfile from "../models/AlumniProfile.js";
+import StudentProfile from "../models/studentProfile.js";
 import EmailService from "../services/NewUserEmailService.js"; // Add email service import
 import csv from "csv-parser";
 import multer from "multer";
 import { Readable } from "stream";
+import nodemailer from "nodemailer";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -163,6 +165,21 @@ export const googleCallback = (req, res, next) => {
       return res.redirect(`${FRONTEND_URL}/login?error=${error}`);
     }
 
+    // Check if student profile is complete
+    if (!user.isProfileComplete) {
+      // Create a temporary identifier/token if needed, or just use the user ID
+      const regUrl = new URL(`${FRONTEND_URL}/login`);
+      regUrl.searchParams.set("needsRegistration", "true");
+      regUrl.searchParams.set("name", encodeURIComponent(user.name));
+      regUrl.searchParams.set("email", user.email);
+      regUrl.searchParams.set("id", user.id.toString());
+      // We pass the accessToken anyway so the frontend can use it to call the register endpoint
+      const { accessToken, refreshToken } = generateTokens(user);
+      regUrl.searchParams.set("accessToken", accessToken);
+
+      return res.redirect(regUrl.toString());
+    }
+
     const { accessToken, refreshToken } = generateTokens(user);
 
     const redirectUrl = new URL(`${FRONTEND_URL}/login`);
@@ -246,6 +263,9 @@ export const googleCallbackAlumni = (req, res, next) => {
     redirectUrl.searchParams.set("email", user.email);
     redirectUrl.searchParams.set("id", user.id.toString());
     redirectUrl.searchParams.set("userType", user.userType);
+    if (user.profilePhoto) {
+      redirectUrl.searchParams.set("profilePhoto", encodeURIComponent(user.profilePhoto));
+    }
 
     console.log("🔄 Redirecting to:", redirectUrl.toString().substring(0, 100) + "...");
     res.redirect(redirectUrl.toString());
@@ -641,11 +661,16 @@ export const registerAlumni = async (req, res) => {
       // Don't fail registration if email fails (same as bulk)
     }
 
-    // Return response (without temporary password)
+    // Generate tokens for immediate upload capability
+    const { accessToken, refreshToken } = generateTokens(alumni);
+
+    // Return response
     res.status(201).json({
       success: true,
       message:
         "Alumni registered successfully. Your account is under verification.",
+      accessToken,
+      refreshToken,
       data: {
         alumni: {
           id: alumni._id,
@@ -752,6 +777,7 @@ export const loginAlumni = async (req, res) => {
           email: alumni.email,
           userType: alumni.userType,
           isVerified: alumni.isVerified,
+          profilePhoto: alumni.profilePhoto,
         },
       });
   } catch (err) {
@@ -836,8 +862,6 @@ export const authenticateToken = (req, res, next) => {
     next();
   });
 };
-
-import nodemailer from "nodemailer";
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
@@ -1182,5 +1206,95 @@ export const checkExtraEmailStatus = async (req, res) => {
       success: false,
       message: "Server error"
     });
+  }
+};
+
+// ✅ Register Student Profile Controller
+export const registerStudent = async (req, res) => {
+  try {
+    const { userId, branch, batch, location, extraEmail, phone, linkedin } = req.body;
+
+    if (!userId || !branch || !batch || !location || !extraEmail || !phone) {
+      return res.status(400).json({ message: "Required fields are missing" });
+    }
+
+    // ✅ Validation: extraEmail must NOT be @mitsgwl.ac.in
+    if (extraEmail.toLowerCase().endsWith("@mitsgwl.ac.in")) {
+      return res.status(400).json({
+        message: "Please provide a personal email address (not your institute ID)"
+      });
+    }
+
+    const student = await User.findById(userId);
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Update User model fields
+    student.extraEmail = extraEmail;
+    student.phone = phone;
+    student.isProfileComplete = true;
+    await student.save();
+
+    // Update or create student profile
+    let profile = await StudentProfile.findOne({ studentId: userId });
+    if (!profile) {
+      profile = new StudentProfile({ studentId: userId });
+    }
+
+    profile.branch = branch;
+    profile.batch = batch;
+    profile.location = location;
+    profile.linkedin = linkedin;
+
+    // ✅ Generate standardized education details for MITS Gwalior
+    // format batch: "2020-2024" or just "2024" (if just 2024, assume 4 year degree)
+    let startYear, endYear;
+    if (batch.includes("-")) {
+      const parts = batch.split("-").map(Number);
+      startYear = parts[0];
+      endYear = parts[1];
+    } else {
+      endYear = parseInt(batch);
+      startYear = endYear - 4;
+    }
+
+    profile.education = [
+      {
+        type: "Bachelor",
+        stream: branch,
+        institution: "Madhav Institute of Technology and Science (MITS), Gwalior",
+        from: `${startYear}-08-01`,
+        to: `${endYear}-05-30`,
+        gpa: "7.5",
+      }
+    ];
+
+    await profile.save();
+
+    // ✅ Send welcome email (Now including personal email if provided)
+    emailService.sendWelcomeEmail(student).catch((error) => {
+      console.error("Failed to send welcome email after registration:", error);
+    });
+
+    // Generate final tokens
+    const { accessToken, refreshToken } = generateTokens(student);
+
+    return res.status(200).json({
+      success: true,
+      message: "Student registration completed successfully",
+      user: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+        userType: student.userType,
+        isProfileComplete: student.isProfileComplete,
+      },
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    console.error("Student registration error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
 };

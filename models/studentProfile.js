@@ -12,6 +12,7 @@ const StudentProfile = mongoose.model(
       },
       location: { type: String },
       branch: { type: String },
+      batch: { type: String },
       about: { type: String },
       skills: { type: mongoose.Schema.Types.Mixed },
       achievements: { type: mongoose.Schema.Types.Mixed },
@@ -32,7 +33,7 @@ const StudentProfile = mongoose.model(
         //   { designation: "Senior Engineer", company: "Meta", from: "2022-07-01", to: null, current: true, location: "CA", description: "Leading Y project" }
         // ]
       },
-      
+
     },
     {
       timestamps: true,

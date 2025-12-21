@@ -46,8 +46,8 @@ const studentSchema = new mongoose.Schema(
     resume: {
       type: String,
     },
-   
-       extraEmail: {
+
+    extraEmail: {
       type: String,
       required: false,
       validate: {
@@ -56,7 +56,10 @@ const studentSchema = new mongoose.Schema(
         },
       },
     },
-
+    isProfileComplete: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
