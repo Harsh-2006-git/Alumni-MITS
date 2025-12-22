@@ -450,7 +450,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <img
                 src="/assets/images/mits-logo.png"
                 alt="MITS Logo"
-                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain"
+                className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain"
               />
               <div>
                 <h1
@@ -462,7 +462,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   MITS Alumni
                 </h1>
                 <p
-                  className={`text-[10px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  className={`text-[11px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                 >
                   Connect & Grow
@@ -1023,10 +1023,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
         </div>
       </header>
 
-      {/* Mobile Sidebar - Show below 1250px - 65% WIDTH */}
+      {/* Mobile Sidebar - Show below 1250px - 60% WIDTH */}
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-y-0 right-0 z-50 w-[65%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed inset-y-0 right-0 z-50 w-[60%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
         {/* Backdrop */}
@@ -1037,7 +1037,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
           />
         )}
 
-        {/* Sidebar Content - 65% width */}
+        {/* Sidebar Content - 60% width */}
         <div
           className={`relative h-full w-full flex flex-col z-50 shadow-2xl ${isDarkMode ? "bg-gray-900" : "bg-white"
             }`}
@@ -1052,7 +1052,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <img
                   src="/assets/images/mits-logo.png"
                   alt="MITS Logo"
-                  className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
+                  className="w-9 h-9 sm:w-10 sm:h-10 object-contain"
                 />
                 <div>
                   <h1

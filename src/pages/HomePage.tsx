@@ -219,7 +219,7 @@ export default function AlumniHomePage({
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       {/* Hero Section */}
       <section
-        className={`w-full px-3 sm:px-4 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 relative overflow-hidden transition-colors duration-500 ${isDarkMode
+        className={`w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-12 relative overflow-hidden transition-colors duration-500 ${isDarkMode
           ? "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
           : "bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-50"
           }`}
@@ -260,19 +260,19 @@ export default function AlumniHomePage({
             }`}
         ></div>
 
-        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 items-center min-h-[400px] sm:min-h-[500px]">
+        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center min-h-[500px]">
           {/* Left Content */}
-          <div className="space-y-3 sm:space-y-5 md:space-y-6 animate-slide-up">
+          <div className="space-y-5 sm:space-y-6 animate-slide-up">
             {/* Welcome Badge with Pulse Animation */}
             <div
-              className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full backdrop-blur-sm border transition-all duration-500 animate-fade-in-delay relative ${isDarkMode
+              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm border transition-all duration-500 animate-fade-in-delay relative ${isDarkMode
                 ? "bg-blue-500/10 border-blue-500/30"
                 : "bg-white/60 border-blue-300 shadow-lg"
                 }`}
               style={{ animationDelay: "0.2s" }}
             >
               <span
-                className={`text-[10px] sm:text-xs md:text-sm font-medium tracking-wide transition-colors duration-500 ${isDarkMode ? "text-blue-300" : "text-blue-700"
+                className={`text-xs sm:text-sm font-medium tracking-wide transition-colors duration-500 ${isDarkMode ? "text-blue-300" : "text-blue-700"
                   }`}
               >
                 Welcome to Your Alumni Network
@@ -295,7 +295,7 @@ export default function AlumniHomePage({
               style={{ animationDelay: "0.4s" }}
             >
               <div
-                className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-lg sm:rounded-xl md:rounded-2xl p-2 shadow-2xl flex-shrink-0 transition-all duration-500 hover:scale-110 hover:rotate-3 ${isDarkMode ? "bg-white" : "bg-white"
+                className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl p-2 shadow-2xl flex-shrink-0 transition-all duration-500 hover:scale-110 hover:rotate-3 ${isDarkMode ? "bg-white" : "bg-white"
                   }`}
               >
                 <img
@@ -305,7 +305,7 @@ export default function AlumniHomePage({
                 />
               </div>
               <h1
-                className={`text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black tracking-tight transition-colors duration-500 animate-text-shimmer ${isDarkMode ? "text-white" : "text-gray-900"
+                className={`text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-black tracking-tight transition-colors duration-500 animate-text-shimmer ${isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
               >
@@ -315,7 +315,7 @@ export default function AlumniHomePage({
 
             {/* Description with Fade In */}
             <p
-              className={`text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed max-w-xl transition-colors duration-500 animate-fade-in-delay ${isDarkMode
+              className={`text-sm sm:text-base md:text-lg leading-relaxed max-w-xl transition-colors duration-500 animate-fade-in-delay ${isDarkMode
                 ? "text-gray-300 font-light"
                 : "text-gray-800 font-normal"
                 }`}
@@ -333,7 +333,7 @@ export default function AlumniHomePage({
             >
               <button
                 onClick={() => navigate("/alumni")}
-                className={`group px-4 sm:px-6 md:px-7 py-2.5 sm:py-3 md:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 sm:gap-2.5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 hover:-translate-y-1 text-xs sm:text-sm w-full sm:w-auto relative overflow-hidden ${isDarkMode
+                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 hover:-translate-y-1 text-sm w-full sm:w-auto relative overflow-hidden ${isDarkMode
                   ? "bg-blue-600 hover:bg-blue-700 text-white"
                   : "bg-blue-600 hover:bg-blue-700 text-white"
                   }`}
@@ -356,7 +356,7 @@ export default function AlumniHomePage({
               </button>
               <button
                 onClick={() => navigate("/event")}
-                className={`group px-4 sm:px-6 md:px-7 py-2.5 sm:py-3 md:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 sm:gap-2.5 transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 hover:-translate-y-1 text-xs sm:text-sm w-full sm:w-auto relative overflow-hidden ${isDarkMode
+                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 hover:-translate-y-1 text-sm w-full sm:w-auto relative overflow-hidden ${isDarkMode
                   ? "bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 hover:border-slate-600"
                   : "bg-white/70 hover:bg-white text-gray-900 border border-gray-300 hover:border-gray-400"
                   }`}
@@ -381,7 +381,7 @@ export default function AlumniHomePage({
 
             {/* Stats Section with Stagger Animation */}
             <div
-              className="grid grid-cols-4 gap-1.5 sm:gap-2 md:gap-4 pt-2 sm:pt-3 md:pt-4"
+              className="grid grid-cols-4 gap-2 sm:gap-4 pt-3 sm:pt-4"
               style={{ animationDelay: "1s" }}
             >
               {[
@@ -428,7 +428,7 @@ export default function AlumniHomePage({
                   style={{ animationDelay: `${1 + idx * 0.1}s` }}
                 >
                   <div
-                    className={`w-5 h-5 sm:w-6 sm:h-6 md:w-9 md:h-9 rounded-md sm:rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-0.5 sm:mb-1 md:mb-3 shadow-lg animate-bounce-slow`}
+                    className={`w-6 h-6 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-1 sm:mb-3 shadow-lg animate-bounce-slow`}
                     style={{ animationDelay: stat.delay }}
                   >
                     {stat.icon === "users" && (
@@ -493,7 +493,7 @@ export default function AlumniHomePage({
                     )}
                   </div>
                   <p
-                    className={`text-xs sm:text-sm md:text-2xl font-bold mb-0.5 sm:mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                    className={`text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
                   >
                     {stat.value}
                   </p>
@@ -550,7 +550,7 @@ export default function AlumniHomePage({
               <img
                 src="/assets/images/bg.png"
                 alt="MITS Campus"
-                className="w-full h-[200px] sm:h-[250px] md:h-[300px] object-cover"
+                className="w-full h-[250px] sm:h-[300px] object-cover"
               />
               <div
                 className={`absolute inset-0 transition-colors duration-500 ${isDarkMode
