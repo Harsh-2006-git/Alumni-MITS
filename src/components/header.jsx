@@ -454,7 +454,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
               />
               <div>
                 <h1
-                  className={`text-sm sm:text-base md:text-lg font-bold ${isDarkMode
+                  className={`text-base sm:text-base md:text-lg font-bold ${isDarkMode
                     ? "text-white"
                     : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
                     }`}
@@ -823,9 +823,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   }`}
               >
                 {isDarkMode ? (
-                  <Sun className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                  <Sun className="w-5 h-5 sm:w-5 sm:h-5" />
                 ) : (
-                  <Moon className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                  <Moon className="w-5 h-5 sm:w-5 sm:h-5" />
                 )}
               </button>
 
@@ -852,7 +852,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       : "bg-blue-100 hover:bg-blue-200 text-blue-600"
                       }`}
                   >
-                    <MessageCircle className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                    <MessageCircle className="w-5 h-5 sm:w-5 sm:h-5" />
                   </button>
                 </>
               )}
@@ -866,7 +866,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       : "bg-blue-100 hover:bg-blue-200 text-blue-700"
                       }`}
                   >
-                    <User className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
+                    <User className="w-5 h-5 sm:w-5 sm:h-5" />
                     <span className="hidden xl:inline text-sm font-medium">
                       Profile
                     </span>
@@ -1013,9 +1013,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 aria-label="Toggle menu"
               >
                 {isMenuOpen ? (
-                  <X className="w-[18px] h-[18px] sm:w-6 sm:h-6" />
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 ) : (
-                  <Menu className="w-[18px] h-[18px] sm:w-6 sm:h-6" />
+                  <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
                 )}
               </button>
             </div>
@@ -1078,7 +1078,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   : "text-gray-500 hover:text-gray-700 hover:bg-blue-50"
                   }`}
               >
-                <X className="w-[18px] h-[18px] sm:w-6 sm:h-6" />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             </div>
           </div>
