@@ -436,37 +436,34 @@ export default function Header({ isDarkMode, toggleTheme }) {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-300 ${
-          isDarkMode
-            ? "bg-gray-900/95 border-gray-800"
-            : "bg-white/80 border-blue-200"
-        }`}
+        className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-300 ${isDarkMode
+          ? "bg-gray-900/95 border-gray-800"
+          : "bg-white/80 border-blue-200"
+          }`}
       >
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex items-center justify-between h-16">
             <div
-              className="flex items-center gap-3 cursor-pointer flex-shrink-0"
+              className="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0"
               onClick={() => navigate("/")}
             >
               <img
                 src="/assets/images/mits-logo.png"
                 alt="MITS Logo"
-                className="w-12 h-12 object-contain"
+                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain"
               />
               <div>
                 <h1
-                  className={`text-lg font-bold ${
-                    isDarkMode
-                      ? "text-white"
-                      : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
-                  }`}
+                  className={`text-sm sm:text-base md:text-lg font-bold ${isDarkMode
+                    ? "text-white"
+                    : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
+                    }`}
                 >
                   MITS Alumni
                 </h1>
                 <p
-                  className={`text-xs ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-[10px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   Connect & Grow
                 </p>
@@ -477,11 +474,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
             <nav className="hidden xl:flex items-center justify-center flex-1 mx-4 gap-2 lg:gap-3">
               <button
                 onClick={() => handleNavClick("/")}
-                className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
-                  isDarkMode
-                    ? "text-white hover:text-indigo-400 hover:bg-gray-800"
-                    : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-                }`}
+                className={`text-sm font-medium transition-colors cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${isDarkMode
+                  ? "text-white hover:text-indigo-400 hover:bg-gray-800"
+                  : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                  }`}
               >
                 Home
               </button>
@@ -497,44 +493,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <div className="absolute -inset-2 z-10 cursor-pointer" />
 
                 <button
-                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
-                    isDarkMode
-                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                  } ${
-                    showAlumniDropdown
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${isDarkMode
+                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    } ${showAlumniDropdown
                       ? isDarkMode
                         ? "text-indigo-400 bg-gray-800"
                         : "text-blue-600 bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   Alumni
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showAlumniDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showAlumniDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
                 {showAlumniDropdown && (
                   <div
-                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
-                      isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-blue-200"
-                    }`}
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-blue-200"
+                      }`}
                   >
                     <div className="py-1">
                       {alumniOptions.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleAlumniOptionClick(option.path)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           {option.label}
                         </button>
@@ -555,44 +546,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <div className="absolute -inset-2 z-10 cursor-pointer" />
 
                 <button
-                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
-                    isDarkMode
-                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                  } ${
-                    showEventsDropdown
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${isDarkMode
+                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    } ${showEventsDropdown
                       ? isDarkMode
                         ? "text-indigo-400 bg-gray-800"
                         : "text-blue-600 bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   Events
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showEventsDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showEventsDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
                 {showEventsDropdown && (
                   <div
-                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
-                      isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-blue-200"
-                    }`}
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-blue-200"
+                      }`}
                   >
                     <div className="py-1">
                       {eventsOptions.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleEventsOptionClick(option.path)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           {option.label}
                         </button>
@@ -613,44 +599,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <div className="absolute -inset-2 z-10 cursor-pointer" />
 
                 <button
-                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
-                    isDarkMode
-                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                  } ${
-                    showJobsDropdown
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${isDarkMode
+                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    } ${showJobsDropdown
                       ? isDarkMode
                         ? "text-indigo-400 bg-gray-800"
                         : "text-blue-600 bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   Jobs
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showJobsDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showJobsDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
                 {showJobsDropdown && (
                   <div
-                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
-                      isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-blue-200"
-                    }`}
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-blue-200"
+                      }`}
                   >
                     <div className="py-1">
                       {jobsOptions.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleJobsOptionClick(option.path)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           {option.label}
                         </button>
@@ -671,44 +652,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <div className="absolute -inset-2 z-10 cursor-pointer" />
 
                 <button
-                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
-                    isDarkMode
-                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                  } ${
-                    showCampaignDropdown
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${isDarkMode
+                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    } ${showCampaignDropdown
                       ? isDarkMode
                         ? "text-indigo-400 bg-gray-800"
                         : "text-blue-600 bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   Campaign
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showCampaignDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showCampaignDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
                 {showCampaignDropdown && (
                   <div
-                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
-                      isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-blue-200"
-                    }`}
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-blue-200"
+                      }`}
                   >
                     <div className="py-1">
                       {campaignOptions.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleCampaignOptionClick(option.path)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           {option.label}
                         </button>
@@ -729,44 +705,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <div className="absolute -inset-2 z-10 cursor-pointer" />
 
                 <button
-                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${
-                    isDarkMode
-                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                  } ${
-                    showMentorDropdown
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 ${isDarkMode
+                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    } ${showMentorDropdown
                       ? isDarkMode
                         ? "text-indigo-400 bg-gray-800"
                         : "text-blue-600 bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   Mentorship
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showMentorDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showMentorDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
                 {showMentorDropdown && (
                   <div
-                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
-                      isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-blue-200"
-                    }`}
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-blue-200"
+                      }`}
                   >
                     <div className="py-1">
                       {mentorOptions.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleMentorOptionClick(option.path)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           {option.label}
                         </button>
@@ -785,44 +756,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
               >
                 <div className="absolute -inset-1 z-10 cursor-pointer" />
                 <button
-                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 whitespace-nowrap ${
-                    isDarkMode
-                      ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
-                      : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
-                  } ${
-                    showAboutDropdown
+                  className={`relative flex items-center gap-1 px-2 lg:px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 cursor-pointer z-20 whitespace-nowrap ${isDarkMode
+                    ? "text-gray-300 hover:text-indigo-400 hover:bg-gray-800"
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50"
+                    } ${showAboutDropdown
                       ? isDarkMode
                         ? "text-indigo-400 bg-gray-800"
                         : "text-blue-600 bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   About
                   <ChevronDown
-                    className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 ${
-                      showAboutDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 ${showAboutDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
                 {showAboutDropdown && (
                   <div
-                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
-                      isDarkMode
-                        ? "bg-gray-800 border-gray-700"
-                        : "bg-white border-blue-200"
-                    }`}
+                    className={`absolute left-0 top-full mt-1 w-48 rounded-lg shadow-lg border overflow-hidden transition-all duration-300 z-50 ${isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-blue-200"
+                      }`}
                   >
                     <div className="py-1">
                       {aboutOptions.map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleAboutOptionClick(option.path)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm transition-all duration-200 cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           {option.label}
                         </button>
@@ -833,36 +799,33 @@ export default function Header({ isDarkMode, toggleTheme }) {
               </div>
               <button
                 onClick={() => handleNavClick("/developer")}
-                className={`relative inline-block text-sm font-semibold tracking-wide transition-all duration-300 cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${
-                  isDarkMode
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 hover:from-indigo-400 hover:via-pink-400 hover:to-orange-400 hover:bg-gray-800"
-                    : "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-500 hover:bg-blue-50"
-                }`}
+                className={`relative inline-block text-sm font-semibold tracking-wide transition-all duration-300 cursor-pointer px-2 lg:px-3 py-2 rounded-lg ${isDarkMode
+                  ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 hover:from-indigo-400 hover:via-pink-400 hover:to-orange-400 hover:bg-gray-800"
+                  : "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 hover:from-indigo-600 hover:via-pink-600 hover:to-red-500 hover:bg-blue-50"
+                  }`}
               >
                 Developer
                 <span
-                  className={`absolute left-0 -bottom-1 w-0 h-[2px] transition-all duration-500 ${
-                    isDarkMode
-                      ? "bg-gradient-to-r from-pink-400 to-indigo-400"
-                      : "bg-gradient-to-r from-purple-600 to-orange-500"
-                  } group-hover:w-full`}
+                  className={`absolute left-0 -bottom-1 w-0 h-[2px] transition-all duration-500 ${isDarkMode
+                    ? "bg-gradient-to-r from-pink-400 to-indigo-400"
+                    : "bg-gradient-to-r from-purple-600 to-orange-500"
+                    } group-hover:w-full`}
                 ></span>
               </button>
             </nav>
 
-            <div className="flex items-center gap-1.5 flex-shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
               <button
                 onClick={toggleTheme}
-                className={`p-2 rounded-lg transition-all duration-300 ${
-                  isDarkMode
-                    ? "bg-gray-800 hover:bg-gray-700 text-yellow-400"
-                    : "bg-blue-100 hover:bg-blue-200 text-blue-600"
-                }`}
+                className={`p-1.5 sm:p-2 rounded-lg transition-all duration-300 ${isDarkMode
+                  ? "bg-gray-800 hover:bg-gray-700 text-yellow-400"
+                  : "bg-blue-100 hover:bg-blue-200 text-blue-600"
+                  }`}
               >
                 {isDarkMode ? (
-                  <Sun className="w-5 h-5" />
+                  <Sun className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                 ) : (
-                  <Moon className="w-5 h-5" />
+                  <Moon className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                 )}
               </button>
 
@@ -872,11 +835,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   {/* Desktop Messages Button - Hidden below 1250px */}
                   <button
                     onClick={handleMessages}
-                    className={`hidden xl:flex items-center gap-2 p-2 rounded-lg transition-all duration-300 ${
-                      isDarkMode
-                        ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
-                        : "bg-blue-100 hover:bg-blue-200 text-blue-600"
-                    }`}
+                    className={`hidden xl:flex items-center gap-2 p-2 rounded-lg transition-all duration-300 ${isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
+                      : "bg-blue-100 hover:bg-blue-200 text-blue-600"
+                      }`}
                   >
                     <MessageCircle className="w-5 h-5" />
                     <span className="text-sm font-medium">Messages</span>
@@ -885,13 +847,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   {/* Mobile Messages Button - Show below 1250px */}
                   <button
                     onClick={handleMessages}
-                    className={`xl:hidden p-2 rounded-lg transition-all duration-300 ${
-                      isDarkMode
-                        ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
-                        : "bg-blue-100 hover:bg-blue-200 text-blue-600"
-                    }`}
+                    className={`xl:hidden p-1.5 sm:p-2 rounded-lg transition-all duration-300 ${isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
+                      : "bg-blue-100 hover:bg-blue-200 text-blue-600"
+                      }`}
                   >
-                    <MessageCircle className="w-5 h-5" />
+                    <MessageCircle className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                   </button>
                 </>
               )}
@@ -900,13 +861,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={toggleProfileMenu}
-                    className={`flex items-center gap-2 p-2 rounded-lg transition-all duration-300 focus:outline-none ${
-                      isDarkMode
-                        ? "bg-gray-800 hover:bg-gray-700 text-white"
-                        : "bg-blue-100 hover:bg-blue-200 text-blue-700"
-                    }`}
+                    className={`flex items-center gap-2 p-1.5 sm:p-2 rounded-lg transition-all duration-300 focus:outline-none ${isDarkMode
+                      ? "bg-gray-800 hover:bg-gray-700 text-white"
+                      : "bg-blue-100 hover:bg-blue-200 text-blue-700"
+                      }`}
                   >
-                    <User className="w-5 h-5" />
+                    <User className="w-[18px] h-[18px] sm:w-5 sm:h-5" />
                     <span className="hidden xl:inline text-sm font-medium">
                       Profile
                     </span>
@@ -914,57 +874,51 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
                   {showProfileMenu && (
                     <div
-                      className={`absolute right-0 mt-2 w-56 rounded-xl shadow-lg border overflow-hidden transition-all duration-300 z-50 ${
-                        isDarkMode
-                          ? "bg-gray-800 border-gray-700"
-                          : "bg-white border-blue-200"
-                      }`}
+                      className={`absolute right-0 mt-2 w-56 rounded-xl shadow-lg border overflow-hidden transition-all duration-300 z-50 ${isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-blue-200"
+                        }`}
                     >
                       <div
-                        className={`px-4 py-3 border-b transition-colors duration-200 ${
-                          isDarkMode
-                            ? "bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border-gray-700"
-                            : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200"
-                        }`}
+                        className={`px-4 py-3 border-b transition-colors duration-200 ${isDarkMode
+                          ? "bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border-gray-700"
+                          : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200"
+                          }`}
                       >
                         <p className="font-bold flex flex-col">
                           {auth.userType === "student" ? (
                             <>
                               <span
-                                className={`text-sm ${
-                                  isDarkMode
-                                    ? "bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
-                                    : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
-                                }`}
+                                className={`text-sm ${isDarkMode
+                                  ? "bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
+                                  : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
+                                  }`}
                               >
                                 {auth.userName.split(" ")[0]}
                               </span>
                               <span
-                                className={`text-sm ${
-                                  isDarkMode
-                                    ? "bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
-                                    : "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
-                                }`}
+                                className={`text-sm ${isDarkMode
+                                  ? "bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+                                  : "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                                  }`}
                               >
                                 {auth.userName.split(" ").slice(1).join(" ")}
                               </span>
                             </>
                           ) : (
                             <span
-                              className={`text-sm ${
-                                isDarkMode
-                                  ? "bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
-                                  : "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
-                              }`}
+                              className={`text-sm ${isDarkMode
+                                ? "bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+                                : "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                                }`}
                             >
                               {auth.userName}
                             </span>
                           )}
                         </p>
                         <p
-                          className={`text-xs mt-1 ${
-                            isDarkMode ? "text-gray-400" : "text-gray-600"
-                          }`}
+                          className={`text-xs mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
                         >
                           {auth.userEmail}
                         </p>
@@ -973,33 +927,30 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       <div className="flex flex-col py-2">
                         <button
                           onClick={() => handleNavClick("/profile")}
-                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           <User className="w-4 h-4" />
                           My Profile
                         </button>
                         <button
                           onClick={() => handleNavClick("/activity")}
-                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           <Activity className="w-4 h-4" />
                           My Activity
                         </button>
                         <button
                           onClick={handleMessages}
-                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer xl:hidden ${
-                            isDarkMode
-                              ? "text-gray-300 hover:bg-gray-700 hover:text-white"
-                              : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                          }`}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer xl:hidden ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
                         >
                           <MessageCircle className="w-4 h-4" />
                           Messages
@@ -1007,11 +958,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
                         <button
                           onClick={handleLogout}
-                          className={`flex items-center gap-2 px-4 py-2 text-sm w-full text-left transition-colors duration-200 rounded-lg ${
-                            isDarkMode
-                              ? "text-red-400 hover:bg-gray-700 hover:text-red-500"
-                              : "text-red-600 hover:bg-red-50 hover:text-red-700"
-                          }`}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm w-full text-left transition-colors duration-200 rounded-lg ${isDarkMode
+                            ? "text-red-400 hover:bg-gray-700 hover:text-red-500"
+                            : "text-red-600 hover:bg-red-50 hover:text-red-700"
+                            }`}
                         >
                           <LogOut className="w-4 h-4" />
                           Logout
@@ -1023,13 +973,11 @@ export default function Header({ isDarkMode, toggleTheme }) {
               ) : (
                 <button
                   onClick={handleSignIn}
-                  className={`flex items-center gap-2 px-3 py-2 xl:px-6 xl:py-2.5 rounded-lg font-medium text-sm transition-all ${
-                    isDarkMode
-                      ? "bg-white hover:bg-gray-100 text-gray-800 shadow-lg hover:shadow-xl"
-                      : "bg-white hover:bg-gray-50 text-gray-800 shadow-lg hover:shadow-xl"
-                  } hover:scale-105 border ${
-                    isDarkMode ? "border-gray-700" : "border-gray-200"
-                  }`}
+                  className={`flex items-center gap-2 px-3 py-2 xl:px-6 xl:py-2.5 rounded-lg font-medium text-sm transition-all ${isDarkMode
+                    ? "bg-white hover:bg-gray-100 text-gray-800 shadow-lg hover:shadow-xl"
+                    : "bg-white hover:bg-gray-50 text-gray-800 shadow-lg hover:shadow-xl"
+                    } hover:scale-105 border ${isDarkMode ? "border-gray-700" : "border-gray-200"
+                    }`}
                 >
                   <svg
                     className="w-4 h-4 xl:w-5 xl:h-5"
@@ -1060,15 +1008,14 @@ export default function Header({ isDarkMode, toggleTheme }) {
               {/* Mobile Menu Button - Show below 1250px */}
               <button
                 onClick={toggleMenu}
-                className={`xl:hidden p-2 rounded-lg ${
-                  isDarkMode ? "text-white" : "text-gray-700"
-                }`}
+                className={`xl:hidden p-1.5 sm:p-2 rounded-lg ${isDarkMode ? "text-white" : "text-gray-700"
+                  }`}
                 aria-label="Toggle menu"
               >
                 {isMenuOpen ? (
-                  <X className="w-6 h-6" />
+                  <X className="w-[18px] h-[18px] sm:w-6 sm:h-6" />
                 ) : (
-                  <Menu className="w-6 h-6" />
+                  <Menu className="w-[18px] h-[18px] sm:w-6 sm:h-6" />
                 )}
               </button>
             </div>
@@ -1076,12 +1023,11 @@ export default function Header({ isDarkMode, toggleTheme }) {
         </div>
       </header>
 
-      {/* Mobile Sidebar - Show below 1250px - FIXED TO 50% WIDTH */}
+      {/* Mobile Sidebar - Show below 1250px - 65% WIDTH */}
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-y-0 right-0 z-50 w-60/100 max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed inset-y-0 right-0 z-50 w-[65%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         {/* Backdrop */}
         {isMenuOpen && (
@@ -1091,39 +1037,35 @@ export default function Header({ isDarkMode, toggleTheme }) {
           />
         )}
 
-        {/* Sidebar Content - 50% width */}
+        {/* Sidebar Content - 65% width */}
         <div
-          className={`relative h-full w-full flex flex-col z-50 shadow-2xl ${
-            isDarkMode ? "bg-gray-900" : "bg-white"
-          }`}
+          className={`relative h-full w-full flex flex-col z-50 shadow-2xl ${isDarkMode ? "bg-gray-900" : "bg-white"
+            }`}
         >
           {/* Header Section */}
           <div
-            className={`p-4 border-b flex-shrink-0 ${
-              isDarkMode ? "border-gray-800" : "border-blue-200"
-            }`}
+            className={`p-4 border-b flex-shrink-0 ${isDarkMode ? "border-gray-800" : "border-blue-200"
+              }`}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <img
                   src="/assets/images/mits-logo.png"
                   alt="MITS Logo"
-                  className="w-10 h-10 object-contain"
+                  className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                 />
                 <div>
                   <h1
-                    className={`text-lg font-bold ${
-                      isDarkMode
-                        ? "text-white"
-                        : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
-                    }`}
+                    className={`text-base sm:text-lg font-bold ${isDarkMode
+                      ? "text-white"
+                      : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
+                      }`}
                   >
                     MITS Alumni
                   </h1>
                   <p
-                    className={`text-xs ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-[10px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     Connect & Grow
                   </p>
@@ -1131,13 +1073,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className={`p-2 rounded-lg ${
-                  isDarkMode
-                    ? "text-gray-400 hover:text-white hover:bg-gray-800"
-                    : "text-gray-500 hover:text-gray-700 hover:bg-blue-50"
-                }`}
+                className={`p-1.5 sm:p-2 rounded-lg ${isDarkMode
+                  ? "text-gray-400 hover:text-white hover:bg-gray-800"
+                  : "text-gray-500 hover:text-gray-700 hover:bg-blue-50"
+                  }`}
               >
-                <X className="w-6 h-6" />
+                <X className="w-[18px] h-[18px] sm:w-6 sm:h-6" />
               </button>
             </div>
           </div>
@@ -1147,11 +1088,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
             <nav className="p-4 space-y-2">
               <button
                 onClick={() => handleNavClick("/")}
-                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center gap-3 ${
-                  isDarkMode
-                    ? "text-white hover:bg-gray-800"
-                    : "text-blue-600 hover:bg-blue-50"
-                }`}
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center gap-3 ${isDarkMode
+                  ? "text-white hover:bg-gray-800"
+                  : "text-blue-600 hover:bg-blue-50"
+                  }`}
               >
                 Home
               </button>
@@ -1160,23 +1100,20 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <div className="flex flex-col">
                 <button
                   onClick={() => setShowAlumniDropdown(!showAlumniDropdown)}
-                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
-                    isDarkMode
-                      ? "text-gray-300 hover:bg-gray-800"
-                      : "text-gray-700 hover:bg-blue-50"
-                  } ${
-                    showAlumniDropdown
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                    } ${showAlumniDropdown
                       ? isDarkMode
                         ? "bg-gray-800"
                         : "bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   <span>Alumni</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showAlumniDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showAlumniDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -1186,11 +1123,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       <button
                         key={index}
                         onClick={() => handleAlumniOptionClick(option.path)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                          isDarkMode
-                            ? "text-gray-300 hover:bg-gray-800"
-                            : "text-gray-600 hover:bg-blue-50"
-                        }`}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
+                          ? "text-gray-300 hover:bg-gray-800"
+                          : "text-gray-600 hover:bg-blue-50"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -1203,23 +1139,20 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <div className="flex flex-col">
                 <button
                   onClick={() => setShowEventsDropdown(!showEventsDropdown)}
-                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
-                    isDarkMode
-                      ? "text-gray-300 hover:bg-gray-800"
-                      : "text-gray-700 hover:bg-blue-50"
-                  } ${
-                    showEventsDropdown
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                    } ${showEventsDropdown
                       ? isDarkMode
                         ? "bg-gray-800"
                         : "bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   <span>Events</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showEventsDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showEventsDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -1229,11 +1162,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       <button
                         key={index}
                         onClick={() => handleEventsOptionClick(option.path)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                          isDarkMode
-                            ? "text-gray-300 hover:bg-gray-800"
-                            : "text-gray-600 hover:bg-blue-50"
-                        }`}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
+                          ? "text-gray-300 hover:bg-gray-800"
+                          : "text-gray-600 hover:bg-blue-50"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -1246,23 +1178,20 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <div className="flex flex-col">
                 <button
                   onClick={() => setShowJobsDropdown(!showJobsDropdown)}
-                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
-                    isDarkMode
-                      ? "text-gray-300 hover:bg-gray-800"
-                      : "text-gray-700 hover:bg-blue-50"
-                  } ${
-                    showJobsDropdown
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                    } ${showJobsDropdown
                       ? isDarkMode
                         ? "bg-gray-800"
                         : "bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   <span>Jobs</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showJobsDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showJobsDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -1272,11 +1201,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       <button
                         key={index}
                         onClick={() => handleJobsOptionClick(option.path)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                          isDarkMode
-                            ? "text-gray-300 hover:bg-gray-800"
-                            : "text-gray-600 hover:bg-blue-50"
-                        }`}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
+                          ? "text-gray-300 hover:bg-gray-800"
+                          : "text-gray-600 hover:bg-blue-50"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -1289,23 +1217,20 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <div className="flex flex-col">
                 <button
                   onClick={() => setShowCampaignDropdown(!showCampaignDropdown)}
-                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
-                    isDarkMode
-                      ? "text-gray-300 hover:bg-gray-800"
-                      : "text-gray-700 hover:bg-blue-50"
-                  } ${
-                    showCampaignDropdown
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                    } ${showCampaignDropdown
                       ? isDarkMode
                         ? "bg-gray-800"
                         : "bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   <span>Campaign</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showCampaignDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showCampaignDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -1315,11 +1240,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       <button
                         key={index}
                         onClick={() => handleCampaignOptionClick(option.path)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                          isDarkMode
-                            ? "text-gray-300 hover:bg-gray-800"
-                            : "text-gray-600 hover:bg-blue-50"
-                        }`}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
+                          ? "text-gray-300 hover:bg-gray-800"
+                          : "text-gray-600 hover:bg-blue-50"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -1332,23 +1256,20 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <div className="flex flex-col">
                 <button
                   onClick={() => setShowMentorDropdown(!showMentorDropdown)}
-                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
-                    isDarkMode
-                      ? "text-gray-300 hover:bg-gray-800"
-                      : "text-gray-700 hover:bg-blue-50"
-                  } ${
-                    showMentorDropdown
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                    } ${showMentorDropdown
                       ? isDarkMode
                         ? "bg-gray-800"
                         : "bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   <span>Mentorship</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showMentorDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showMentorDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -1358,11 +1279,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       <button
                         key={index}
                         onClick={() => handleMentorOptionClick(option.path)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                          isDarkMode
-                            ? "text-gray-300 hover:bg-gray-800"
-                            : "text-gray-600 hover:bg-blue-50"
-                        }`}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
+                          ? "text-gray-300 hover:bg-gray-800"
+                          : "text-gray-600 hover:bg-blue-50"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -1375,23 +1295,20 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <div className="flex flex-col">
                 <button
                   onClick={() => setShowAboutDropdown(!showAboutDropdown)}
-                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${
-                    isDarkMode
-                      ? "text-gray-300 hover:bg-gray-800"
-                      : "text-gray-700 hover:bg-blue-50"
-                  } ${
-                    showAboutDropdown
+                  className={`w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer flex items-center justify-between ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                    } ${showAboutDropdown
                       ? isDarkMode
                         ? "bg-gray-800"
                         : "bg-blue-50"
                       : ""
-                  }`}
+                    }`}
                 >
                   <span>About</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      showAboutDropdown ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 transition-transform duration-200 ${showAboutDropdown ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -1401,11 +1318,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       <button
                         key={index}
                         onClick={() => handleAboutOptionClick(option.path)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${
-                          isDarkMode
-                            ? "text-gray-300 hover:bg-gray-800"
-                            : "text-gray-600 hover:bg-blue-50"
-                        }`}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
+                          ? "text-gray-300 hover:bg-gray-800"
+                          : "text-gray-600 hover:bg-blue-50"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -1415,18 +1331,16 @@ export default function Header({ isDarkMode, toggleTheme }) {
               </div>
               <button
                 onClick={() => handleNavClick("/developer")}
-                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer ${
-                  isDarkMode
-                    ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 hover:from-pink-500/20 hover:via-purple-500/20 hover:to-indigo-500/20"
-                    : "bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-orange-500/10 hover:from-purple-500/20 hover:via-pink-500/20 hover:to-orange-500/20"
-                }`}
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer ${isDarkMode
+                  ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 hover:from-pink-500/20 hover:via-purple-500/20 hover:to-indigo-500/20"
+                  : "bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-orange-500/10 hover:from-purple-500/20 hover:via-pink-500/20 hover:to-orange-500/20"
+                  }`}
               >
                 <span
-                  className={`bg-clip-text text-transparent bg-gradient-to-r ${
-                    isDarkMode
-                      ? "from-pink-400 via-purple-400 to-indigo-400"
-                      : "from-purple-600 via-pink-500 to-orange-500"
-                  }`}
+                  className={`bg-clip-text text-transparent bg-gradient-to-r ${isDarkMode
+                    ? "from-pink-400 via-purple-400 to-indigo-400"
+                    : "from-purple-600 via-pink-500 to-orange-500"
+                    }`}
                 >
                   ✨ Developer
                 </span>
@@ -1436,19 +1350,17 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
           {/* Bottom Section - Always Visible */}
           <div
-            className={`p-4 border-t flex-shrink-0 ${
-              isDarkMode ? "border-gray-800" : "border-blue-200"
-            }`}
+            className={`p-4 border-t flex-shrink-0 ${isDarkMode ? "border-gray-800" : "border-blue-200"
+              }`}
           >
             {auth ? (
               <div className="space-y-2">
                 <button
                   onClick={() => handleNavClick("/profile")}
-                  className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer flex items-center gap-3 ${
-                    isDarkMode
-                      ? "text-gray-300 hover:bg-gray-800"
-                      : "text-gray-700 hover:bg-blue-50"
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer flex items-center gap-3 ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800"
+                    : "text-gray-700 hover:bg-blue-50"
+                    }`}
                 >
                   <User className="w-4 h-4" />
                   My Profile
@@ -1456,11 +1368,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
                 <button
                   onClick={handleLogout}
-                  className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer flex items-center gap-3 ${
-                    isDarkMode
-                      ? "text-red-400 hover:bg-gray-800 hover:text-red-500"
-                      : "text-red-600 hover:bg-red-50 hover:text-red-700"
-                  }`}
+                  className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer flex items-center gap-3 ${isDarkMode
+                    ? "text-red-400 hover:bg-gray-800 hover:text-red-500"
+                    : "text-red-600 hover:bg-red-50 hover:text-red-700"
+                    }`}
                 >
                   <LogOut className="w-4 h-4" />
                   Logout
@@ -1469,11 +1380,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
             ) : (
               <button
                 onClick={handleSignIn}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${
-                  isDarkMode
-                    ? "bg-white hover:bg-gray-100 text-gray-800"
-                    : "bg-white hover:bg-gray-50 text-gray-800 border border-gray-200"
-                } hover:scale-105`}
+                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${isDarkMode
+                  ? "bg-white hover:bg-gray-100 text-gray-800"
+                  : "bg-white hover:bg-gray-50 text-gray-800 border border-gray-200"
+                  } hover:scale-105`}
               >
                 <svg
                   className="w-6 h-6"

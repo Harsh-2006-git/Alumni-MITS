@@ -210,40 +210,35 @@ export default function AlumniHomePage({
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
     >
       {/* Header / Navbar */}
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       {/* Hero Section */}
       <section
-        className={`w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-12 relative overflow-hidden transition-colors duration-500 ${
-          isDarkMode
-            ? "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
-            : "bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-50"
-        }`}
+        className={`w-full px-3 sm:px-4 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12 relative overflow-hidden transition-colors duration-500 ${isDarkMode
+          ? "bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900"
+          : "bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-50"
+          }`}
       >
         {/* Animated Background Shapes - Parallax Layer 1 */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none hidden lg:block">
           <div
-            className={`absolute top-20 -left-20 w-72 h-72 rounded-full filter blur-3xl animate-blob opacity-20 ${
-              isDarkMode ? "bg-blue-500" : "bg-blue-400"
-            }`}
+            className={`absolute top-20 -left-20 w-72 h-72 rounded-full filter blur-3xl animate-blob opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"
+              }`}
             style={{ animationDelay: "0s" }}
           ></div>
           <div
-            className={`absolute top-40 -right-20 w-96 h-96 rounded-full filter blur-3xl animate-blob animation-delay-2000 opacity-20 ${
-              isDarkMode ? "bg-purple-500" : "bg-purple-400"
-            }`}
+            className={`absolute top-40 -right-20 w-96 h-96 rounded-full filter blur-3xl animate-blob animation-delay-2000 opacity-20 ${isDarkMode ? "bg-purple-500" : "bg-purple-400"
+              }`}
             style={{ animationDelay: "2s" }}
           ></div>
           <div
-            className={`absolute -bottom-20 left-40 w-80 h-80 rounded-full filter blur-3xl animate-blob animation-delay-4000 opacity-20 ${
-              isDarkMode ? "bg-pink-500" : "bg-pink-400"
-            }`}
+            className={`absolute -bottom-20 left-40 w-80 h-80 rounded-full filter blur-3xl animate-blob animation-delay-4000 opacity-20 ${isDarkMode ? "bg-pink-500" : "bg-pink-400"
+              }`}
             style={{ animationDelay: "2s" }}
           ></div>
         </div>
@@ -259,42 +254,37 @@ export default function AlumniHomePage({
 
         {/* Dark/Light Overlay with Animation */}
         <div
-          className={`absolute inset-0 transition-all duration-500 animate-fade-in ${
-            isDarkMode
-              ? "bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60"
-              : "bg-gradient-to-b from-white/40 via-transparent to-blue-50/50"
-          }`}
+          className={`absolute inset-0 transition-all duration-500 animate-fade-in ${isDarkMode
+            ? "bg-gradient-to-b from-slate-900/40 via-transparent to-slate-900/60"
+            : "bg-gradient-to-b from-white/40 via-transparent to-blue-50/50"
+            }`}
         ></div>
 
-        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-10 items-center min-h-[500px]">
+        <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 items-center min-h-[400px] sm:min-h-[500px]">
           {/* Left Content */}
-          <div className="space-y-5 sm:space-y-6 animate-slide-up">
+          <div className="space-y-3 sm:space-y-5 md:space-y-6 animate-slide-up">
             {/* Welcome Badge with Pulse Animation */}
             <div
-              className={`inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-sm border transition-all duration-500 animate-fade-in-delay relative ${
-                isDarkMode
-                  ? "bg-blue-500/10 border-blue-500/30"
-                  : "bg-white/60 border-blue-300 shadow-lg"
-              }`}
+              className={`inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full backdrop-blur-sm border transition-all duration-500 animate-fade-in-delay relative ${isDarkMode
+                ? "bg-blue-500/10 border-blue-500/30"
+                : "bg-white/60 border-blue-300 shadow-lg"
+                }`}
               style={{ animationDelay: "0.2s" }}
             >
               <span
-                className={`text-xs sm:text-sm font-medium tracking-wide transition-colors duration-500 ${
-                  isDarkMode ? "text-blue-300" : "text-blue-700"
-                }`}
+                className={`text-[10px] sm:text-xs md:text-sm font-medium tracking-wide transition-colors duration-500 ${isDarkMode ? "text-blue-300" : "text-blue-700"
+                  }`}
               >
                 Welcome to Your Alumni Network
               </span>
               {/* Decorative Elements with Animation */}
               <div
-                className={`absolute -top-6 -right-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 animate-pulse-slow ${
-                  isDarkMode ? "bg-blue-500/20" : "bg-blue-400/40"
-                }`}
+                className={`absolute -top-6 -right-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 animate-pulse-slow ${isDarkMode ? "bg-blue-500/20" : "bg-blue-400/40"
+                  }`}
               ></div>
               <div
-                className={`absolute -bottom-6 -left-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 animate-pulse-slow ${
-                  isDarkMode ? "bg-purple-500/20" : "bg-purple-400/40"
-                }`}
+                className={`absolute -bottom-6 -left-6 w-28 h-28 rounded-full filter blur-2xl transition-colors duration-500 animate-pulse-slow ${isDarkMode ? "bg-purple-500/20" : "bg-purple-400/40"
+                  }`}
                 style={{ animationDelay: "1s" }}
               ></div>
             </div>
@@ -305,9 +295,8 @@ export default function AlumniHomePage({
               style={{ animationDelay: "0.4s" }}
             >
               <div
-                className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl p-2 shadow-2xl flex-shrink-0 transition-all duration-500 hover:scale-110 hover:rotate-3 ${
-                  isDarkMode ? "bg-white" : "bg-white"
-                }`}
+                className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-lg sm:rounded-xl md:rounded-2xl p-2 shadow-2xl flex-shrink-0 transition-all duration-500 hover:scale-110 hover:rotate-3 ${isDarkMode ? "bg-white" : "bg-white"
+                  }`}
               >
                 <img
                   src="/assets/images/mits-logo.png"
@@ -316,9 +305,8 @@ export default function AlumniHomePage({
                 />
               </div>
               <h1
-                className={`text-4xl sm:text-5xl md:text-6xl lg:text-5xl font-black tracking-tight transition-colors duration-500 animate-text-shimmer ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-black tracking-tight transition-colors duration-500 animate-text-shimmer ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
                 style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
               >
                 MITS
@@ -327,11 +315,10 @@ export default function AlumniHomePage({
 
             {/* Description with Fade In */}
             <p
-              className={`text-sm sm:text-base md:text-lg leading-relaxed max-w-xl transition-colors duration-500 animate-fade-in-delay ${
-                isDarkMode
-                  ? "text-gray-300 font-light"
-                  : "text-gray-800 font-normal"
-              }`}
+              className={`text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed max-w-xl transition-colors duration-500 animate-fade-in-delay ${isDarkMode
+                ? "text-gray-300 font-light"
+                : "text-gray-800 font-normal"
+                }`}
               style={{ animationDelay: "0.6s" }}
             >
               Join our thriving community of 5000+ alumni across the globe,
@@ -346,11 +333,10 @@ export default function AlumniHomePage({
             >
               <button
                 onClick={() => navigate("/alumni")}
-                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 hover:-translate-y-1 text-sm w-full sm:w-auto relative overflow-hidden ${
-                  isDarkMode
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
-                }`}
+                className={`group px-4 sm:px-6 md:px-7 py-2.5 sm:py-3 md:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 sm:gap-2.5 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 hover:-translate-y-1 text-xs sm:text-sm w-full sm:w-auto relative overflow-hidden ${isDarkMode
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                  }`}
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                 <svg
@@ -370,11 +356,10 @@ export default function AlumniHomePage({
               </button>
               <button
                 onClick={() => navigate("/event")}
-                className={`group px-6 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2.5 transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 hover:-translate-y-1 text-sm w-full sm:w-auto relative overflow-hidden ${
-                  isDarkMode
-                    ? "bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 hover:border-slate-600"
-                    : "bg-white/70 hover:bg-white text-gray-900 border border-gray-300 hover:border-gray-400"
-                }`}
+                className={`group px-4 sm:px-6 md:px-7 py-2.5 sm:py-3 md:py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 sm:gap-2.5 transition-all duration-300 backdrop-blur-sm shadow-lg hover:scale-105 hover:-translate-y-1 text-xs sm:text-sm w-full sm:w-auto relative overflow-hidden ${isDarkMode
+                  ? "bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 hover:border-slate-600"
+                  : "bg-white/70 hover:bg-white text-gray-900 border border-gray-300 hover:border-gray-400"
+                  }`}
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
                 <svg
@@ -396,7 +381,7 @@ export default function AlumniHomePage({
 
             {/* Stats Section with Stagger Animation */}
             <div
-              className="grid grid-cols-4 gap-2 sm:gap-4 pt-3 sm:pt-4"
+              className="grid grid-cols-4 gap-1.5 sm:gap-2 md:gap-4 pt-2 sm:pt-3 md:pt-4"
               style={{ animationDelay: "1s" }}
             >
               {[
@@ -435,17 +420,15 @@ export default function AlumniHomePage({
               ].map((stat, idx) => (
                 <div
                   key={idx}
-                  className={`p-2 sm:p-4 rounded-xl border transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-xl ${
-                    stat.glow
-                  } animate-fade-in-up ${
-                    isDarkMode
+                  className={`p-1.5 sm:p-2 md:p-4 rounded-lg sm:rounded-xl border transition-all duration-500 hover:scale-105 hover:-translate-y-2 hover:shadow-xl ${stat.glow
+                    } animate-fade-in-up ${isDarkMode
                       ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                       : "bg-white/70 border-gray-200 shadow-lg"
-                  }`}
+                    }`}
                   style={{ animationDelay: `${1 + idx * 0.1}s` }}
                 >
                   <div
-                    className={`w-6 h-6 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-1 sm:mb-3 shadow-lg animate-bounce-slow`}
+                    className={`w-5 h-5 sm:w-6 sm:h-6 md:w-9 md:h-9 rounded-md sm:rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center mb-0.5 sm:mb-1 md:mb-3 shadow-lg animate-bounce-slow`}
                     style={{ animationDelay: stat.delay }}
                   >
                     {stat.icon === "users" && (
@@ -510,14 +493,13 @@ export default function AlumniHomePage({
                     )}
                   </div>
                   <p
-                    className={`text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                    className={`text-xs sm:text-sm md:text-2xl font-bold mb-0.5 sm:mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
                   >
                     {stat.value}
                   </p>
                   <p
-                    className={`text-[10px] sm:text-xs font-medium transition-colors duration-500 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-[10px] sm:text-xs font-medium transition-colors duration-500 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     {stat.label}
                   </p>
@@ -541,20 +523,18 @@ export default function AlumniHomePage({
 
               {/* Gradient Overlay */}
               <div
-                className={`absolute inset-0 transition-colors duration-500 ${
-                  isDarkMode
-                    ? "bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"
-                    : "bg-gradient-to-t from-white/40 via-transparent to-transparent"
-                }`}
+                className={`absolute inset-0 transition-colors duration-500 ${isDarkMode
+                  ? "bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"
+                  : "bg-gradient-to-t from-white/40 via-transparent to-transparent"
+                  }`}
               ></div>
 
               {/* Floating Badge */}
               <div
-                className={`absolute top-4 right-4 px-4 py-2 rounded-full backdrop-blur-md ${
-                  isDarkMode
-                    ? "bg-blue-500/50 text-white border border-blue-400/30"
-                    : "bg-white/80 text-blue-700 border border-blue-200"
-                } font-semibold text-sm animate-float shadow-lg`}
+                className={`absolute top-4 right-4 px-4 py-2 rounded-full backdrop-blur-md ${isDarkMode
+                  ? "bg-blue-500/50 text-white border border-blue-400/30"
+                  : "bg-white/80 text-blue-700 border border-blue-200"
+                  } font-semibold text-sm animate-float shadow-lg`}
               >
                 🎓 Campus Life
               </div>
@@ -570,14 +550,13 @@ export default function AlumniHomePage({
               <img
                 src="/assets/images/bg.png"
                 alt="MITS Campus"
-                className="w-full h-[250px] sm:h-[300px] object-cover"
+                className="w-full h-[200px] sm:h-[250px] md:h-[300px] object-cover"
               />
               <div
-                className={`absolute inset-0 transition-colors duration-500 ${
-                  isDarkMode
-                    ? "bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"
-                    : "bg-gradient-to-t from-white/40 via-transparent to-transparent"
-                }`}
+                className={`absolute inset-0 transition-colors duration-500 ${isDarkMode
+                  ? "bg-gradient-to-t from-slate-900/60 via-transparent to-transparent"
+                  : "bg-gradient-to-t from-white/40 via-transparent to-transparent"
+                  }`}
               ></div>
             </div>
           </div>
@@ -710,16 +689,14 @@ export default function AlumniHomePage({
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-6">
             <h2
-              className={`text-xl md:text-3xl font-bold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-xl md:text-3xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               Our Global Network
             </h2>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Connect with alumni worldwide and explore endless opportunities
             </p>
@@ -730,11 +707,10 @@ export default function AlumniHomePage({
             {features.map((feature, index) => (
               <div
                 key={index}
-                className={`rounded-xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
-                    : "bg-white border-blue-200 shadow-lg"
-                }`}
+                className={`rounded-xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${isDarkMode
+                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
+                  : "bg-white border-blue-200 shadow-lg"
+                  }`}
               >
                 <div className="p-6">
                   <div className="flex justify-center mb-4">
@@ -742,25 +718,22 @@ export default function AlumniHomePage({
                       <img
                         src={feature.icon}
                         alt={feature.title}
-                        className={`w-14 h-14 object-contain ${
-                          isDarkMode ? "filter invert brightness-0" : ""
-                        }`}
+                        className={`w-14 h-14 object-contain ${isDarkMode ? "filter invert brightness-0" : ""
+                          }`}
                       />
                     </div>
                   </div>
 
                   <h3
-                    className={`text-lg font-semibold text-center mb-3 leading-snug ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
+                    className={`text-lg font-semibold text-center mb-3 leading-snug ${isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
                   >
                     {feature.title}
                   </h3>
 
                   <p
-                    className={`text-sm text-center leading-relaxed ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
-                    }`}
+                    className={`text-sm text-center leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                      }`}
                   >
                     {feature.description}
                   </p>
@@ -776,16 +749,14 @@ export default function AlumniHomePage({
       <section className="container mx-auto px-10 lg:px-16 py-12">
         <div className="text-center mb-8">
           <h2
-            className={`text-2xl md:text-3xl font-bold mb-3 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl md:text-3xl font-bold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             A Glimpse of Our Campus
           </h2>
           <p
-            className={`text-base ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Take an aerial tour of our beautiful campus and facilities
           </p>
@@ -795,9 +766,8 @@ export default function AlumniHomePage({
           {/* Left - Text Content */}
           <div className="space-y-4">
             <p
-              className={`text-base leading-relaxed hidden md:block ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-base leading-relaxed hidden md:block ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Experience the breathtaking beauty of our 250-acre campus from a
               bird's eye view. Our state-of-the-art facilities, lush green
@@ -805,9 +775,8 @@ export default function AlumniHomePage({
               for learning and innovation.
             </p>
             <p
-              className={`text-base leading-relaxed hidden md:block ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-base leading-relaxed hidden md:block ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Since 1957, MITS has been a beacon of academic excellence,
               fostering generations of brilliant minds who have gone on to make
@@ -815,33 +784,30 @@ export default function AlumniHomePage({
             </p>
             <div className="flex flex-wrap gap-2 sm:gap-3 pt-2 justify-center md:justify-start">
               <div
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${
-                  isDarkMode
-                    ? "bg-blue-900/30 text-blue-300 border border-blue-700/50"
-                    : "bg-blue-100 text-blue-700 border border-blue-200"
-                }`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${isDarkMode
+                  ? "bg-blue-900/30 text-blue-300 border border-blue-700/50"
+                  : "bg-blue-100 text-blue-700 border border-blue-200"
+                  }`}
               >
                 <span className="text-[10px] sm:text-sm font-medium whitespace-nowrap">
                   250+ Acres
                 </span>
               </div>
               <div
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${
-                  isDarkMode
-                    ? "bg-purple-900/30 text-purple-300 border border-purple-700/50"
-                    : "bg-purple-100 text-purple-700 border border-purple-200"
-                }`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${isDarkMode
+                  ? "bg-purple-900/30 text-purple-300 border border-purple-700/50"
+                  : "bg-purple-100 text-purple-700 border border-purple-200"
+                  }`}
               >
                 <span className="text-[10px] sm:text-sm font-medium whitespace-nowrap">
                   67+ Years
                 </span>
               </div>
               <div
-                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${
-                  isDarkMode
-                    ? "bg-green-900/30 text-green-300 border border-green-700/50"
-                    : "bg-green-100 text-green-700 border border-green-200"
-                }`}
+                className={`px-2 sm:px-4 py-1 sm:py-2 rounded-lg text-center ${isDarkMode
+                  ? "bg-green-900/30 text-green-300 border border-green-700/50"
+                  : "bg-green-100 text-green-700 border border-green-200"
+                  }`}
               >
                 <span className="text-[10px] sm:text-sm font-medium whitespace-nowrap">
                   World-Class
@@ -853,11 +819,10 @@ export default function AlumniHomePage({
           {/* Right - Video */}
           <div>
             <div
-              className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
-                  : "bg-white border-blue-200 shadow-lg"
-              }`}
+              className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
+                : "bg-white border-blue-200 shadow-lg"
+                }`}
             >
               <div
                 className="relative w-full"
@@ -907,9 +872,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className={`text-3xl md:text-4xl font-bold mb-4 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-3xl md:text-4xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Empower Your Professional Journey
           </motion.h2>
@@ -917,9 +881,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className={`text-lg ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Discover powerful tools and resources designed to accelerate your
             career growth
@@ -962,11 +925,10 @@ export default function AlumniHomePage({
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.6, delay: idx * 0.2 }}
               whileHover={{ scale: 1.05, y: -10 }}
-              className={`p-6 pt-8 rounded-2xl border transition-all hover:shadow-2xl overflow-hidden ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200 shadow-lg"
-              }`}
+              className={`p-6 pt-8 rounded-2xl border transition-all hover:shadow-2xl overflow-hidden ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200 shadow-lg"
+                }`}
             >
               <div className="relative mb-10">
                 <motion.div
@@ -989,27 +951,24 @@ export default function AlumniHomePage({
                 </div>
               </div>
               <h3
-                className={`text-xl font-bold mb-3 text-center ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-xl font-bold mb-3 text-center ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 {item.title}
               </h3>
               <p
-                className={`text-sm mb-4 text-center ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm mb-4 text-center ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 {item.description}
               </p>
               <motion.button
                 whileHover={{ scale: 1.05, x: 5 }}
                 whileTap={{ scale: 0.95 }}
-                className={`text-sm font-semibold mx-auto block ${
-                  isDarkMode
-                    ? "text-blue-400 hover:text-blue-300"
-                    : "text-blue-600 hover:text-blue-700"
-                }`}
+                className={`text-sm font-semibold mx-auto block ${isDarkMode
+                  ? "text-blue-400 hover:text-blue-300"
+                  : "text-blue-600 hover:text-blue-700"
+                  }`}
               >
                 Learn More →
               </motion.button>
@@ -1031,9 +990,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className={`text-3xl md:text-4xl font-bold mb-4 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-3xl md:text-4xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Latest Opportunities
           </motion.h2>
@@ -1041,9 +999,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className={`text-lg ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Exclusive positions from top companies in your network
           </motion.p>
@@ -1105,11 +1062,10 @@ export default function AlumniHomePage({
                 y: -8,
                 transition: { type: "spring", stiffness: 400 },
               }}
-              className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200 shadow-lg"
-              }`}
+              className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200 shadow-lg"
+                }`}
             >
               <div className="flex items-start gap-4 mb-4">
                 <motion.img
@@ -1121,16 +1077,14 @@ export default function AlumniHomePage({
                 />
                 <div className="flex-1">
                   <h3
-                    className={`font-bold text-lg ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
+                    className={`font-bold text-lg ${isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
                   >
                     {job.title}
                   </h3>
                   <p
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     {job.company}
                   </p>
@@ -1140,56 +1094,48 @@ export default function AlumniHomePage({
               <div className="space-y-2 mb-4">
                 <div className="flex items-center gap-2">
                   <MapPin
-                    className={`w-4 h-4 ${
-                      isDarkMode ? "text-blue-400" : "text-blue-600"
-                    }`}
+                    className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
                   />
                   <span
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {job.location}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock
-                    className={`w-4 h-4 ${
-                      isDarkMode ? "text-blue-400" : "text-blue-600"
-                    }`}
+                    className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
                   />
                   <span
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {job.experience}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Briefcase
-                    className={`w-4 h-4 ${
-                      isDarkMode ? "text-blue-400" : "text-blue-600"
-                    }`}
+                    className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
                   />
                   <span
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {job.type}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <DollarSign
-                    className={`w-4 h-4 ${
-                      isDarkMode ? "text-green-400" : "text-green-600"
-                    }`}
+                    className={`w-4 h-4 ${isDarkMode ? "text-green-400" : "text-green-600"
+                      }`}
                   />
                   <span
-                    className={`text-sm font-semibold ${
-                      isDarkMode ? "text-green-400" : "text-green-600"
-                    }`}
+                    className={`text-sm font-semibold ${isDarkMode ? "text-green-400" : "text-green-600"
+                      }`}
                   >
                     {job.salary}
                   </span>
@@ -1204,11 +1150,10 @@ export default function AlumniHomePage({
                       scale: 1.2,
                       y: -2,
                     }}
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      isDarkMode
-                        ? "bg-purple-900/30 text-purple-300 border border-purple-700/50"
-                        : "bg-purple-100 text-purple-700 border border-purple-200"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${isDarkMode
+                      ? "bg-purple-900/30 text-purple-300 border border-purple-700/50"
+                      : "bg-purple-100 text-purple-700 border border-purple-200"
+                      }`}
                   >
                     {skill}
                   </motion.span>
@@ -1217,19 +1162,17 @@ export default function AlumniHomePage({
 
               <div className="flex items-center justify-between mb-4">
                 <span
-                  className={`text-xs flex items-center gap-1 ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-xs flex items-center gap-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   <Calendar className="w-3 h-3" />
                   Posted {job.posted}
                 </span>
                 <span
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    isDarkMode
-                      ? "bg-green-900/30 text-green-400"
-                      : "bg-green-100 text-green-700"
-                  }`}
+                  className={`text-xs px-2 py-1 rounded-full ${isDarkMode
+                    ? "bg-green-900/30 text-green-400"
+                    : "bg-green-100 text-green-700"
+                    }`}
                 >
                   {job.status}
                 </span>
@@ -1275,9 +1218,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className={`text-3xl md:text-4xl font-bold mb-4 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-3xl md:text-4xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Upcoming Events
           </motion.h2>
@@ -1285,9 +1227,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className={`text-lg ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Join exciting events and connect with your community
           </motion.p>
@@ -1352,11 +1293,10 @@ export default function AlumniHomePage({
                 y: -10,
                 rotateY: 5,
               }}
-              className={`rounded-2xl border overflow-hidden transition-all hover:shadow-2xl ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200 shadow-lg"
-              }`}
+              className={`rounded-2xl border overflow-hidden transition-all hover:shadow-2xl ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200 shadow-lg"
+                }`}
             >
               <motion.div
                 whileHover={{ scale: 1.1 }}
@@ -1370,22 +1310,20 @@ export default function AlumniHomePage({
                 <div className="absolute inset-0 bg-black/30"></div>
                 <div className="absolute top-4 left-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      event.type === "reunion"
-                        ? "bg-purple-600 text-white"
-                        : "bg-blue-600 text-white"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${event.type === "reunion"
+                      ? "bg-purple-600 text-white"
+                      : "bg-blue-600 text-white"
+                      }`}
                   >
                     {event.type}
                   </span>
                 </div>
                 <div className="absolute top-4 right-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      isDarkMode
-                        ? "bg-gray-800 text-gray-300"
-                        : "bg-white text-gray-700"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${isDarkMode
+                      ? "bg-gray-800 text-gray-300"
+                      : "bg-white text-gray-700"
+                      }`}
                   >
                     {event.status}
                   </span>
@@ -1394,16 +1332,14 @@ export default function AlumniHomePage({
 
               <div className="p-6">
                 <h3
-                  className={`font-bold text-xl mb-2 ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`font-bold text-xl mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   {event.title}
                 </h3>
                 <p
-                  className={`text-sm mb-4 ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   {event.description}
                 </p>
@@ -1411,42 +1347,36 @@ export default function AlumniHomePage({
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center gap-2">
                     <MapPin
-                      className={`w-4 h-4 ${
-                        isDarkMode ? "text-blue-400" : "text-blue-600"
-                      }`}
+                      className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                        }`}
                     />
                     <span
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
+                      className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                        }`}
                     >
                       {event.venue}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin
-                      className={`w-4 h-4 ${
-                        isDarkMode ? "text-blue-400" : "text-blue-600"
-                      }`}
+                      className={`w-4 h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                        }`}
                     />
                     <span
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
+                      className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                        }`}
                     >
                       {event.location}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users
-                      className={`w-4 h-4 ${
-                        isDarkMode ? "text-green-400" : "text-green-600"
-                      }`}
+                      className={`w-4 h-4 ${isDarkMode ? "text-green-400" : "text-green-600"
+                        }`}
                     />
                     <span
-                      className={`text-sm font-semibold ${
-                        isDarkMode ? "text-green-400" : "text-green-600"
-                      }`}
+                      className={`text-sm font-semibold ${isDarkMode ? "text-green-400" : "text-green-600"
+                        }`}
                     >
                       {event.spots}
                     </span>
@@ -1456,22 +1386,19 @@ export default function AlumniHomePage({
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Calendar
-                      className={`w-4 h-4 ${
-                        isDarkMode ? "text-orange-400" : "text-orange-600"
-                      }`}
+                      className={`w-4 h-4 ${isDarkMode ? "text-orange-400" : "text-orange-600"
+                        }`}
                     />
                     <span
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
-                      }`}
+                      className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                        }`}
                     >
                       {event.date}
                     </span>
                   </div>
                   <span
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {event.time}
                   </span>
@@ -1504,9 +1431,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className={`text-3xl md:text-4xl font-bold mb-4 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-3xl md:text-4xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Active Campaigns
           </motion.h2>
@@ -1514,9 +1440,8 @@ export default function AlumniHomePage({
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className={`text-lg ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Support meaningful initiatives in your community
           </motion.p>
@@ -1531,11 +1456,10 @@ export default function AlumniHomePage({
               scale: 1.02,
               y: -5,
             }}
-            className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`p-6 rounded-2xl border transition-all hover:shadow-2xl ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -1560,16 +1484,14 @@ export default function AlumniHomePage({
             </motion.div>
 
             <h3
-              className={`font-bold text-xl mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`font-bold text-xl mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               Green Campus Initiative
             </h3>
             <p
-              className={`text-sm mb-4 ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Making our campus eco-friendly, one step at a time. Planting
               trees, installing solar panels, and creating sustainable
@@ -1579,16 +1501,14 @@ export default function AlumniHomePage({
             <div className="mb-4">
               <div className="flex justify-between mb-2">
                 <span
-                  className={`text-sm font-semibold ${
-                    isDarkMode ? "text-blue-400" : "text-blue-600"
-                  }`}
+                  className={`text-sm font-semibold ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                    }`}
                 >
                   55.3%
                 </span>
                 <span
-                  className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   ₹8,29,734 of ₹15,00,000
                 </span>
@@ -1606,15 +1526,13 @@ export default function AlumniHomePage({
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p
-                  className={`text-lg font-bold ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   ₹8,29,734{" "}
                   <span
-                    className={`text-sm font-normal ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-sm font-normal ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     raised of ₹15,00,000
                   </span>
@@ -1622,14 +1540,12 @@ export default function AlumniHomePage({
               </div>
               <div className="flex items-center gap-2">
                 <Clock
-                  className={`w-4 h-4 ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`w-4 h-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 />
                 <span
-                  className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   23 days left
                 </span>
@@ -1645,16 +1561,14 @@ export default function AlumniHomePage({
               />
               <div>
                 <p
-                  className={`font-semibold ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   Gaurav Tiwari
                 </p>
                 <p
-                  className={`text-xs ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   Organizer
                 </p>
@@ -1662,14 +1576,12 @@ export default function AlumniHomePage({
               <div className="ml-auto">
                 <div className="flex items-center gap-1">
                   <Users
-                    className={`w-4 h-4 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`w-4 h-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   />
                   <span
-                    className={`text-sm ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     46 donors
                   </span>
