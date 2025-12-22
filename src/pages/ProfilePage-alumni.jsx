@@ -319,46 +319,98 @@ export default function AlumniProfilePage() {
         return;
       }
 
-      const formData = new FormData();
-      formData.append("resume", file);
+      // Re-validate file on mobile (some browsers lose file reference)
+      if (!file || !file.size) {
+        alert("File is invalid. Please select the file again.");
+        setResumeFile(null);
+        return;
+      }
 
-      const response = await fetch(`${API_BASE_URL}/alumni/upload-resume`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
+      // Validate file type and size again
+      if (file.type !== "application/pdf") {
+        alert("Only PDF files are allowed");
+        setResumeFile(null);
+        return;
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File size must be less than 10MB");
+        setResumeFile(null);
+        return;
+      }
+
+      console.log("📤 Starting resume upload:", {
+        fileName: file.name,
+        fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        fileType: file.type,
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Resume upload successful:", result);
+      // Create FormData - ensure proper construction for mobile
+      const formData = new FormData();
+      formData.append("resume", file, file.name);
 
-        // Update user data with the new resume URL
-        if (userData && result.resumeUrl) {
-          setUserData({
-            ...userData,
-            resume: result.resumeUrl,
-          });
+      // Add timeout for mobile networks
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/alumni/upload-resume`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Don't set Content-Type - let browser set it with boundary
+          },
+          body: formData,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log("✅ Resume upload successful:", result);
+
+          // Update user data with the new resume URL
+          if (userData && result.resumeUrl) {
+            setUserData({
+              ...userData,
+              resume: result.resumeUrl,
+            });
+          }
+
+          setShowResumeModal(false);
+          setResumeFile(null);
+          await fetchUserData(); // Refresh user data
+
+          alert("✅ Resume uploaded successfully!");
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.message || `Server error: ${response.status}`
+          );
         }
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
 
-        setShowResumeModal(false);
-        setResumeFile(null);
-        await fetchUserData(); // Refresh user data
-
-        alert("Resume uploaded successfully!");
-      } else {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
+        if (fetchError.name === 'AbortError') {
+          throw new Error("Upload timeout. Please check your internet connection and try again.");
+        }
+        throw fetchError;
       }
     } catch (error) {
-      console.error("Error uploading resume:", error);
-      alert(
-        `Failed to upload resume: ${error.message ? error.message : "Unknown error"
-        }`
-      );
+      console.error("❌ Resume upload error:", error);
+
+      let errorMessage = "Failed to upload resume. ";
+
+      if (error.message === "Failed to fetch") {
+        errorMessage += "Network error. Please check your internet connection and try again.";
+      } else if (error.message.includes("timeout")) {
+        errorMessage += "Upload took too long. Please try with a smaller file or better connection.";
+      } else {
+        errorMessage += error.message || "Unknown error occurred.";
+      }
+
+      alert(errorMessage);
     } finally {
       setUploadingResume(false);
     }
