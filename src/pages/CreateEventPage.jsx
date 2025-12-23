@@ -4,7 +4,7 @@ import {
   MapPin,
   Users,
   Video,
-  IndianRupee,
+
   Loader,
   Sparkles,
   CheckCircle,
@@ -24,17 +24,15 @@ const Message = ({ type, message, onClose }) => {
 
   return (
     <div
-      className={`fixed top-20 right-4 sm:right-6 z-[100] max-w-sm w-[calc(100%-2rem)] sm:w-auto animate-slideIn ${
-        type === "success"
-          ? "bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200"
-          : "bg-gradient-to-r from-red-50 to-pink-50 border border-red-200"
-      } rounded-lg shadow-lg p-4`}
+      className={`fixed top-20 right-4 sm:right-6 z-[100] max-w-sm w-[calc(100%-2rem)] sm:w-auto animate-slideIn ${type === "success"
+        ? "bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200"
+        : "bg-gradient-to-r from-red-50 to-pink-50 border border-red-200"
+        } rounded-lg shadow-lg p-4`}
     >
       <div className="flex items-start gap-3">
         <div
-          className={`flex-shrink-0 ${
-            type === "success" ? "text-green-500" : "text-red-500"
-          }`}
+          className={`flex-shrink-0 ${type === "success" ? "text-green-500" : "text-red-500"
+            }`}
         >
           {type === "success" ? (
             <CheckCircle className="w-5 h-5" />
@@ -44,20 +42,18 @@ const Message = ({ type, message, onClose }) => {
         </div>
         <div className="flex-1 min-w-0">
           <p
-            className={`text-sm font-medium truncate ${
-              type === "success" ? "text-green-800" : "text-red-800"
-            }`}
+            className={`text-sm font-medium truncate ${type === "success" ? "text-green-800" : "text-red-800"
+              }`}
           >
             {message}
           </p>
         </div>
         <button
           onClick={onClose}
-          className={`flex-shrink-0 ${
-            type === "success"
-              ? "text-green-400 hover:text-green-600"
-              : "text-red-400 hover:text-red-600"
-          }`}
+          className={`flex-shrink-0 ${type === "success"
+            ? "text-green-400 hover:text-green-600"
+            : "text-red-400 hover:text-red-600"
+            }`}
         >
           <X className="w-4 h-4" />
         </button>
@@ -72,7 +68,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
     description: "",
     date: "",
     location: "",
-    price: 0,
+
     organizer: "",
     category: "educational",
     type: "in-person",
@@ -251,7 +247,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
           description: "",
           date: "",
           location: "",
-          price: 0,
+
           organizer: "",
           category: "educational",
           type: "in-person",
@@ -271,7 +267,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
       displayMessage(
         "error",
         error.message ||
-          "Error creating event. Please check your connection and try again."
+        "Error creating event. Please check your connection and try again."
       );
     } finally {
       setSubmitting(false);
@@ -283,7 +279,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "price" || name === "maxAttendees" ? Number(value) : value,
+        name === "maxAttendees" ? Number(value) : value,
     }));
   };
 
@@ -317,9 +313,8 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
         </p>
 
         <p
-          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
-            isDarkMode ? "text-gray-300" : "text-gray-700"
-          }`}
+          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+            }`}
         >
           Organize memorable events that bring our alumni together and create
           lasting connections.
@@ -330,9 +325,8 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
         {!isUserLoggedIn && (
           <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 max-w-md mx-auto">
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-yellow-300" : "text-yellow-700"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-yellow-300" : "text-yellow-700"
+                }`}
             >
               💡 Please login to create events and access all features
             </p>
@@ -350,32 +344,28 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Calendar className="w-8 h-8 text-blue-500 mb-2" />
             <h3 className="font-semibold mb-2">Easy Event Creation</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Fill out a simple form to create and manage your events with ease.
             </p>
           </div>
 
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Users className="w-8 h-8 text-green-500 mb-2" />
             <h3 className="font-semibold mb-2">Reach Alumni Network</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Your event will be visible to MITS alumni and students who share
               your interests.
@@ -383,16 +373,14 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
           </div>
 
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Sparkles className="w-8 h-8 text-purple-500 mb-2" />
             <h3 className="font-semibold mb-2">Build Community</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Create meaningful connections and strengthen the MITS alumni
               network.
@@ -405,11 +393,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
@@ -440,31 +427,27 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
       {/* Why Create Events Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-12">
         <div
-          className={`p-8 rounded-xl ${
-            isDarkMode ? "bg-slate-900" : "bg-white shadow-lg"
-          }`}
+          className={`p-8 rounded-xl ${isDarkMode ? "bg-slate-900" : "bg-white shadow-lg"
+            }`}
         >
           <h2
-            className={`text-2xl font-bold mb-6 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Why Create Events on Our Platform?
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-blue-500">
                 Targeted Audience
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Reach specifically MITS alumni and students who are interested
                 in networking and learning.
@@ -472,17 +455,15 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-green-500">
                 Free to Create
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Create and promote your events without any platform fees or
                 hidden costs.
@@ -490,17 +471,15 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-purple-500">
                 Easy Management
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Manage registrations, communicate with attendees, and track
                 event success all in one place.
@@ -508,17 +487,15 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-orange-500">
                 Alumni Engagement
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Engage with the vibrant MITS alumni community and build lasting
                 professional relationships.
@@ -532,9 +509,8 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                 Ready to Create Your Event?
               </h3>
               <p
-                className={`text-sm mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-sm mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
                 Login to access the event creation form and start organizing
                 memorable gatherings.
@@ -555,18 +531,16 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div
-              className={`rounded-2xl sm:rounded-3xl shadow-2xl ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
-                  : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
-              }`}
+              className={`rounded-2xl sm:rounded-3xl shadow-2xl ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
+                : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
+                }`}
             >
               <div
-                className={`p-4 sm:p-6 border-b-2 flex-shrink-0 ${
-                  isDarkMode
-                    ? "border-blue-500/30 bg-slate-900/90"
-                    : "border-blue-300 bg-white/90"
-                }`}
+                className={`p-4 sm:p-6 border-b-2 flex-shrink-0 ${isDarkMode
+                  ? "border-blue-500/30 bg-slate-900/90"
+                  : "border-blue-300 bg-white/90"
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
@@ -574,11 +548,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                   </h2>
                   <button
                     onClick={() => setShowEventDialog(false)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isDarkMode
-                        ? "text-gray-400 hover:text-white hover:bg-slate-800"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${isDarkMode
+                      ? "text-gray-400 hover:text-white hover:bg-slate-800"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      }`}
                   >
                     <X size={20} className="sm:w-6 sm:h-6" />
                   </button>
@@ -599,11 +572,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                       onChange={handleChange}
                       required
                       placeholder="Enter an engaging event title..."
-                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                        isDarkMode
-                          ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
-                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
-                      } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
+                        : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
+                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                     />
                   </div>
 
@@ -619,11 +591,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                       required
                       rows={3}
                       placeholder="Describe your event in detail..."
-                      className={`w-full px-3 py-2 rounded-lg border text-sm resize-vertical ${
-                        isDarkMode
-                          ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
-                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
-                      } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm resize-vertical ${isDarkMode
+                        ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
+                        : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
+                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                     />
                   </div>
 
@@ -641,11 +612,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         onChange={handleChange}
                         required
                         min={new Date().toISOString().split("T")[0]}
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
+                          : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
+                          } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                       />
                     </div>
 
@@ -661,38 +631,17 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         onChange={handleChange}
                         required
                         placeholder="Venue or online platform"
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
+                          } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                       />
                     </div>
                   </div>
 
                   {/* Price & Attendees */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block mb-2 font-semibold text-sm">
-                        <IndianRupee className="w-4 h-4 inline mr-1" />
-                        Price (₹) *
-                      </label>
-                      <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        required
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
-                      />
-                    </div>
+
 
                     <div>
                       <label className="block mb-2 font-semibold text-sm">
@@ -707,11 +656,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         required
                         min="1"
                         placeholder="50"
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
+                          : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
+                          } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                       />
                     </div>
                   </div>
@@ -726,11 +674,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         name="category"
                         value={formData.category}
                         onChange={handleChange}
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
+                          : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
+                          } focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer`}
                       >
                         {categories.map((cat) => (
                           <option key={cat.value} value={cat.value}>
@@ -749,11 +696,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         name="type"
                         value={formData.type}
                         onChange={handleChange}
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-slate-600 text-white focus:border-cyan-500"
+                          : "bg-white border-gray-300 text-gray-900 focus:border-cyan-400"
+                          } focus:outline-none focus:ring-2 focus:ring-cyan-500 cursor-pointer`}
                       >
                         <option value="in-person">In-Person</option>
                         <option value="virtual">Virtual</option>
@@ -774,11 +720,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         onChange={handleChange}
                         required
                         placeholder="Your name or organization"
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
-                            : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
-                        } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
+                          : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
+                          } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                       />
                     </div>
 
@@ -789,11 +734,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                       </label>
                       <div className="space-y-2">
                         <div
-                          className={`relative rounded-lg border-2 border-dashed ${
-                            isDarkMode
-                              ? "border-slate-600 hover:border-cyan-500"
-                              : "border-gray-300 hover:border-cyan-400"
-                          } transition-colors`}
+                          className={`relative rounded-lg border-2 border-dashed ${isDarkMode
+                            ? "border-slate-600 hover:border-cyan-500"
+                            : "border-gray-300 hover:border-cyan-400"
+                            } transition-colors`}
                         >
                           <input
                             type="file"
@@ -804,21 +748,18 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                           />
                           <div className="p-4 text-center">
                             <Upload
-                              className={`w-8 h-8 mx-auto mb-2 ${
-                                isDarkMode ? "text-slate-400" : "text-gray-400"
-                              }`}
+                              className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? "text-slate-400" : "text-gray-400"
+                                }`}
                             />
                             <p
-                              className={`text-sm ${
-                                isDarkMode ? "text-slate-300" : "text-gray-600"
-                              }`}
+                              className={`text-sm ${isDarkMode ? "text-slate-300" : "text-gray-600"
+                                }`}
                             >
                               Click to upload image
                             </p>
                             <p
-                              className={`text-xs mt-1 ${
-                                isDarkMode ? "text-slate-400" : "text-gray-500"
-                              }`}
+                              className={`text-xs mt-1 ${isDarkMode ? "text-slate-400" : "text-gray-500"
+                                }`}
                             >
                               JPEG, PNG, GIF, WebP (Max 5MB)
                             </p>
@@ -830,22 +771,20 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                           <div className="relative mt-2">
                             <div className="flex items-center justify-between mb-2">
                               <span
-                                className={`text-xs ${
-                                  isDarkMode
-                                    ? "text-slate-300"
-                                    : "text-gray-600"
-                                }`}
+                                className={`text-xs ${isDarkMode
+                                  ? "text-slate-300"
+                                  : "text-gray-600"
+                                  }`}
                               >
                                 Preview:
                               </span>
                               <button
                                 type="button"
                                 onClick={removeImage}
-                                className={`text-xs flex items-center gap-1 px-2 py-1 rounded ${
-                                  isDarkMode
-                                    ? "text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                                    : "text-red-500 hover:text-red-700 hover:bg-red-50"
-                                }`}
+                                className={`text-xs flex items-center gap-1 px-2 py-1 rounded ${isDarkMode
+                                  ? "text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                  : "text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  }`}
                               >
                                 <X className="w-3 h-3" />
                                 Remove
@@ -864,9 +803,8 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                         {/* Optional URL fallback */}
                         <div className="mt-4">
                           <p
-                            className={`text-xs mb-1 ${
-                              isDarkMode ? "text-slate-400" : "text-gray-500"
-                            }`}
+                            className={`text-xs mb-1 ${isDarkMode ? "text-slate-400" : "text-gray-500"
+                              }`}
                           >
                             Or provide an image URL (optional):
                           </p>
@@ -876,11 +814,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                             value={formData.image}
                             onChange={handleChange}
                             placeholder="https://example.com/image.jpg"
-                            className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                              isDarkMode
-                                ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
-                                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
-                            } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
+                            className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                              ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-cyan-500"
+                              : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-cyan-400"
+                              } focus:outline-none focus:ring-2 focus:ring-cyan-500`}
                           />
                         </div>
                       </div>
@@ -909,11 +846,10 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                     <button
                       type="button"
                       onClick={() => setShowEventDialog(false)}
-                      className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                        isDarkMode
-                          ? "bg-slate-800 text-cyan-400 border border-cyan-500/30"
-                          : "bg-white text-blue-600 border border-blue-300"
-                      }`}
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all ${isDarkMode
+                        ? "bg-slate-800 text-cyan-400 border border-cyan-500/30"
+                        : "bg-white text-blue-600 border border-blue-300"
+                        }`}
                     >
                       Cancel
                     </button>
@@ -921,9 +857,8 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
 
                   {/* Form Notes */}
                   <div
-                    className={`text-xs mt-4 ${
-                      isDarkMode ? "text-slate-400" : "text-gray-500"
-                    }`}
+                    className={`text-xs mt-4 ${isDarkMode ? "text-slate-400" : "text-gray-500"
+                      }`}
                   >
                     <p className="mb-1">* Required fields</p>
                     <p>

@@ -33,18 +33,18 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
-  const BASE_URL = import.meta.env.VITE_API_BASE_URL ;
-  
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   console.log("BASE_URL from env:", BASE_URL);
 
   // Update the helper function to ensure uniqueness
   const getPersonKey = (person, prefix = "") => {
     const baseKey = `${prefix}${person.userType}-${person.phone}-${person.email || "no-email"}`;
-    
+
     if (person.id) {
       return `${baseKey}-${person.id}`;
     }
-    
+
     const hash = `${person.name || ""}${person.phone}${person.email || ""}`;
     return `${baseKey}-${hash}`;
   };
@@ -92,19 +92,19 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   // Function to group messages by date
   const groupMessagesByDate = (messages) => {
     if (!messages || messages.length === 0) return [];
-    
+
     const grouped = [];
     let currentDate = null;
     let currentGroup = [];
-    
+
     // Sort messages by date (oldest to newest)
-    const sortedMessages = [...messages].sort((a, b) => 
+    const sortedMessages = [...messages].sort((a, b) =>
       new Date(a.createdAt) - new Date(b.createdAt)
     );
-    
+
     sortedMessages.forEach((msg, index) => {
       const messageDate = formatDate(msg.createdAt);
-      
+
       if (messageDate !== currentDate) {
         // If we have a current group, add it to grouped array
         if (currentGroup.length > 0) {
@@ -113,7 +113,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
             messages: currentGroup
           });
         }
-        
+
         // Start new group
         currentDate = messageDate;
         currentGroup = [msg];
@@ -121,7 +121,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         // Add to current group
         currentGroup.push(msg);
       }
-      
+
       // Add the last group
       if (index === sortedMessages.length - 1) {
         grouped.push({
@@ -130,7 +130,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         });
       }
     });
-    
+
     return grouped;
   };
 
@@ -156,28 +156,16 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
             if (response.ok) {
               const data = await response.json();
-              const currentUserData = data.data?.find(
-                (p) => p.email === parsedAuth.userEmail
-              );
 
-              if (currentUserData) {
-                console.log("Found current user data:", currentUserData);
-                setCurrentUser({
-                  phone: currentUserData.phone,
-                  userType: currentUserData.userType,
-                  name: parsedAuth.userName,
-                  email: parsedAuth.userEmail,
-                  id: parsedAuth.userId,
-                });
-              } else {
-                setCurrentUser({
-                  phone: parsedAuth.userId,
-                  userType: "student",
-                  name: parsedAuth.userName,
-                  email: parsedAuth.userEmail,
-                  id: parsedAuth.userId,
-                });
-              }
+              // Decoding token to get correct phone and other details
+              // parsedAuth already contains most of these from the login/header logic
+              setCurrentUser({
+                phone: parsedAuth.phone || parsedAuth.userId, // Prefer phone if available
+                userType: parsedAuth.userType || "student",
+                name: parsedAuth.userName,
+                email: parsedAuth.userEmail,
+                id: parsedAuth.userId,
+              });
             }
           } catch (error) {
             console.error("Error fetching user data:", error);
@@ -283,7 +271,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         setPeople(filteredPeople);
 
         const messagesResponse = await fetch(
-         `${BASE_URL}/message/my`,
+          `${BASE_URL}/message/my`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -348,7 +336,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("Selected user phone:", selectedUser.phone);
 
       const response = await fetch(
-       `${BASE_URL}/message/my`,
+        `${BASE_URL}/message/my`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -393,7 +381,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       }
 
       const response = await fetch(
-       `${BASE_URL}/message/send`,
+        `${BASE_URL}/message/send`,
         {
           method: "POST",
           headers: {
@@ -480,20 +468,17 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   if (isInitializing) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          isDarkMode ? "bg-slate-900" : "bg-gray-50"
-        }`}
+        className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
+          }`}
       >
         <div className="text-center">
           <Loader
-            className={`w-12 h-12 mx-auto mb-4 animate-spin ${
-              isDarkMode ? "text-purple-500" : "text-purple-600"
-            }`}
+            className={`w-12 h-12 mx-auto mb-4 animate-spin ${isDarkMode ? "text-purple-500" : "text-purple-600"
+              }`}
           />
           <p
-            className={`text-lg ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Loading...
           </p>
@@ -504,9 +489,8 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
   return (
     <div
-      className={`h-screen flex flex-col overflow-hidden ${
-        isDarkMode ? "bg-slate-900" : "bg-gray-100"
-      }`}
+      className={`h-screen flex flex-col overflow-hidden ${isDarkMode ? "bg-slate-900" : "bg-gray-100"
+        }`}
     >
       {/* Header */}
       <div className="flex-shrink-0">
@@ -520,37 +504,34 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
             <>
               {/* Mobile Toggle */}
               <div
-                className={`flex border-b flex-shrink-0 ${
-                  isDarkMode
+                className={`flex border-b flex-shrink-0 ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-white border-gray-200"
-                }`}
+                  }`}
               >
                 <button
                   onClick={() => setMobileView("chats")}
-                  className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                    mobileView === "chats"
+                  className={`flex-1 py-3 text-sm font-medium transition-colors ${mobileView === "chats"
                       ? isDarkMode
                         ? "text-purple-400 border-b-2 border-purple-400"
                         : "text-purple-600 border-b-2 border-purple-600"
                       : isDarkMode
-                      ? "text-gray-400"
-                      : "text-gray-500"
-                  }`}
+                        ? "text-gray-400"
+                        : "text-gray-500"
+                    }`}
                 >
                   Recent Chats
                 </button>
                 <button
                   onClick={() => setMobileView("people")}
-                  className={`flex-1 py-3 text-sm font-medium transition-colors ${
-                    mobileView === "people"
+                  className={`flex-1 py-3 text-sm font-medium transition-colors ${mobileView === "people"
                       ? isDarkMode
                         ? "text-purple-400 border-b-2 border-purple-400"
                         : "text-purple-600 border-b-2 border-purple-600"
                       : isDarkMode
-                      ? "text-gray-400"
-                      : "text-gray-500"
-                  }`}
+                        ? "text-gray-400"
+                        : "text-gray-500"
+                    }`}
                 >
                   People You May Know
                 </button>
@@ -558,28 +539,25 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
               {/* Search Bar */}
               <div
-                className={`p-4 border-b flex-shrink-0 ${
-                  isDarkMode
+                className={`p-4 border-b flex-shrink-0 ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-white border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="relative">
                   <Search
-                    className={`absolute left-3 top-3 w-4 h-4 ${
-                      isDarkMode ? "text-gray-500" : "text-gray-400"
-                    }`}
+                    className={`absolute left-3 top-3 w-4 h-4 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
                   />
                   <input
                     type="text"
                     placeholder="Search..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg transition-colors focus:outline-none ${
-                      isDarkMode
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-lg transition-colors focus:outline-none ${isDarkMode
                         ? "bg-slate-700 text-white placeholder-gray-500"
                         : "bg-gray-100 text-gray-900 placeholder-gray-400"
-                    }`}
+                      }`}
                   />
                 </div>
               </div>
@@ -587,15 +565,13 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
               {/* Chat List */}
               {mobileView === "chats" && (
                 <div
-                  className={`flex-1 overflow-y-auto ${
-                    isDarkMode ? "bg-slate-900" : "bg-gray-50"
-                  }`}
+                  className={`flex-1 overflow-y-auto ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
+                    }`}
                 >
                   {filteredChats.length === 0 ? (
                     <div
-                      className={`text-center py-12 ${
-                        isDarkMode ? "text-gray-500" : "text-gray-400"
-                      }`}
+                      className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                        }`}
                     >
                       <p className="text-sm">No recent conversations</p>
                     </div>
@@ -604,19 +580,17 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       <div
                         key={getPersonKey(person, "mobile-chat-")}
                         onClick={() => setSelectedUser(person)}
-                        className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
-                          isDarkMode
+                        className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${isDarkMode
                             ? "border-slate-800 hover:bg-slate-800"
                             : "border-gray-200 hover:bg-gray-100"
-                        }`}
+                          }`}
                       >
                         <div className="relative">
                           <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                              person.userType === "alumni"
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${person.userType === "alumni"
                                 ? "bg-gradient-to-br from-purple-500 to-pink-500"
                                 : "bg-gradient-to-br from-blue-500 to-cyan-500"
-                            }`}
+                              }`}
                           >
                             {person.userType === "alumni" ? (
                               <GraduationCap className="w-6 h-6 text-white" />
@@ -627,16 +601,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3
-                            className={`font-semibold truncate ${
-                              isDarkMode ? "text-white" : "text-gray-900"
-                            }`}
+                            className={`font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                              }`}
                           >
                             {person.name}
                           </h3>
                           <p
-                            className={`text-sm truncate ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
+                            className={`text-sm truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
                           >
                             {person.email}
                           </p>
@@ -650,9 +622,8 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
               {/* People List */}
               {mobileView === "people" && (
                 <div
-                  className={`flex-1 overflow-y-auto ${
-                    isDarkMode ? "bg-slate-900" : "bg-gray-50"
-                  }`}
+                  className={`flex-1 overflow-y-auto ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
+                    }`}
                 >
                   {filteredPeople
                     .filter(
@@ -662,19 +633,17 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       <div
                         key={getPersonKey(person, "mobile-person-")}
                         onClick={() => setSelectedUser(person)}
-                        className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
-                          isDarkMode
+                        className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${isDarkMode
                             ? "border-slate-800 hover:bg-slate-800"
                             : "border-gray-200 hover:bg-gray-100"
-                        }`}
+                          }`}
                       >
                         <div className="relative">
                           <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                              person.userType === "alumni"
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${person.userType === "alumni"
                                 ? "bg-gradient-to-br from-purple-500 to-pink-500"
                                 : "bg-gradient-to-br from-blue-500 to-cyan-500"
-                            }`}
+                              }`}
                           >
                             {person.userType === "alumni" ? (
                               <GraduationCap className="w-6 h-6 text-white" />
@@ -685,16 +654,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3
-                            className={`font-semibold truncate ${
-                              isDarkMode ? "text-white" : "text-gray-900"
-                            }`}
+                            className={`font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                              }`}
                           >
                             {person.name}
                           </h3>
                           <p
-                            className={`text-sm truncate ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
+                            className={`text-sm truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
                           >
                             {person.email}
                           </p>
@@ -709,28 +676,25 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
             <div className="flex-1 flex flex-col overflow-hidden min-h-0 max-h-full">
               {/* Chat Header */}
               <div
-                className={`px-4 py-3 flex items-center justify-between border-b flex-shrink-0 ${
-                  isDarkMode
+                className={`px-4 py-3 flex items-center justify-between border-b flex-shrink-0 ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-white border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setSelectedUser(null)}
-                    className={`p-2 -ml-2 rounded-lg ${
-                      isDarkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"
-                    }`}
+                    className={`p-2 -ml-2 rounded-lg ${isDarkMode ? "hover:bg-slate-700" : "hover:bg-gray-100"
+                      }`}
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                   <div className="relative">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        selectedUser.userType === "alumni"
+                      className={`w-10 h-10 rounded-full flex items-center justify-center ${selectedUser.userType === "alumni"
                           ? "bg-gradient-to-br from-purple-500 to-pink-500"
                           : "bg-gradient-to-br from-blue-500 to-cyan-500"
-                      }`}
+                        }`}
                     >
                       {selectedUser.userType === "alumni" ? (
                         <GraduationCap className="w-5 h-5 text-white" />
@@ -741,16 +705,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   </div>
                   <div>
                     <h3
-                      className={`font-semibold ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {selectedUser.name}
                     </h3>
                     <p
-                      className={`text-xs ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
+                      className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
                     >
                       {selectedUser.email}
                     </p>
@@ -758,20 +720,18 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    className={`p-2 rounded-lg ${
-                      isDarkMode
+                    className={`p-2 rounded-lg ${isDarkMode
                         ? "hover:bg-slate-700 text-gray-300"
                         : "hover:bg-gray-100 text-gray-600"
-                    }`}
+                      }`}
                   >
                     <Phone className="w-5 h-5" />
                   </button>
                   <button
-                    className={`p-2 rounded-lg ${
-                      isDarkMode
+                    className={`p-2 rounded-lg ${isDarkMode
                         ? "hover:bg-slate-700 text-gray-300"
                         : "hover:bg-gray-100 text-gray-600"
-                    }`}
+                      }`}
                   >
                     <MoreVertical className="w-5 h-5" />
                   </button>
@@ -781,15 +741,13 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
               {/* Messages */}
               <div
                 ref={messagesContainerRef}
-                className={`flex-1 overflow-y-auto p-4 min-h-0 ${
-                  isDarkMode ? "bg-slate-900" : "bg-gray-50"
-                }`}
+                className={`flex-1 overflow-y-auto p-4 min-h-0 ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
+                  }`}
               >
                 {messages.length === 0 ? (
                   <div
-                    className={`text-center py-12 ${
-                      isDarkMode ? "text-gray-500" : "text-gray-400"
-                    }`}
+                    className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
                   >
                     <p className="text-sm">
                       No messages yet. Start the conversation!
@@ -801,45 +759,40 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       <div key={`group-${groupIndex}`}>
                         {/* Date Separator */}
                         <div className="flex items-center justify-center my-6">
-                          <div className={`px-3 py-1 rounded-full text-xs ${
-                            isDarkMode 
-                              ? "bg-slate-800 text-gray-400" 
+                          <div className={`px-3 py-1 rounded-full text-xs ${isDarkMode
+                              ? "bg-slate-800 text-gray-400"
                               : "bg-gray-200 text-gray-600"
-                          }`}>
+                            }`}>
                             {group.date}
                           </div>
                         </div>
-                        
+
                         {/* Messages for this date */}
                         {group.messages.map((msg) => {
                           const isSent = msg.sender?.phone === currentUser?.phone;
                           return (
                             <div
                               key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
-                              className={`mb-4 flex ${
-                                isSent ? "justify-end" : "justify-start"
-                              }`}
+                              className={`mb-4 flex ${isSent ? "justify-end" : "justify-start"
+                                }`}
                             >
                               <div className="max-w-xs">
                                 <div
-                                  className={`rounded-2xl px-4 py-2.5 ${
-                                    isSent
+                                  className={`rounded-2xl px-4 py-2.5 ${isSent
                                       ? "bg-purple-500 text-white rounded-br-sm"
                                       : isDarkMode
-                                      ? "bg-slate-800 text-white rounded-bl-sm"
-                                      : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
-                                  }`}
+                                        ? "bg-slate-800 text-white rounded-bl-sm"
+                                        : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
+                                    }`}
                                 >
                                   <p className="text-sm whitespace-pre-wrap">
                                     {msg.text}
                                   </p>
                                 </div>
                                 <p
-                                  className={`text-xs mt-1 ${
-                                    isSent ? "text-right" : "text-left"
-                                  } ${
-                                    isDarkMode ? "text-gray-500" : "text-gray-500"
-                                  }`}
+                                  className={`text-xs mt-1 ${isSent ? "text-right" : "text-left"
+                                    } ${isDarkMode ? "text-gray-500" : "text-gray-500"
+                                    }`}
                                 >
                                   {formatTime(msg.createdAt)}
                                 </p>
@@ -856,11 +809,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
               {/* Message Input */}
               <div
-                className={`p-4 border-t flex-shrink-0 ${
-                  isDarkMode
+                className={`p-4 border-t flex-shrink-0 ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-white border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <input
@@ -869,11 +821,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                     onChange={(e) => setMessageText(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type a message"
-                    className={`flex-1 px-4 py-2.5 rounded-full focus:outline-none ${
-                      isDarkMode
+                    className={`flex-1 px-4 py-2.5 rounded-full focus:outline-none ${isDarkMode
                         ? "bg-slate-700 text-white placeholder-gray-500"
                         : "bg-gray-100 text-gray-900 placeholder-gray-400"
-                    }`}
+                      }`}
                     disabled={loading}
                   />
                   <button
@@ -897,42 +848,37 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         <div className="hidden lg:flex flex-1 gap-4 min-h-0 overflow-hidden">
           {/* Left Sidebar - Recent Chats */}
           <div
-            className={`w-80 border flex flex-col rounded-lg overflow-hidden ${
-              isDarkMode
+            className={`w-80 border flex flex-col rounded-lg overflow-hidden ${isDarkMode
                 ? "bg-slate-800 border-slate-700"
                 : "bg-white border-gray-200"
-            }`}
+              }`}
           >
             <div
-              className={`p-4 border-b flex-shrink-0 ${
-                isDarkMode ? "border-slate-700" : "border-gray-200"
-              }`}
+              className={`p-4 border-b flex-shrink-0 ${isDarkMode ? "border-slate-700" : "border-gray-200"
+                }`}
             >
               <div className="relative">
                 <Search
-                  className={`absolute left-3 top-3 w-4 h-4 ${
-                    isDarkMode ? "text-gray-500" : "text-gray-400"
-                  }`}
+                  className={`absolute left-3 top-3 w-4 h-4 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                    }`}
                 />
                 <input
                   type="text"
                   placeholder="Search conversations..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2.5 rounded-lg transition-colors focus:outline-none ${
-                    isDarkMode
+                  className={`w-full pl-10 pr-4 py-2.5 rounded-lg transition-colors focus:outline-none ${isDarkMode
                       ? "bg-slate-700 text-white placeholder-gray-500"
                       : "bg-gray-100 text-gray-900 placeholder-gray-400"
-                  }`}
+                    }`}
                 />
               </div>
             </div>
             <div className="flex-1 overflow-y-auto">
               {filteredChats.length === 0 ? (
                 <div
-                  className={`text-center py-12 ${
-                    isDarkMode ? "text-gray-500" : "text-gray-400"
-                  }`}
+                  className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                    }`}
                 >
                   <p className="text-sm">No recent conversations</p>
                 </div>
@@ -941,23 +887,21 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   <div
                     key={getPersonKey(person, "desktop-chat-")}
                     onClick={() => setSelectedUser(person)}
-                    className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
-                      selectedUser?.phone === person.phone
+                    className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${selectedUser?.phone === person.phone
                         ? isDarkMode
                           ? "bg-slate-700"
                           : "bg-gray-100"
                         : isDarkMode
-                        ? "border-slate-700 hover:bg-slate-750"
-                        : "border-gray-200 hover:bg-gray-50"
-                    }`}
+                          ? "border-slate-700 hover:bg-slate-750"
+                          : "border-gray-200 hover:bg-gray-50"
+                      }`}
                   >
                     <div className="relative">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          person.userType === "alumni"
+                        className={`w-12 h-12 rounded-full flex items-center justify-center ${person.userType === "alumni"
                             ? "bg-gradient-to-br from-purple-500 to-pink-500"
                             : "bg-gradient-to-br from-blue-500 to-cyan-500"
-                        }`}
+                          }`}
                       >
                         {person.userType === "alumni" ? (
                           <GraduationCap className="w-6 h-6 text-white" />
@@ -968,16 +912,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
-                        className={`font-semibold truncate ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         {person.name}
                       </h3>
                       <p
-                        className={`text-sm truncate ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
+                        className={`text-sm truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
                       >
                         {person.email}
                       </p>
@@ -990,28 +932,25 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
           {/* Center - Chat Window */}
           <div
-            className={`flex-1 flex flex-col rounded-lg overflow-hidden border max-h-full ${
-              isDarkMode ? "border-slate-700" : "border-gray-200"
-            }`}
+            className={`flex-1 flex flex-col rounded-lg overflow-hidden border max-h-full ${isDarkMode ? "border-slate-700" : "border-gray-200"
+              }`}
           >
             {selectedUser ? (
               <>
                 {/* Chat Header */}
                 <div
-                  className={`px-6 py-4 flex items-center justify-between border-b flex-shrink-0 ${
-                    isDarkMode
+                  className={`px-6 py-4 flex items-center justify-between border-b flex-shrink-0 ${isDarkMode
                       ? "bg-slate-800 border-slate-700"
                       : "bg-white border-gray-200"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          selectedUser.userType === "alumni"
+                        className={`w-12 h-12 rounded-full flex items-center justify-center ${selectedUser.userType === "alumni"
                             ? "bg-gradient-to-br from-purple-500 to-pink-500"
                             : "bg-gradient-to-br from-blue-500 to-cyan-500"
-                        }`}
+                          }`}
                       >
                         {selectedUser.userType === "alumni" ? (
                           <GraduationCap className="w-6 h-6 text-white" />
@@ -1022,16 +961,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                     </div>
                     <div>
                       <h3
-                        className={`font-semibold ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         {selectedUser.name}
                       </h3>
                       <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-gray-400" : "text-gray-500"
-                        }`}
+                        className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                          }`}
                       >
                         {selectedUser.email}
                       </p>
@@ -1039,29 +976,26 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      className={`p-2 rounded-lg ${
-                        isDarkMode
+                      className={`p-2 rounded-lg ${isDarkMode
                           ? "hover:bg-slate-700 text-gray-300"
                           : "hover:bg-gray-100 text-gray-600"
-                      }`}
+                        }`}
                     >
                       <Phone className="w-5 h-5" />
                     </button>
                     <button
-                      className={`p-2 rounded-lg ${
-                        isDarkMode
+                      className={`p-2 rounded-lg ${isDarkMode
                           ? "hover:bg-slate-700 text-gray-300"
                           : "hover:bg-gray-100 text-gray-600"
-                      }`}
+                        }`}
                     >
                       <Video className="w-5 h-5" />
                     </button>
                     <button
-                      className={`p-2 rounded-lg ${
-                        isDarkMode
+                      className={`p-2 rounded-lg ${isDarkMode
                           ? "hover:bg-slate-700 text-gray-300"
                           : "hover:bg-gray-100 text-gray-600"
-                      }`}
+                        }`}
                     >
                       <MoreVertical className="w-5 h-5" />
                     </button>
@@ -1071,15 +1005,13 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                 {/* Messages */}
                 <div
                   ref={messagesContainerRef}
-                  className={`flex-1 overflow-y-auto p-6 min-h-0 ${
-                    isDarkMode ? "bg-slate-900" : "bg-gray-50"
-                  }`}
+                  className={`flex-1 overflow-y-auto p-6 min-h-0 ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
+                    }`}
                 >
                   {messages.length === 0 ? (
                     <div
-                      className={`text-center py-12 ${
-                        isDarkMode ? "text-gray-500" : "text-gray-400"
-                      }`}
+                      className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                        }`}
                     >
                       <p className="text-sm">
                         No messages yet. Start the conversation!
@@ -1091,45 +1023,40 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                         <div key={`group-${groupIndex}`}>
                           {/* Date Separator */}
                           <div className="flex items-center justify-center my-8">
-                            <div className={`px-4 py-1.5 rounded-full text-sm ${
-                              isDarkMode 
-                                ? "bg-slate-800 text-gray-400" 
+                            <div className={`px-4 py-1.5 rounded-full text-sm ${isDarkMode
+                                ? "bg-slate-800 text-gray-400"
                                 : "bg-gray-200 text-gray-600"
-                            }`}>
+                              }`}>
                               {group.date}
                             </div>
                           </div>
-                          
+
                           {/* Messages for this date */}
                           {group.messages.map((msg) => {
                             const isSent = msg.sender?.phone === currentUser?.phone;
                             return (
                               <div
                                 key={msg.id || `${msg.createdAt}-${msg.text?.substring(0, 10)}`}
-                                className={`mb-4 flex ${
-                                  isSent ? "justify-end" : "justify-start"
-                                }`}
+                                className={`mb-4 flex ${isSent ? "justify-end" : "justify-start"
+                                  }`}
                               >
                                 <div className="max-w-md">
                                   <div
-                                    className={`rounded-2xl px-4 py-2.5 ${
-                                      isSent
+                                    className={`rounded-2xl px-4 py-2.5 ${isSent
                                         ? "bg-purple-500 text-white rounded-br-sm"
                                         : isDarkMode
-                                        ? "bg-slate-800 text-white rounded-bl-sm"
-                                        : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
-                                    }`}
+                                          ? "bg-slate-800 text-white rounded-bl-sm"
+                                          : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
+                                      }`}
                                   >
                                     <p className="text-sm whitespace-pre-wrap">
                                       {msg.text}
                                     </p>
                                   </div>
                                   <p
-                                    className={`text-xs mt-1 ${
-                                      isSent ? "text-right" : "text-left"
-                                    } ${
-                                      isDarkMode ? "text-gray-500" : "text-gray-500"
-                                    }`}
+                                    className={`text-xs mt-1 ${isSent ? "text-right" : "text-left"
+                                      } ${isDarkMode ? "text-gray-500" : "text-gray-500"
+                                      }`}
                                   >
                                     {formatTime(msg.createdAt)}
                                   </p>
@@ -1146,19 +1073,17 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
                 {/* Message Input */}
                 <div
-                  className={`px-6 py-4 border-t flex-shrink-0 ${
-                    isDarkMode
+                  className={`px-6 py-4 border-t flex-shrink-0 ${isDarkMode
                       ? "bg-slate-800 border-slate-700"
                       : "bg-white border-gray-200"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <button
-                      className={`p-2 rounded-lg ${
-                        isDarkMode
+                      className={`p-2 rounded-lg ${isDarkMode
                           ? "hover:bg-slate-700 text-gray-400"
                           : "hover:bg-gray-100 text-gray-600"
-                      }`}
+                        }`}
                     >
                       <Paperclip className="w-5 h-5" />
                     </button>
@@ -1168,19 +1093,17 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       onChange={(e) => setMessageText(e.target.value)}
                       onKeyPress={handleKeyPress}
                       placeholder="Type a message"
-                      className={`flex-1 px-4 py-2.5 rounded-full focus:outline-none ${
-                        isDarkMode
+                      className={`flex-1 px-4 py-2.5 rounded-full focus:outline-none ${isDarkMode
                           ? "bg-slate-700 text-white placeholder-gray-500"
                           : "bg-gray-100 text-gray-900 placeholder-gray-400"
-                      }`}
+                        }`}
                       disabled={loading}
                     />
                     <button
-                      className={`p-2 rounded-lg ${
-                        isDarkMode
+                      className={`p-2 rounded-lg ${isDarkMode
                           ? "hover:bg-slate-700 text-gray-400"
                           : "hover:bg-gray-100 text-gray-600"
-                      }`}
+                        }`}
                     >
                       <Smile className="w-5 h-5" />
                     </button>
@@ -1200,26 +1123,22 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
               </>
             ) : (
               <div
-                className={`flex-1 flex items-center justify-center ${
-                  isDarkMode ? "bg-slate-900" : "bg-gray-50"
-                }`}
+                className={`flex-1 flex items-center justify-center ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
+                  }`}
               >
                 <div className="text-center py-12">
                   <div
-                    className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${
-                      isDarkMode ? "bg-slate-800" : "bg-white"
-                    }`}
+                    className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${isDarkMode ? "bg-slate-800" : "bg-white"
+                      }`}
                   >
                     <Users
-                      className={`w-8 h-8 ${
-                        isDarkMode ? "text-gray-600" : "text-gray-400"
-                      }`}
+                      className={`w-8 h-8 ${isDarkMode ? "text-gray-600" : "text-gray-400"
+                        }`}
                     />
                   </div>
                   <p
-                    className={`text-lg ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+                    className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
                   >
                     Select a conversation to start chatting
                   </p>
@@ -1230,21 +1149,18 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
           {/* Right Sidebar - People You May Know */}
           <div
-            className={`w-80 border flex flex-col rounded-lg overflow-hidden ${
-              isDarkMode
+            className={`w-80 border flex flex-col rounded-lg overflow-hidden ${isDarkMode
                 ? "bg-slate-800 border-slate-700"
                 : "bg-white border-gray-200"
-            }`}
+              }`}
           >
             <div
-              className={`p-4 border-b flex-shrink-0 ${
-                isDarkMode ? "border-slate-700" : "border-gray-200"
-              }`}
+              className={`p-4 border-b flex-shrink-0 ${isDarkMode ? "border-slate-700" : "border-gray-200"
+                }`}
             >
               <h2
-                className={`text-lg font-semibold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 People You May Know
               </h2>
@@ -1256,19 +1172,17 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   <div
                     key={getPersonKey(person, "sidebar-person-")}
                     onClick={() => setSelectedUser(person)}
-                    className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${
-                      isDarkMode
+                    className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${isDarkMode
                         ? "border-slate-700 hover:bg-slate-750"
                         : "border-gray-200 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     <div className="relative">
                       <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                          person.userType === "alumni"
+                        className={`w-12 h-12 rounded-full flex items-center justify-center ${person.userType === "alumni"
                             ? "bg-gradient-to-br from-purple-500 to-pink-500"
                             : "bg-gradient-to-br from-blue-500 to-cyan-500"
-                        }`}
+                          }`}
                       >
                         {person.userType === "alumni" ? (
                           <GraduationCap className="w-6 h-6 text-white" />
@@ -1279,16 +1193,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
-                        className={`font-semibold truncate ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}
+                        className={`font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
                       >
                         {person.name}
                       </h3>
                       <p
-                        className={`text-sm truncate ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
+                        className={`text-sm truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
                       >
                         {person.email}
                       </p>

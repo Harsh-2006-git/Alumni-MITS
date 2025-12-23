@@ -1234,7 +1234,7 @@ export default function AlumniHomePage({
           </motion.p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             {
               title: "Fusion Fiesta",
@@ -1293,7 +1293,7 @@ export default function AlumniHomePage({
                 y: -10,
                 rotateY: 5,
               }}
-              className={`rounded-2xl border overflow-hidden transition-all hover:shadow-2xl ${isDarkMode
+              className={`rounded-2xl border overflow-hidden transition-all hover:shadow-2xl max-w-md mx-auto w-full ${isDarkMode
                 ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                 : "bg-white border-blue-200 shadow-lg"
                 }`}
@@ -1424,7 +1424,7 @@ export default function AlumniHomePage({
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        className="container mx-auto px-10 lg:px-16 py-12"
+        className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-8 md:py-12"
       >
         <div className="text-center mb-12">
           <motion.h2

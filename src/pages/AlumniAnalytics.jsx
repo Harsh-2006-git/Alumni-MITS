@@ -241,9 +241,8 @@ export default function AlumniAnalytics({
     if (active && payload && payload.length) {
       return (
         <div
-          className={`p-3 rounded-lg shadow-lg ${
-            isDarkMode ? "bg-gray-800" : "bg-white"
-          } border ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}
+          className={`p-3 rounded-lg shadow-lg ${isDarkMode ? "bg-gray-800" : "bg-white"
+            } border ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}
         >
           <p className="font-semibold">{label}</p>
           {payload.map((entry, index) => (
@@ -260,11 +259,10 @@ export default function AlumniAnalytics({
   if (loading) {
     return (
       <div
-        className={`min-h-screen transition-colors duration-500 ${
-          isDarkMode
-            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-            : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-        }`}
+        className={`min-h-screen transition-colors duration-500 ${isDarkMode
+          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+          }`}
       >
         <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
         <div className="flex items-center justify-center py-32">
@@ -287,58 +285,61 @@ export default function AlumniAnalytics({
   if (alumniData.length === 0) {
     return (
       <div
-        className={`min-h-screen transition-colors duration-500 ${
-          isDarkMode
-            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-            : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-        }`}
+        className={`min-h-screen transition-colors duration-500 ${isDarkMode
+          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+          }`}
       >
         <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <section className="container mx-auto px-4 md:px-10 lg:px-16 py-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <TrendingUp className="w-8 h-8 text-cyan-400" />
-              <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
                 Alumni Analytics
               </h1>
             </div>
             <p
-              className={`text-lg ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
-              } max-w-2xl mx-auto`}
+              className={`text-lg sm:text-xl ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                } max-w-2xl mx-auto`}
             >
               Comprehensive insights and trends about our alumni community
             </p>
+            <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mt-4"></div>
           </div>
 
           {/* No Data Found */}
           <div
-            className={`max-w-2xl mx-auto p-8 rounded-2xl border text-center ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`max-w-2xl mx-auto p-8 rounded-2xl border text-center ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <AlertCircle className="w-16 h-16 mx-auto mb-4 text-blue-500" />
-            <h2 className="text-2xl font-bold mb-2">No Alumni Found for Analysis</h2>
-            <p className={`mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
-              Start by adding alumni profiles to view analytics and insights about your community.
+            <h2 className="text-2xl font-bold mb-2">
+              No Alumni Found for Analysis
+            </h2>
+            <p
+              className={`mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+            >
+              Start by adding alumni profiles to view analytics and insights
+              about your community.
             </p>
             <button
-              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
-                isDarkMode
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
-              }`}
+              className={`px-6 py-3 rounded-lg font-semibold transition-colors ${isDarkMode
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+                }`}
             >
               Add First Alumni
             </button>
           </div>
 
           {/* Empty Stats */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
             {[
               {
                 label: "Total Alumni",
@@ -367,11 +368,10 @@ export default function AlumniAnalytics({
             ].map((stat, idx) => (
               <div
                 key={idx}
-                className={`p-6 rounded-2xl border transition-all ${
-                  isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                    : "bg-white border-blue-200 shadow-lg"
-                }`}
+                className={`p-6 rounded-2xl border transition-all ${isDarkMode
+                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                  : "bg-white border-blue-200 shadow-lg"
+                  }`}
               >
                 <div
                   className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}
@@ -384,9 +384,8 @@ export default function AlumniAnalytics({
                   {stat.value}
                 </p>
                 <p
-                  className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   {stat.label}
                 </p>
@@ -403,34 +402,33 @@ export default function AlumniAnalytics({
   // Main analytics with data
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section className="container mx-auto px-4 md:px-10 lg:px-16 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <TrendingUp className="w-8 h-8 text-cyan-400" />
-            <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent">
               Alumni Analytics
             </h1>
           </div>
           <p
-            className={`text-lg ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            } max-w-2xl mx-auto`}
+            className={`text-lg sm:text-xl ${isDarkMode ? "text-gray-300" : "text-gray-600"
+              } max-w-2xl mx-auto`}
           >
             Comprehensive insights and trends about our alumni community
           </p>
+          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mt-4"></div>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
           {[
             {
               label: "Total Alumni",
@@ -463,26 +461,24 @@ export default function AlumniAnalytics({
           ].map((stat, idx) => (
             <div
               key={idx}
-              className={`p-6 rounded-2xl border transition-all hover:scale-105 ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200 shadow-lg"
-              }`}
+              className={`p-3 md:p-6 rounded-xl md:rounded-2xl border transition-all hover:scale-105 hover:shadow-xl md:hover:shadow-2xl ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200 shadow-md md:shadow-lg"
+                }`}
             >
               <div
-                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4 shadow-lg`}
+                className={`w-8 h-8 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-2 md:mb-4 shadow-lg`}
               >
-                <stat.icon className="w-6 h-6 text-white" />
+                <stat.icon className="w-4 h-4 md:w-6 md:h-6 text-white" />
               </div>
               <p
-                className={`text-3xl font-bold mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                className={`text-lg md:text-3xl font-bold mb-1 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
               >
                 {stat.value}
               </p>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-xs md:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 {stat.label}
               </p>
@@ -494,17 +490,16 @@ export default function AlumniAnalytics({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Alumni Growth Over Time */}
           <div
-            className={`p-6 rounded-2xl border ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`p-4 md:p-6 rounded-2xl border ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-cyan-400" />
               <h3 className="text-lg font-semibold">Alumni Growth Over Time</h3>
             </div>
-            <div className="h-80">
+            <div className="h-64 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData.growthData || []}>
                   <CartesianGrid
@@ -539,17 +534,16 @@ export default function AlumniAnalytics({
 
           {/* Branch Distribution */}
           <div
-            className={`p-6 rounded-2xl border ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`p-4 md:p-6 rounded-2xl border ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <PieChart className="w-5 h-5 text-purple-400" />
               <h3 className="text-lg font-semibold">Branch Distribution</h3>
             </div>
-            <div className="h-80">
+            <div className="h-64 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
                   <Pie
@@ -560,7 +554,7 @@ export default function AlumniAnalytics({
                     label={({ name, percent }) =>
                       `${name} (${(percent * 100).toFixed(0)}%)`
                     }
-                    outerRadius={80}
+                    outerRadius="80%"
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -581,17 +575,16 @@ export default function AlumniAnalytics({
 
           {/* Top Locations */}
           <div
-            className={`p-6 rounded-2xl border ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`p-4 md:p-6 rounded-2xl border ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <MapIcon className="w-5 h-5 text-green-400" />
               <h3 className="text-lg font-semibold">Top Locations</h3>
             </div>
-            <div className="h-80">
+            <div className="h-64 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData.locationChartData || []}>
                   <CartesianGrid
@@ -621,17 +614,16 @@ export default function AlumniAnalytics({
 
           {/* Top Companies */}
           <div
-            className={`p-6 rounded-2xl border ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`p-4 md:p-6 rounded-2xl border ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <Building2 className="w-5 h-5 text-orange-400" />
               <h3 className="text-lg font-semibold">Top Companies</h3>
             </div>
-            <div className="h-80">
+            <div className="h-64 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData.companyChartData || []}>
                   <CartesianGrid
@@ -661,17 +653,16 @@ export default function AlumniAnalytics({
 
           {/* Experience Level Distribution */}
           <div
-            className={`p-6 rounded-2xl border ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`p-4 md:p-6 rounded-2xl border ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <Calendar className="w-5 h-5 text-yellow-400" />
               <h3 className="text-lg font-semibold">Experience Distribution</h3>
             </div>
-            <div className="h-80">
+            <div className="h-64 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData.experienceChartData || []}>
                   <CartesianGrid
@@ -698,17 +689,16 @@ export default function AlumniAnalytics({
 
           {/* Monthly Registration Trend */}
           <div
-            className={`p-6 rounded-2xl border ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-            }`}
+            className={`p-4 md:p-6 rounded-2xl border ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+              : "bg-white border-blue-200 shadow-lg"
+              }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <BarChart3 className="w-5 h-5 text-pink-400" />
               <h3 className="text-lg font-semibold">Monthly Registrations</h3>
             </div>
-            <div className="h-80">
+            <div className="h-64 md:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData.monthlyTrendData || []}>
                   <CartesianGrid
@@ -738,63 +728,73 @@ export default function AlumniAnalytics({
 
         {/* Summary Statistics */}
         <div
-          className={`p-6 rounded-2xl border mb-8 ${
-            isDarkMode
-              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-              : "bg-white border-blue-200 shadow-lg"
-          }`}
+          className={`p-4 md:p-6 rounded-2xl border mb-8 ${isDarkMode
+            ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+            : "bg-white border-blue-200 shadow-lg"
+            }`}
         >
           <h3 className="text-lg font-semibold mb-4">Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4">
               <div
-                className={`text-2xl font-bold mb-1 ${
-                  isDarkMode ? "text-blue-400" : "text-blue-600"
-                }`}
+                className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                  }`}
               >
                 {alumniData.length}
               </div>
-              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <div
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
                 Total Alumni
               </div>
             </div>
             <div className="text-center p-4">
               <div
-                className={`text-2xl font-bold mb-1 ${
-                  isDarkMode ? "text-green-400" : "text-green-600"
-                }`}
+                className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-green-400" : "text-green-600"
+                  }`}
               >
-                {new Set(alumniData.map(a => a.profile?.location)).size}
+                {new Set(alumniData.map((a) => a.profile?.location)).size}
               </div>
-              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <div
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
                 Cities Covered
               </div>
             </div>
             <div className="text-center p-4">
               <div
-                className={`text-2xl font-bold mb-1 ${
-                  isDarkMode ? "text-purple-400" : "text-purple-600"
-                }`}
+                className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                  }`}
               >
-                {new Set(
-                  alumniData.flatMap(
-                    (a) => a.profile?.experience?.map((exp) => exp.company) || []
-                  )
-                ).size}
+                {
+                  new Set(
+                    alumniData.flatMap(
+                      (a) =>
+                        a.profile?.experience?.map((exp) => exp.company) || []
+                    )
+                  ).size
+                }
               </div>
-              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <div
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
                 Companies
               </div>
             </div>
             <div className="text-center p-4">
               <div
-                className={`text-2xl font-bold mb-1 ${
-                  isDarkMode ? "text-orange-400" : "text-orange-600"
-                }`}
+                className={`text-2xl font-bold mb-1 ${isDarkMode ? "text-orange-400" : "text-orange-600"
+                  }`}
               >
-                {new Set(alumniData.map(a => a.profile?.branch)).size}
+                {new Set(alumniData.map((a) => a.profile?.branch)).size}
               </div>
-              <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              <div
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
                 Branches
               </div>
             </div>

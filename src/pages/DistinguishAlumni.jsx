@@ -299,13 +299,13 @@ export function ScrollingAlumni({ isDarkMode }) {
         {/* Section Header - Compact */}
         <div className="text-center mb-8">
           <h2
-            className={`text-lg sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-2xl md:text-3xl font-bold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
             Our Distinguished Alumni
           </h2>
           <p
-            className={`text-xs sm:text-sm md:text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
             Meet our distinguished alumni shaping industries and driving

@@ -141,8 +141,10 @@ export default function AlumniAuth({
           name: decodeURIComponent(userName || ""),
           email: userEmail || "",
           userType: "alumni",
+          phone: params.get("phone") || "",
           profilePhoto: userProfilePhoto ? decodeURIComponent(userProfilePhoto) : null,
         },
+        phone: params.get("phone") || "",
         expiry: Date.now() + 1000 * 60 * 60,
       };
 

@@ -624,7 +624,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       }`}
                   >
                     <div className="py-1">
-                      {jobsOptions.map((option, index) => (
+                      {jobsOptions.filter(option =>
+                        option.label !== "Create Jobs" || (auth?.userType === "alumni" || auth?.userType === "admin" || !auth)
+                      ).map((option, index) => (
                         <button
                           key={index}
                           onClick={() => handleJobsOptionClick(option.path)}
@@ -1197,7 +1199,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
                 {showJobsDropdown && (
                   <div className="ml-4 mt-1 flex flex-col gap-1">
-                    {jobsOptions.map((option, index) => (
+                    {jobsOptions.filter(option =>
+                      option.label !== "Create Jobs" || (auth?.userType === "alumni" || auth?.userType === "admin" || !auth)
+                    ).map((option, index) => (
                       <button
                         key={index}
                         onClick={() => handleJobsOptionClick(option.path)}

@@ -827,7 +827,8 @@ export default function LoginPage({
         userName: decodedName,
         userEmail: userEmailParam || "",
         userId: userIdParam || "",
-        userType: "student",
+        phone: params.get("phone") || "",
+        userType: params.get("userType") || "student",
         expiry: Date.now() + 1000 * 60 * 60,
       };
 
@@ -950,6 +951,7 @@ export default function LoginPage({
         userName: decodedName,
         userEmail: userEmailParam || "",
         userId: userIdParam || "",
+        phone: params.get("phone") || "",
       };
 
       // Check if user needs extra email from backend

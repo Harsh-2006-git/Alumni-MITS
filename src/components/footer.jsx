@@ -28,7 +28,13 @@ export default function Footer({ isDarkMode }) {
             className={`text-xs md:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
-            © 2025 MITS Alumni Network. All rights reserved. | Developed by{" "}
+            © 2025 MITS Alumni Network. All rights reserved.
+          </p>
+          <p
+            className={`text-xs md:text-sm mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+          >
+            Developed by{" "}
             <a
               onClick={() => navigate("/developer")}
               className="font-extrabold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 bg-clip-text text-transparent cursor-pointer hover:underline"

@@ -35,6 +35,16 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
       setShowAuthPopup(true);
       return;
     }
+
+    // Get user type from localStorage
+    const authData = localStorage.getItem("auth");
+    const userType = authData ? JSON.parse(authData).userType : null;
+
+    if (userType === "student") {
+      showToast("Only alumni and admins can post jobs.", "error");
+      return;
+    }
+
     setShowPostJobDialog(true);
   };
 
@@ -91,9 +101,8 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
         {!isUserLoggedIn && (
           <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 max-w-md mx-auto">
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-yellow-300" : "text-yellow-700"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-yellow-300" : "text-yellow-700"
+                }`}
             >
               💡 Please login to post jobs and access all features
             </p>
@@ -105,9 +114,8 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
         </p>
 
         <p
-          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
-            isDarkMode ? "text-gray-300" : "text-gray-700"
-          }`}
+          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+            }`}
         >
           Help fellow alumni and students find their next career opportunity by
           posting job openings from your company.
@@ -126,16 +134,14 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Upload className="w-8 h-8 text-blue-500 mb-2" />
             <h3 className="font-semibold mb-2">Easy Job Posting</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Fill out a simple form to post job opportunities quickly and
               efficiently.
@@ -143,16 +149,14 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
           </div>
 
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Sparkles className="w-8 h-8 text-green-500 mb-2" />
             <h3 className="font-semibold mb-2">Reach Qualified Candidates</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Your job will be visible to MITS alumni and students actively
               seeking opportunities.
@@ -160,16 +164,14 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
           </div>
 
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Users className="w-8 h-8 text-purple-500 mb-2" />
             <h3 className="font-semibold mb-2">Build Your Network</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Connect with talented individuals from the MITS community and
               strengthen your professional network.
@@ -182,11 +184,10 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
           ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
           : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
@@ -207,31 +208,27 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-12">
         <div
-          className={`p-8 rounded-xl ${
-            isDarkMode ? "bg-slate-900" : "bg-white shadow-lg"
-          }`}
+          className={`p-8 rounded-xl ${isDarkMode ? "bg-slate-900" : "bg-white shadow-lg"
+            }`}
         >
           <h2
-            className={`text-2xl font-bold mb-6 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Why Post Jobs on Our Platform?
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-blue-500">
                 Targeted Audience
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Reach specifically MITS alumni and students who are pre-vetted
                 and qualified for various roles.
@@ -239,17 +236,15 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-green-500">
                 Cost Effective
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Post jobs for free and connect with talented individuals without
                 any recruitment costs.
@@ -257,17 +252,15 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-purple-500">
                 Quick Hiring
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Reduce your time-to-hire by connecting directly with candidates
                 from the MITS network.
@@ -275,17 +268,15 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-orange-500">
                 Alumni Network
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Leverage the strong MITS alumni network for referrals and
                 quality candidate recommendations.
@@ -299,9 +290,8 @@ export default function CreateJobPage({ isDarkMode, toggleTheme }) {
                 Ready to Post a Job?
               </h3>
               <p
-                className={`text-sm mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-sm mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
                 Login to access the job posting form and start connecting with
                 talented candidates from the MITS community.
