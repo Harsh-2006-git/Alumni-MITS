@@ -12,13 +12,18 @@ export const getAllPeople = async (req, res) => {
         userType: { $in: ["student", "alumni"] },
         _id: { $ne: currentUserId }
       },
-      "id name email phone userType"
+      "name email phone userType"
     );
+
+    const peopleWithId = people.map(p => ({
+      ...p.toJSON(),
+      id: p._id.toString()
+    }));
 
     return res.status(200).json({
       success: true,
-      count: people.length,
-      data: people,
+      count: peopleWithId.length,
+      data: peopleWithId,
     });
   } catch (error) {
     console.error("Error fetching people:", error);
@@ -76,23 +81,20 @@ export const getMyMessages = async (req, res) => {
 
     const messagesWithUsers = await Promise.all(
       messages.map(async (msg) => {
-        // Both sender and receiver are now in the User model
         const sender = await User.findById(
           msg.senderId,
-          "id name userType phone email"
+          "name userType phone email"
         );
-
         const receiver = await User.findById(
           msg.receiverId,
-          "id name userType phone email"
+          "name userType phone email"
         );
-
         return {
           id: msg._id,
           text: msg.text,
           createdAt: msg.createdAt,
-          sender: sender ? sender.toJSON() : null,
-          receiver: receiver ? receiver.toJSON() : null,
+          sender: sender ? { ...sender.toJSON(), id: sender._id.toString() } : null,
+          receiver: receiver ? { ...receiver.toJSON(), id: receiver._id.toString() } : null,
         };
       })
     );

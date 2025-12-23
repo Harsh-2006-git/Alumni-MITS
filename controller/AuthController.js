@@ -1367,6 +1367,7 @@ export const registerStudent = async (req, res) => {
         id: student._id,
         name: student.name,
         email: student.email,
+        phone: student.phone,
         userType: student.userType,
         isProfileComplete: student.isProfileComplete,
       },
