@@ -12,6 +12,6 @@ const router = express.Router();
 // Protected routes
 router.post("/send", authenticateClient, sendMessage);
 router.get("/my", authenticateClient, getMyMessages);
-router.get("/people", getAllPeople);
+router.get("/people", authenticateClient, getAllPeople);
 
 export default router;

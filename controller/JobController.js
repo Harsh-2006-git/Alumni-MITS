@@ -7,6 +7,14 @@ export const createJob = async (req, res) => {
     // Get user data from token
     const { email, userType } = req.user;
 
+    // Check if user is allowed to post jobs (only alumni and admins)
+    if (userType !== "alumni" && userType !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Only alumni and admins are allowed to post jobs",
+      });
+    }
+
     // All available fields from req.body
     const {
       title,

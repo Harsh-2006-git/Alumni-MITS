@@ -2,10 +2,8 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import User from "../models/user.js"; // User = Student
-import Alumni from "../models/alumni.js";
-import AlumniProfile from "../models/AlumniProfile.js";
-import StudentProfile from "../models/studentProfile.js";
+import User from "../models/user.js";
+import UserProfile from "../models/UserProfile.js";
 import EmailService from "../services/NewUserEmailService.js"; // Add email service import
 import csv from "csv-parser";
 import multer from "multer";
@@ -66,6 +64,7 @@ const generateTokensAdmin = (adminPayload) => {
   return { accessToken, refreshToken };
 };
 
+// ✅ Admin Login Controller
 // ✅ Admin Login Controller
 export const adminLogin = async (req, res) => {
   try {
@@ -133,6 +132,7 @@ passport.use(
             phone,
             password: randomPassword,
             userType: "student",
+            isVerified: true, // Auto-verify students
           });
 
           // ✅ Send welcome email for Google OAuth registration (non-blocking)
@@ -189,6 +189,9 @@ export const googleCallback = (req, res, next) => {
     redirectUrl.searchParams.set("email", user.email);
     redirectUrl.searchParams.set("id", user.id.toString());
     redirectUrl.searchParams.set("userType", user.userType);
+    if (user.phone) {
+      redirectUrl.searchParams.set("phone", user.phone);
+    }
 
     res.redirect(redirectUrl.toString());
   })(req, res, next);
@@ -209,20 +212,19 @@ passport.use(
       try {
         const email = profile.emails[0].value;
 
-        // Check if alumni exists with this email
-        let alumni = await Alumni.findOne({ email: email.toLowerCase() });
+        // Check if user exists with this email and is alumni
+        let user = await User.findOne({ email: email.toLowerCase(), userType: "alumni" });
 
-        if (!alumni) {
+        if (!user) {
           return done(null, false, { message: "alumni_not_registered" });
         }
 
-        // Check if alumni is verified
-        if (!alumni.isVerified) {
+        // Check verification
+        if (!user.isVerified) {
           return done(null, false, { message: "alumni_not_verified" });
         }
 
-        // Alumni is registered and verified, proceed with login
-        return done(null, alumni);
+        return done(null, user);
       } catch (err) {
         return done(err, null);
       }
@@ -263,6 +265,9 @@ export const googleCallbackAlumni = (req, res, next) => {
     redirectUrl.searchParams.set("email", user.email);
     redirectUrl.searchParams.set("id", user.id.toString());
     redirectUrl.searchParams.set("userType", user.userType);
+    if (user.phone) {
+      redirectUrl.searchParams.set("phone", user.phone);
+    }
     if (user.profilePhoto) {
       redirectUrl.searchParams.set("profilePhoto", encodeURIComponent(user.profilePhoto));
     }
@@ -324,9 +329,9 @@ export const googleCallbackAlumniRegister = (req, res, next) => {
     // Initial check if email is already taken (backend side check)
     // We can do this here to give immediate feedback or let the frontend handle it
     // Let's do a quick check to fail fast if it's an existing ALUMNI
-    const existingAlumni = await Alumni.findOne({ email });
-    if (existingAlumni) {
-      console.log("⚠️ Email already registered as Alumni:", email);
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      console.log("⚠️ Email already registered:", email);
       return res.redirect(`${FRONTEND_URL}/auth-alumni?error=email_exists`);
     }
 
@@ -368,6 +373,8 @@ export const register = async (req, res) => {
       phone,
       password: hashedPassword,
       userType: "student",
+      isVerified: true, // Auto-verify students
+      isProfileComplete: false,
     });
 
     const { accessToken, refreshToken } = generateTokens(user);
@@ -401,6 +408,25 @@ export const register = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error("Registration error:", err);
+
+    // ✅ Handle MongoDB duplicate key error (E11000)
+    if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern || {})[0];
+      let message = "A duplicate record already exists.";
+
+      if (field === "phone") {
+        message = "This phone number is already registered.";
+      } else if (field === "email") {
+        message = "This email is already registered.";
+      }
+
+      return res.status(409).json({
+        success: false,
+        message
+      });
+    }
+
     res
       .status(500)
       .json({ message: "Registration failed", error: err.message });
@@ -537,20 +563,24 @@ export const registerAlumni = async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
     const sanitizedPhone = cleanedPhone.substring(0, 15);
 
-    const existingEmail = await Alumni.findOne({ email: normalizedEmail });
-    if (existingEmail) {
-      return res.status(400).json({
-        success: false,
-        message: "Email already exists in system",
-      });
-    }
+    // CHECK USER MODEL
+    const existingUser = await User.findOne({
+      $or: [{ email: normalizedEmail }, { phone: sanitizedPhone }]
+    });
 
-    const existingPhone = await Alumni.findOne({ phone: sanitizedPhone });
-    if (existingPhone) {
-      return res.status(400).json({
-        success: false,
-        message: "Phone number already exists in system",
-      });
+    if (existingUser) {
+      if (existingUser.email === normalizedEmail) {
+        return res.status(400).json({
+          success: false,
+          message: "Email already exists in system",
+        });
+      }
+      if (existingUser.phone === sanitizedPhone) {
+        return res.status(400).json({
+          success: false,
+          message: "Phone number already exists in system",
+        });
+      }
     }
 
     // Sanitize inputs (same as bulk)
@@ -615,20 +645,21 @@ export const registerAlumni = async (req, res) => {
       JSON.stringify(education, null, 2)
     );
 
-    // Create alumni record (same structure as bulk but with isVerified: false)
-    const alumni = await Alumni.create({
+    // Create user record (Unified User Model)
+    const user = await User.create({
       name: sanitizeInput(name),
       email: normalizedEmail,
       phone: sanitizedPhone,
-      branch: sanitizeInput(branch),
+      branch: sanitizeInput(branch), // Storing branch in User for easy access
+      batch: sanitizeInput(batchYear), // Storing batch in User for easy access
       password: hashedPassword,
       userType: "alumni",
       isVerified: false, // Set to false for manual registration
     });
 
-    // Create alumni profile with education data (EXACT same as bulk)
-    const alumniProfileData = {
-      alumniId: alumni._id,
+    // Create user profile with education data (Unified UserProfile)
+    const userProfileData = {
+      userId: user._id,
       branch: sanitizeInput(branch),
       batch: sanitizeInput(batchYear),
       location: sanitizedLocation,
@@ -638,11 +669,11 @@ export const registerAlumni = async (req, res) => {
 
     console.log("Creating profile with exact education format");
 
-    await AlumniProfile.create(alumniProfileData);
+    await UserProfile.create(userProfileData);
 
     // Prepare user data for email
     const userWithCredentials = {
-      ...alumni.toJSON(),
+      ...user.toJSON(),
       batchYear: sanitizeInput(batchYear),
       location: sanitizedLocation,
       linkedinUrl: sanitizedLinkedIn,
@@ -652,17 +683,17 @@ export const registerAlumni = async (req, res) => {
     // Send welcome email (same as bulk)
     try {
       await emailService.sendWelcomeEmail(userWithCredentials);
-      console.log(`✅ Welcome email sent to ${alumni.email}`);
+      console.log(`✅ Welcome email sent to ${user.email}`);
     } catch (emailError) {
       console.error(
-        `❌ Failed to send welcome email to ${alumni.email}:`,
+        `❌ Failed to send welcome email to ${user.email}:`,
         emailError
       );
       // Don't fail registration if email fails (same as bulk)
     }
 
     // Generate tokens for immediate upload capability
-    const { accessToken, refreshToken } = generateTokens(alumni);
+    const { accessToken, refreshToken } = generateTokens(user);
 
     // Return response
     res.status(201).json({
@@ -673,13 +704,13 @@ export const registerAlumni = async (req, res) => {
       refreshToken,
       data: {
         alumni: {
-          id: alumni._id,
-          name: alumni.name,
-          email: alumni.email,
-          phone: alumni.phone,
-          branch: alumni.branch,
-          userType: alumni.userType,
-          isVerified: alumni.isVerified,
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          branch: user.branch,
+          userType: user.userType,
+          isVerified: user.isVerified,
         },
         profile: {
           batchYear: batchYear,
@@ -691,6 +722,24 @@ export const registerAlumni = async (req, res) => {
     });
   } catch (error) {
     console.error("Alumni registration error:", error);
+
+    // ✅ Handle MongoDB duplicate key error (E11000)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      let message = "A duplicate record already exists.";
+
+      if (field === "phone") {
+        message = "This phone number is already associated with another account.";
+      } else if (field === "email") {
+        message = "This email is already registered.";
+      }
+
+      return res.status(409).json({
+        success: false,
+        message
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: "Server error during alumni registration",
@@ -707,19 +756,21 @@ export const registerAlumni = async (req, res) => {
 export const loginAlumni = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const alumni = await Alumni.findOne({ email });
 
-    if (!alumni) return res.status(404).json({ message: "User not found" });
+    // Check for user of type alumni
+    const user = await User.findOne({ email, userType: "alumni" });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     // Check verification
-    if (!alumni.isVerified) {
+    if (!user.isVerified) {
       return res.status(403).json({
         message:
           "Your account is under verification. Please wait for approval.",
       });
     }
 
-    const isMatch = await bcrypt.compare(password, alumni.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
@@ -727,11 +778,11 @@ export const loginAlumni = async (req, res) => {
     // ✅ Generate Access Token (short life)
     const accessToken = jwt.sign(
       {
-        id: alumni.id,
-        email: alumni.email,
-        name: alumni.name,
-        phone: alumni.phone,
-        userType: alumni.userType,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        userType: user.userType,
       },
       JWT_SECRET,
       { expiresIn: "1h" }
@@ -740,11 +791,11 @@ export const loginAlumni = async (req, res) => {
     // ✅ Generate Refresh Token (long life)
     const refreshToken = jwt.sign(
       {
-        id: alumni.id,
-        email: alumni.email,
-        name: alumni.name,
-        phone: alumni.phone,
-        userType: alumni.userType,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        phone: user.phone,
+        userType: user.userType,
       },
       REFRESH_TOKEN_SECRET,
       { expiresIn: "7d" }
@@ -752,9 +803,6 @@ export const loginAlumni = async (req, res) => {
 
     // ✅ Option 1 (temporary): store in memory
     refreshTokens.push(refreshToken);
-
-    // ✅ Option 2 (recommended): store in DB (uncomment if you add model)
-    // await RefreshToken.create({ token: refreshToken, userId: alumni.id });
 
     // Send tokens
     res
@@ -772,12 +820,12 @@ export const loginAlumni = async (req, res) => {
         accessToken,
         refreshToken,
         user: {
-          id: alumni.id,
-          name: alumni.name,
-          email: alumni.email,
-          userType: alumni.userType,
-          isVerified: alumni.isVerified,
-          profilePhoto: alumni.profilePhoto,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          userType: user.userType,
+          isVerified: user.isVerified,
+          profilePhoto: user.profilePhoto,
         },
       });
   } catch (err) {
@@ -890,22 +938,26 @@ export const handleForgotPassword = async (req, res) => {
       });
     }
 
-    // Check if alumni exists
-    const alumni = await Alumni.findOne({ email });
-    if (!alumni) {
+    // Check if user exists (Unified User Model)
+    // We check for userType 'alumni' specifically if this is an alumni portal feature,
+    // or generic if for all. Assuming generic for now or strictly alumni if called from alumni portal.
+    // Let's make it work for any user who drives the forgotten password flow.
+    const user = await User.findOne({ email });
+
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: "No alumni found with this email address",
+        message: "No user found with this email address",
       });
     }
 
     // Handle different actions
     switch (action) {
       case "send-otp":
-        return await handleSendOTP(alumni, res);
+        return await handleSendOTP(user, res);
 
       case "verify-reset":
-        return await handleVerifyAndReset(alumni, otp, newPassword, res);
+        return await handleVerifyAndReset(user, otp, newPassword, res);
 
       default:
         return res.status(400).json({
@@ -923,26 +975,26 @@ export const handleForgotPassword = async (req, res) => {
 };
 
 // Handle OTP sending
-const handleSendOTP = async (alumni, res) => {
+const handleSendOTP = async (user, res) => {
   try {
     // Generate OTP and set expiry (10 minutes)
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Save OTP and expiry to alumni record
-    alumni.resetPasswordOTP = otp;
-    alumni.resetPasswordOTPExpiry = otpExpiry;
-    await alumni.save();
+    // Save OTP and expiry to user record
+    user.resetPasswordOTP = otp;
+    user.resetPasswordOTPExpiry = otpExpiry;
+    await user.save();
 
     // Send OTP via email
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: alumni.email,
+      to: user.email,
       subject: "Password Reset OTP - Alumni Portal",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Password Reset Request</h2>
-          <p>Hello ${alumni.name},</p>
+          <p>Hello ${user.name},</p>
           <p>You have requested to reset your password. Use the OTP below to proceed:</p>
           <div style="background-color: #f4f4f4; padding: 15px; text-align: center; margin: 20px 0;">
             <h1 style="margin: 0; color: #333; letter-spacing: 5px;">${otp}</h1>
@@ -969,7 +1021,7 @@ const handleSendOTP = async (alumni, res) => {
 };
 
 // Handle OTP verification and password reset
-const handleVerifyAndReset = async (alumni, otp, newPassword, res) => {
+const handleVerifyAndReset = async (user, otp, newPassword, res) => {
   try {
     // Validate required fields
     if (!otp || !newPassword) {
@@ -988,7 +1040,7 @@ const handleVerifyAndReset = async (alumni, otp, newPassword, res) => {
     }
 
     // Verify OTP
-    if (alumni.resetPasswordOTP !== otp) {
+    if (user.resetPasswordOTP !== otp) {
       return res.status(400).json({
         success: false,
         message: "Invalid OTP",
@@ -996,7 +1048,7 @@ const handleVerifyAndReset = async (alumni, otp, newPassword, res) => {
     }
 
     // Check if OTP has expired
-    if (new Date() > alumni.resetPasswordOTPExpiry) {
+    if (new Date() > user.resetPasswordOTPExpiry) {
       return res.status(400).json({
         success: false,
         message: "OTP has expired. Please request a new one.",
@@ -1007,20 +1059,20 @@ const handleVerifyAndReset = async (alumni, otp, newPassword, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update password and clear OTP fields
-    alumni.password = hashedPassword;
-    alumni.resetPasswordOTP = undefined;
-    alumni.resetPasswordOTPExpiry = undefined;
-    await alumni.save();
+    user.password = hashedPassword;
+    user.resetPasswordOTP = undefined;
+    user.resetPasswordOTPExpiry = undefined;
+    await user.save();
 
     // Send confirmation email
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: alumni.email,
+      to: user.email,
       subject: "Password Reset Successful - Alumni Portal",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Password Reset Successful</h2>
-          <p>Hello ${alumni.name},</p>
+          <p>Hello ${user.name},</p>
           <p>Your password has been successfully reset.</p>
           <p>If you didn't make this change, please contact support immediately.</p>
           <br>
@@ -1054,10 +1106,10 @@ export const checkAlumniEmail = async (req, res) => {
       });
     }
 
-    // Check if alumni exists with this email
-    const alumni = await Alumni.findOne({ email });
+    // Check if alumni exists with this email (Unified User Model)
+    const user = await User.findOne({ email, userType: "alumni" });
 
-    if (!alumni) {
+    if (!user) {
       return res.status(404).json({
         success: false,
         isRegistered: false,
@@ -1066,7 +1118,7 @@ export const checkAlumniEmail = async (req, res) => {
     }
 
     // Check if alumni is verified
-    if (!alumni.isVerified) {
+    if (!user.isVerified) {
       return res.status(200).json({
         success: true,
         isRegistered: true,
@@ -1074,8 +1126,8 @@ export const checkAlumniEmail = async (req, res) => {
         message:
           "Email found but account is not verified. Please verify your account first.",
         data: {
-          name: alumni.name,
-          email: alumni.email,
+          name: user.name,
+          email: user.email,
         },
       });
     }
@@ -1086,9 +1138,9 @@ export const checkAlumniEmail = async (req, res) => {
       isVerified: true,
       message: "Email verified as registered alumni",
       data: {
-        name: alumni.name,
-        email: alumni.email,
-        userType: alumni.userType,
+        name: user.name,
+        email: user.email,
+        userType: user.userType,
       },
     });
   } catch (error) {
@@ -1230,16 +1282,44 @@ export const registerStudent = async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
+    // ✅ Check if phone number is already taken by another user
+    const existingPhone = await User.findOne({
+      phone,
+      _id: { $ne: userId }
+    });
+
+    if (existingPhone) {
+      return res.status(409).json({
+        success: false,
+        message: "Phone number is already associated with another account."
+      });
+    }
+
+    // ✅ Check if personal email is already taken by another user
+    if (extraEmail) {
+      const existingEmail = await User.findOne({
+        extraEmail,
+        _id: { $ne: userId }
+      });
+
+      if (existingEmail) {
+        return res.status(409).json({
+          success: false,
+          message: "Personal email is already associated with another account."
+        });
+      }
+    }
+
     // Update User model fields
     student.extraEmail = extraEmail;
     student.phone = phone;
-    student.isProfileComplete = true;
+    student.isProfileComplete = true; // Mark profile as complete
     await student.save();
 
-    // Update or create student profile
-    let profile = await StudentProfile.findOne({ studentId: userId });
+    // Update or create user profile (Unified UserProfile)
+    let profile = await UserProfile.findOne({ userId });
     if (!profile) {
-      profile = new StudentProfile({ studentId: userId });
+      profile = new UserProfile({ userId });
     }
 
     profile.branch = branch;
@@ -1295,6 +1375,26 @@ export const registerStudent = async (req, res) => {
     });
   } catch (error) {
     console.error("Student registration error:", error);
-    return res.status(500).json({ message: "Server error" });
+
+    // ✅ Handle MongoDB duplicate key error (E11000)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      let message = "A duplicate record already exists.";
+
+      if (field === "phone") {
+        message = "This phone number is already associated with another account.";
+      } else if (field === "email") {
+        message = "This email is already registered.";
+      } else if (field === "extraEmail") {
+        message = "This personal email is already associated with another account.";
+      }
+
+      return res.status(409).json({
+        success: false,
+        message
+      });
+    }
+
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };

@@ -1,17 +1,15 @@
 import Event from "./event.js";
 import EventRegistration from "./eventRegistration.js";
+import User from "./user.js";
+import UserProfile from "./UserProfile.js";
 
-// MongoDB equivalent of "Event.hasMany(EventRegistration)"
-// Each EventRegistration stores eventId: ObjectId of Event
-// To populate: Event.find().populate("registrations")
+// Event associations
 Event.schema.virtual("registrations", {
   ref: "EventRegistration",
   localField: "_id",
   foreignField: "eventId",
 });
 
-// MongoDB equivalent of "EventRegistration.belongsTo(Event)"
-// To populate: EventRegistration.find().populate("event")
 EventRegistration.schema.virtual("event", {
   ref: "Event",
   localField: "eventId",
@@ -19,10 +17,22 @@ EventRegistration.schema.virtual("event", {
   justOne: true,
 });
 
-// required for virtual fields in JSON
+// User associations
+User.schema.virtual("profile", {
+  ref: "UserProfile",
+  localField: "_id",
+  foreignField: "userId",
+  justOne: true,
+});
+
+// Settings for virtuals
 Event.set("toObject", { virtuals: true });
 Event.set("toJSON", { virtuals: true });
 EventRegistration.set("toObject", { virtuals: true });
 EventRegistration.set("toJSON", { virtuals: true });
+User.set("toObject", { virtuals: true });
+User.set("toJSON", { virtuals: true });
+UserProfile.set("toObject", { virtuals: true });
+UserProfile.set("toJSON", { virtuals: true });
 
-export { Event, EventRegistration };
+export { Event, EventRegistration, User, UserProfile };

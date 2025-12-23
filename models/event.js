@@ -24,11 +24,7 @@ const EventSchema = new mongoose.Schema(
       maxlength: 100,
     },
 
-    price: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
+
 
     organizer: {
       type: String,

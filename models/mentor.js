@@ -5,7 +5,7 @@ const MentorSchema = new mongoose.Schema(
   {
     alumni_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Alumni",
+      ref: "User",
       required: true,
     },
     name: {
@@ -66,7 +66,7 @@ const MentorSchema = new mongoose.Schema(
     },
     mentee_students: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: "Student",
+      ref: "User",
       default: [],
     },
   },
@@ -76,7 +76,7 @@ const MentorSchema = new mongoose.Schema(
 );
 
 MentorSchema.virtual("alumni", {
-  ref: "Alumni",
+  ref: "User",
   localField: "alumni_id",
   foreignField: "_id",
   justOne: true,

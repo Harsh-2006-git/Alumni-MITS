@@ -3,8 +3,8 @@ import multer from "multer";
 import csv from "csv-parser";
 import { Readable } from "stream";
 import bcrypt from "bcrypt";
-import AlumniProfile from "../models/AlumniProfile.js";
-import Alumni from "../models/alumni.js";
+import UserProfile from "../models/UserProfile.js";
+import User from "../models/user.js";
 import EmailService from "../services/NewUserEmailService.js";
 
 // Configure multer for file upload
@@ -129,9 +129,10 @@ const generateEducationFromBatch = (batchYear, branch) => {
 
 // Check for existing records in bulk
 const checkExistingRecords = async (emails, phones) => {
-  const existingEmails = await Alumni.find({ email: { $in: emails } }, "email");
+  // Query User model for existing emails and phones
+  const existingEmails = await User.find({ email: { $in: emails } }, "email");
 
-  const existingPhones = await Alumni.find(
+  const existingPhones = await User.find(
     { phone: { $in: phones.map((phone) => sanitizePhone(phone)) } },
     "phone"
   );
@@ -313,20 +314,21 @@ const BulkRegisterAlumni = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         try {
-          // Create alumni record
-          const alumni = await Alumni.create({
+          // Create user record (Unified User)
+          const user = await User.create({
             name: name.trim(),
             email: normalizedEmail,
             phone: sanitizedPhone,
-            branch: branch.trim(),
+            branch: branch.trim(), // Include branch/batch in User for quick access
+            batch: batchYear.trim(),
             password: hashedPassword,
             userType: "alumni",
             isVerified: true,
           });
 
-          // Create alumni profile with education data in EXACT format
-          const alumniProfileData = {
-            alumniId: alumni._id,
+          // Create user profile with education data in EXACT format
+          const userProfileData = {
+            userId: user._id,
             branch: branch.trim(),
             batch: batchYear.trim(),
             location: sanitizedLocation,
@@ -336,14 +338,14 @@ const BulkRegisterAlumni = async (req, res) => {
 
           console.log("Creating profile with exact education format");
 
-          await AlumniProfile.create(alumniProfileData);
+          await UserProfile.create(userProfileData);
 
           // Add to successful registrations
           successfulRegistrations.push({
-            name: alumni.name,
-            email: alumni.email,
-            phone: alumni.phone,
-            branch: alumni.branch,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            branch: user.branch,
             batchYear: batchYear.trim(),
             location: sanitizedLocation || "Not provided",
             linkedinUrl: sanitizedLinkedIn || "Not provided",
@@ -359,7 +361,7 @@ const BulkRegisterAlumni = async (req, res) => {
           try {
             await delay(CONFIG.EMAIL_DELAY);
             const userWithCredentials = {
-              ...alumni.toJSON(),
+              ...user.toJSON(),
               temporaryPassword: password,
               batchYear: batchYear.trim(),
               location: sanitizedLocation,
@@ -368,16 +370,16 @@ const BulkRegisterAlumni = async (req, res) => {
             };
 
             await emailService.sendWelcomeEmail(userWithCredentials);
-            console.log(`✅ Welcome email sent to ${alumni.email}`);
+            console.log(`✅ Welcome email sent to ${user.email}`);
           } catch (emailError) {
             console.error(
-              `❌ Failed to send welcome email to ${alumni.email}:`,
+              `❌ Failed to send welcome email to ${user.email}:`,
               emailError
             );
             errors.push({
               row: rowNumber,
               field: "email_service",
-              value: alumni.email,
+              value: user.email,
               message: `Email sending failed: ${emailError.message}`,
             });
           }

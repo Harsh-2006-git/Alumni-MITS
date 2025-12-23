@@ -10,7 +10,7 @@ const MentorStudentSchema = new mongoose.Schema(
     },
     student_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
+      ref: "User",
       required: true,
     },
     status: {

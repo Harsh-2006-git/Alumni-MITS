@@ -37,6 +37,7 @@ router.get("/all", getAllMentors);
 // Student routes
 router.post("/mentors/:mentorId/request", authMiddleware, requestMentorship);
 router.get("/student/my-mentorships", authMiddleware, getStudentMentorships);
+router.get("/student/mentorships", authMiddleware, getStudentMentorships);
 
 // Mentor routes
 router.get("/mentor/requests", authMiddleware, getMentorshipRequests);

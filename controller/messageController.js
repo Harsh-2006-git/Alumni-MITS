@@ -1,21 +1,24 @@
-// controllers/peopleController.js
-import Student from "../models/user.js";
-import Alumni from "../models/alumni.js";
+// controllers/messageController.js
+import User from "../models/user.js";
+import Message from "../models/Message.js";
 
 export const getAllPeople = async (req, res) => {
   try {
-    const students = await Student.find({}, "id name email phone userType");
-    const alumni = await Alumni.find({}, "id name email phone userType");
+    const currentUserId = req.user.id;
 
-    const combined = [
-      ...students.map((s) => s.toJSON()),
-      ...alumni.map((a) => a.toJSON()),
-    ];
+    // Fetch all students and alumni except the current user
+    const people = await User.find(
+      {
+        userType: { $in: ["student", "alumni"] },
+        _id: { $ne: currentUserId }
+      },
+      "id name email phone userType"
+    );
 
     return res.status(200).json({
       success: true,
-      count: combined.length,
-      data: combined,
+      count: people.length,
+      data: people,
     });
   } catch (error) {
     console.error("Error fetching people:", error);
@@ -24,8 +27,6 @@ export const getAllPeople = async (req, res) => {
       .json({ success: false, message: "Failed to fetch people" });
   }
 };
-
-import Message from "../models/Message.js";
 
 export const sendMessage = async (req, res) => {
   try {
@@ -36,10 +37,10 @@ export const sendMessage = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // 🔹 Find receiver
-    const receiverModel = receiverType === "student" ? Student : Alumni;
-    const receiver = await receiverModel.findOne({
+    // 🔹 Find receiver (Unified User Model)
+    const receiver = await User.findOne({
       phone: receiverPhone,
+      userType: receiverType
     });
 
     if (!receiver) {
@@ -75,15 +76,13 @@ export const getMyMessages = async (req, res) => {
 
     const messagesWithUsers = await Promise.all(
       messages.map(async (msg) => {
-        const senderModel = msg.senderType === "student" ? Student : Alumni;
-        const receiverModel = msg.receiverType === "student" ? Student : Alumni;
-
-        const sender = await senderModel.findById(
+        // Both sender and receiver are now in the User model
+        const sender = await User.findById(
           msg.senderId,
           "id name userType phone email"
         );
 
-        const receiver = await receiverModel.findById(
+        const receiver = await User.findById(
           msg.receiverId,
           "id name userType phone email"
         );

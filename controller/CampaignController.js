@@ -1,7 +1,5 @@
-// controllers/campaignController.js
 import Campaign from "../models/campaign.js";
-import Alumni from "../models/alumni.js";
-import Student from "../models/user.js";
+import User from "../models/user.js";
 import cloudinary from "cloudinary";
 import multer from "multer";
 import mongoose from "mongoose";
@@ -57,36 +55,28 @@ export const createCampaign = async (req, res) => {
       });
     }
 
-    // Check if user exists and handle college user type
+    // Check if user exists (Unified User Model)
     let user;
     let campaignEmail = email;
     let campaignUserType = userType;
-    let isApproved = false; // Default to false
+    let isApproved = false;
 
-    if (userType === "alumni") {
-      user = await Alumni.findOne({ email });
-      isApproved = false; // Alumni campaigns need approval
-    } else if (userType === "student") {
-      user = await Student.findOne({ email });
-      isApproved = false; // Student campaigns need approval
-    } else if (userType === "admin") {
-      // For college user type, use vice chancellor email and auto-approve
-      campaignEmail = "vicechancellor@mitsgwalior.in";
-      campaignUserType = "admin";
-      isApproved = true; // College campaigns are auto-approved
-      // No need to check user existence in Alumni/Student tables for college
-      user = { _id: "college_admin" }; // Mock user object for college
+    if (["admin", "hod", "faculty"].includes(userType)) {
+      // Internal educational users - use a generic authority email or their own?
+      // Keeping original behavior where admin campaigns use a fixed vice chancellor email
+      if (userType === "admin") {
+        campaignEmail = "vicechancellor@mitsgwalior.in";
+      }
+      isApproved = true; // Internal campaigns are auto-approved
+      user = { _id: "college_staff" }; // Placeholder for existence check
+    } else if (["alumni", "student"].includes(userType)) {
+      user = await User.findOne({ email, userType });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      isApproved = false; // Students/Alumni need approval
     } else {
-      return res.status(400).json({
-        message: "Invalid user type",
-      });
-    }
-
-    // For student and alumni, verify user exists
-    if (userType !== "admin" && !user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return res.status(400).json({ message: "Invalid user type" });
     }
 
     // Handle image uploads

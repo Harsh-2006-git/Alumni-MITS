@@ -1,145 +1,270 @@
-import AlumniProfile from "../models/AlumniProfile.js";
-import Alumni from "../models/alumni.js";
-import Student from "../models/user.js";
-import StudentProfile from "../models/studentProfile.js";
+import UserProfile from "../models/UserProfile.js";
+import User from "../models/user.js";
+import cloudinary from "cloudinary";
+import { google } from "googleapis";
+import { Readable } from "stream";
+import multer from "multer";
+import { GoogleGenAI } from "@google/genai";
+import puppeteer from "puppeteer";
 
-export const saveAlumniProfile = async (req, res) => {
-  try {
-    const alumniId = req.user.id; // Extracted from JWT by middleware
-    if (!alumniId) {
-      return res.status(400).json({ message: "Alumni ID not found in token" });
-    }
+// ==================== CLOUDINARY CONFIG ====================
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-    const {
-      location,
-      branch,
-      about,
-      skills,
-      achievements,
-      linkedin,
-      github,
-      twitter,
-      portfolio,
-      education,
-      experience,
-    } = req.body;
+// ==================== GOOGLE DRIVE CONFIG ====================
+const oauth2Client = new google.auth.OAuth2(
+  process.env.GDRIVE_OAUTH_CLIENT_ID,
+  process.env.GDRIVE_OAUTH_CLIENT_SECRET,
+  process.env.GDRIVE_OAUTH_REDIRECT_URI
+);
 
-    // Check if profile exists
-    let profile = await AlumniProfile.findOne({ alumniId });
+oauth2Client.setCredentials({
+  refresh_token: process.env.GDRIVE_REFRESH_TOKEN,
+});
 
-    if (profile) {
-      // Update existing profile
-      profile = await AlumniProfile.findOneAndUpdate(
-        { alumniId },
-        {
-          location,
-          branch,
-          about,
-          skills,
-          achievements,
-          linkedin,
-          github,
-          twitter,
-          portfolio,
-          education,
-          experience,
-        },
-        { new: true }
-      );
+const drive = google.drive({ version: "v3", auth: oauth2Client });
+
+// ==================== MULTER CONFIG ====================
+// Configure multer for file upload
+export const upload = multer({
+  storage: multer.memoryStorage(), // Store file in memory as buffer
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Only apply filter if it's an image upload
+    if (file.fieldname === "profilePhoto") {
+      const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PNG, and JPG files are allowed"), false);
+      }
     } else {
-      // Create new profile
-      profile = await AlumniProfile.create({
-        alumniId,
-        location,
-        branch,
-        about,
-        skills,
-        achievements,
-        linkedin,
-        github,
-        twitter,
-        portfolio,
-        education,
-        experience,
-      });
+      cb(null, true);
     }
+  },
+});
 
-    res.status(200).json({ message: "Profile saved successfully", profile });
+// ==================== ALUMNI CONTROLLERS ====================
+
+export const getAllAlumni = async (req, res) => {
+  try {
+    // Find all users with userType 'alumni' and isVerified true
+    const alumniList = await User.find({ userType: "alumni", isVerified: true })
+      .select("-password")
+      .sort({ _id: 1 });
+
+    // Get all alumni IDs for batch profile lookup
+    const alumniIds = alumniList.map((alumni) => alumni._id);
+
+    // Fetch all profiles in one query
+    const profiles = await UserProfile.find({ userId: { $in: alumniIds } });
+
+    // Create a map for quick profile lookup
+    const profileMap = new Map();
+    profiles.forEach((profile) => {
+      profileMap.set(profile.userId.toString(), profile);
+    });
+
+    // Combine alumni with their profiles
+    const formattedAlumni = alumniList.map((alumni) => {
+      const profile = profileMap.get(alumni._id.toString());
+      return {
+        id: alumni._id,
+        name: alumni.name,
+        email: alumni.email,
+        phone: alumni.phone,
+        currentRole: profile?.experience?.[0]?.role || "N/A",
+        company: profile?.experience?.[0]?.company || "N/A",
+        location: profile?.location || "N/A",
+        linkedin: profile?.linkedin || null,
+        isVerified: alumni.isVerified,
+        userType: alumni.userType,
+        profilePhoto: alumni.profilePhoto || null,
+        alumniResume: alumni.resume || null,
+        profileResume: null, // Unified resume in user model
+        batch: alumni.batch || profile?.batch || null, // Prefer batch from User, fallback to Profile
+        profile: profile || {},
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formattedAlumni.length,
+      data: formattedAlumni,
+    });
   } catch (error) {
-    console.error("Error saving alumni profile:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error fetching all alumni:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching alumni.",
+      error: error.message,
+    });
   }
 };
 
-export const saveStudentProfile = async (req, res) => {
+export const getAllAlumni2 = async (req, res) => {
   try {
-    const studentId = req.user.id; // Extracted from JWT by middleware
+    // Find all users with userType 'alumni' (including unverified)
+    const alumniList = await User.find({ userType: "alumni" })
+      .select("-password")
+      .sort({ _id: 1 });
 
-    if (!studentId) {
-      return res.status(400).json({ message: "Student ID not found in token" });
-    }
+    // Get all alumni IDs for batch profile lookup
+    const alumniIds = alumniList.map((alumni) => alumni._id);
 
-    const {
-      location,
-      branch,
-      about,
-      skills,
-      achievements,
-      linkedin,
-      github,
-      twitter,
-      portfolio,
-      education,
-      experience,
-    } = req.body;
+    // Fetch all profiles in one query
+    const profiles = await UserProfile.find({ userId: { $in: alumniIds } });
 
-    // Check if profile exists
-    let profile = await StudentProfile.findOne({ studentId });
+    // Create a map for quick profile lookup
+    const profileMap = new Map();
+    profiles.forEach((profile) => {
+      profileMap.set(profile.userId.toString(), profile);
+    });
 
-    if (profile) {
-      // Update existing profile
-      profile = await StudentProfile.findOneAndUpdate(
-        { studentId },
-        {
-          location,
-          branch,
-          about,
-          skills,
-          achievements,
-          linkedin,
-          github,
-          twitter,
-          portfolio,
-          education,
-          experience,
-        },
-        { new: true }
-      );
-    } else {
-      // Create new profile
-      profile = await StudentProfile.create({
-        studentId,
-        location,
-        branch,
-        about,
-        skills,
-        achievements,
-        linkedin,
-        github,
-        twitter,
-        portfolio,
-        education,
-        experience,
+    // Combine alumni with their profiles
+    const formattedAlumni = alumniList.map((alumni) => {
+      const profile = profileMap.get(alumni._id.toString());
+      return {
+        id: alumni._id,
+        name: alumni.name,
+        email: alumni.email,
+        phone: alumni.phone,
+        currentRole: profile?.experience?.[0]?.role || "N/A",
+        company: profile?.experience?.[0]?.company || "N/A",
+        location: profile?.location || "N/A",
+        linkedin: profile?.linkedin || null,
+        isVerified: alumni.isVerified,
+        userType: alumni.userType,
+        profilePhoto: alumni.profilePhoto || null,
+        alumniResume: alumni.resume || null,
+        profileResume: null,
+        batch: alumni.batch || profile?.batch || null,
+        profile: profile || {},
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formattedAlumni.length,
+      data: formattedAlumni,
+    });
+  } catch (error) {
+    console.error("Error fetching all alumni (admin):", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching alumni.",
+      error: error.message,
+    });
+  }
+};
+
+export const getUnverifiedAlumni = async (req, res) => {
+  try {
+    const pendingAlumni = await User.find({ userType: "alumni", isVerified: false })
+      .select("-password")
+      .sort({ _id: 1 });
+
+    // Get all alumni IDs for batch profile lookup
+    const alumniIds = pendingAlumni.map((alumni) => alumni._id);
+
+    // Fetch all profiles in one query
+    const profiles = await UserProfile.find({ userId: { $in: alumniIds } });
+
+    // Create a map for quick profile lookup
+    const profileMap = new Map();
+    profiles.forEach((profile) => {
+      profileMap.set(profile.userId.toString(), profile);
+    });
+
+    const formatted = pendingAlumni.map((alumni) => {
+      const profile = profileMap.get(alumni._id.toString());
+      return {
+        id: alumni._id,
+        name: alumni.name,
+        email: alumni.email,
+        phone: alumni.phone,
+        userType: alumni.userType,
+        profilePhoto: alumni.profilePhoto || null,
+        alumniResume: alumni.resume || null,
+        profileResume: null,
+        profile: profile || {},
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      data: formatted,
+    });
+  } catch (error) {
+    console.error("Error fetching unverified alumni:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching unverified alumni.",
+      error: error.message,
+    });
+  }
+};
+
+export const verifyAlumniStatus = async (req, res) => {
+  try {
+    const { id } = req.params; // alumni/user ID
+    const { action } = req.body; // 'accept' or 'reject'
+
+    const alumni = await User.findById(id);
+    if (!alumni) {
+      return res.status(404).json({
+        success: false,
+        message: "Alumni not found.",
       });
     }
 
-    res.status(200).json({
-      message: "Student profile saved successfully",
-      profile,
+    // Ensure it is actually an alumni
+    if (alumni.userType !== "alumni") {
+      return res.status(400).json({
+        success: false,
+        message: "User is not an alumni.",
+      });
+    }
+
+    if (action === "accept") {
+      alumni.isVerified = true;
+      await alumni.save();
+
+      return res.status(200).json({
+        success: true,
+        message: `Alumni ${alumni.name} has been verified successfully.`,
+      });
+    }
+
+    if (action === "reject") {
+      // Delete profile first
+      await UserProfile.deleteOne({ userId: id });
+      // Delete user
+      await User.findByIdAndDelete(id);
+
+      return res.status(200).json({
+        success: true,
+        message: `Alumni ${alumni.name} has been rejected and removed.`,
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "Invalid action. Use 'accept' or 'reject'.",
     });
   } catch (error) {
-    console.error("Error saving student profile:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error verifying alumni:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while verifying alumni.",
+      error: error.message,
+    });
   }
 };
 
@@ -156,7 +281,7 @@ export const deleteAlumni = async (req, res) => {
     }
 
     // Check if alumni exists
-    const alumni = await Alumni.findById(id);
+    const alumni = await User.findById(id);
     if (!alumni) {
       return res.status(404).json({
         success: false,
@@ -165,11 +290,11 @@ export const deleteAlumni = async (req, res) => {
     }
 
     try {
-      // Delete alumni profile first
-      await AlumniProfile.deleteOne({ alumniId: id });
+      // Delete user profile first
+      await UserProfile.deleteOne({ userId: id });
 
-      // Delete alumni record
-      await Alumni.findByIdAndDelete(id);
+      // Delete user record
+      await User.findByIdAndDelete(id);
 
       res.status(200).json({
         success: true,
@@ -203,13 +328,13 @@ export const getAlumniProfile = async (req, res) => {
     }
 
     // Fetch alumni
-    const alumni = await Alumni.findById(id);
+    const alumni = await User.findById(id);
     if (!alumni) {
       return res.status(404).json({ message: "Alumni not found" });
     }
 
-    // Fetch profile using alumniId association
-    const profile = await AlumniProfile.findOne({ alumniId: id });
+    // Fetch profile
+    const profile = await UserProfile.findOne({ userId: id });
 
     res.status(200).json({
       message: "Alumni details fetched successfully",
@@ -224,6 +349,76 @@ export const getAlumniProfile = async (req, res) => {
   }
 };
 
+export const saveAlumniProfile = async (req, res) => {
+  try {
+    const alumniId = req.user.id; // Extracted from JWT by middleware
+    if (!alumniId) {
+      return res.status(400).json({ message: "Alumni ID not found in token" });
+    }
+
+    const {
+      location,
+      branch,
+      about,
+      skills,
+      achievements,
+      linkedin,
+      github,
+      twitter,
+      portfolio,
+      education,
+      experience,
+    } = req.body;
+
+    // Check if profile exists
+    let profile = await UserProfile.findOne({ userId: alumniId });
+
+    if (profile) {
+      // Update existing profile
+      profile = await UserProfile.findOneAndUpdate(
+        { userId: alumniId },
+        {
+          location,
+          branch,
+          about,
+          skills,
+          achievements,
+          linkedin,
+          github,
+          twitter,
+          portfolio,
+          education,
+          experience,
+        },
+        { new: true }
+      );
+    } else {
+      // Create new profile
+      profile = await UserProfile.create({
+        userId: alumniId,
+        location,
+        branch,
+        about,
+        skills,
+        achievements,
+        linkedin,
+        github,
+        twitter,
+        portfolio,
+        education,
+        experience,
+      });
+    }
+
+    res.status(200).json({ message: "Profile saved successfully", profile });
+  } catch (error) {
+    console.error("Error saving alumni profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// ==================== STUDENT CONTROLLERS ====================
+
 export const getStudentProfile = async (req, res) => {
   try {
     const { id, userType } = req.user;
@@ -234,13 +429,13 @@ export const getStudentProfile = async (req, res) => {
     }
 
     // Fetch student
-    const student = await Student.findById(id);
+    const student = await User.findById(id);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    // Fetch profile using studentId association
-    const profile = await StudentProfile.findOne({ studentId: id });
+    // Fetch profile
+    const profile = await UserProfile.findOne({ userId: id });
 
     res.status(200).json({
       message: "Student details fetched successfully",
@@ -255,245 +450,77 @@ export const getStudentProfile = async (req, res) => {
   }
 };
 
-export const getAllAlumni = async (req, res) => {
+export const saveStudentProfile = async (req, res) => {
   try {
-    const alumniList = await Alumni.find({ isVerified: true })
-      .select("-password")
-      .sort({ _id: 1 });
+    const studentId = req.user.id; // Extracted from JWT by middleware
 
-    // Get all alumni IDs for batch profile lookup
-    const alumniIds = alumniList.map((alumni) => alumni._id);
-
-    // Fetch all profiles in one query
-    const profiles = await AlumniProfile.find({ alumniId: { $in: alumniIds } });
-
-    // Create a map for quick profile lookup
-    const profileMap = new Map();
-    profiles.forEach((profile) => {
-      profileMap.set(profile.alumniId.toString(), profile);
-    });
-
-    // Combine alumni with their profiles
-    const formattedAlumni = alumniList.map((alumni) => {
-      const profile = profileMap.get(alumni._id.toString());
-      return {
-        id: alumni._id,
-        name: alumni.name,
-        email: alumni.email,
-        phone: alumni.phone,
-        isVerified: alumni.isVerified,
-        userType: alumni.userType,
-        profilePhoto: alumni.profilePhoto || null,
-        alumniResume: alumni.resume || null,
-        profileResume: profile?.resume || null,
-        batch: profile?.batch || null,
-        batch: alumni.batch || null,
-        profile: profile || {},
-      };
-    });
-
-    res.status(200).json({
-      success: true,
-      count: formattedAlumni.length,
-      data: formattedAlumni,
-    });
-  } catch (error) {
-    console.error("Error fetching all alumni:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error while fetching alumni.",
-      error: error.message,
-    });
-  }
-};
-
-export const getAllAlumni2 = async (req, res) => {
-  try {
-    const alumniList = await Alumni.find().select("-password").sort({ _id: 1 });
-
-    // Get all alumni IDs for batch profile lookup
-    const alumniIds = alumniList.map((alumni) => alumni._id);
-
-    // Fetch all profiles in one query
-    const profiles = await AlumniProfile.find({ alumniId: { $in: alumniIds } });
-
-    // Create a map for quick profile lookup
-    const profileMap = new Map();
-    profiles.forEach((profile) => {
-      profileMap.set(profile.alumniId.toString(), profile);
-    });
-
-    // Combine alumni with their profiles
-    const formattedAlumni = alumniList.map((alumni) => {
-      const profile = profileMap.get(alumni._id.toString());
-      return {
-        id: alumni._id,
-        name: alumni.name,
-        email: alumni.email,
-        phone: alumni.phone,
-        isVerified: alumni.isVerified,
-        userType: alumni.userType,
-        profilePhoto: alumni.profilePhoto || null,
-        alumniResume: alumni.resume || null,
-        profileResume: profile?.resume || null,
-        profile: profile || {},
-      };
-    });
-
-    res.status(200).json({
-      success: true,
-      count: formattedAlumni.length,
-      data: formattedAlumni,
-    });
-  } catch (error) {
-    console.error("Error fetching all alumni:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error while fetching alumni.",
-      error: error.message,
-    });
-  }
-};
-
-
-export const getUnverifiedAlumni = async (req, res) => {
-  try {
-    const pendingAlumni = await Alumni.find({ isVerified: false })
-      .select("-password")
-      .sort({ _id: 1 });
-
-    // Get all alumni IDs for batch profile lookup
-    const alumniIds = pendingAlumni.map((alumni) => alumni._id);
-
-    // Fetch all profiles in one query
-    const profiles = await AlumniProfile.find({ alumniId: { $in: alumniIds } });
-
-    // Create a map for quick profile lookup
-    const profileMap = new Map();
-    profiles.forEach((profile) => {
-      profileMap.set(profile.alumniId.toString(), profile);
-    });
-
-    // Combine alumni with their profiles
-    const formatted = pendingAlumni.map((alumni) => {
-      const profile = profileMap.get(alumni._id.toString());
-      return {
-        id: alumni._id,
-        name: alumni.name,
-        email: alumni.email,
-        phone: alumni.phone,
-        userType: alumni.userType,
-        profilePhoto: alumni.profilePhoto || null,
-        alumniResume: alumni.resume || null,
-        profileResume: profile?.resume || null,
-        profile: profile || {},
-      };
-    });
-
-    res.status(200).json({
-      success: true,
-      count: formatted.length,
-      data: formatted,
-    });
-  } catch (error) {
-    console.error("Error fetching unverified alumni:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error while fetching unverified alumni.",
-      error: error.message,
-    });
-  }
-};
-
-export const verifyAlumniStatus = async (req, res) => {
-  try {
-    const { id } = req.params; // alumni ID
-    const { action } = req.body; // 'accept' or 'reject'
-
-    const alumni = await Alumni.findById(id);
-    if (!alumni) {
-      return res.status(404).json({
-        success: false,
-        message: "Alumni not found.",
-      });
+    if (!studentId) {
+      return res.status(400).json({ message: "Student ID not found in token" });
     }
 
-    if (action === "accept") {
-      alumni.isVerified = true;
-      await alumni.save();
+    const {
+      location,
+      branch,
+      about,
+      skills,
+      achievements,
+      linkedin,
+      github,
+      twitter,
+      portfolio,
+      education,
+      experience,
+    } = req.body;
 
-      return res.status(200).json({
-        success: true,
-        message: `Alumni ${alumni.name} has been verified successfully.`,
-      });
-    }
+    // Check if profile exists
+    let profile = await UserProfile.findOne({ userId: studentId });
 
-    if (action === "reject") {
-      await Alumni.findByIdAndDelete(id);
-
-      return res.status(200).json({
-        success: true,
-        message: `Alumni ${alumni.name} has been rejected and removed.`,
-      });
-    }
-
-    return res.status(400).json({
-      success: false,
-      message: "Invalid action. Use 'accept' or 'reject'.",
-    });
-  } catch (error) {
-    console.error("Error verifying alumni:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error while verifying alumni.",
-      error: error.message,
-    });
-  }
-};
-
-import cloudinary from "cloudinary";
-import { google } from "googleapis";
-import { Readable } from "stream";
-import multer from "multer";
-
-// ==================== CLOUDINARY CONFIG ====================
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// ==================== GOOGLE DRIVE CONFIG ====================
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GDRIVE_OAUTH_CLIENT_ID,
-  process.env.GDRIVE_OAUTH_CLIENT_SECRET,
-  process.env.GDRIVE_OAUTH_REDIRECT_URI
-);
-
-oauth2Client.setCredentials({
-  refresh_token: process.env.GDRIVE_REFRESH_TOKEN,
-});
-
-const drive = google.drive({ version: "v3", auth: oauth2Client });
-
-// ==================== MULTER CONFIG ====================
-const storage = multer.memoryStorage();
-// Configure multer for file upload
-export const upload = multer({
-  storage: multer.memoryStorage(), // Store file in memory as buffer
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
-
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
+    if (profile) {
+      // Update existing profile
+      profile = await UserProfile.findOneAndUpdate(
+        { userId: studentId },
+        {
+          location,
+          branch,
+          about,
+          skills,
+          achievements,
+          linkedin,
+          github,
+          twitter,
+          portfolio,
+          education,
+          experience,
+        },
+        { new: true }
+      );
     } else {
-      cb(new Error("Only PNG, and JPG files are allowed"), false);
+      // Create new profile
+      profile = await UserProfile.create({
+        userId: studentId,
+        location,
+        branch,
+        about,
+        skills,
+        achievements,
+        linkedin,
+        github,
+        twitter,
+        portfolio,
+        education,
+        experience,
+      });
     }
-  },
-});
+
+    res.status(200).json({
+      message: "Student profile saved successfully",
+      profile,
+    });
+  } catch (error) {
+    console.error("Error saving student profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 // ==================== PROFILE PHOTO UPLOAD (CLOUDINARY) ====================
 export const uploadProfilePhoto = async (req, res) => {
@@ -504,8 +531,8 @@ export const uploadProfilePhoto = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    if (!userType || !userId) {
-      return res.status(400).json({ message: "Missing userType or userId" });
+    if (!userId) {
+      return res.status(400).json({ message: "Missing userId" });
     }
 
     if (!["image/jpeg", "image/png", "image/jpg"].includes(req.file.mimetype)) {
@@ -517,7 +544,7 @@ export const uploadProfilePhoto = async (req, res) => {
     console.log("📸 Uploading profile photo to Cloudinary...");
 
     // Unique public_id: "profiles/userType_userId"
-    const publicId = `profiles/${userType}_${userId}`;
+    const publicId = `profiles/${userType || 'user'}_${userId}`;
 
     // Upload to Cloudinary using stream
     const stream = cloudinary.v2.uploader.upload_stream(
@@ -537,13 +564,9 @@ export const uploadProfilePhoto = async (req, res) => {
         const imageUrl = uploadResult.secure_url;
         console.log("✅ Uploaded to Cloudinary:", imageUrl);
 
-        // Update database
+        // Update database (Unified User)
         try {
-          if (userType === "alumni") {
-            await Alumni.findByIdAndUpdate(userId, { profilePhoto: imageUrl });
-          } else if (userType === "student") {
-            await Student.findByIdAndUpdate(userId, { profilePhoto: imageUrl });
-          }
+          await User.findByIdAndUpdate(userId, { profilePhoto: imageUrl });
 
           console.log("✅ Database updated successfully");
 
@@ -569,7 +592,6 @@ export const uploadProfilePhoto = async (req, res) => {
 };
 
 // ==================== RESUME UPLOAD (GOOGLE DRIVE) ====================
-
 export const uploadResume = async (req, res) => {
   try {
     const { userType, id: userId } = req.user;
@@ -579,8 +601,8 @@ export const uploadResume = async (req, res) => {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    if (!userType || !userId) {
-      return res.status(400).json({ message: "Missing userType or userId" });
+    if (!userId) {
+      return res.status(400).json({ message: "Missing userId" });
     }
 
     if (req.file.mimetype !== "application/pdf") {
@@ -592,37 +614,31 @@ export const uploadResume = async (req, res) => {
     if (req.file.size > maxFileSize) {
       return res
         .status(400)
-        .json({ message: "File size too large. Maximum 5MB allowed." });
+        .json({ message: "File size exceeds 5MB limit" });
     }
 
-    const fileName = `${userType}_${userId}_${Date.now()}_resume.pdf`;
-
-    console.log("📄 Uploading resume to Google Drive:", fileName);
-
-    // Convert buffer to stream
-    const bufferStream = Readable.from(req.file.buffer);
+    console.log("📄 Uploading resume to Google Drive...");
 
     const fileMetadata = {
-      name: fileName,
-      parents: [process.env.GDRIVE_FOLDER_ID],
+      name: `Resume_${userType}_${userId}.pdf`,
+      parents: [process.env.GDRIVE_FOLDER_ID], // Save in specific folder
     };
 
     const media = {
-      mimeType: "application/pdf",
-      body: bufferStream,
+      mimeType: req.file.mimetype,
+      body: Readable.from(req.file.buffer),
     };
 
-    // Upload to Google Drive
-    const file = await drive.files.create({
+    const response = await drive.files.create({
       resource: fileMetadata,
       media: media,
-      fields: "id, name, webViewLink",
+      fields: "id, webViewLink",
     });
 
-    const fileId = file.data.id;
-    console.log("✅ Uploaded to Google Drive with ID:", fileId);
+    const fileId = response.data.id;
+    const resumeUrl = response.data.webViewLink; // Link to view file
 
-    // Make file publicly viewable
+    // Make file readable by anyone with the link (Optional)
     await drive.permissions.create({
       fileId: fileId,
       requestBody: {
@@ -631,22 +647,12 @@ export const uploadResume = async (req, res) => {
       },
     });
 
-    // Get the direct download URL
-    const resumeUrl = `https://drive.google.com/uc?id=${fileId}&export=download`;
+    console.log(`✅ Resume uploaded! ID: ${fileId}, URL: ${resumeUrl}`);
 
-    // Update database based on user type
-    let updatedRecord;
-    if (userType === "alumni") {
-      updatedRecord = await Alumni.findByIdAndUpdate(userId, {
-        resume: resumeUrl,
-      });
-    } else if (userType === "student") {
-      updatedRecord = await Student.findByIdAndUpdate(userId, {
-        resume: resumeUrl,
-      });
-    } else {
-      return res.status(400).json({ message: "Invalid user type" });
-    }
+    // Update database (Unified User)
+    const updatedRecord = await User.findByIdAndUpdate(userId, {
+      resume: resumeUrl,
+    });
 
     // Check if database update was successful
     if (!updatedRecord) {
@@ -659,7 +665,7 @@ export const uploadResume = async (req, res) => {
       message: "Resume uploaded successfully",
       resumeUrl: resumeUrl,
       fileId: fileId,
-      fileName: fileName,
+      fileName: `Resume_${userType}_${userId}.pdf`,
     });
   } catch (err) {
     console.error("❌ Resume Upload Error:", err);
@@ -684,8 +690,7 @@ export const uploadResume = async (req, res) => {
   }
 };
 
-import axios from "axios";
-import { GoogleGenAI } from "@google/genai";
+// ==================== AI SKILLS MATCH (GEMINI) ====================
 
 // ✅ Initialize GoogleGenAI with API key from environment variable
 const ai = new GoogleGenAI({
@@ -732,11 +737,21 @@ export const analyzeSkillsMatch = async (req, res) => {
     if (!Array.isArray(jobSkills) || jobSkills.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "jobSkills array is required and cannot be empty",
+        message: "Job skills are required and must be an array",
       });
     }
 
-    // ✅ Check rate limit (your custom rate limiter)
+    // ✅ Fetch user profile skills (Unified UserProfile)
+    let userSkills = [];
+    if (id) {
+      const profile = await UserProfile.findOne({ userId: id });
+      if (profile?.skills) userSkills = profile.skills;
+    }
+
+    // If user has no skills listed, we can't analyze much, but we shouldn't fail hard.
+    // We can proceed with empty userSkills and let AI say 0% match.
+
+    // ✅ Check rate limit before calling API
     try {
       checkRateLimit();
     } catch (rateLimitError) {
@@ -747,111 +762,55 @@ export const analyzeSkillsMatch = async (req, res) => {
       });
     }
 
-    // ✅ Fetch user profile skills
-    let userSkills = [];
-    if (userType === "student") {
-      const student = await StudentProfile.findOne({ studentId: id });
-      if (student?.skills) userSkills = student.skills;
-    } else if (userType === "alumni") {
-      const alumni = await AlumniProfile.findOne({ alumniId: id });
-      if (alumni?.skills) userSkills = alumni.skills;
-    }
+    // ✅ Construct prompt for Gemini
+    const systemPrompt = `
+      You are an expert AI Career Coach and HR Specialist. 
+      Your task is to analyze the match between a candidate's skills and a job description.
+      
+      Job Title: ${jobTitle || "Not specified"}
+      Required Skills: ${jobSkills.join(", ")}
+      Candidate Skills: ${userSkills.length > 0 ? userSkills.join(", ") : "None listed"}
+      
+      Provide a structured JSON response with:
+      1. "matchPercentage": A number between 0 and 100 representing the relevance of candidate skills to the job.
+      2. "missingSkills": A list of critical skills the candidate is missing.
+      3. "recommendation": A brief, encouraging advice on what to learn or improve (max 2 sentences).
+      4. "marketDemand": A short insight on the demand for these skills in the current market (max 1 sentence).
+      
+      Output ONLY valid JSON. Do not add markdown formatting or extra text.
+    `;
 
-    // ✅ Handle missing user skills
-    if (!userSkills.length) {
-      return res.status(400).json({
-        success: false,
-        message: "User has no skills to compare.",
-      });
-    }
+    // ✅ Call Gemini API
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // ✅ Build intelligent prompt (EXACTLY THE SAME AS BEFORE)
-    const prompt = `
-You are an expert career assistant. Compare the user's skills with the required job skills for the role "${
-      jobTitle || "unspecified job"
-    }".
+    // Add timeout to prevented hanging requests
+    const result = await Promise.race([
+      model.generateContent(systemPrompt),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timeout")), 10000)
+      )
+    ]);
 
-Rules for scoring:
-- Score realistically based on how many job skills the user actually has.
-- Give 10/10 only if **every job skill** is covered by user skills.
-- If skills are partially matched, lower the score (e.g., 6/10 or 7/10).
-- Be objective — don't be overly optimistic.
-- Always return **only JSON**, nothing else — no extra text or newlines.
+    const response = await result.response;
+    let text = response.text();
 
-User Skills: ${JSON.stringify(userSkills)}
-Job Skills: ${JSON.stringify(jobSkills)}
+    // Clean up response if it wraps in markdown code blocks
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
-Respond strictly in this JSON format:
-{
-  "score": "X/10",
-  "jobOverview": "short description of the job and its expectations",
-  "strongMatches": "comma separated list of skills that match strongly",
-  "missingSkills": "comma separated list of missing or weak skills",
-  "howToCoverMissing": "specific ways the user can learn or improve those skills",
-  "overallGuide": "a realistic evaluation of readiness for the job",
-  "learningPlan": "short learning roadmap"
-}
-`;
+    const analysisData = JSON.parse(text);
 
-    // ✅ Use GoogleGenAI client instead of direct axios call
-    const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash", // Using the same model as your URL
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: prompt }],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 2048,
-      },
-    });
-
-    // ✅ Extract Gemini raw text
-    const geminiText = response.text?.trim() || "";
-
-    if (!geminiText) {
-      return res.status(500).json({
-        success: false,
-        message: "No response received from Gemini API.",
-      });
-    }
-
-    // ✅ Clean and Parse JSON (remove \n, ``` etc.) - SAME AS BEFORE
-    let cleaned = geminiText
-      .replace(/```json/i, "")
-      .replace(/```/g, "")
-      .replace(/\n/g, "")
-      .trim();
-
-    let analysis;
-    try {
-      analysis = JSON.parse(cleaned);
-    } catch (err) {
-      console.error("⚠️ JSON Parse Error — returning raw text:", cleaned);
-      return res.status(500).json({
-        success: false,
-        message: "Gemini API did not return valid JSON.",
-        rawResponse: cleaned,
-      });
-    }
-
-    // ✅ Return final JSON response
     return res.status(200).json({
       success: true,
-      message: "Skill analysis completed successfully",
-      data: {
-        userSkills,
-        jobSkills,
-        jobTitle,
-        analysis,
-      },
+      matchPercentage: analysisData.matchPercentage || 0,
+      missingSkills: analysisData.missingSkills || [],
+      recommendation: analysisData.recommendation || "Update your profile with more skills.",
+      marketDemand: analysisData.marketDemand || "These skills are in demand.",
     });
-  } catch (error) {
-    console.error("❌ Gemini API Error:", error.message);
 
-    // ✅ Handle specific error types
+  } catch (error) {
+    console.error("Gemini Analysis Error:", error);
+
+    // Handle specific error types
     if (
       error.message?.includes("RATE_LIMIT_EXCEEDED") ||
       error.status === 429
@@ -863,7 +822,7 @@ Respond strictly in this JSON format:
       });
     }
 
-    if (error.code === "ECONNABORTED") {
+    if (error.code === "ECONNABORTED" || error.message === "Request timeout") {
       return res.status(408).json({
         success: false,
         message: "Request timeout. Please try again.",
@@ -878,8 +837,8 @@ Respond strictly in this JSON format:
   }
 };
 
-import https from "https";
-import puppeteer from "puppeteer";
+// ==================== LINKEDIN PROFILE FETCHING ====================
+
 export const getLinkedInProfileByUrl = async (req, res) => {
   let browser;
   try {
@@ -889,7 +848,7 @@ export const getLinkedInProfileByUrl = async (req, res) => {
     if (!url) {
       return res.status(400).json({
         message: "URL parameter is required",
-        example: "?url=https://www.linkedin.com/in/harsh-manmode-2a0b91325",
+        example: "?url=https://www.linkedin.com/in/username",
       });
     }
 
@@ -901,177 +860,45 @@ export const getLinkedInProfileByUrl = async (req, res) => {
       });
     }
 
-    // Launch puppeteer browser
-    browser = await puppeteer.launch({
-      headless: "new",
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-accelerated-2d-canvas",
-        "--disable-gpu",
-        "--window-size=1920x1080",
-      ],
-    });
+    // THIS FUNCTIONALITY MIGHT BREAK IF LINKEDIN CHANGES DOM STRUCTURE
+    // USING PUPPETEER FOR SCRAPING
+    // NOTE: Scraping LinkedIn is against their TOS. Proceed with caution or use official API.
+    // For this educational/internal project, we attempt scraping.
 
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
     const page = await browser.newPage();
 
-    // Set user agent to mimic real browser
+    // Set a realistic user agent
     await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     );
 
-    // Set viewport
-    await page.setViewport({ width: 1920, height: 1080 });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
 
-    // Navigate to LinkedIn profile
-    await page.goto(url, {
-      waitUntil: "networkidle2",
-      timeout: 30000,
-    });
-
-    // Wait a bit for dynamic content
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    // Extract profile data
-    const profileData = await page.evaluate(() => {
-      const data = {
-        name: null,
-        headline: null,
-        location: null,
-        about: null,
-        profileImage: null,
-        connections: null,
-        experience: [],
-        education: [],
-        skills: [],
-      };
-
-      // Extract name
-      const nameElement = document.querySelector(
-        "h1.text-heading-xlarge, h1.top-card-layout__title"
-      );
-      if (nameElement) data.name = nameElement.innerText.trim();
-
-      // Extract headline
-      const headlineElement = document.querySelector(
-        ".text-body-medium.break-words, .top-card-layout__headline"
-      );
-      if (headlineElement) data.headline = headlineElement.innerText.trim();
-
-      // Extract location
-      const locationElement = document.querySelector(
-        ".text-body-small.inline.t-black--light.break-words, .top-card__subline-item"
-      );
-      if (locationElement) data.location = locationElement.innerText.trim();
-
-      // Extract about
-      const aboutElement = document.querySelector(
-        '#about ~ .display-flex .inline-show-more-text span[aria-hidden="true"]'
-      );
-      if (aboutElement) data.about = aboutElement.innerText.trim();
-
-      // Extract profile image
-      const imageElement = document.querySelector(
-        "img.pv-top-card-profile-picture__image, img.profile-photo-edit__preview"
-      );
-      if (imageElement) data.profileImage = imageElement.src;
-
-      // Extract connections
-      const connectionsElement = document.querySelector(
-        ".pv-top-card--list-bullet li"
-      );
-      if (connectionsElement) {
-        const text = connectionsElement.innerText;
-        const match = text.match(/(\d+[\+]?)\s+connection/i);
-        if (match) data.connections = match[1];
-      }
-
-      // Extract experience
-      const experienceSection = document.querySelector("#experience");
-      if (experienceSection) {
-        const experienceItems =
-          experienceSection.parentElement.querySelectorAll(
-            "ul li.artdeco-list__item"
-          );
-        experienceItems.forEach((item, index) => {
-          if (index < 5) {
-            const position = item.querySelector(
-              '.mr1.t-bold span[aria-hidden="true"]'
-            );
-            const company = item.querySelector(
-              '.t-14.t-normal span[aria-hidden="true"]'
-            );
-            if (position && company) {
-              data.experience.push({
-                position: position.innerText.trim(),
-                company: company.innerText.trim(),
-              });
-            }
-          }
-        });
-      }
-
-      // Extract education
-      const educationSection = document.querySelector("#education");
-      if (educationSection) {
-        const educationItems = educationSection.parentElement.querySelectorAll(
-          "ul li.artdeco-list__item"
-        );
-        educationItems.forEach((item, index) => {
-          if (index < 3) {
-            const school = item.querySelector(
-              '.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]'
-            );
-            const degree = item.querySelector(
-              '.t-14.t-normal span[aria-hidden="true"]'
-            );
-            if (school) {
-              data.education.push({
-                school: school.innerText.trim(),
-                degree: degree ? degree.innerText.trim() : null,
-              });
-            }
-          }
-        });
-      }
-
-      // Extract skills
-      const skillsSection = document.querySelector("#skills");
-      if (skillsSection) {
-        const skillItems = skillsSection.parentElement.querySelectorAll(
-          "ul li.artdeco-list__item"
-        );
-        skillItems.forEach((item, index) => {
-          if (index < 10) {
-            const skill = item.querySelector(
-              '.mr1.hoverable-link-text.t-bold span[aria-hidden="true"]'
-            );
-            if (skill) {
-              data.skills.push(skill.innerText.trim());
-            }
-          }
-        });
-      }
-
-      return data;
+    // Extract public data (limited view without login)
+    const data = await page.evaluate(() => {
+      const name = document.querySelector(".top-card-layout__title")?.innerText || "";
+      const headline = document.querySelector(".top-card-layout__headline")?.innerText || "";
+      const about = document.querySelector(".core-section-container__content .break-words")?.innerText || "";
+      return { name, headline, about };
     });
 
     await browser.close();
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
-      url,
-      data: profileData,
+      data: data
     });
+
   } catch (error) {
     if (browser) await browser.close();
-
-    console.error("LinkedIn scraper error:", error);
-    return res.status(500).json({
+    console.error("LinkedIn Scraping Error:", error);
+    res.status(500).json({
       success: false,
-      message:
-        "Failed to scrape profile. LinkedIn may require login or the profile is private.",
+      message: "Failed to fetch LinkedIn profile",
       error: error.message,
     });
   }

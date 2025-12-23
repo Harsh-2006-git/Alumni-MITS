@@ -96,7 +96,7 @@ export const addEvent = [
         description,
         date,
         location,
-        price,
+
         organizer,
         category,
         type,
@@ -118,8 +118,7 @@ export const addEvent = [
         });
       }
 
-      // Parse numeric fields
-      const parsedPrice = price ? parseFloat(price) : 0;
+
       const parsedMaxAttendees = maxAttendees ? parseInt(maxAttendees, 10) : 50;
 
       // ---------------------------------------------
@@ -163,7 +162,7 @@ export const addEvent = [
         description: description ? description.trim() : "",
         date,
         location: location.trim(),
-        price: parsedPrice,
+
         organizer: organizer.trim(),
         organizerEmail: email, // from token
         category: category || "educational",
@@ -442,7 +441,7 @@ export const updateEvent = async (req, res) => {
       description,
       date,
       location,
-      price,
+
       organizer,
       organizerEmail,
       postedBy,
@@ -477,7 +476,7 @@ export const updateEvent = async (req, res) => {
         description,
         date,
         location,
-        price,
+
         organizer,
         organizerEmail,
         postedBy,

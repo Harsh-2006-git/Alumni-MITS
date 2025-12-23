@@ -1,7 +1,6 @@
 // controllers/mentorController.js
 import Mentor from "../models/mentor.js";
-import Alumni from "../models/alumni.js";
-import Student from "../models/user.js";
+import User from "../models/user.js";
 import MentorStudent from "../models/mentee.js";
 
 import MentorshipEmailService from "../services/MentorshipEmailService.js";
@@ -63,8 +62,8 @@ export const createMentor = async (req, res) => {
     // Get alumni details from req.user
     const { id: alumni_id, name, email, phone } = req.user;
 
-    // Check if alumni exists in database
-    const alumni = await Alumni.findById(alumni_id);
+    // Check if user exists in database (Unified User Model)
+    const alumni = await User.findOne({ _id: alumni_id, userType: "alumni" });
     if (!alumni) {
       return res.status(404).json({
         success: false,
@@ -388,8 +387,8 @@ export const requestMentorship = async (req, res) => {
       });
     }
 
-    // Check if student exists
-    const student = await Student.findById(studentId);
+    // Check if student exists (Unified User Model)
+    const student = await User.findOne({ _id: studentId, userType: "student" });
     if (!student) {
       return res.status(404).json({
         success: false,
@@ -1055,15 +1054,15 @@ export const getMentorMenteesForChat = async (req, res) => {
       const mentorRelationships = await MentorStudent.find({
         student_id: userId
       })
-      .populate({
-        path: 'mentor_id',
-        select: 'name email phone alumni_id batch_year branch',
-        populate: {
-          path: 'alumni_id',
-          select: 'name email phone'
-        }
-      })
-      .sort({ updatedAt: -1 }); // Most recent first
+        .populate({
+          path: 'mentor_id',
+          select: 'name email phone alumni_id batch_year branch',
+          populate: {
+            path: 'alumni_id',
+            select: 'name email phone'
+          }
+        })
+        .sort({ updatedAt: -1 }); // Most recent first
 
       mentorRelationships.forEach(relation => {
         if (relation.mentor_id) {
@@ -1085,14 +1084,14 @@ export const getMentorMenteesForChat = async (req, res) => {
     } else if (userType === 'alumni') {
       // Find mentor profile for this alumni
       const mentor = await Mentor.findOne({ alumni_id: userId });
-      
+
       if (mentor) {
         // Get all mentee relationships for this mentor (any status)
         const menteeRelationships = await MentorStudent.find({
           mentor_id: mentor._id
         })
-        .populate('student_id', 'name email phone')
-        .sort({ updatedAt: -1 }); // Most recent first
+          .populate('student_id', 'name email phone')
+          .sort({ updatedAt: -1 }); // Most recent first
 
         menteeRelationships.forEach(relation => {
           if (relation.student_id) {
@@ -1117,8 +1116,8 @@ export const getMentorMenteesForChat = async (req, res) => {
       data: result,
       count: result.length,
       userType: userType,
-      message: userType === 'student' 
-        ? `Found ${result.length} mentor(s)` 
+      message: userType === 'student'
+        ? `Found ${result.length} mentor(s)`
         : `Found ${result.length} mentee(s)`
     });
   } catch (error) {
@@ -1145,10 +1144,10 @@ export const checkRelationshipWithUser = async (req, res) => {
       const mentorRelationships = await MentorStudent.find({
         student_id: userId
       })
-      .populate({
-        path: 'mentor_id',
-        match: { phone: targetPhone }
-      });
+        .populate({
+          path: 'mentor_id',
+          match: { phone: targetPhone }
+        });
 
       const foundRelation = mentorRelationships.find(rel => rel.mentor_id);
       if (foundRelation) {
@@ -1167,10 +1166,10 @@ export const checkRelationshipWithUser = async (req, res) => {
         const menteeRelationships = await MentorStudent.find({
           mentor_id: mentor._id
         })
-        .populate({
-          path: 'student_id',
-          match: { phone: targetPhone }
-        });
+          .populate({
+            path: 'student_id',
+            match: { phone: targetPhone }
+          });
 
         const foundRelation = menteeRelationships.find(rel => rel.student_id);
         if (foundRelation) {
