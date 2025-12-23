@@ -299,16 +299,14 @@ export function ScrollingAlumni({ isDarkMode }) {
         {/* Section Header - Compact */}
         <div className="text-center mb-8">
           <h2
-            className={`text-2xl md:text-3xl font-bold mb-3 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-lg sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Our Distinguished Alumni
           </h2>
           <p
-            className={`text-base ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-xs sm:text-sm md:text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Meet our distinguished alumni shaping industries and driving
             innovation worldwide.
@@ -319,18 +317,16 @@ export function ScrollingAlumni({ isDarkMode }) {
         <div className="relative">
           {/* Light gradient overlays */}
           <div
-            className={`absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${
-              isDarkMode
+            className={`absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${isDarkMode
                 ? "bg-gradient-to-r from-slate-900 to-transparent"
                 : "bg-gradient-to-r from-white to-transparent"
-            }`}
+              }`}
           ></div>
           <div
-            className={`absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${
-              isDarkMode
+            className={`absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${isDarkMode
                 ? "bg-gradient-to-l from-slate-900 to-transparent"
                 : "bg-gradient-to-l from-white to-transparent"
-            }`}
+              }`}
           ></div>
 
           {/* Scrolling Content */}
@@ -392,11 +388,10 @@ export function ScrollingAlumni({ isDarkMode }) {
 function AlumniCard({ alumnus, isDarkMode }) {
   return (
     <div
-      className={`flex-shrink-0 w-48 sm:w-56 rounded-xl border transition-all ${
-        isDarkMode
+      className={`flex-shrink-0 w-48 sm:w-56 rounded-xl border transition-all ${isDarkMode
           ? "bg-slate-800 border-blue-600/20"
           : "bg-white border-blue-200"
-      }`}
+        }`}
     >
       <div className="p-3 sm:p-4">
         <div className="flex justify-center mb-3">
@@ -412,9 +407,8 @@ function AlumniCard({ alumnus, isDarkMode }) {
 
         <div className="text-center">
           <h3
-            className={`text-sm font-bold mb-1 line-clamp-2 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-sm font-bold mb-1 line-clamp-2 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             {alumnus.name}
           </h3>
@@ -424,18 +418,16 @@ function AlumniCard({ alumnus, isDarkMode }) {
           </p>
 
           <p
-            className={`text-xs mb-2 ${
-              isDarkMode ? "text-gray-400" : "text-gray-500"
-            }`}
+            className={`text-xs mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
           >
             📍 {alumnus.city}
           </p>
 
           {alumnus.description && (
             <p
-              className={`text-xs leading-relaxed line-clamp-2 ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
-              }`}
+              className={`text-xs leading-relaxed line-clamp-2 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
             >
               {alumnus.description}
             </p>
@@ -451,33 +443,33 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("All");
 
-const cities = useMemo(() => {
-  const citySet = new Set(
-    alumni
-      .map((a) => a.city || "Unknown") // Handle missing cities
-      .filter(city => city && city.trim() !== "") // Filter out empty strings
-  );
-  return ["All", ...Array.from(citySet).sort()];
-}, []);
+  const cities = useMemo(() => {
+    const citySet = new Set(
+      alumni
+        .map((a) => a.city || "Unknown") // Handle missing cities
+        .filter(city => city && city.trim() !== "") // Filter out empty strings
+    );
+    return ["All", ...Array.from(citySet).sort()];
+  }, []);
 
   const citiesCount = useMemo(() => {
     return new Set(alumni.map((a) => a.city)).size;
   }, []);
 
- const filteredAlumni = useMemo(() => {
-  return alumni.filter((alumnus) => {
-    const matchesSearch =
-      alumnus.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      alumnus.post.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      alumnus.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredAlumni = useMemo(() => {
+    return alumni.filter((alumnus) => {
+      const matchesSearch =
+        alumnus.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        alumnus.post.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        alumnus.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCity =
-      selectedCity === "All" || 
-      (alumnus.city || "Unknown") === selectedCity;
+      const matchesCity =
+        selectedCity === "All" ||
+        (alumnus.city || "Unknown") === selectedCity;
 
-    return matchesSearch && matchesCity;
-  });
-}, [searchQuery, selectedCity]);
+      return matchesSearch && matchesCity;
+    });
+  }, [searchQuery, selectedCity]);
 
   const totalAlumni = alumni.length;
 
@@ -501,9 +493,8 @@ const cities = useMemo(() => {
               Connect with our growing community
             </p>
             <p
-              className={`text-xs sm:text-sm lg:text-lg block lg:inline lg:ml-2 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-xs sm:text-sm lg:text-lg block lg:inline lg:ml-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               of {totalAlumni}+ alumni across {citiesCount} cities
             </p>
@@ -519,19 +510,17 @@ const cities = useMemo(() => {
           <div className="grid grid-cols-3 gap-2 sm:gap-4 w-full">
             {/* Alumni Count */}
             <div
-              className={`rounded-xl p-4 text-center border transition-all ${
-                isDarkMode
+              className={`rounded-xl p-4 text-center border transition-all ${isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200"
-              }`}
+                }`}
             >
               <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-1">
                 {totalAlumni}+
               </div>
               <div
-                className={`text-xs ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-xs ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
                 Distinguished Alumni
               </div>
@@ -539,19 +528,17 @@ const cities = useMemo(() => {
 
             {/* Cities Count */}
             <div
-              className={`rounded-xl p-4 text-center border transition-all ${
-                isDarkMode
+              className={`rounded-xl p-4 text-center border transition-all ${isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200"
-              }`}
+                }`}
             >
               <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-1">
                 {citiesCount}
               </div>
               <div
-                className={`text-xs ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-xs ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
                 Cities Represented
               </div>
@@ -559,19 +546,17 @@ const cities = useMemo(() => {
 
             {/* Years of Excellence */}
             <div
-              className={`rounded-xl p-4 text-center border transition-all ${
-                isDarkMode
+              className={`rounded-xl p-4 text-center border transition-all ${isDarkMode
                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                   : "bg-white border-blue-200"
-              }`}
+                }`}
             >
               <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-1">
                 50+
               </div>
               <div
-                className={`text-xs ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-xs ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
                 Years of Excellence
               </div>
@@ -587,46 +572,42 @@ const cities = useMemo(() => {
             {/* Search Bar */}
             <div className="flex-1 relative">
               <Search
-                className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-500"
-                }`}
+                className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
               />
               <input
                 type="text"
                 placeholder="Search by name, position, or description..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2 rounded-lg border-2 transition-colors text-sm ${
-                  isDarkMode
+                className={`w-full pl-10 pr-4 py-2 rounded-lg border-2 transition-colors text-sm ${isDarkMode
                     ? "bg-slate-800 border-blue-600/20 text-white placeholder-gray-400 focus:border-cyan-400"
                     : "bg-white border-blue-200 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                } focus:outline-none`}
+                  } focus:outline-none`}
               />
             </div>
 
             {/* City Filter */}
             <select
-  value={selectedCity}
-  onChange={(e) => setSelectedCity(e.target.value)}
-  className={`px-3 py-2 rounded-lg border-2 transition-colors text-sm ${
-    isDarkMode
-      ? "bg-slate-800 border-blue-600/20 text-white focus:border-cyan-400"
-      : "bg-white border-blue-200 text-gray-900 focus:border-blue-500"
-  } focus:outline-none cursor-pointer`}
->
-  {cities.map((city) => (
-    <option key={city} value={city}>
-      {city}
-    </option>
-  ))}
-</select>
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className={`px-3 py-2 rounded-lg border-2 transition-colors text-sm ${isDarkMode
+                  ? "bg-slate-800 border-blue-600/20 text-white focus:border-cyan-400"
+                  : "bg-white border-blue-200 text-gray-900 focus:border-blue-500"
+                } focus:outline-none cursor-pointer`}
+            >
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Results Count */}
           <div
-            className={`text-center text-sm ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            }`}
+            className={`text-center text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"
+              }`}
           >
             Showing {filteredAlumni.length} of {totalAlumni} alumni
           </div>
@@ -640,11 +621,10 @@ const cities = useMemo(() => {
             {filteredAlumni.map((alumnus, index) => (
               <div
                 key={index}
-                className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${
-                  isDarkMode
+                className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${isDarkMode
                     ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
                     : "bg-white border-blue-200 shadow-lg"
-                }`}
+                  }`}
               >
                 <div className="p-6">
                   <div className="flex justify-center mb-4">
@@ -661,9 +641,8 @@ const cities = useMemo(() => {
 
                   <div className="text-center">
                     <h2
-                      className={`text-lg font-bold mb-2 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-lg font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {alumnus.name}
                     </h2>
@@ -673,18 +652,16 @@ const cities = useMemo(() => {
                     </p>
 
                     <p
-                      className={`text-xs mb-3 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
+                      className={`text-xs mb-3 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
                     >
                       📍 {alumnus.city}
                     </p>
 
                     {alumnus.description && (
                       <p
-                        className={`text-xs leading-relaxed ${
-                          isDarkMode ? "text-gray-300" : "text-gray-600"
-                        }`}
+                        className={`text-xs leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
                       >
                         {alumnus.description}
                       </p>
@@ -698,9 +675,8 @@ const cities = useMemo(() => {
           {filteredAlumni.length === 0 && (
             <div className="text-center py-12">
               <p
-                className={`text-xl ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-xl ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 No alumni found matching your search criteria.
               </p>

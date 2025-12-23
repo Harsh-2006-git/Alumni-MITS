@@ -5,31 +5,28 @@ export default function Footer({ isDarkMode }) {
 
   return (
     <footer
-      className={`w-full ${isDarkMode ? "bg-gray-900" : "bg-white"} border-t ${
-        isDarkMode ? "border-gray-800" : "border-gray-200"
-      }`}
+      className={`w-full ${isDarkMode ? "bg-gray-900" : "bg-white"} border-t ${isDarkMode ? "border-gray-800" : "border-gray-200"
+        }`}
     >
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 py-6 md:px-6 md:py-8">
         {/* Copyright Section */}
         <div className="text-center">
-          <div className="flex items-center justify-center gap-3 mb-2">
+          <div className="flex items-center justify-center gap-2 mb-2">
             <img
               src="/assets/images/mits-logo.png"
               alt="MITS Logo"
-              className="w-8 h-8 object-contain"
+              className="w-6 h-6 md:w-8 md:h-8 object-contain"
             />
             <h3
-              className={`text-lg font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-base md:text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               MITS Alumni
             </h3>
           </div>
           <p
-            className={`text-sm ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-xs md:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             © 2025 MITS Alumni Network. All rights reserved. | Developed by{" "}
             <a
