@@ -229,40 +229,38 @@ export default function BatchmatesFinder({
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
           ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
           : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-0">
         <div className="relative z-10">
-          <section className="text-center py-6 sm:py-8 lg:py-6 px-4 sm:px-6">
+          <section className="text-center py-4 sm:py-8 lg:py-6 px-2 sm:px-6">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
-                <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-3 mb-2 sm:mb-4">
+                <Sparkles className="w-5 h-5 sm:w-8 sm:h-8 text-cyan-400" />
+                <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
                   Batchmates Finder
                 </h1>
-                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+                <Sparkles className="w-5 h-5 sm:w-8 sm:h-8 text-cyan-400" />
               </div>
 
-              <div className="mb-2 sm:mb-3">
-                <p className="text-lg sm:text-xl lg:text-2xl bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold block lg:inline">
+              <div className="mb-1.5 sm:mb-3">
+                <p className="text-sm sm:text-xl lg:text-2xl bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold block lg:inline">
                   Find and connect with your batchmates
                 </p>
                 <p
-                  className={`text-sm sm:text-base lg:text-xl block lg:inline lg:ml-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`text-xs sm:text-base lg:text-xl block lg:inline lg:ml-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   from the same graduating year and stream
                 </p>
               </div>
 
-              <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full"></div>
+              <div className="w-12 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full"></div>
             </div>
           </section>
 
@@ -282,29 +280,26 @@ export default function BatchmatesFinder({
           ) : (
             <>
               <div
-                className={`rounded-2xl border p-4 sm:p-6 mb-6 ${
-                  isDarkMode
+                className={`rounded-2xl border p-4 sm:p-6 mb-6 ${isDarkMode
                     ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                     : "bg-white border-blue-200 shadow-lg"
-                }`}
+                  }`}
               >
                 <div className="flex flex-col md:flex-row gap-4 mb-4">
                   <div className="flex-1 relative">
                     <Search
-                      className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
+                      className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
                     />
                     <input
                       type="text"
                       placeholder="Search batchmates by name..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-colors ${
-                        isDarkMode
+                      className={`w-full pl-10 pr-4 py-3 rounded-xl border transition-colors ${isDarkMode
                           ? "bg-slate-800 border-slate-700 text-white placeholder-gray-400 focus:border-purple-500"
                           : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500"
-                      } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                        } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                     />
                   </div>
 
@@ -312,45 +307,42 @@ export default function BatchmatesFinder({
                   <div className="flex gap-2">
                     <button
                       onClick={() => setViewMode("batches")}
-                      className={`px-4 py-3 rounded-xl font-semibold border-2 transition-all flex items-center gap-2 ${
-                        viewMode === "batches"
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold border-2 transition-all flex items-center justify-center gap-2 text-sm sm:text-base ${viewMode === "batches"
                           ? isDarkMode
                             ? "bg-purple-600 border-purple-600 text-white"
                             : "bg-purple-500 border-purple-500 text-white"
                           : isDarkMode
-                          ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
-                          : "border-purple-500 text-purple-600 hover:bg-purple-50"
-                      }`}
+                            ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
+                            : "border-purple-500 text-purple-600 hover:bg-purple-50"
+                        }`}
                     >
-                      <GraduationCap className="w-5 h-5" />
-                      <span className="hidden sm:inline">Batches</span>
+                      <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span>Batches</span>
                     </button>
 
                     <button
                       onClick={() => setViewMode("list")}
-                      className={`px-4 py-3 rounded-xl font-semibold border-2 transition-all flex items-center gap-2 ${
-                        viewMode === "list"
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl font-semibold border-2 transition-all flex items-center justify-center gap-2 text-sm sm:text-base ${viewMode === "list"
                           ? isDarkMode
                             ? "bg-purple-600 border-purple-600 text-white"
                             : "bg-purple-500 border-purple-500 text-white"
                           : isDarkMode
-                          ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
-                          : "border-purple-500 text-purple-600 hover:bg-purple-50"
-                      }`}
+                            ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
+                            : "border-purple-500 text-purple-600 hover:bg-purple-50"
+                        }`}
                     >
-                      <Users className="w-5 h-5" />
-                      <span className="hidden sm:inline">List</span>
+                      <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span>List</span>
                     </button>
 
                     <button
                       onClick={() => setShowFilters(!showFilters)}
-                      className={`px-4 py-3 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center gap-2 md:hidden ${
-                        isDarkMode
+                      className={`px-3 py-2.5 rounded-xl font-semibold border-2 transition-all hover:scale-105 flex items-center justify-center gap-2 md:hidden ${isDarkMode
                           ? "border-purple-600 text-purple-400 hover:bg-purple-900/30"
                           : "border-purple-500 text-purple-600 hover:bg-purple-50"
-                      }`}
+                        }`}
                     >
-                      <Filter className="w-5 h-5" />
+                      <Filter className="w-4 h-4 sm:w-5 sm:h-5" />
                     </button>
                   </div>
                 </div>
@@ -361,9 +353,8 @@ export default function BatchmatesFinder({
                     <div className="space-y-4">
                       <div>
                         <label
-                          className={`block text-sm font-medium mb-2 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                           <GraduationCap className="w-4 h-4 inline mr-2" />
                           Graduation Year
@@ -371,11 +362,10 @@ export default function BatchmatesFinder({
                         <select
                           value={selectedBatch}
                           onChange={(e) => setSelectedBatch(e.target.value)}
-                          className={`w-full px-4 py-3 rounded-xl border transition-colors ${
-                            isDarkMode
+                          className={`w-full px-4 py-3 rounded-xl border transition-colors ${isDarkMode
                               ? "bg-slate-800 border-slate-700 text-white"
                               : "bg-white border-gray-300 text-gray-900"
-                          } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                            } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                         >
                           {batches.map((batch) => (
                             <option key={batch} value={batch}>
@@ -389,9 +379,8 @@ export default function BatchmatesFinder({
 
                       <div>
                         <label
-                          className={`block text-sm font-medium mb-2 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                           <GraduationCap className="w-4 h-4 inline mr-2" />
                           Stream/Department
@@ -401,11 +390,10 @@ export default function BatchmatesFinder({
                           onChange={(e) =>
                             setSelectedDepartment(e.target.value)
                           }
-                          className={`w-full px-4 py-3 rounded-xl border transition-colors ${
-                            isDarkMode
+                          className={`w-full px-4 py-3 rounded-xl border transition-colors ${isDarkMode
                               ? "bg-slate-800 border-slate-700 text-white"
                               : "bg-white border-gray-300 text-gray-900"
-                          } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                            } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                         >
                           {departments.map((dept) => (
                             <option key={dept} value={dept}>
@@ -417,9 +405,8 @@ export default function BatchmatesFinder({
 
                       <div>
                         <label
-                          className={`block text-sm font-medium mb-2 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                           <MapPin className="w-4 h-4 inline mr-2" />
                           Current Location
@@ -427,11 +414,10 @@ export default function BatchmatesFinder({
                         <select
                           value={selectedLocation}
                           onChange={(e) => setSelectedLocation(e.target.value)}
-                          className={`w-full px-4 py-3 rounded-xl border transition-colors ${
-                            isDarkMode
+                          className={`w-full px-4 py-3 rounded-xl border transition-colors ${isDarkMode
                               ? "bg-slate-800 border-slate-700 text-white"
                               : "bg-white border-gray-300 text-gray-900"
-                          } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                            } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                         >
                           {locations.map((location) => (
                             <option key={location} value={location}>
@@ -456,11 +442,10 @@ export default function BatchmatesFinder({
                       <select
                         value={selectedBatch}
                         onChange={(e) => setSelectedBatch(e.target.value)}
-                        className={`px-4 py-3 rounded-xl border transition-colors ${
-                          isDarkMode
+                        className={`px-4 py-3 rounded-xl border transition-colors ${isDarkMode
                             ? "bg-slate-800 border-slate-700 text-white"
                             : "bg-white border-gray-300 text-gray-900"
-                        } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                          } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                       >
                         {batches.map((batch) => (
                           <option key={batch} value={batch}>
@@ -474,11 +459,10 @@ export default function BatchmatesFinder({
                       <select
                         value={selectedDepartment}
                         onChange={(e) => setSelectedDepartment(e.target.value)}
-                        className={`px-4 py-3 rounded-xl border transition-colors ${
-                          isDarkMode
+                        className={`px-4 py-3 rounded-xl border transition-colors ${isDarkMode
                             ? "bg-slate-800 border-slate-700 text-white"
                             : "bg-white border-gray-300 text-gray-900"
-                        } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                          } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                       >
                         {departments.map((dept) => (
                           <option key={dept} value={dept}>
@@ -490,11 +474,10 @@ export default function BatchmatesFinder({
                       <select
                         value={selectedLocation}
                         onChange={(e) => setSelectedLocation(e.target.value)}
-                        className={`px-4 py-3 rounded-xl border transition-colors ${
-                          isDarkMode
+                        className={`px-4 py-3 rounded-xl border transition-colors ${isDarkMode
                             ? "bg-slate-800 border-slate-700 text-white"
                             : "bg-white border-gray-300 text-gray-900"
-                        } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
+                          } focus:outline-none focus:ring-2 focus:ring-purple-500/20`}
                       >
                         {locations.map((location) => (
                           <option key={location} value={location}>
@@ -516,9 +499,8 @@ export default function BatchmatesFinder({
                       }}
                     >
                       <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
+                        className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
                       >
                         {viewMode === "batches" ? (
                           <>
@@ -551,38 +533,34 @@ export default function BatchmatesFinder({
                           ([batch, alumniList]) => (
                             <div
                               key={batch}
-                              className={`rounded-2xl border transition-all hover:shadow-xl ${
-                                isDarkMode
+                              className={`rounded-2xl border transition-all hover:shadow-xl ${isDarkMode
                                   ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
                                   : "bg-white border-blue-200 shadow-lg"
-                              }`}
+                                }`}
                             >
                               <button
                                 onClick={() => toggleBatch(batch)}
-                                className={`w-full p-4 text-left flex justify-between items-center ${
-                                  expandedBatch === batch
+                                className={`w-full p-4 text-left flex justify-between items-center ${expandedBatch === batch
                                     ? isDarkMode
                                       ? "bg-blue-900/30"
                                       : "bg-blue-50"
                                     : ""
-                                }`}
+                                  }`}
                               >
                                 <div>
                                   <h3
-                                    className={`font-bold text-lg ${
-                                      isDarkMode
+                                    className={`font-bold text-lg ${isDarkMode
                                         ? "text-white"
                                         : "text-gray-900"
-                                    }`}
+                                      }`}
                                   >
                                     Class of {batch}
                                   </h3>
                                   <p
-                                    className={`text-sm ${
-                                      isDarkMode
+                                    className={`text-sm ${isDarkMode
                                         ? "text-gray-400"
                                         : "text-gray-600"
-                                    }`}
+                                      }`}
                                   >
                                     {alumniList.length} alumni
                                   </p>
@@ -603,11 +581,10 @@ export default function BatchmatesFinder({
                                       return (
                                         <div
                                           key={alumni.id}
-                                          className={`p-3 rounded-xl border transition-all hover:scale-105 cursor-pointer ${
-                                            isDarkMode
+                                          className={`p-3 rounded-xl border transition-all hover:scale-105 cursor-pointer ${isDarkMode
                                               ? "bg-slate-800/50 border-slate-700 hover:bg-slate-700/50"
                                               : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                                          }`}
+                                            }`}
                                           onClick={() => openModal(alumni)}
                                         >
                                           <div className="flex items-center gap-3">
@@ -621,20 +598,18 @@ export default function BatchmatesFinder({
                                             />
                                             <div className="flex-1 min-w-0">
                                               <h4
-                                                className={`font-semibold text-sm truncate ${
-                                                  isDarkMode
+                                                className={`font-semibold text-sm truncate ${isDarkMode
                                                     ? "text-white"
                                                     : "text-gray-900"
-                                                }`}
+                                                  }`}
                                               >
                                                 {alumni.name}
                                               </h4>
                                               <p
-                                                className={`text-xs truncate ${
-                                                  isDarkMode
+                                                className={`text-xs truncate ${isDarkMode
                                                     ? "text-gray-400"
                                                     : "text-gray-600"
-                                                }`}
+                                                  }`}
                                               >
                                                 {educationDetails?.stream ||
                                                   "N/A"}
@@ -646,11 +621,10 @@ export default function BatchmatesFinder({
                                     })}
                                     {alumniList.length > 10 && (
                                       <div
-                                        className={`text-center text-sm ${
-                                          isDarkMode
+                                        className={`text-center text-sm ${isDarkMode
                                             ? "text-gray-400"
                                             : "text-gray-500"
-                                        }`}
+                                          }`}
                                       >
                                         +{alumniList.length - 10} more alumni
                                       </div>
@@ -663,161 +637,150 @@ export default function BatchmatesFinder({
                         )}
                       </div>
                     ) : // List View
-                    filteredAlumni.length > 0 ? (
-                      <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                        {filteredAlumni.map((alumni) => {
-                          const educationDetails = getEducationDetails(alumni);
-                          const alumniBatch = getBatchFromEducation(alumni);
+                      filteredAlumni.length > 0 ? (
+                        <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                          {filteredAlumni.map((alumni) => {
+                            const educationDetails = getEducationDetails(alumni);
+                            const alumniBatch = getBatchFromEducation(alumni);
 
-                          return (
-                            <div
-                              key={alumni.id}
-                              className={`p-4 sm:p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl cursor-pointer ${
-                                isDarkMode
-                                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                                  : "bg-white border-blue-200 shadow-lg"
-                              }`}
-                              onClick={() => openModal(alumni)}
-                            >
-                              <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                  <img
-                                    src={
-                                      alumni.profilePhoto ||
-                                      "https://i.pinimg.com/originals/a3/f4/bc/a3f4bc0dc7d1b030b782c62d7a4781cf.jpg"
-                                    }
-                                    alt={alumni.name}
-                                    className="w-12 h-12 rounded-full object-cover"
-                                  />
-                                  <div>
-                                    <h3
-                                      className={`font-bold text-lg ${
-                                        isDarkMode
-                                          ? "text-white"
-                                          : "text-gray-900"
-                                      }`}
-                                    >
-                                      {alumni.name}
-                                    </h3>
-                                    {alumni.isVerified && (
-                                      <span className="inline-flex items-center gap-1 text-xs text-blue-500">
-                                        <Shield className="w-3 h-3" />
-                                        Verified
-                                      </span>
-                                    )}
+                            return (
+                              <div
+                                key={alumni.id}
+                                className={`p-4 sm:p-6 rounded-2xl border transition-all hover:scale-105 hover:shadow-2xl cursor-pointer ${isDarkMode
+                                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                                    : "bg-white border-blue-200 shadow-lg"
+                                  }`}
+                                onClick={() => openModal(alumni)}
+                              >
+                                <div className="flex items-start justify-between mb-4">
+                                  <div className="flex items-center gap-3">
+                                    <img
+                                      src={
+                                        alumni.profilePhoto ||
+                                        "https://i.pinimg.com/originals/a3/f4/bc/a3f4bc0dc7d1b030b782c62d7a4781cf.jpg"
+                                      }
+                                      alt={alumni.name}
+                                      className="w-12 h-12 rounded-full object-cover"
+                                    />
+                                    <div>
+                                      <h3
+                                        className={`font-bold text-lg ${isDarkMode
+                                            ? "text-white"
+                                            : "text-gray-900"
+                                          }`}
+                                      >
+                                        {alumni.name}
+                                      </h3>
+                                      {alumni.isVerified && (
+                                        <span className="inline-flex items-center gap-1 text-xs text-blue-500">
+                                          <Shield className="w-3 h-3" />
+                                          Verified
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              <div className="space-y-2 mb-4">
-                                {educationDetails && (
-                                  <>
+                                <div className="space-y-2 mb-4">
+                                  {educationDetails && (
+                                    <>
+                                      <div className="flex items-center gap-2">
+                                        <GraduationCap
+                                          className={`w-4 h-4 ${isDarkMode
+                                              ? "text-gray-500"
+                                              : "text-gray-400"
+                                            }`}
+                                        />
+                                        <span
+                                          className={`text-sm ${isDarkMode
+                                              ? "text-gray-300"
+                                              : "text-gray-700"
+                                            }`}
+                                        >
+                                          Class of {alumniBatch} •{" "}
+                                          {educationDetails.stream}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Building2
+                                          className={`w-4 h-4 ${isDarkMode
+                                              ? "text-gray-500"
+                                              : "text-gray-400"
+                                            }`}
+                                        />
+                                        <span
+                                          className={`text-sm ${isDarkMode
+                                              ? "text-gray-300"
+                                              : "text-gray-700"
+                                            }`}
+                                        >
+                                          {educationDetails.institution}
+                                        </span>
+                                      </div>
+                                    </>
+                                  )}
+
+                                  {getCurrentCompany(alumni) !==
+                                    "Not Currently Employed" && (
+                                      <div className="flex items-center gap-2">
+                                        <Building2
+                                          className={`w-4 h-4 ${isDarkMode
+                                              ? "text-gray-500"
+                                              : "text-gray-400"
+                                            }`}
+                                        />
+                                        <span
+                                          className={`text-sm ${isDarkMode
+                                              ? "text-gray-300"
+                                              : "text-gray-700"
+                                            }`}
+                                        >
+                                          {getCurrentDesignation(alumni)} at{" "}
+                                          {getCurrentCompany(alumni)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  {alumni.profile?.location && (
                                     <div className="flex items-center gap-2">
-                                      <GraduationCap
-                                        className={`w-4 h-4 ${
-                                          isDarkMode
+                                      <MapPin
+                                        className={`w-4 h-4 ${isDarkMode
                                             ? "text-gray-500"
                                             : "text-gray-400"
-                                        }`}
+                                          }`}
                                       />
                                       <span
-                                        className={`text-sm ${
-                                          isDarkMode
+                                        className={`text-sm ${isDarkMode
                                             ? "text-gray-300"
                                             : "text-gray-700"
-                                        }`}
+                                          }`}
                                       >
-                                        Class of {alumniBatch} •{" "}
-                                        {educationDetails.stream}
+                                        {alumni.profile.location}
                                       </span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                      <Building2
-                                        className={`w-4 h-4 ${
-                                          isDarkMode
-                                            ? "text-gray-500"
-                                            : "text-gray-400"
-                                        }`}
-                                      />
-                                      <span
-                                        className={`text-sm ${
-                                          isDarkMode
-                                            ? "text-gray-300"
-                                            : "text-gray-700"
-                                        }`}
-                                      >
-                                        {educationDetails.institution}
-                                      </span>
-                                    </div>
-                                  </>
-                                )}
+                                  )}
+                                </div>
 
-                                {getCurrentCompany(alumni) !==
-                                  "Not Currently Employed" && (
-                                  <div className="flex items-center gap-2">
-                                    <Building2
-                                      className={`w-4 h-4 ${
-                                        isDarkMode
-                                          ? "text-gray-500"
-                                          : "text-gray-400"
-                                      }`}
-                                    />
-                                    <span
-                                      className={`text-sm ${
-                                        isDarkMode
-                                          ? "text-gray-300"
-                                          : "text-gray-700"
-                                      }`}
-                                    >
-                                      {getCurrentDesignation(alumni)} at{" "}
-                                      {getCurrentCompany(alumni)}
-                                    </span>
-                                  </div>
-                                )}
-                                {alumni.profile?.location && (
-                                  <div className="flex items-center gap-2">
-                                    <MapPin
-                                      className={`w-4 h-4 ${
-                                        isDarkMode
-                                          ? "text-gray-500"
-                                          : "text-gray-400"
-                                      }`}
-                                    />
-                                    <span
-                                      className={`text-sm ${
-                                        isDarkMode
-                                          ? "text-gray-300"
-                                          : "text-gray-700"
-                                      }`}
-                                    >
-                                      {alumni.profile.location}
-                                    </span>
-                                  </div>
-                                )}
+                                <button className="w-full px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
+                                  View Full Profile
+                                </button>
                               </div>
-
-                              <button className="w-full px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium text-sm hover:from-purple-700 hover:to-pink-700 transition-all duration-300 hover:scale-105">
-                                View Full Profile
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div
-                        className={`text-center py-20 ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
-                      >
-                        <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p className="text-xl font-semibold mb-2">
-                          No batchmates found
-                        </p>
-                        <p className="text-sm">
-                          Try adjusting your filters to find your batchmates
-                        </p>
-                      </div>
-                    )}
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div
+                          className={`text-center py-20 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                            }`}
+                        >
+                          <Users className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                          <p className="text-xl font-semibold mb-2">
+                            No batchmates found
+                          </p>
+                          <p className="text-sm">
+                            Try adjusting your filters to find your batchmates
+                          </p>
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>

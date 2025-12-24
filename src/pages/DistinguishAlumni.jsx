@@ -318,14 +318,14 @@ export function ScrollingAlumni({ isDarkMode }) {
           {/* Light gradient overlays */}
           <div
             className={`absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${isDarkMode
-                ? "bg-gradient-to-r from-slate-900 to-transparent"
-                : "bg-gradient-to-r from-white to-transparent"
+              ? "bg-gradient-to-r from-slate-900 to-transparent"
+              : "bg-gradient-to-r from-white to-transparent"
               }`}
           ></div>
           <div
             className={`absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${isDarkMode
-                ? "bg-gradient-to-l from-slate-900 to-transparent"
-                : "bg-gradient-to-l from-white to-transparent"
+              ? "bg-gradient-to-l from-slate-900 to-transparent"
+              : "bg-gradient-to-l from-white to-transparent"
               }`}
           ></div>
 
@@ -388,17 +388,17 @@ export function ScrollingAlumni({ isDarkMode }) {
 function AlumniCard({ alumnus, isDarkMode }) {
   return (
     <div
-      className={`flex-shrink-0 w-48 sm:w-56 rounded-xl border transition-all ${isDarkMode
-          ? "bg-slate-800 border-blue-600/20"
-          : "bg-white border-blue-200"
+      className={`flex-shrink-0 w-40 sm:w-56 rounded-xl border transition-all ${isDarkMode
+        ? "bg-slate-800 border-blue-600/20"
+        : "bg-white border-blue-200"
         }`}
     >
       <div className="p-3 sm:p-4">
-        <div className="flex justify-center mb-3">
+        <div className="flex justify-center mb-2 sm:mb-3">
           <img
             src={alumnus.image}
             alt={alumnus.name}
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover"
+            className="w-14 h-14 sm:w-20 sm:h-20 rounded-lg object-cover shadow-md"
             onError={(e) => {
               e.target.src = "https://via.placeholder.com/80x80?text=No+Image";
             }}
@@ -407,18 +407,18 @@ function AlumniCard({ alumnus, isDarkMode }) {
 
         <div className="text-center">
           <h3
-            className={`text-sm font-bold mb-1 line-clamp-2 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-[12px] sm:text-sm font-bold mb-0.5 sm:mb-1 line-clamp-1 sm:line-clamp-2 ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
             {alumnus.name}
           </h3>
 
-          <p className="text-xs mb-1 font-medium bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent line-clamp-2">
+          <p className="text-[10px] sm:text-xs mb-1 font-medium bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent line-clamp-1 sm:line-clamp-2 leading-tight">
             {alumnus.post}
           </p>
 
           <p
-            className={`text-xs mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+            className={`text-[9px] sm:text-xs mb-1.5 ${isDarkMode ? "text-gray-400" : "text-gray-500"
               }`}
           >
             📍 {alumnus.city}
@@ -426,7 +426,7 @@ function AlumniCard({ alumnus, isDarkMode }) {
 
           {alumnus.description && (
             <p
-              className={`text-xs leading-relaxed line-clamp-2 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+              className={`text-[10px] sm:text-xs leading-relaxed line-clamp-2 ${isDarkMode ? "text-gray-300" : "text-gray-600"
                 }`}
             >
               {alumnus.description}
@@ -511,8 +511,8 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
             {/* Alumni Count */}
             <div
               className={`rounded-xl p-4 text-center border transition-all ${isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200"
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200"
                 }`}
             >
               <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-1">
@@ -529,8 +529,8 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
             {/* Cities Count */}
             <div
               className={`rounded-xl p-4 text-center border transition-all ${isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200"
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200"
                 }`}
             >
               <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-1">
@@ -547,8 +547,8 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
             {/* Years of Excellence */}
             <div
               className={`rounded-xl p-4 text-center border transition-all ${isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                  : "bg-white border-blue-200"
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200"
                 }`}
             >
               <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent mb-1">
@@ -581,8 +581,8 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full pl-10 pr-4 py-2 rounded-lg border-2 transition-colors text-sm ${isDarkMode
-                    ? "bg-slate-800 border-blue-600/20 text-white placeholder-gray-400 focus:border-cyan-400"
-                    : "bg-white border-blue-200 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                  ? "bg-slate-800 border-blue-600/20 text-white placeholder-gray-400 focus:border-cyan-400"
+                  : "bg-white border-blue-200 text-gray-900 placeholder-gray-500 focus:border-blue-500"
                   } focus:outline-none`}
               />
             </div>
@@ -592,8 +592,8 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
               className={`px-3 py-2 rounded-lg border-2 transition-colors text-sm ${isDarkMode
-                  ? "bg-slate-800 border-blue-600/20 text-white focus:border-cyan-400"
-                  : "bg-white border-blue-200 text-gray-900 focus:border-blue-500"
+                ? "bg-slate-800 border-blue-600/20 text-white focus:border-cyan-400"
+                : "bg-white border-blue-200 text-gray-900 focus:border-blue-500"
                 } focus:outline-none cursor-pointer`}
             >
               {cities.map((city) => (
@@ -622,8 +622,8 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
               <div
                 key={index}
                 className={`rounded-2xl overflow-hidden border transition-all hover:scale-105 hover:shadow-2xl ${isDarkMode
-                    ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
-                    : "bg-white border-blue-200 shadow-lg"
+                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20 shadow-lg"
+                  : "bg-white border-blue-200 shadow-lg"
                   }`}
               >
                 <div className="p-6">

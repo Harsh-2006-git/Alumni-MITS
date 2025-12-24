@@ -144,7 +144,7 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
               <button
                 type="button"
                 onClick={() => setShowInfo(!showInfo)}
-                className={`p-1 rounded-lg ${isDarkMode
+                className={`p-1.5 rounded-lg flex-shrink-0 ${isDarkMode
                   ? "hover:bg-gray-800 text-blue-400"
                   : "hover:bg-gray-100 text-blue-600"
                   }`}
@@ -153,7 +153,7 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
                 <HelpCircle className="w-5 h-5" />
               </button>
             </div>
-            <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            <p className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}>
               Please provide a personal email to continue
             </p>
@@ -307,23 +307,28 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
   const handleNext = (e) => {
     e.preventDefault();
     if (step === 1) {
-      if (!formData.extraEmail || !formData.phone || !formData.location) {
+      if (!formData.extraEmail || !formData.phone) {
         setError("Please fill all required fields");
         return;
       }
-
       if (formData.extraEmail.toLowerCase().endsWith("@mitsgwl.ac.in")) {
-        setError("Please provide a personal email address (not your institute ID)");
+        setError("Please provide a personal email address");
         return;
       }
-
       setError("");
       setStep(2);
+    } else if (step === 2) {
+      if (!formData.location) {
+        setError("Location is required");
+        return;
+      }
+      setError("");
+      setStep(3);
     }
   };
 
   const handleBack = () => {
-    setStep(1);
+    setStep(prev => prev - 1);
     setError("");
   };
 
@@ -429,89 +434,96 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
               ))}
             </div>
 
-            <div className="text-center mb-8">
+            <div className="text-center mb-6 sm:mb-8">
               <motion.h3
                 key={step}
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`text-3xl font-extrabold tracking-tight mb-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-                {step === 1 ? "Connect with Us" : "MITS Roots"}
+                className={`text-xl sm:text-3xl font-extrabold tracking-tight mb-1 sm:mb-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                {step === 1 ? "Contact Details" : step === 2 ? "Social & Location" : "Academic Roots"}
               </motion.h3>
               <motion.p
                 key={`desc-${step}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className={`text-sm tracking-wide uppercase font-semibold ${isDarkMode ? "text-slate-400" : "text-gray-500"}`}>
-                {step === 1 ? "Official details & Socials" : "Define your academic journey"}
+                className={`text-[10px] sm:text-xs tracking-wide uppercase font-semibold ${isDarkMode ? "text-slate-400" : "text-gray-500"}`}>
+                {step === 1 ? "Stay Connected" : step === 2 ? "Professional & Geographic" : "Define your MITS journey"}
               </motion.p>
             </div>
 
-            <form onSubmit={step === 1 ? handleNext : handleSubmit} className="space-y-6">
+            <form onSubmit={step < 3 ? handleNext : handleSubmit} className="space-y-4 sm:space-y-6">
               <AnimatePresence mode="wait">
-                {step === 1 ? (
+                {step === 1 && (
                   <motion.div
                     key="step1"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="space-y-5"
+                    className="space-y-4"
                   >
                     <div className="group">
-                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Personal Email</label>
+                      <label className={`block text-[10px] sm:text-xs font-bold uppercase mb-1.5 sm:mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Personal Email</label>
                       <div className="relative">
-                        <div className={`absolute left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
-                          <Mail className="w-4 h-4" />
+                        <div className={`absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
+                          <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </div>
                         <input
                           type="email"
                           value={formData.extraEmail}
                           onChange={(e) => setFormData({ ...formData, extraEmail: e.target.value })}
-                          className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50 focus:bg-slate-800" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500 focus:bg-white"} outline-none`}
-                          placeholder="Your personal email address"
+                          className={`w-full pl-12 sm:pl-14 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
+                          placeholder="johndoe@gmail.com"
                           required
                         />
                       </div>
-                      <p className={`mt-1.5 text-[10px] italic pl-1 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Important: Personal email only. @mitsgwl.ac.in is restricted.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div className="group">
-                        <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Phone Number</label>
-                        <div className="relative">
-                          <div className={`absolute left-4 top-1/2 -translate-y-1/2 font-bold text-sm ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>+91</div>
-                          <input
-                            type="tel"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
-                            className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-bold tracking-widest ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
-                            placeholder="00000 00000"
-                            required
-                          />
-                        </div>
+                    <div className="group">
+                      <label className={`block text-[10px] sm:text-xs font-bold uppercase mb-1.5 sm:mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Phone Number</label>
+                      <div className="relative">
+                        <div className={`absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 font-bold text-xs sm:text-sm ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>+91</div>
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+                          className={`w-full pl-12 sm:pl-14 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base rounded-2xl border-2 transition-all duration-300 font-bold tracking-widest ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
+                          placeholder="00000 00000"
+                          required
+                        />
                       </div>
+                    </div>
+                  </motion.div>
+                )}
 
-                      <div className="group">
-                        <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>LinkedIn URL</label>
-                        <div className="relative">
-                          <div className={`absolute left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
-                            <Linkedin className="w-4 h-4" />
-                          </div>
-                          <input
-                            type="url"
-                            value={formData.linkedin}
-                            onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                            className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
-                            placeholder="Professional profile"
-                          />
+                {step === 2 && (
+                  <motion.div
+                    key="step2"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="space-y-4"
+                  >
+                    <div className="group">
+                      <label className={`block text-[10px] sm:text-xs font-bold uppercase mb-1.5 sm:mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>LinkedIn URL (Optional)</label>
+                      <div className="relative">
+                        <div className={`absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
+                          <Linkedin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </div>
+                        <input
+                          type="url"
+                          value={formData.linkedin}
+                          onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                          className={`w-full pl-12 sm:pl-14 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
+                          placeholder="linkedin.com/in/username"
+                        />
                       </div>
                     </div>
 
                     <div className="relative group">
-                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Current Location</label>
+                      <label className={`block text-[10px] sm:text-xs font-bold uppercase mb-1.5 sm:mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Current Location</label>
                       <div className="relative">
-                        <div className={`absolute left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
-                          <MapPin className="w-4 h-4" />
+                        <div className={`absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors ${isDarkMode ? "bg-slate-800 text-slate-400 group-focus-within:text-blue-400" : "bg-gray-100 text-gray-500 group-focus-within:text-blue-600"}`}>
+                          <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </div>
                         <input
                           type="text"
@@ -521,8 +533,8 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
                             setShowLocationDropdown(true);
                           }}
                           onFocus={() => setShowLocationDropdown(true)}
-                          className={`w-full pl-14 pr-4 py-3.5 rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
-                          placeholder="Where are you currently based?"
+                          className={`w-full pl-12 sm:pl-14 pr-4 py-2.5 sm:py-3.5 text-sm sm:text-base rounded-2xl border-2 transition-all duration-300 font-medium ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
+                          placeholder="City, State"
                           required
                         />
                         {showLocationDropdown && formData.location && filteredCities.length > 0 && (
@@ -541,7 +553,6 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
                                 }}
                                 className={`w-full px-4 py-3 text-left text-sm font-semibold flex items-center gap-3 rounded-xl transition-all ${isDarkMode ? "text-slate-300 hover:bg-blue-600 hover:text-white" : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"}`}
                               >
-                                <span className={`p-1 rounded-md ${isDarkMode ? "bg-slate-800" : "bg-gray-100"}`}><MapPin className="w-3.5 h-3.5" /></span>
                                 {city}
                               </button>
                             ))}
@@ -550,47 +561,45 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
                       </div>
                     </div>
                   </motion.div>
-                ) : (
+                )}
+
+                {step === 3 && (
                   <motion.div
-                    key="step2"
+                    key="step3"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
+                    className="space-y-4"
                   >
                     <div className="group">
-                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Engineering Branch</label>
+                      <label className={`block text-[10px] sm:text-xs font-bold uppercase mb-1.5 sm:mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Engineering Branch</label>
                       <div className="relative">
                         <select
                           value={formData.branch}
                           onChange={(e) => setFormData({ ...formData, branch: e.target.value })}
-                          className={`w-full px-5 py-4 rounded-2xl border-2 transition-all appearance-none font-bold ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500 focus:bg-white"} outline-none`}
+                          className={`w-full px-4 text-sm sm:text-base py-3 sm:py-4 rounded-2xl border-2 transition-all appearance-none font-bold ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
                           required
                         >
-                          <option value="">Select your discipline</option>
+                          <option value="">Select Branch</option>
                           {branches.map(b => <option key={b} value={b}>{b}</option>)}
                         </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                          <ChevronDown className={`w-5 h-5 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`} />
-                        </div>
+                        <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-50" />
                       </div>
                     </div>
 
                     <div className="group">
-                      <label className={`block text-xs font-bold uppercase mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Graduation Year</label>
+                      <label className={`block text-[10px] sm:text-xs font-bold uppercase mb-1.5 sm:mb-2 pl-1 transition-colors ${isDarkMode ? "text-slate-500 group-focus-within:text-blue-400" : "text-gray-500 group-focus-within:text-blue-600"}`}>Graduation Year</label>
                       <div className="relative">
                         <select
                           value={formData.batch}
                           onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
-                          className={`w-full px-5 py-4 rounded-2xl border-2 transition-all appearance-none font-bold tracking-wider ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500 focus:bg-white"} outline-none`}
+                          className={`w-full px-4 text-sm sm:text-base py-3 sm:py-4 rounded-2xl border-2 transition-all appearance-none font-bold tracking-wider ${isDarkMode ? "bg-slate-800/50 border-slate-700/50 text-white focus:border-blue-500/50" : "bg-gray-50 border-gray-100 text-gray-900 focus:border-blue-500"} outline-none`}
                           required
                         >
-                          <option value="">Year of Graduation</option>
+                          <option value="">Select Year</option>
                           {years.map(y => <option key={y} value={y}>{y}</option>)}
                         </select>
-                        <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                          <Calendar className={`w-5 h-5 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`} />
-                        </div>
+                        <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none opacity-50" />
                       </div>
                     </div>
 
@@ -615,20 +624,18 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
 
               {error && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="p-4 rounded-2xl bg-rose-600/10 border border-rose-500/20 text-rose-500 text-xs font-bold flex items-center gap-3 backdrop-blur-sm"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className={`p-3 rounded-xl border flex items-center gap-2 text-xs font-bold ${isDarkMode ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-red-50 border-red-100 text-red-600"}`}
                 >
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <AlertCircle className="w-4 h-4" />
                   {error}
                 </motion.div>
               )}
 
-              <div className="flex gap-4 pt-4">
-                {step === 2 && (
+              <div className="flex gap-3 pt-2">
+                {step > 1 && (
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={handleBack}
                     className={`flex-1 py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-2 ${isDarkMode ? "bg-slate-800/80 text-white hover:bg-slate-800" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
@@ -1332,59 +1339,59 @@ export default function LoginPage({
                     </div>
                   </div>
 
-                  <div className="mt-6 text-center">
+                  <div className="mt-4 text-center">
                     <p
-                      className={`text-sm mb-3 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      className={`text-xs sm:text-sm mb-2 sm:mb-3 ${isDarkMode ? "text-gray-400" : "text-gray-600"
                         }`}
                     >
                       Already graduated?
                     </p>
                     <button
                       onClick={() => navigate("/login-alumni")}
-                      className={`w-full px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 ${isDarkMode
+                      className={`w-full px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all hover:scale-105 ${isDarkMode
                         ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
                         : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
                         } shadow-lg hover:shadow-xl flex items-center gap-2 justify-center mx-auto`}
                     >
                       Login as Alumni
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 </div>
 
                 <div
-                  className={`mt-6 rounded-xl p-6 backdrop-blur-xl border flex justify-center items-center ${isDarkMode
+                  className={`mt-4 sm:mt-6 rounded-xl p-4 sm:p-6 backdrop-blur-xl border flex justify-center items-center ${isDarkMode
                     ? "bg-slate-900/50 border-slate-700/50"
                     : "bg-white/80 border-blue-200"
                     }`}
                 >
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-4 sm:gap-6">
                     <div className="relative flex-shrink-0">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50"></div>
                       <img
                         src="/assets/images/harsh.png"
                         alt="Harsh Manmode"
-                        className="w-20 h-23 rounded-full border-2 border-blue-500 relative z-10"
+                        className="w-16 h-18 sm:w-20 sm:h-23 rounded-full border-2 border-blue-500 relative z-10"
                       />
                     </div>
                     <div className="flex flex-col items-center">
                       <p
-                        className={`text-xs font-semibold tracking-wider mb-2 ${isDarkMode ? "text-gray-500" : "text-blue-600/60"
+                        className={`text-[10px] sm:text-xs font-bold tracking-widest mb-1 sm:mb-2 ${isDarkMode ? "text-gray-500" : "text-blue-600/60"
                           }`}
                       >
                         DEVELOPED BY
                       </p>
                       <h3
-                        className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                        className={`text-base sm:text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"
                           }`}
                       >
                         Harsh Manmode
                       </h3>
                       <p
-                        className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        className={`text-[10px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
                           }`}
                       >
-                        Information Technology, II Year
+                        IT, II Year
                       </p>
                       <div className="flex gap-2 mt-2 justify-center">
                         {[
@@ -1396,10 +1403,6 @@ export default function LoginPage({
                             icon: Linkedin,
                             href: "https://www.linkedin.com/in/harsh-manmode-2a0b91325/",
                           },
-                          {
-                            icon: Twitter,
-                            href: "https://www.linkedin.com/in/harsh-manmode-2a0b91325/",
-                          },
                         ].map((social, idx) => (
                           <a
                             key={idx}
@@ -1409,7 +1412,7 @@ export default function LoginPage({
                               : "bg-blue-100 hover:bg-blue-200 text-blue-600"
                               }`}
                           >
-                            <social.icon className="w-4 h-4" />
+                            <social.icon className="w-3.5 h-3.5" />
                           </a>
                         ))}
                       </div>

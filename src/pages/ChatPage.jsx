@@ -759,16 +759,16 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                               className={`mb-4 flex ${isSent ? "justify-end" : "justify-start"
                                 }`}
                             >
-                              <div className="max-w-xs">
+                              <div className="max-w-[85%] sm:max-w-[70%] lg:max-w-md">
                                 <div
-                                  className={`rounded-2xl px-4 py-2.5 ${isSent
-                                    ? "bg-purple-500 text-white rounded-br-sm"
+                                  className={`rounded-2xl px-4 py-2.5 shadow-sm ${isSent
+                                    ? "bg-purple-600 text-white rounded-tr-none sm:rounded-tr-2xl sm:rounded-br-sm"
                                     : isDarkMode
-                                      ? "bg-slate-800 text-white rounded-bl-sm"
-                                      : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
+                                      ? "bg-slate-800 text-white rounded-tl-none sm:rounded-tl-2xl sm:rounded-bl-sm"
+                                      : "bg-white text-gray-900 rounded-tl-none sm:rounded-tl-2xl sm:rounded-bl-sm border border-gray-200"
                                     }`}
                                 >
-                                  <p className="text-sm whitespace-pre-wrap">
+                                  <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
                                     {msg.text}
                                   </p>
                                 </div>
@@ -1023,16 +1023,16 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                                 className={`mb-4 flex ${isSent ? "justify-end" : "justify-start"
                                   }`}
                               >
-                                <div className="max-w-md">
+                                <div className="max-w-[75%] lg:max-w-md">
                                   <div
-                                    className={`rounded-2xl px-4 py-2.5 ${isSent
-                                      ? "bg-purple-500 text-white rounded-br-sm"
+                                    className={`rounded-2xl px-4 py-2.5 shadow-sm ${isSent
+                                      ? "bg-purple-600 text-white rounded-br-sm"
                                       : isDarkMode
                                         ? "bg-slate-800 text-white rounded-bl-sm"
                                         : "bg-white text-gray-900 rounded-bl-sm border border-gray-200"
                                       }`}
                                   >
-                                    <p className="text-sm whitespace-pre-wrap">
+                                    <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
                                       {msg.text}
                                     </p>
                                   </div>

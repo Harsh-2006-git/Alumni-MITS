@@ -295,7 +295,7 @@ export default function AlumniMap({
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      <section className="container mx-auto px-10 lg:px-16 py-0">
+      <section className="container mx-auto px-4 sm:px-10 lg:px-16 py-0">
         <div className="relative z-10">
           <section className="text-center py-6 sm:py-8 lg:py-6 px-4 sm:px-6">
             <div className="max-w-4xl mx-auto">
@@ -364,8 +364,7 @@ export default function AlumniMap({
               </div>
               <div
                 ref={mapRef}
-                style={{ height: "600px", borderRadius: "12px" }}
-                className="w-full"
+                className="w-full h-[400px] sm:h-[600px] rounded-xl relative z-0"
               ></div>
             </div>
           )}

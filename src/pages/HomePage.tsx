@@ -1330,15 +1330,15 @@ export default function AlumniHomePage({
                 </div>
               </motion.div>
 
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 <h3
-                  className={`font-bold text-xl mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                  className={`font-bold text-lg sm:text-xl mb-1 sm:mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                 >
                   {event.title}
                 </h3>
                 <p
-                  className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  className={`text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-none ${isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                 >
                   {event.description}
@@ -1407,9 +1407,9 @@ export default function AlumniHomePage({
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-full px-4 py-2 rounded-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white flex items-center justify-center gap-2"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg font-semibold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white flex items-center justify-center gap-2 text-xs sm:text-sm"
                 >
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Register Now
                 </motion.button>
               </div>
@@ -1484,13 +1484,13 @@ export default function AlumniHomePage({
             </motion.div>
 
             <h3
-              className={`font-bold text-base sm:text-lg md:text-xl mb-1 sm:mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+              className={`font-bold text-sm sm:text-lg md:text-xl mb-1 sm:mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
                 }`}
             >
               Green Campus Initiative
             </h3>
             <p
-              className={`text-xs sm:text-sm mb-3 sm:mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              className={`text-[11px] sm:text-sm mb-3 sm:mb-4 leading-relaxed ${isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
             >
               Making our campus eco-friendly, one step at a time. Planting
@@ -1499,18 +1499,18 @@ export default function AlumniHomePage({
             </p>
 
             <div className="mb-4">
-              <div className="flex justify-between mb-2">
+              <div className="flex justify-between mb-1 sm:mb-2">
                 <span
-                  className={`text-sm font-semibold ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                  className={`text-xs sm:text-sm font-semibold ${isDarkMode ? "text-blue-400" : "text-blue-600"
                     }`}
                 >
                   55.3%
                 </span>
                 <span
-                  className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  className={`text-[10px] sm:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                 >
-                  ₹8,29,734 of ₹15,00,000
+                  ₹8.3L of ₹15L
                 </span>
               </div>
               <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -1526,15 +1526,15 @@ export default function AlumniHomePage({
             <div className="flex items-center justify-between mb-4">
               <div>
                 <p
-                  className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                  className={`text-base sm:text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                 >
                   ₹8,29,734{" "}
                   <span
-                    className={`text-sm font-normal ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    className={`text-[10px] sm:text-sm font-normal ${isDarkMode ? "text-gray-400" : "text-gray-600"
                       }`}
                   >
-                    raised of ₹15,00,000
+                    raised of ₹15L
                   </span>
                 </p>
               </div>
@@ -1580,7 +1580,7 @@ export default function AlumniHomePage({
                       }`}
                   />
                   <span
-                    className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
                       }`}
                   >
                     46 donors
@@ -1592,9 +1592,9 @@ export default function AlumniHomePage({
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full px-4 py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2"
+              className="w-full px-4 py-2.5 sm:py-3 rounded-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white flex items-center justify-center gap-2 text-sm"
             >
-              <Heart className="w-5 h-5" />
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
               Support Campaign
             </motion.button>
           </motion.div>
