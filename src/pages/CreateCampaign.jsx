@@ -40,15 +40,17 @@ export default function CreateCampaignPage({
       const authData = localStorage.getItem("auth");
       if (authData) {
         const parsedAuth = JSON.parse(authData);
-        if (parsedAuth.accessToken) {
+        if (parsedAuth && parsedAuth.accessToken) {
           setUserInfo(parsedAuth);
           setIsCheckingAuth(false);
           return;
         }
       }
+      setUserInfo(null); // Explicitly set to null if no valid auth
       setIsCheckingAuth(false);
     } catch (error) {
       console.error("Error checking authentication:", error);
+      setUserInfo(null);
       setIsCheckingAuth(false);
     }
   };
@@ -242,9 +244,8 @@ export default function CreateCampaignPage({
         </p>
 
         <p
-          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
-            isDarkMode ? "text-gray-300" : "text-gray-700"
-          }`}
+          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+            }`}
         >
           Share your innovative project with the MITS community and get the
           support you need to make it happen.
@@ -255,9 +256,8 @@ export default function CreateCampaignPage({
         {!isUserLoggedIn && (
           <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 max-w-md mx-auto">
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-yellow-300" : "text-yellow-700"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-yellow-300" : "text-yellow-700"
+                }`}
             >
               💡 Please login to create campaigns and access all features
             </p>
@@ -275,16 +275,14 @@ export default function CreateCampaignPage({
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Upload className="w-8 h-8 text-blue-500 mb-2" />
             <h3 className="font-semibold mb-2">Easy Campaign Creation</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Fill out a simple form to launch your campaign and start receiving
               support.
@@ -292,16 +290,14 @@ export default function CreateCampaignPage({
           </div>
 
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Sparkles className="w-8 h-8 text-green-500 mb-2" />
             <h3 className="font-semibold mb-2">Reach Supporters</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Your campaign will be visible to MITS alumni and students who want
               to support great ideas.
@@ -309,16 +305,14 @@ export default function CreateCampaignPage({
           </div>
 
           <div
-            className={`p-4 rounded-lg ${
-              isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-            }`}
+            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+              }`}
           >
             <Users className="w-8 h-8 text-purple-500 mb-2" />
             <h3 className="font-semibold mb-2">Build Community</h3>
             <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Connect with like-minded individuals from the MITS community and
               grow your network.
@@ -333,9 +327,8 @@ export default function CreateCampaignPage({
   if (isCheckingAuth) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          isDarkMode ? "bg-slate-900" : "bg-gray-50"
-        }`}
+        className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
+          }`}
       >
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -349,20 +342,19 @@ export default function CreateCampaignPage({
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+      className={`min-h-screen transition-colors duration-300 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-      {/* Auth Popup */}
       {showAuthPopup && (
         <AuthPopup
           isOpen={showAuthPopup}
           onClose={() => setShowAuthPopup(false)}
           isDarkMode={isDarkMode}
+          isAuthenticated={!!userInfo}
         />
       )}
 
@@ -375,31 +367,27 @@ export default function CreateCampaignPage({
       {/* Why Create Campaigns Section */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-12">
         <div
-          className={`p-8 rounded-xl ${
-            isDarkMode ? "bg-slate-900" : "bg-white shadow-lg"
-          }`}
+          className={`p-8 rounded-xl ${isDarkMode ? "bg-slate-900" : "bg-white shadow-lg"
+            }`}
         >
           <h2
-            className={`text-2xl font-bold mb-6 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Why Create Campaigns on Our Platform?
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-blue-500">
                 Targeted Support
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Reach specifically MITS alumni and students who understand and
                 value your vision.
@@ -407,17 +395,15 @@ export default function CreateCampaignPage({
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-green-500">
                 No Platform Fees
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Launch your campaigns for free and keep more of the funds you
                 raise.
@@ -425,17 +411,15 @@ export default function CreateCampaignPage({
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-purple-500">
                 Alumni Network
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Leverage the strong MITS alumni network for mentorship,
                 guidance, and support.
@@ -443,17 +427,15 @@ export default function CreateCampaignPage({
             </div>
 
             <div
-              className={`p-6 rounded-lg ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-50"
-              }`}
+              className={`p-6 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                }`}
             >
               <h3 className="font-semibold mb-3 text-orange-500">
                 Community Driven
               </h3>
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Build lasting relationships with supporters who genuinely care
                 about your success.
@@ -467,9 +449,8 @@ export default function CreateCampaignPage({
                 Ready to Launch Your Campaign?
               </h3>
               <p
-                className={`text-sm mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
+                className={`text-sm mb-4 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
                 Login to access the campaign creation form and start bringing
                 your vision to life.
@@ -490,18 +471,16 @@ export default function CreateCampaignPage({
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div
-              className={`rounded-2xl sm:rounded-3xl shadow-2xl ${
-                isDarkMode
-                  ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
-                  : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
-              }`}
+              className={`rounded-2xl sm:rounded-3xl shadow-2xl ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
+                : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
+                }`}
             >
               <div
-                className={`p-4 sm:p-6 border-b-2 flex-shrink-0 ${
-                  isDarkMode
-                    ? "border-blue-500/30 bg-slate-900/90"
-                    : "border-blue-300 bg-white/90"
-                }`}
+                className={`p-4 sm:p-6 border-b-2 flex-shrink-0 ${isDarkMode
+                  ? "border-blue-500/30 bg-slate-900/90"
+                  : "border-blue-300 bg-white/90"
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
@@ -509,11 +488,10 @@ export default function CreateCampaignPage({
                   </h2>
                   <button
                     onClick={() => setShowCampaignDialog(false)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      isDarkMode
-                        ? "text-gray-400 hover:text-white hover:bg-slate-800"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }`}
+                    className={`p-2 rounded-lg transition-colors ${isDarkMode
+                      ? "text-gray-400 hover:text-white hover:bg-slate-800"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      }`}
                   >
                     <X size={20} className="sm:w-6 sm:h-6" />
                   </button>
@@ -523,11 +501,10 @@ export default function CreateCampaignPage({
               <div className="p-4 sm:p-6">
                 {message.text && (
                   <div
-                    className={`mb-4 p-4 rounded-xl text-sm ${
-                      message.type === "success"
-                        ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                        : "bg-red-500/20 text-red-400 border border-red-500/30"
-                    }`}
+                    className={`mb-4 p-4 rounded-xl text-sm ${message.type === "success"
+                      ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                      : "bg-red-500/20 text-red-400 border border-red-500/30"
+                      }`}
                   >
                     {message.text}
                   </div>
@@ -546,11 +523,10 @@ export default function CreateCampaignPage({
                       onChange={handleInputChange}
                       placeholder="Enter campaign title"
                       required
-                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                        isDarkMode
-                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                      }`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
                     />
                   </div>
 
@@ -564,11 +540,10 @@ export default function CreateCampaignPage({
                       value={formData.categories}
                       onChange={handleInputChange}
                       required
-                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                        isDarkMode
-                          ? "bg-slate-800 border-cyan-500/20 text-white"
-                          : "bg-gray-50 border-blue-200 text-gray-900"
-                      }`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-cyan-500/20 text-white"
+                        : "bg-gray-50 border-blue-200 text-gray-900"
+                        }`}
                     >
                       <option value="">Select a category</option>
                       <option value="startup">Startup</option>
@@ -592,11 +567,10 @@ export default function CreateCampaignPage({
                       value={formData.tagline}
                       onChange={handleInputChange}
                       placeholder="Short catchy phrase"
-                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                        isDarkMode
-                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                      }`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
                     />
                   </div>
 
@@ -611,11 +585,10 @@ export default function CreateCampaignPage({
                       onChange={handleInputChange}
                       placeholder="Describe your campaign..."
                       rows="4"
-                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                        isDarkMode
-                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                      }`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
                     ></textarea>
                   </div>
 
@@ -631,11 +604,10 @@ export default function CreateCampaignPage({
                         value={formData.startDate}
                         onChange={handleInputChange}
                         required
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-cyan-500/20 text-white"
-                            : "bg-gray-50 border-blue-200 text-gray-900"
-                        }`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white"
+                          : "bg-gray-50 border-blue-200 text-gray-900"
+                          }`}
                       />
                     </div>
                     <div>
@@ -648,11 +620,10 @@ export default function CreateCampaignPage({
                         value={formData.endDate}
                         onChange={handleInputChange}
                         required
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-cyan-500/20 text-white"
-                            : "bg-gray-50 border-blue-200 text-gray-900"
-                        }`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white"
+                          : "bg-gray-50 border-blue-200 text-gray-900"
+                          }`}
                       />
                     </div>
                   </div>
@@ -671,11 +642,10 @@ export default function CreateCampaignPage({
                       step="0.01"
                       min="0"
                       required
-                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                        isDarkMode
-                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                      }`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
                     />
                   </div>
 
@@ -691,11 +661,10 @@ export default function CreateCampaignPage({
                         value={formData.projectLink}
                         onChange={handleInputChange}
                         placeholder="https://your-project.com"
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                            : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                        }`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                          }`}
                       />
                     </div>
                     <div>
@@ -708,11 +677,10 @@ export default function CreateCampaignPage({
                         value={formData.github}
                         onChange={handleInputChange}
                         placeholder="https://github.com/your-repo"
-                        className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                          isDarkMode
-                            ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                            : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                        }`}
+                        className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                          }`}
                       />
                     </div>
                   </div>
@@ -729,11 +697,10 @@ export default function CreateCampaignPage({
                       onChange={handleInputChange}
                       placeholder="+91 9876543210"
                       required
-                      className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                        isDarkMode
-                          ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
-                          : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
-                      }`}
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
                     />
                   </div>
 
@@ -743,11 +710,10 @@ export default function CreateCampaignPage({
                       Campaign Images (Max 3)
                     </label>
                     <div
-                      className={`border-2 border-dashed rounded-lg p-4 text-center ${
-                        isDarkMode
-                          ? "border-cyan-500/30 bg-slate-800/50"
-                          : "border-blue-300 bg-gray-50"
-                      }`}
+                      className={`border-2 border-dashed rounded-lg p-4 text-center ${isDarkMode
+                        ? "border-cyan-500/30 bg-slate-800/50"
+                        : "border-blue-300 bg-gray-50"
+                        }`}
                     >
                       <input
                         type="file"
@@ -780,9 +746,8 @@ export default function CreateCampaignPage({
                         {selectedFiles.map((file, index) => (
                           <div
                             key={index}
-                            className={`flex items-center justify-between p-2 rounded text-xs ${
-                              isDarkMode ? "bg-slate-800" : "bg-gray-100"
-                            }`}
+                            className={`flex items-center justify-between p-2 rounded text-xs ${isDarkMode ? "bg-slate-800" : "bg-gray-100"
+                              }`}
                           >
                             <span className="truncate flex-1">
                               {file.name} (
@@ -820,11 +785,10 @@ export default function CreateCampaignPage({
                     <button
                       type="button"
                       onClick={() => setShowCampaignDialog(false)}
-                      className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-                        isDarkMode
-                          ? "bg-slate-800 text-cyan-400 border border-cyan-500/30"
-                          : "bg-white text-blue-600 border border-blue-300"
-                      }`}
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all ${isDarkMode
+                        ? "bg-slate-800 text-cyan-400 border border-cyan-500/30"
+                        : "bg-white text-blue-600 border border-blue-300"
+                        }`}
                     >
                       Cancel
                     </button>

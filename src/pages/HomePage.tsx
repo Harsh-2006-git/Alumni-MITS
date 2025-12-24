@@ -744,7 +744,9 @@ export default function AlumniHomePage({
         </div>
       </section>
 
-      <ScrollingAlumni isDarkMode={isDarkMode} />
+      <div className="block lg:hidden">
+        <ScrollingAlumni isDarkMode={isDarkMode} />
+      </div>
       {/* Campus Glimpse Video Section */}
       <section className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-8 md:py-12">
         <div className="text-center mb-8">

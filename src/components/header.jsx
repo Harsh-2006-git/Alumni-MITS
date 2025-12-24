@@ -891,7 +891,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                           {auth.userType === "student" ? (
                             <>
                               <span
-                                className={`text-sm ${isDarkMode
+                                className={`text-[10px] sm:text-sm font-bold truncate ${isDarkMode
                                   ? "bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
                                   : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
                                   }`}
@@ -899,7 +899,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                                 {auth.userName.split(" ")[0]}
                               </span>
                               <span
-                                className={`text-sm ${isDarkMode
+                                className={`text-[10px] sm:text-xs font-medium truncate ${isDarkMode
                                   ? "bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
                                   : "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
                                   }`}
@@ -1025,10 +1025,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
         </div>
       </header>
 
-      {/* Mobile Sidebar - Show below 1250px - 60% WIDTH */}
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-y-0 right-0 z-50 w-[60%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed inset-y-0 right-0 z-50 w-[65%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
         {/* Backdrop */}

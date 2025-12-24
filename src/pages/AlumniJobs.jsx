@@ -57,9 +57,8 @@ const HeroSection = ({
         </p>
 
         <p
-          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${
-            isDarkMode ? "text-gray-300" : "text-gray-700"
-          }`}
+          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+            }`}
         >
           {description}
         </p>
@@ -71,11 +70,10 @@ const HeroSection = ({
           <button
             onClick={onRefreshJobs}
             disabled={loading}
-            className={`flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95 ${
-              isDarkMode
+            className={`flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95 ${isDarkMode
                 ? "bg-slate-800 text-cyan-300 border border-cyan-500/30"
                 : "bg-white text-blue-600 border border-blue-300 shadow-lg"
-            }`}
+              }`}
           >
             <RefreshCw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
             {loading ? "Refreshing..." : "Refresh Jobs"}
@@ -84,9 +82,8 @@ const HeroSection = ({
 
         {jobCount > 0 && (
           <p
-            className={`text-sm mt-4 ${
-              isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}
+            className={`text-sm mt-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
           >
             Showing {jobCount} job{jobCount !== 1 ? "s" : ""}
           </p>
@@ -124,11 +121,10 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
       }}
     >
       <div
-        className={`relative w-full sm:max-w-6xl sm:my-8 mt-0 mb-0 min-h-[calc(100vh-60px)] sm:min-h-0 sm:max-h-[90vh] overflow-y-auto sm:rounded-xl rounded-t-2xl rounded-b-none sm:rounded-b-xl border-0 sm:border transition-all ${
-          isDarkMode
+        className={`relative w-full sm:max-w-6xl sm:my-8 mt-0 mb-0 min-h-[calc(100vh-60px)] sm:min-h-0 sm:max-h-[90vh] overflow-y-auto sm:rounded-xl rounded-t-2xl rounded-b-none sm:rounded-b-xl border-0 sm:border transition-all ${isDarkMode
             ? "bg-slate-900 sm:border-slate-700"
             : "bg-white sm:border-gray-200 sm:shadow-2xl"
-        }`}
+          }`}
         style={{
           paddingBottom: "env(safe-area-inset-bottom)",
         }}
@@ -136,11 +132,10 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
         <div className="relative">
           <button
             onClick={onClose}
-            className={`absolute top-4 right-4 z-20 p-2 rounded-lg transition-all ${
-              isDarkMode
+            className={`absolute top-4 right-4 z-20 p-2 rounded-lg transition-all ${isDarkMode
                 ? "bg-slate-800 hover:bg-slate-700 text-gray-400 hover:text-white"
                 : "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900"
-            }`}
+              }`}
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -177,9 +172,8 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
                     <h1
-                      className={`text-xl sm:text-2xl font-bold break-words ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-xl sm:text-2xl font-bold break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {job.title}
                     </h1>
@@ -190,33 +184,30 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                   <div className="flex items-center gap-2 mb-3">
                     <Building2 className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400 shrink-0" />
                     <p
-                      className={`text-sm sm:text-base break-words ${
-                        isDarkMode ? "text-gray-300" : "text-gray-600"
-                      }`}
+                      className={`text-sm sm:text-base break-words ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}
                     >
                       {job.company}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <span
-                      className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
-                        job.type === "full-time"
+                      className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${job.type === "full-time"
                           ? "bg-green-500 text-white"
                           : job.type === "part-time"
-                          ? "bg-blue-500 text-white"
-                          : job.type === "internship"
-                          ? "bg-purple-500 text-white"
-                          : "bg-orange-500 text-white"
-                      }`}
+                            ? "bg-blue-500 text-white"
+                            : job.type === "internship"
+                              ? "bg-purple-500 text-white"
+                              : "bg-orange-500 text-white"
+                        }`}
                     >
                       {job.type}
                     </span>
                     <span
-                      className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${
-                        isDarkMode
+                      className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${isDarkMode
                           ? "bg-blue-900/40 text-blue-300"
                           : "bg-blue-50 text-blue-700"
-                      }`}
+                        }`}
                     >
                       {job.category}
                     </span>
@@ -227,104 +218,92 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
 
             <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-6">
               <div
-                className={`p-3 rounded-lg border ${
-                  isDarkMode
+                className={`p-3 rounded-lg border ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-gray-50 border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <MapPin className="w-3 h-3 text-purple-500 shrink-0" />
                   <span
-                    className={`text-xs font-medium ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-xs font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     Location
                   </span>
                 </div>
                 <p
-                  className={`text-xs sm:text-sm font-medium break-words ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`text-xs sm:text-sm font-medium break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   {job.location}
                 </p>
               </div>
 
               <div
-                className={`p-3 rounded-lg border ${
-                  isDarkMode
+                className={`p-3 rounded-lg border ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-gray-50 border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <DollarSign className="w-3 h-3 text-green-500 shrink-0" />
                   <span
-                    className={`text-xs font-medium ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-xs font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     Salary
                   </span>
                 </div>
                 <p
-                  className={`text-xs sm:text-sm font-medium break-words ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`text-xs sm:text-sm font-medium break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   {job.salary}
                 </p>
               </div>
 
               <div
-                className={`p-3 rounded-lg border ${
-                  isDarkMode
+                className={`p-3 rounded-lg border ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-gray-50 border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-3 h-3 text-blue-500 shrink-0" />
                   <span
-                    className={`text-xs font-medium ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-xs font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     Experience
                   </span>
                 </div>
                 <p
-                  className={`text-xs sm:text-sm font-medium ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`text-xs sm:text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   {job.experience}
                 </p>
               </div>
 
               <div
-                className={`p-3 rounded-lg border ${
-                  isDarkMode
+                className={`p-3 rounded-lg border ${isDarkMode
                     ? "bg-slate-800 border-slate-700"
                     : "bg-gray-50 border-gray-200"
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Calendar className="w-3 h-3 text-orange-500 shrink-0" />
                   <span
-                    className={`text-xs font-medium ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-xs font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     Posted
                   </span>
                 </div>
                 <p
-                  className={`text-xs sm:text-sm font-medium ${
-                    isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
+                  className={`text-xs sm:text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
                 >
                   {formatDate(job.postedDate)}
                 </p>
@@ -332,26 +311,23 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
             </div>
 
             <div
-              className={`p-3 sm:p-4 rounded-lg border mb-6 ${
-                isDarkMode
+              className={`p-3 sm:p-4 rounded-lg border mb-6 ${isDarkMode
                   ? "bg-blue-900/20 border-blue-700/30"
                   : "bg-blue-50 border-blue-200"
-              }`}
+                }`}
             >
               <div className="flex items-start gap-3">
                 <Calendar className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <h3
-                    className={`font-semibold mb-1 text-xs sm:text-sm ${
-                      isDarkMode ? "text-blue-300" : "text-blue-700"
-                    }`}
+                    className={`font-semibold mb-1 text-xs sm:text-sm ${isDarkMode ? "text-blue-300" : "text-blue-700"
+                      }`}
                   >
                     Application Deadline
                   </h3>
                   <p
-                    className={`text-xs sm:text-sm break-words ${
-                      isDarkMode ? "text-blue-400" : "text-blue-600"
-                    }`}
+                    className={`text-xs sm:text-sm break-words ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                      }`}
                   >
                     {new Date(job.applicationDeadline).toLocaleDateString()}
                   </p>
@@ -361,17 +337,15 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
 
             <div className="mb-6">
               <h2
-                className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 <Briefcase className="w-4 h-4 text-purple-500 shrink-0" />
                 Job Description
               </h2>
               <p
-                className={`leading-relaxed text-xs sm:text-sm break-words ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`leading-relaxed text-xs sm:text-sm break-words ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
               >
                 {job.description}
               </p>
@@ -379,9 +353,8 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
 
             <div className="mb-6">
               <h2
-                className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 <Target className="w-4 h-4 text-blue-500 shrink-0" />
                 Required Skills
@@ -390,11 +363,10 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                 {job.requiredSkills?.map((skill, idx) => (
                   <span
                     key={idx}
-                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium break-words ${
-                      isDarkMode
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-medium break-words ${isDarkMode
                         ? "bg-blue-900/30 text-blue-300 border border-blue-700/30"
                         : "bg-blue-50 text-blue-700 border border-blue-200"
-                    }`}
+                      }`}
                   >
                     {skill}
                   </span>
@@ -404,9 +376,8 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
 
             <div className="mb-6">
               <h2
-                className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 <Award className="w-4 h-4 text-green-500 shrink-0" />
                 Qualifications
@@ -415,9 +386,8 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                 {job.qualifications?.map((qual, idx) => (
                   <li
                     key={idx}
-                    className={`flex items-start gap-3 text-xs sm:text-sm ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`flex items-start gap-3 text-xs sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     <CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
                     <span className="break-words flex-1">{qual}</span>
@@ -429,16 +399,14 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
 
           <div className="p-4 sm:p-6 space-y-4">
             <div
-              className={`p-4 rounded-lg border ${
-                isDarkMode
+              className={`p-4 rounded-lg border ${isDarkMode
                   ? "bg-slate-800 border-slate-700"
                   : "bg-gray-50 border-gray-200"
-              }`}
+                }`}
             >
               <h3
-                className={`text-sm font-semibold mb-3 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-sm font-semibold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 How to Apply
               </h3>
@@ -465,25 +433,22 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                 Check Skill Match
               </button>
               <p
-                className={`text-xs text-center mt-2 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-xs text-center mt-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Analyze your skills against job requirements
               </p>
             </div>
 
             <div
-              className={`p-4 rounded-lg border ${
-                isDarkMode
+              className={`p-4 rounded-lg border ${isDarkMode
                   ? "bg-slate-800 border-slate-700"
                   : "bg-gray-50 border-gray-200"
-              }`}
+                }`}
             >
               <h3
-                className={`text-sm font-semibold mb-3 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-sm font-semibold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 Job Overview
               </h3>
@@ -492,16 +457,14 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                   <Calendar className="w-4 h-4 text-purple-500 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-xs font-medium mb-0.5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-xs font-medium mb-0.5 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       Posted
                     </p>
                     <p
-                      className={`text-sm font-medium break-words ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-sm font-medium break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {formatDate(job.postedDate)}
                     </p>
@@ -512,16 +475,14 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                   <TrendingUp className="w-4 h-4 text-blue-500 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-xs font-medium mb-0.5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-xs font-medium mb-0.5 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       Experience Level
                     </p>
                     <p
-                      className={`text-sm font-medium break-words ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-sm font-medium break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {job.experience}
                     </p>
@@ -532,16 +493,14 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                   <Briefcase className="w-4 h-4 text-green-500 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-xs font-medium mb-0.5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-xs font-medium mb-0.5 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       Position
                     </p>
                     <p
-                      className={`text-sm font-medium break-words ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-sm font-medium break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {job.type}
                     </p>
@@ -552,16 +511,14 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                   <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-xs font-medium mb-0.5 ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-xs font-medium mb-0.5 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       Verified Posting
                     </p>
                     <p
-                      className={`text-sm font-medium ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {job.verified ? "Yes" : "No"}
                     </p>
@@ -571,16 +528,14 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
             </div>
 
             <div
-              className={`p-4 rounded-lg border ${
-                isDarkMode
+              className={`p-4 rounded-lg border ${isDarkMode
                   ? "bg-slate-800 border-slate-700"
                   : "bg-gray-50 border-gray-200"
-              }`}
+                }`}
             >
               <h3
-                className={`text-sm font-semibold mb-3 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-sm font-semibold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 About {job.company}
               </h3>
@@ -610,9 +565,8 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p
-                    className={`font-medium text-sm break-words ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
+                    className={`font-medium text-sm break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
                   >
                     {job.company}
                   </p>
@@ -622,11 +576,10 @@ const JobModal = ({ job, onClose, isDarkMode, onApply, onSkillAnalysis }) => {
                 href={job.companyWebsite}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center gap-2 text-sm font-medium transition-all break-words ${
-                  isDarkMode
+                className={`flex items-center gap-2 text-sm font-medium transition-all break-words ${isDarkMode
                     ? "text-blue-400 hover:text-blue-300"
                     : "text-blue-600 hover:text-blue-700"
-                }`}
+                  }`}
               >
                 <Globe className="w-4 h-4 shrink-0" />
                 <span className="break-all">Visit Website</span>
@@ -656,7 +609,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
     category: "all",
     experience: "all",
   });
-  
+
   // Add authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
@@ -667,15 +620,20 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
   }, []);
 
   const checkAuthentication = () => {
-    // Check for token in localStorage
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    
-    if (token && user) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
+    // Check for token in localStorage using the standard "auth" key
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const parsedAuth = JSON.parse(authData);
+        if (parsedAuth && parsedAuth.accessToken) {
+          setIsAuthenticated(true);
+          return;
+        }
+      } catch (error) {
+        console.error("Error parsing auth data:", error);
+      }
     }
+    setIsAuthenticated(false);
   };
 
   const showToast = (message, type = "info") => {
@@ -693,7 +651,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
       setShowAuthPopup(true);
       return;
     }
-    
+
     const newBookmarks = new Set(bookmarkedJobs);
     if (newBookmarks.has(jobId)) {
       newBookmarks.delete(jobId);
@@ -750,7 +708,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
       setShowAuthPopup(true);
       return;
     }
-    
+
     // Redirect directly to Internshala internships page
     window.open("https://internshala.com/internships", "_blank");
   };
@@ -788,7 +746,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
       setShowAuthPopup(true);
       return;
     }
-    
+
     setSelectedJob(job);
     setShowModal(true);
     document.body.style.overflow = "hidden";
@@ -801,7 +759,7 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
       setShowAuthPopup(true);
       return;
     }
-    
+
     setSelectedJob(job);
     setShowSkillAnalysis(true);
     document.body.style.overflow = "hidden";
@@ -855,11 +813,10 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
           ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
           : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
@@ -877,11 +834,10 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-16 py-6 sm:py-12">
         {/* Search and Filters Section */}
         <div
-          className={`p-3 sm:p-4 rounded-xl mb-4 sm:mb-6 ${
-            isDarkMode
+          className={`p-3 sm:p-4 rounded-xl mb-4 sm:mb-6 ${isDarkMode
               ? "bg-slate-900 border border-slate-700"
               : "bg-white border border-gray-200 shadow-sm"
-          }`}
+            }`}
         >
           <div className="space-y-3">
             <div className="w-full relative">
@@ -891,41 +847,37 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                 placeholder="Search jobs, companies, or skills..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className={`w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-lg border transition-all text-sm ${
-                  isDarkMode
+                className={`w-full pl-10 pr-4 py-2.5 sm:py-3 rounded-lg border transition-all text-sm ${isDarkMode
                     ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
                     : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
-                }`}
+                  }`}
               />
             </div>
 
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`sm:hidden w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border transition-all text-sm font-medium ${
-                isDarkMode
+              className={`sm:hidden w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border transition-all text-sm font-medium ${isDarkMode
                   ? "bg-slate-800 border-slate-600 text-white hover:bg-slate-700 active:bg-slate-600"
                   : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50 active:bg-gray-100"
-              }`}
+                }`}
             >
               <Filter className="w-4 h-4" />
               {showFilters ? "Hide Filters" : "Show Filters"}
             </button>
 
             <div
-              className={`grid grid-cols-1 sm:grid-cols-3 gap-2 ${
-                showFilters ? "block" : "hidden sm:grid"
-              }`}
+              className={`grid grid-cols-1 sm:grid-cols-3 gap-2 ${showFilters ? "block" : "hidden sm:grid"
+                }`}
             >
               <select
                 value={filters.type}
                 onChange={(e) =>
                   setFilters({ ...filters, type: e.target.value })
                 }
-                className={`px-3 py-2.5 sm:py-3 rounded-lg border transition-all text-sm focus:outline-none ${
-                  isDarkMode
+                className={`px-3 py-2.5 sm:py-3 rounded-lg border transition-all text-sm focus:outline-none ${isDarkMode
                     ? "bg-slate-800 border-slate-600 text-white focus:ring-2 focus:ring-blue-500/20"
                     : "bg-white border-gray-300 text-gray-900 focus:ring-2 focus:ring-blue-500/20"
-                }`}
+                  }`}
               >
                 <option value="all">All Types</option>
                 <option value="full-time">Full Time</option>
@@ -939,11 +891,10 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                 onChange={(e) =>
                   setFilters({ ...filters, category: e.target.value })
                 }
-                className={`px-3 py-2.5 sm:py-3 rounded-lg border transition-all text-sm focus:outline-none ${
-                  isDarkMode
+                className={`px-3 py-2.5 sm:py-3 rounded-lg border transition-all text-sm focus:outline-none ${isDarkMode
                     ? "bg-slate-800 border-slate-600 text-white focus:ring-2 focus:ring-blue-500/20"
                     : "bg-white border-gray-300 text-gray-900 focus:ring-2 focus:ring-blue-500/20"
-                }`}
+                  }`}
               >
                 <option value="all">All Categories</option>
                 <option value="AI Analysis">AI Analysis</option>
@@ -958,11 +909,10 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                 onChange={(e) =>
                   setFilters({ ...filters, experience: e.target.value })
                 }
-                className={`px-3 py-2.5 sm:py-3 rounded-lg border transition-all text-sm focus:outline-none ${
-                  isDarkMode
+                className={`px-3 py-2.5 sm:py-3 rounded-lg border transition-all text-sm focus:outline-none ${isDarkMode
                     ? "bg-slate-800 border-slate-600 text-white focus:ring-2 focus:ring-blue-500/20"
                     : "bg-white border-gray-300 text-gray-900 focus:ring-2 focus:ring-blue-500/20"
-                }`}
+                  }`}
               >
                 <option value="all">All Experience</option>
                 <option value="internship">Internship</option>
@@ -976,27 +926,25 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
               filters.type !== "all" ||
               filters.category !== "all" ||
               filters.experience !== "all") && (
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <p
-                  className={`text-xs sm:text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
-                  {filteredJobs.length} job
-                  {filteredJobs.length !== 1 ? "s" : ""} found
-                </p>
-                <button
-                  onClick={clearFilters}
-                  className={`text-xs sm:text-sm font-medium transition-all ${
-                    isDarkMode
-                      ? "text-blue-400 hover:text-blue-300"
-                      : "text-blue-600 hover:text-blue-700"
-                  }`}
-                >
-                  Clear Filters
-                </button>
-              </div>
-            )}
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <p
+                    className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                  >
+                    {filteredJobs.length} job
+                    {filteredJobs.length !== 1 ? "s" : ""} found
+                  </p>
+                  <button
+                    onClick={clearFilters}
+                    className={`text-xs sm:text-sm font-medium transition-all ${isDarkMode
+                        ? "text-blue-400 hover:text-blue-300"
+                        : "text-blue-600 hover:text-blue-700"
+                      }`}
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
           </div>
         </div>
 
@@ -1011,9 +959,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                 }}
               />
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Loading jobs...
               </p>
@@ -1024,11 +971,10 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
             {filteredJobs.map((job) => (
               <div
                 key={job.id}
-                className={`p-4 sm:p-5 rounded-xl border transition-all ${
-                  isDarkMode
+                className={`p-4 sm:p-5 rounded-xl border transition-all ${isDarkMode
                     ? "bg-slate-900 border-slate-700 hover:border-slate-600"
                     : "bg-white border-gray-200 shadow-sm hover:shadow-md"
-                }`}
+                  }`}
                 style={{
                   transform: "translateZ(0)",
                   WebkitTransform: "translateZ(0)",
@@ -1063,9 +1009,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h3
-                          className={`text-base font-semibold break-words ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
+                          className={`text-base font-semibold break-words ${isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
                         >
                           {job.title}
                         </h3>
@@ -1076,9 +1021,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                       <div className="flex items-center gap-2">
                         <Building2 className="w-3 h-3 text-blue-400 shrink-0" />
                         <span
-                          className={`text-sm break-words ${
-                            isDarkMode ? "text-gray-300" : "text-gray-600"
-                          }`}
+                          className={`text-sm break-words ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                            }`}
                         >
                           {job.company}
                         </span>
@@ -1090,9 +1034,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                     <div className="flex items-center gap-1">
                       <MapPin className="w-3 h-3 text-purple-500 shrink-0" />
                       <span
-                        className={`truncate ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
+                        className={`truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
                       >
                         {job.location}
                       </span>
@@ -1100,9 +1043,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                     <div className="flex items-center gap-1">
                       <DollarSign className="w-3 h-3 text-green-500 shrink-0" />
                       <span
-                        className={`truncate ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
+                        className={`truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                          }`}
                       >
                         {job.salary}
                       </span>
@@ -1132,24 +1074,22 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex gap-1.5 flex-wrap">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold uppercase ${
-                          job.type === "full-time"
+                        className={`px-2 py-1 rounded-full text-xs font-semibold uppercase ${job.type === "full-time"
                             ? "bg-green-500 text-white"
                             : job.type === "part-time"
-                            ? "bg-blue-500 text-white"
-                            : job.type === "internship"
-                            ? "bg-purple-500 text-white"
-                            : "bg-orange-500 text-white"
-                        }`}
+                              ? "bg-blue-500 text-white"
+                              : job.type === "internship"
+                                ? "bg-purple-500 text-white"
+                                : "bg-orange-500 text-white"
+                          }`}
                       >
                         {job.type}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium max-w-[150px] truncate ${
-                          isDarkMode
+                        className={`px-2 py-1 rounded-full text-xs font-medium max-w-[150px] truncate ${isDarkMode
                             ? "bg-blue-900/40 text-blue-300"
                             : "bg-blue-50 text-blue-700"
-                        }`}
+                          }`}
                       >
                         {job.category}
                       </span>
@@ -1158,19 +1098,18 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleBookmark(job.id)}
-                        className={`p-2 rounded-lg transition-all active:scale-95 ${
-                          bookmarkedJobs.has(job.id)
+                        className={`p-2 rounded-lg transition-all active:scale-95 ${bookmarkedJobs.has(job.id)
                             ? "text-white"
                             : isDarkMode
-                            ? "bg-slate-800 hover:bg-slate-700 text-gray-400 active:bg-slate-600"
-                            : "bg-gray-100 hover:bg-gray-200 text-gray-600 active:bg-gray-300"
-                        }`}
+                              ? "bg-slate-800 hover:bg-slate-700 text-gray-400 active:bg-slate-600"
+                              : "bg-gray-100 hover:bg-gray-200 text-gray-600 active:bg-gray-300"
+                          }`}
                         style={
                           bookmarkedJobs.has(job.id)
                             ? {
-                                background:
-                                  "linear-gradient(135deg, rgb(147, 51, 234) 0%, rgb(219, 39, 119) 100%)",
-                              }
+                              background:
+                                "linear-gradient(135deg, rgb(147, 51, 234) 0%, rgb(219, 39, 119) 100%)",
+                            }
                             : {}
                         }
                         aria-label="Bookmark job"
@@ -1222,9 +1161,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
                         <h3
-                          className={`text-lg font-semibold ${
-                            isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
+                          className={`text-lg font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
                         >
                           {job.title}
                         </h3>
@@ -1237,9 +1175,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                         <div className="flex items-center gap-1">
                           <Building2 className="w-3 h-3 text-blue-400 shrink-0" />
                           <span
-                            className={`text-sm ${
-                              isDarkMode ? "text-gray-300" : "text-gray-600"
-                            }`}
+                            className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                              }`}
                           >
                             {job.company}
                           </span>
@@ -1248,9 +1185,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-purple-500 shrink-0" />
                           <span
-                            className={`text-sm ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
+                            className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
                           >
                             {job.location}
                           </span>
@@ -1259,9 +1195,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                         <div className="flex items-center gap-1">
                           <DollarSign className="w-3 h-3 text-green-500 shrink-0" />
                           <span
-                            className={`text-sm ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
+                            className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
                           >
                             {job.salary}
                           </span>
@@ -1270,9 +1205,8 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                         <div className="flex items-center gap-1">
                           <TrendingUp className="w-3 h-3 text-blue-500 shrink-0" />
                           <span
-                            className={`text-sm ${
-                              isDarkMode ? "text-gray-400" : "text-gray-600"
-                            }`}
+                            className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                              }`}
                           >
                             {job.experience}
                           </span>
@@ -1285,24 +1219,22 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                     <div className="flex flex-col items-end gap-2">
                       <div className="flex gap-1">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold uppercase ${
-                            job.type === "full-time"
+                          className={`px-2 py-1 rounded-full text-xs font-semibold uppercase ${job.type === "full-time"
                               ? "bg-green-500 text-white"
                               : job.type === "part-time"
-                              ? "bg-blue-500 text-white"
-                              : job.type === "internship"
-                              ? "bg-purple-500 text-white"
-                              : "bg-orange-500 text-white"
-                          }`}
+                                ? "bg-blue-500 text-white"
+                                : job.type === "internship"
+                                  ? "bg-purple-500 text-white"
+                                  : "bg-orange-500 text-white"
+                            }`}
                         >
                           {job.type}
                         </span>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            isDarkMode
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${isDarkMode
                               ? "bg-blue-900/40 text-blue-300"
                               : "bg-blue-50 text-blue-700"
-                          }`}
+                            }`}
                         >
                           {job.category}
                         </span>
@@ -1322,19 +1254,18 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => toggleBookmark(job.id)}
-                        className={`p-2 rounded-lg transition-all ${
-                          bookmarkedJobs.has(job.id)
+                        className={`p-2 rounded-lg transition-all ${bookmarkedJobs.has(job.id)
                             ? "text-white"
                             : isDarkMode
-                            ? "bg-slate-800 hover:bg-slate-700 text-gray-400"
-                            : "bg-gray-100 hover:bg-gray-200 text-gray-600"
-                        }`}
+                              ? "bg-slate-800 hover:bg-slate-700 text-gray-400"
+                              : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                          }`}
                         style={
                           bookmarkedJobs.has(job.id)
                             ? {
-                                background:
-                                  "linear-gradient(135deg, rgb(147, 51, 234) 0%, rgb(219, 39, 119) 100%)",
-                              }
+                              background:
+                                "linear-gradient(135deg, rgb(147, 51, 234) 0%, rgb(219, 39, 119) 100%)",
+                            }
                             : {}
                         }
                         aria-label="Bookmark job"
@@ -1362,11 +1293,10 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
 
         {!loading && filteredJobs.length === 0 && (
           <div
-            className={`text-center py-12 rounded-xl ${
-              isDarkMode
+            className={`text-center py-12 rounded-xl ${isDarkMode
                 ? "bg-slate-900 border border-slate-700"
                 : "bg-white border border-gray-200"
-            }`}
+              }`}
           >
             <div
               className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
@@ -1378,16 +1308,14 @@ export default function JobsPage({ isDarkMode, toggleTheme }) {
               <Search className="w-6 h-6 text-white" />
             </div>
             <h3
-              className={`text-xl font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-xl font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               No jobs found
             </h3>
             <p
-              className={`text-sm mb-4 ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-sm mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Try adjusting your search criteria or filters
             </p>

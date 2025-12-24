@@ -580,34 +580,34 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       <div
                         key={getPersonKey(person, "mobile-chat-")}
                         onClick={() => setSelectedUser(person)}
-                        className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${isDarkMode
+                        className={`px-4 py-2.5 flex items-center gap-3 border-b cursor-pointer transition-colors ${isDarkMode
                           ? "border-slate-800 hover:bg-slate-800"
                           : "border-gray-200 hover:bg-gray-100"
                           }`}
                       >
                         <div className="relative">
                           <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center ${person.userType === "alumni"
+                            className={`w-9 h-9 rounded-full flex items-center justify-center ${person.userType === "alumni"
                               ? "bg-gradient-to-br from-purple-500 to-pink-500"
                               : "bg-gradient-to-br from-blue-500 to-cyan-500"
                               }`}
                           >
                             {person.userType === "alumni" ? (
-                              <GraduationCap className="w-6 h-6 text-white" />
+                              <GraduationCap className="w-5 h-5 text-white" />
                             ) : (
-                              <User className="w-6 h-6 text-white" />
+                              <User className="w-5 h-5 text-white" />
                             )}
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3
-                            className={`font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                            className={`font-semibold truncate text-[13px] ${isDarkMode ? "text-white" : "text-gray-900"
                               }`}
                           >
                             {person.name}
                           </h3>
                           <p
-                            className={`text-sm truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                            className={`text-[11px] truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
                               }`}
                           >
                             {person.email}
@@ -633,34 +633,34 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       <div
                         key={getPersonKey(person, "mobile-person-")}
                         onClick={() => setSelectedUser(person)}
-                        className={`px-4 py-4 flex items-center gap-3 border-b cursor-pointer transition-colors ${isDarkMode
+                        className={`px-4 py-2.5 flex items-center gap-3 border-b cursor-pointer transition-colors ${isDarkMode
                           ? "border-slate-800 hover:bg-slate-800"
                           : "border-gray-200 hover:bg-gray-100"
                           }`}
                       >
                         <div className="relative">
                           <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center ${person.userType === "alumni"
+                            className={`w-9 h-9 rounded-full flex items-center justify-center ${person.userType === "alumni"
                               ? "bg-gradient-to-br from-purple-500 to-pink-500"
                               : "bg-gradient-to-br from-blue-500 to-cyan-500"
                               }`}
                           >
                             {person.userType === "alumni" ? (
-                              <GraduationCap className="w-6 h-6 text-white" />
+                              <GraduationCap className="w-5 h-5 text-white" />
                             ) : (
-                              <User className="w-6 h-6 text-white" />
+                              <User className="w-5 h-5 text-white" />
                             )}
                           </div>
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3
-                            className={`font-semibold truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                            className={`font-semibold truncate text-[13px] ${isDarkMode ? "text-white" : "text-gray-900"
                               }`}
                           >
                             {person.name}
                           </h3>
                           <p
-                            className={`text-sm truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                            className={`text-[11px] truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
                               }`}
                           >
                             {person.email}

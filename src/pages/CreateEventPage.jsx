@@ -85,8 +85,15 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
 
   // Check if user is logged in
   const isLoggedIn = () => {
-    const authData = localStorage.getItem("auth");
-    return authData && JSON.parse(authData).accessToken;
+    try {
+      const authData = localStorage.getItem("auth");
+      if (!authData) return false;
+      const parsed = JSON.parse(authData);
+      return !!(parsed && parsed.accessToken);
+    } catch (e) {
+      console.error("Auth check error:", e);
+      return false;
+    }
   };
 
   const displayMessage = (type, text) => {
@@ -409,12 +416,12 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
         />
       )}
 
-      {/* Auth Popup */}
       {showAuthPopup && (
         <AuthPopup
           isOpen={showAuthPopup}
           onClose={() => setShowAuthPopup(false)}
           isDarkMode={isDarkMode}
+          isAuthenticated={isLoggedIn()}
         />
       )}
 

@@ -297,15 +297,15 @@ export function ScrollingAlumni({ isDarkMode }) {
     <section className="w-full py-8 mt-8">
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header - Compact */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <h2
-            className={`text-2xl md:text-3xl font-bold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
             Our Distinguished Alumni
           </h2>
           <p
-            className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-xs sm:text-sm md:text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
             Meet our distinguished alumni shaping industries and driving
@@ -407,18 +407,18 @@ function AlumniCard({ alumnus, isDarkMode }) {
 
         <div className="text-center">
           <h3
-            className={`text-[12px] sm:text-sm font-bold mb-0.5 sm:mb-1 line-clamp-1 sm:line-clamp-2 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-[12px] sm:text-sm font-bold mb-0.5 sm:line-clamp-2 ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
             {alumnus.name}
           </h3>
 
-          <p className="text-[10px] sm:text-xs mb-1 font-medium bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent line-clamp-1 sm:line-clamp-2 leading-tight">
+          <p className="text-[10px] sm:text-xs mb-0.5 font-medium bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent line-clamp-1 sm:line-clamp-2 leading-tight">
             {alumnus.post}
           </p>
 
           <p
-            className={`text-[9px] sm:text-xs mb-1.5 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+            className={`text-[9px] sm:text-xs mb-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
               }`}
           >
             📍 {alumnus.city}
