@@ -59,6 +59,10 @@ const MentorSchema = new mongoose.Schema(
       type: Number,
       default: 0.0,
     },
+    upi_id: {
+      type: String,
+      default: null,
+    },
 
     available: {
       type: Boolean,

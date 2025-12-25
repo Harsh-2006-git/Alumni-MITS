@@ -44,6 +44,35 @@ const MentorStudentSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    payment_screenshot: {
+      type: String,
+      default: null,
+    },
+    payment_status: {
+      type: String,
+      enum: ["pending", "completed", "failed"],
+      default: "pending",
+    },
+    meeting_link: {
+      type: String,
+      default: null,
+    },
+    reschedule_requested: {
+      type: Boolean,
+      default: false,
+    },
+    reschedule_message: {
+      type: String,
+      default: null,
+    },
+    reschedule_date: {
+      type: Date,
+      default: null,
+    },
+    reschedule_time: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true,

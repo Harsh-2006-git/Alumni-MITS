@@ -5,6 +5,67 @@ import MentorStudent from "../models/mentee.js";
 
 import MentorshipEmailService from "../services/MentorshipEmailService.js";
 import mongoose from "mongoose";
+import multer from "multer";
+import cloudinary from "cloudinary";
+
+// Configure Multer for Memory Storage
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed!"), false);
+    }
+  },
+});
+
+// Cloudinary Upload Utility
+const uploadToCloudinary = (file) => {
+  return new Promise((resolve, reject) => {
+    if (![
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "image/webp"
+    ].includes(file.mimetype)) {
+      return reject(new Error("Only JPEG, JPG, PNG and WebP images are allowed"));
+    }
+
+    const publicId = `mentorships/payment_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+    const stream = cloudinary.v2.uploader.upload_stream(
+      {
+        public_id: publicId,
+        folder: "mentorship_payments",
+        resource_type: "image",
+      },
+      (error, uploadResult) => {
+        if (error) {
+          console.error("❌ Cloudinary Upload Error:", error);
+          reject(new Error("Error uploading to Cloudinary"));
+        } else {
+          resolve(uploadResult.secure_url);
+        }
+      }
+    );
+
+    stream.end(file.buffer);
+  });
+};
+
+// Cloudinary Config
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
 
 const emailService = new MentorshipEmailService();
 
@@ -57,6 +118,7 @@ export const createMentor = async (req, res) => {
       availability,
       fees,
       available,
+      upi_id,
     } = req.body;
 
     // Get alumni details from req.user
@@ -106,6 +168,7 @@ export const createMentor = async (req, res) => {
       topics: topics || [],
       availability: availability || {},
       fees: fees || 0.0,
+      upi_id: upi_id || null,
       available: available !== undefined ? available : true,
       mentee_students: [],
     });
@@ -148,6 +211,7 @@ export const editMentor = async (req, res) => {
       availability,
       fees,
       available,
+      upi_id,
     } = req.body;
 
     // Find mentor
@@ -182,6 +246,7 @@ export const editMentor = async (req, res) => {
     if (availability !== undefined) updateData.availability = availability;
     if (fees !== undefined) updateData.fees = fees;
     if (available !== undefined) updateData.available = available;
+    if (upi_id !== undefined) updateData.upi_id = upi_id;
 
     // Update mentor
     const updatedMentor = await Mentor.findByIdAndUpdate(mentorId, updateData, {
@@ -354,142 +419,160 @@ export const canCreateMentor = async (req, res) => {
 };
 
 // Student requests to register under a mentor
-export const requestMentorship = async (req, res) => {
-  try {
-    if (!req.user || req.user.userType !== "student") {
-      return res.status(403).json({
-        success: false,
-        message: "Access denied. Only students can request mentorship",
-      });
-    }
-
-    const { mentorId } = req.params;
-    const { request_message, session_date, session_time } = req.body;
-    const studentId = req.user.id;
-
-    // Check if mentor exists and is available
-    const mentor = await Mentor.findById(mentorId).populate(
-      "alumni_id",
-      "name email"
-    );
-
-    if (!mentor) {
-      return res.status(404).json({
-        success: false,
-        message: "Mentor not found",
-      });
-    }
-
-    if (!mentor.available) {
-      return res.status(400).json({
-        success: false,
-        message: "Mentor is currently not available for new mentees",
-      });
-    }
-
-    // Check if student exists (Unified User Model)
-    const student = await User.findOne({ _id: studentId, userType: "student" });
-    if (!student) {
-      return res.status(404).json({
-        success: false,
-        message: "Student not found",
-      });
-    }
-
-    // Check if mentorship request already exists
-    const existingRequest = await MentorStudent.findOne({
-      mentor_id: mentorId,
-      student_id: studentId,
-    });
-
-    if (existingRequest) {
-      return res.status(400).json({
-        success: false,
-        message: `Mentorship request already exists with status: ${existingRequest.status}`,
-      });
-    }
-
-    // Create mentorship request
-    const mentorship = await MentorStudent.create({
-      mentor_id: mentorId,
-      student_id: studentId,
-      status: "pending",
-      request_message: request_message || null,
-      session_date: session_date || null,
-      session_time: session_time || null,
-      request_date: new Date().toISOString().split("T")[0],
-      request_time: new Date().toTimeString().split(" ")[0],
-    });
-
-    // Send email notifications
+export const requestMentorship = [
+  upload.single("payment_screenshot"),
+  async (req, res) => {
     try {
-      await emailService.sendMentorshipRequestEmail(
-        mentor.alumni_id.email, // Mentor's email
-        student.email, // Student's email
-        {
-          studentName: student.name,
-          studentEmail: student.email,
-          mentorName: mentor.name,
-          requestMessage: request_message,
-          sessionDate: session_date,
-          sessionTime: session_time,
-          requestDate: new Date(),
-        }
+      if (!req.user || req.user.userType !== "student") {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. Only students can request mentorship",
+        });
+      }
+
+      const { mentorId } = req.params;
+      const { request_message, session_date, session_time } = req.body;
+      const studentId = req.user.id;
+
+      // Check if mentor exists and is available
+      const mentor = await Mentor.findById(mentorId).populate(
+        "alumni_id",
+        "name email"
       );
-    } catch (emailError) {
-      console.error("Failed to send email notifications:", emailError);
-      // Continue with the response even if email fails
-    }
 
-    // Fetch created relationship with details
-    const mentorshipWithDetails = await MentorStudent.findById(mentorship._id)
-      .populate({
-        path: "mentor_id",
-        populate: {
-          path: "alumni_id",
-          select: "name email profilePhoto",
-        },
-      })
-      .populate("student_id", "name email phone profilePhoto");
+      if (!mentor) {
+        return res.status(404).json({
+          success: false,
+          message: "Mentor not found",
+        });
+      }
 
-    // Structure response to match Sequelize include format
-    const responseData = processMentorshipData(mentorshipWithDetails);
-    if (mentorshipWithDetails.mentor_id) {
-      responseData.mentor = {
-        id: mentorshipWithDetails.mentor_id._id,
-        name: mentorshipWithDetails.mentor_id.name,
-        alumni: {
-          id: mentorshipWithDetails.mentor_id.alumni_id._id,
-          name: mentorshipWithDetails.mentor_id.alumni_id.name,
-          email: mentorshipWithDetails.mentor_id.alumni_id.email,
-          profilePhoto: mentorshipWithDetails.mentor_id.alumni_id.profilePhoto,
-        },
-      };
-    }
-    if (mentorshipWithDetails.student_id) {
-      responseData.student = {
-        id: mentorshipWithDetails.student_id._id,
-        name: mentorshipWithDetails.student_id.name,
-        email: mentorshipWithDetails.student_id.email,
-        phone: mentorshipWithDetails.student_id.phone,
-        profilePhoto: mentorshipWithDetails.student_id.profilePhoto,
-      };
-    }
+      if (!mentor.available) {
+        return res.status(400).json({
+          success: false,
+          message: "Mentor is currently not available for new mentees",
+        });
+      }
 
-    res.status(201).json({
-      success: true,
-      message: "Mentorship request sent successfully",
-      data: responseData,
-    });
-  } catch (error) {
-    console.error("Error requesting mentorship:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error.message,
-    });
+      // Check if student exists (Unified User Model)
+      const student = await User.findOne({ _id: studentId, userType: "student" });
+      if (!student) {
+        return res.status(404).json({
+          success: false,
+          message: "Student not found",
+        });
+      }
+
+      // Check if mentorship request already exists
+      const existingRequest = await MentorStudent.findOne({
+        mentor_id: mentorId,
+        student_id: studentId,
+      });
+
+      if (existingRequest) {
+        return res.status(400).json({
+          success: false,
+          message: `Mentorship request already exists with status: ${existingRequest.status}`,
+        });
+      }
+
+      // Upload payment screenshot if provided
+      let payment_screenshot_url = null;
+      if (req.file) {
+        try {
+          payment_screenshot_url = await uploadToCloudinary(req.file);
+        } catch (uploadError) {
+          console.error("Payment screenshot upload error:", uploadError);
+          return res.status(500).json({
+            success: false,
+            message: "Failed to upload payment screenshot",
+          });
+        }
+      }
+
+      // Create mentorship request
+      const mentorship = await MentorStudent.create({
+        mentor_id: mentorId,
+        student_id: studentId,
+        status: "pending",
+        request_message: request_message || null,
+        payment_screenshot: payment_screenshot_url || null,
+        session_date: session_date || null,
+        session_time: session_time || null,
+        request_date: new Date().toISOString().split("T")[0],
+        request_time: new Date().toTimeString().split(" ")[0],
+      });
+
+      // Send email notifications
+      try {
+        await emailService.sendMentorshipRequestEmail(
+          mentor.alumni_id.email, // Mentor's email
+          student.email, // Student's email
+          {
+            studentName: student.name,
+            studentEmail: student.email,
+            mentorName: mentor.name,
+            requestMessage: request_message,
+            sessionDate: session_date,
+            sessionTime: session_time,
+            requestDate: new Date(),
+          }
+        );
+      } catch (emailError) {
+        console.error("Failed to send email notifications:", emailError);
+        // Continue with the response even if email fails
+      }
+
+      // Fetch created relationship with details
+      const mentorshipWithDetails = await MentorStudent.findById(mentorship._id)
+        .populate({
+          path: "mentor_id",
+          populate: {
+            path: "alumni_id",
+            select: "name email profilePhoto",
+          },
+        })
+        .populate("student_id", "name email phone profilePhoto");
+
+      // Structure response to match Sequelize include format
+      const responseData = processMentorshipData(mentorshipWithDetails);
+      if (mentorshipWithDetails.mentor_id) {
+        responseData.mentor = {
+          id: mentorshipWithDetails.mentor_id._id,
+          name: mentorshipWithDetails.mentor_id.name,
+          alumni: {
+            id: mentorshipWithDetails.mentor_id.alumni_id._id,
+            name: mentorshipWithDetails.mentor_id.alumni_id.name,
+            email: mentorshipWithDetails.mentor_id.alumni_id.email,
+            profilePhoto: mentorshipWithDetails.mentor_id.alumni_id.profilePhoto,
+          },
+        };
+      }
+      if (mentorshipWithDetails.student_id) {
+        responseData.student = {
+          id: mentorshipWithDetails.student_id._id,
+          name: mentorshipWithDetails.student_id.name,
+          email: mentorshipWithDetails.student_id.email,
+          phone: mentorshipWithDetails.student_id.phone,
+          profilePhoto: mentorshipWithDetails.student_id.profilePhoto,
+        };
+      }
+
+      res.status(201).json({
+        success: true,
+        message: "Mentorship request sent successfully",
+        data: responseData,
+      });
+    } catch (error) {
+      console.error("Error requesting mentorship:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
   }
-};
+];
 
 // Mentor accepts/rejects mentorship request
 export const respondToMentorshipRequest = async (req, res) => {
@@ -502,7 +585,7 @@ export const respondToMentorshipRequest = async (req, res) => {
     }
 
     const { requestId } = req.params;
-    const { action, mentor_notes, session_date, session_time } = req.body;
+    const { action, mentor_notes, session_date, session_time, reschedule_message, reschedule_date, reschedule_time } = req.body;
 
     // Find mentorship request
     const mentorship = await MentorStudent.findById(requestId)
@@ -523,7 +606,8 @@ export const respondToMentorshipRequest = async (req, res) => {
       });
     }
 
-    if (mentorship.status !== "pending") {
+    // Allow actions on pending requests OR reschedule requests
+    if (mentorship.status !== "pending" && !mentorship.reschedule_requested) {
       return res.status(400).json({
         success: false,
         message: `Request is already ${mentorship.status}`,
@@ -531,15 +615,31 @@ export const respondToMentorshipRequest = async (req, res) => {
     }
 
     let updateData = {};
-    let newStatus = "";
+    let newStatus = mentorship.status;
 
-    if (action === "accept") {
+    if (action === "verify_payment") {
+      updateData = {
+        payment_status: "completed"
+      };
+    } else if (action === "request_reschedule") {
+      updateData = {
+        reschedule_requested: true,
+        reschedule_message: reschedule_message || null,
+        reschedule_date: reschedule_date || null,
+        reschedule_time: reschedule_time || null,
+        mentor_notes: mentor_notes || null
+      };
+    } else if (action === "accept") {
       newStatus = "active";
+      // If session_date/time are provided in body (unlikely for simple accept), use them,
+      // otherwise keep the existing ones (from the student's request)
       updateData = {
         status: newStatus,
-        session_date: session_date || mentorship.session_date,
-        session_time: session_time || mentorship.session_time,
+        // Only update if explicitly provided, otherwise keep existing
+        ...(session_date && { session_date }),
+        ...(session_time && { session_time }),
         mentor_notes: mentor_notes || null,
+        reschedule_requested: false, // Clear reschedule flag
       };
     } else if (action === "reject") {
       newStatus = "cancelled";
@@ -550,7 +650,7 @@ export const respondToMentorshipRequest = async (req, res) => {
     } else {
       return res.status(400).json({
         success: false,
-        message: "Invalid action. Use 'accept' or 'reject'",
+        message: "Invalid action. Use 'accept', 'reject', 'verify_payment', or 'request_reschedule'",
       });
     }
 
@@ -577,11 +677,14 @@ export const respondToMentorshipRequest = async (req, res) => {
         {
           studentName: updatedMentorship.student_id.name,
           mentorName: updatedMentorship.mentor_id.name,
-          newStatus: newStatus,
-          oldStatus: "pending",
+          newStatus: action === "verify_payment" ? "Payment Verified" : (action === "request_reschedule" ? "Reschedule Requested" : newStatus),
+          oldStatus: mentorship.status,
           mentorNotes: mentor_notes,
           sessionDate: session_date || updatedMentorship.session_date,
           sessionTime: session_time || updatedMentorship.session_time,
+          rescheduleDate: reschedule_date,
+          rescheduleTime: reschedule_time,
+          rescheduleMessage: reschedule_message,
         }
       );
     } catch (emailError) {
@@ -632,7 +735,7 @@ export const respondToMentorshipRequest = async (req, res) => {
 export const updateSessionDetails = async (req, res) => {
   try {
     const { requestId } = req.params;
-    const { session_date, session_time, mentor_notes } = req.body;
+    const { session_date, session_time, mentor_notes, meeting_link } = req.body;
 
     // Find mentorship
     const mentorship = await MentorStudent.findById(requestId)
@@ -680,10 +783,23 @@ export const updateSessionDetails = async (req, res) => {
       });
     }
 
+    // Check if session is already finalized (has meeting link)
+    if (mentorship.meeting_link && req.user.userType !== 'admin' && !meeting_link) {
+      return res.status(403).json({
+        success: false,
+        message: "This session has been finalized. No further changes can be made.",
+      });
+    }
+
     const updateData = {};
     if (session_date !== undefined) updateData.session_date = session_date;
     if (session_time !== undefined) updateData.session_time = session_time;
     if (mentor_notes !== undefined) updateData.mentor_notes = mentor_notes;
+    if (meeting_link !== undefined) updateData.meeting_link = meeting_link;
+    // Clear reschedule flag when student updates after reschedule request
+    if (isStudent && mentorship.reschedule_requested) {
+      updateData.reschedule_requested = false;
+    }
 
     const updatedMentorship = await MentorStudent.findByIdAndUpdate(
       requestId,
@@ -700,23 +816,43 @@ export const updateSessionDetails = async (req, res) => {
       .populate("student_id", "name email phone profilePhoto");
 
     // Send email notifications for updates
+    // Send email notifications for updates
     try {
-      const updates = [];
-      if (session_date) updates.push("session date");
-      if (session_time) updates.push("session time");
-      if (mentor_notes) updates.push("mentor notes");
+      // If meeting link is being added/updated, send finalized email
+      if (meeting_link) {
+        await emailService.sendMentorshipFinalizedEmail(
+          updatedMentorship.mentor_id.alumni_id.email,
+          updatedMentorship.student_id.email,
+          {
+            studentName: updatedMentorship.student_id.name,
+            mentorName: updatedMentorship.mentor_id.name,
+            sessionDate: session_date || updatedMentorship.session_date,
+            sessionTime: session_time || updatedMentorship.session_time,
+            meetingLink: meeting_link,
+            mentorNotes: mentor_notes || updatedMentorship.mentor_notes,
+          }
+        );
+      } else {
+        // Normal update email
+        const updates = [];
+        if (session_date) updates.push("session date");
+        if (session_time) updates.push("session time");
+        if (mentor_notes) updates.push("mentor notes");
 
-      await emailService.sendMentorshipUpdateEmail(
-        updatedMentorship.mentor_id.alumni_id.email,
-        updatedMentorship.student_id.email,
-        {
-          studentName: updatedMentorship.student_id.name,
-          mentorName: updatedMentorship.mentor_id.name,
-          updates: updates.join(", "),
-          sessionDate: session_date || updatedMentorship.session_date,
-          sessionTime: session_time || updatedMentorship.session_time,
+        if (updates.length > 0) {
+          await emailService.sendMentorshipUpdateEmail(
+            updatedMentorship.mentor_id.alumni_id.email,
+            updatedMentorship.student_id.email,
+            {
+              studentName: updatedMentorship.student_id.name,
+              mentorName: updatedMentorship.mentor_id.name,
+              updates: updates.join(", "),
+              sessionDate: session_date || updatedMentorship.session_date,
+              sessionTime: session_time || updatedMentorship.session_time,
+            }
+          );
         }
-      );
+      }
     } catch (emailError) {
       console.error("Failed to send update emails:", emailError);
     }

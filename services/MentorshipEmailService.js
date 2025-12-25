@@ -70,6 +70,78 @@ class MentorshipEmailService {
   }
 
   // Send email when mentorship details are updated
+  async sendMentorshipFinalizedEmail(mentorEmail, studentEmail, details) {
+    const template = this.generateMentorshipFinalizedTemplate(details);
+    const subject = "Mentorship Session Finalized - Meeting Link Added";
+
+    await Promise.all([
+      this.sendEmail(mentorEmail, subject, template),
+      this.sendEmail(studentEmail, subject, template),
+    ]);
+  }
+
+  generateMentorshipFinalizedTemplate(details) {
+    const { studentName, mentorName, sessionDate, sessionTime, meetingLink, mentorNotes } = details;
+
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentorship Session Finalized</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
+        .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
+        .header { background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); padding: 40px 20px; text-align: center; color: white; }
+        .content { padding: 40px 25px; }
+        .meeting-link-box { background: #e8f5e9; border: 2px solid #4caf50; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+        .meeting-link { color: #2e7d32; font-weight: bold; word-break: break-all; font-size: 16px; }
+        .label { font-weight: bold; color: #1565c0; margin-bottom: 5px; display: block; }
+        .value { margin-bottom: 15px; color: #333; }
+        .footer { background: #333; color: white; padding: 20px; text-align: center; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Mentorship Session Finalized!</h1>
+            <p>Your session is confirmed and ready to go.</p>
+        </div>
+        <div class="content">
+            <p>Hello <strong>${studentName}</strong> and <strong>${mentorName}</strong>,</p>
+            <p>The mentorship session details have been finalized. Please find the meeting link below.</p>
+            
+            <div class="meeting-link-box">
+                <div class="label">Google Meet Link</div>
+                <a href="${meetingLink}" class="meeting-link">${meetingLink}</a>
+            </div>
+
+            <div class="label">Session Date</div>
+            <div class="value">${new Date(sessionDate).toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</div>
+
+            <div class="label">Session Time</div>
+            <div class="value">${sessionTime}</div>
+
+            ${mentorNotes ? `
+            <div class="label">Mentor Notes</div>
+            <div class="value">${mentorNotes}</div>
+            ` : ''}
+
+            <p style="margin-top: 20px; font-size: 14px; color: #666;">
+                Please join the meeting link at the scheduled time. If you face any issues, please contact support.
+            </p>
+        </div>
+        <div class="footer">
+            &copy; ${new Date().getFullYear()} MITS Mentorship Platform. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
+    `;
+  }
+
   async sendMentorshipUpdateEmail(mentorEmail, studentEmail, updateData) {
     try {
       // Send to both parties
@@ -174,6 +246,19 @@ class MentorshipEmailService {
     await this.transporter.sendMail(mailOptions);
     console.log(`✅ Update notification sent to student: ${studentEmail}`);
   }
+
+  // Generic helper to send email
+  async sendEmail(to, subject, html) {
+    const mailOptions = {
+      from: `"MITS Alumni Portal" <${process.env.GMAIL_USER}>`,
+      to,
+      subject,
+      html,
+    };
+    await this.transporter.sendMail(mailOptions);
+    console.log(`✅ Email sent to: ${to}`);
+  }
+
 
   // Helper method to get status action text
   getStatusActionText(status) {
@@ -300,9 +385,9 @@ class MentorshipEmailService {
 <body>
     <div class="email-container">
         ${this.generateHeader(
-          "New Mentorship Request",
-          "You have received a new mentorship request"
-        )}
+      "New Mentorship Request",
+      "You have received a new mentorship request"
+    )}
 
         <div class="content">
             <div class="success-section">
@@ -325,45 +410,42 @@ class MentorshipEmailService {
                     <div class="detail-label">Request Date</div>
                     <div class="detail-value">${formattedRequestDate}</div>
                 </div>
-                ${
-                  sessionDate
-                    ? `
+                ${sessionDate
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Preferred Session Date</div>
                     <div class="detail-value">${new Date(
-                      sessionDate
-                    ).toLocaleDateString("en-IN", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}</div>
+          sessionDate
+        ).toLocaleDateString("en-IN", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}</div>
                 </div>
                 `
-                    : ""
-                }
-                ${
-                  sessionTime
-                    ? `
+        : ""
+      }
+                ${sessionTime
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Preferred Session Time</div>
                     <div class="detail-value">${sessionTime}</div>
                 </div>
                 `
-                    : ""
-                }
+        : ""
+      }
             </div>
 
-            ${
-              requestMessage
-                ? `
+            ${requestMessage
+        ? `
             <div class="message-section">
                 <div class="message-title">Student's Personal Message</div>
                 <div class="message-content">"${requestMessage}"</div>
             </div>
             `
-                : ""
-            }
+        : ""
+      }
 
             <div class="action-section">
                 <div class="action-title">📋 Action Required</div>
@@ -472,9 +554,9 @@ class MentorshipEmailService {
 <body>
     <div class="email-container">
         ${this.generateHeader(
-          "Mentorship Request Sent",
-          "Your request has been successfully submitted"
-        )}
+      "Mentorship Request Sent",
+      "Your request has been successfully submitted"
+    )}
 
         <div class="content">
             <div class="success-section">
@@ -493,45 +575,42 @@ class MentorshipEmailService {
                     <div class="detail-label">Request Date</div>
                     <div class="detail-value">${formattedRequestDate}</div>
                 </div>
-                ${
-                  sessionDate
-                    ? `
+                ${sessionDate
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Preferred Session Date</div>
                     <div class="detail-value">${new Date(
-                      sessionDate
-                    ).toLocaleDateString("en-IN", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}</div>
+          sessionDate
+        ).toLocaleDateString("en-IN", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}</div>
                 </div>
                 `
-                    : ""
-                }
-                ${
-                  sessionTime
-                    ? `
+        : ""
+      }
+                ${sessionTime
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Preferred Session Time</div>
                     <div class="detail-value">${sessionTime}</div>
                 </div>
                 `
-                    : ""
-                }
+        : ""
+      }
             </div>
 
-            ${
-              requestMessage
-                ? `
+            ${requestMessage
+        ? `
             <div class="message-section">
                 <div class="message-title">Your Message to Mentor</div>
                 <div class="message-content">"${requestMessage}"</div>
             </div>
             `
-                : ""
-            }
+        : ""
+      }
 
             <div class="instructions-section">
                 <div class="instructions-title">📋 What Happens Next?</div>
@@ -566,16 +645,26 @@ class MentorshipEmailService {
       sessionTime,
     } = statusData;
 
+    const isReschedule = newStatus === "Reschedule Requested";
+
+    // Use reschedule details if available and it is a reschedule request
+    const effectiveDate = isReschedule && statusData.rescheduleDate ? statusData.rescheduleDate : sessionDate;
+    const effectiveTime = isReschedule && statusData.rescheduleTime ? statusData.rescheduleTime : sessionTime;
+    const messageLabel = isReschedule ? "Reason for Reschedule" : "Your Notes";
+    const messageContent = isReschedule && statusData.rescheduleMessage ? statusData.rescheduleMessage : mentorNotes;
+
     const statusColors = {
       active: "#4CAF50",
       cancelled: "#f44336",
       completed: "#2196F3",
+      "Reschedule Requested": "#FFA000",
     };
 
     const statusIcons = {
       active: "✅",
       cancelled: "❌",
       completed: "🎓",
+      "Reschedule Requested": "📅",
     };
 
     const statusMessages = {
@@ -596,11 +685,9 @@ class MentorshipEmailService {
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
 
-        .header { background: linear-gradient(135deg, ${
-          statusColors[newStatus]
-        } 0%, ${statusColors[newStatus]}dd 50%, ${
-      statusColors[newStatus]
-    }bb 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
+        .header { background: linear-gradient(135deg, ${statusColors[newStatus]
+      } 0%, ${statusColors[newStatus]}dd 50%, ${statusColors[newStatus]
+      }bb 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
         .header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; z-index: 0; }
         .header::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; z-index: 0; }
         .logo-container { margin-bottom: 20px; position: relative; z-index: 1; }
@@ -612,9 +699,8 @@ class MentorshipEmailService {
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
-        .greeting { font-size: 26px; color: ${
-          statusColors[newStatus]
-        }; margin-bottom: 15px; font-weight: 700; }
+        .greeting { font-size: 26px; color: ${statusColors[newStatus]
+      }; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
 
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
@@ -654,21 +740,20 @@ class MentorshipEmailService {
 <body>
     <div class="email-container">
         ${this.generateHeader(
-          statusMessages[newStatus],
-          `You ${newStatus} a mentorship request`
-        )}
+        statusMessages[newStatus],
+        `You ${newStatus} a mentorship request`
+      )}
 
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">${statusIcons[newStatus]}</div>
                 <div class="greeting">Request ${this.getStatusActionText(
-                  newStatus
-                )}!</div>
-                <div class="success-text">You have successfully ${newStatus} the mentorship request from ${studentName}. ${
-      newStatus === "active"
+        newStatus
+      )}!</div>
+                <div class="success-text">You have successfully ${newStatus} the mentorship request from ${studentName}. ${newStatus === "active"
         ? "The student has been notified and your session is confirmed."
         : "The student has been notified of your decision."
-    }</div>
+      }</div>
             </div>
 
             <div class="details-section">
@@ -679,37 +764,34 @@ class MentorshipEmailService {
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">New Status</div>
-                    <div class="detail-value" style="text-transform: capitalize; font-weight: 600; color: ${
-                      statusColors[newStatus]
-                    };">${newStatus}</div>
+                    <div class="detail-value" style="text-transform: capitalize; font-weight: 600; color: ${statusColors[newStatus]
+      };">${newStatus}</div>
                 </div>
-                ${
-                  sessionDate
-                    ? `
+                ${sessionDate
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Session Date</div>
-                    <div class="detail-value">${new Date(
-                      sessionDate
-                    ).toLocaleDateString("en-IN", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}</div>
+                    <div class="detail-value">${effectiveDate ? new Date(
+          effectiveDate
+        ).toLocaleDateString("en-IN", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }) : 'Not Scheduled'}</div>
                 </div>
                 `
-                    : ""
-                }
-                ${
-                  sessionTime
-                    ? `
+        : ""
+      }
+                ${effectiveTime
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Session Time</div>
-                    <div class="detail-value">${sessionTime}</div>
+                    <div class="detail-value">${effectiveTime}</div>
                 </div>
                 `
-                    : ""
-                }
+        : ""
+      }
             </div>
 
             <div class="status-section">
@@ -721,20 +803,18 @@ class MentorshipEmailService {
                     </div>
                     <div class="status-item">
                         <div class="status-label">New Status</div>
-                        <div class="status-value" style="text-transform: capitalize; font-weight: 600; color: ${
-                          statusColors[newStatus]
-                        };">${newStatus}</div>
+                        <div class="status-value" style="text-transform: capitalize; font-weight: 600; color: ${statusColors[newStatus] || '#FFA000'
+      };">${newStatus}</div>
                     </div>
-                    ${
-                      mentorNotes
-                        ? `
+                    ${messageContent
+        ? `
                     <div class="status-item">
-                        <div class="status-label">Your Notes</div>
-                        <div class="status-value">${mentorNotes}</div>
+                        <div class="status-label">${messageLabel}</div>
+                        <div class="status-value">${messageContent}</div>
                     </div>
                     `
-                        : ""
-                    }
+        : ""
+      }
                 </div>
             </div>
 
@@ -772,13 +852,24 @@ class MentorshipEmailService {
       active: "✅",
       cancelled: "❌",
       completed: "🎓",
+      "Reschedule Requested": "📅",
     };
 
     const statusMessages = {
       active: "Mentorship Request Accepted!",
       cancelled: "Mentorship Request Declined",
       completed: "Mentorship Session Completed",
+      "Reschedule Requested": "Mentorship Reschedule Requested",
     };
+
+    const isReschedule = newStatus === "Reschedule Requested";
+
+    // Use reschedule details if available and it is a reschedule request
+    const effectiveDate = isReschedule && statusData.rescheduleDate ? statusData.rescheduleDate : sessionDate;
+    const effectiveTime = isReschedule && statusData.rescheduleTime ? statusData.rescheduleTime : sessionTime;
+    const messageLabel = isReschedule ? "Reason for Reschedule" : "Your Notes";
+    const messageContent = isReschedule && statusData.rescheduleMessage ? statusData.rescheduleMessage : mentorNotes;
+
 
     return `
 <!DOCTYPE html>
@@ -792,11 +883,9 @@ class MentorshipEmailService {
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #1a3a52; background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); padding: 10px; }
         .email-container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(25, 103, 210, 0.15); }
 
-        .header { background: linear-gradient(135deg, ${
-          statusColors[newStatus]
-        } 0%, ${statusColors[newStatus]}dd 50%, ${
-      statusColors[newStatus]
-    }bb 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
+        .header { background: linear-gradient(135deg, ${statusColors[newStatus]
+      } 0%, ${statusColors[newStatus]}dd 50%, ${statusColors[newStatus]
+      }bb 100%); padding: 40px 20px; text-align: center; position: relative; overflow: hidden; }
         .header::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; z-index: 0; }
         .header::after { content: ''; position: absolute; bottom: -30%; left: -5%; width: 200px; height: 200px; background: rgba(255, 255, 255, 0.08); border-radius: 50%; z-index: 0; }
         .logo-container { margin-bottom: 20px; position: relative; z-index: 1; }
@@ -808,9 +897,8 @@ class MentorshipEmailService {
         .content { padding: 40px 25px; }
         .success-section { text-align: center; margin-bottom: 35px; }
         .success-icon { font-size: 48px; margin-bottom: 20px; }
-        .greeting { font-size: 26px; color: ${
-          statusColors[newStatus]
-        }; margin-bottom: 15px; font-weight: 700; }
+        .greeting { font-size: 26px; color: ${statusColors[newStatus]
+      }; margin-bottom: 15px; font-weight: 700; }
         .success-text { font-size: 15px; color: #455a64; line-height: 1.8; margin-bottom: 25px; }
 
         .details-section { background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); padding: 25px; border-radius: 12px; margin: 25px 0; border: 2px solid #4caf50; }
@@ -855,21 +943,20 @@ class MentorshipEmailService {
 <body>
     <div class="email-container">
         ${this.generateHeader(
-          statusMessages[newStatus],
-          `${mentorName} has ${newStatus} your request`
-        )}
+        statusMessages[newStatus],
+        `${mentorName} has ${newStatus} your request`
+      )}
 
         <div class="content">
             <div class="success-section">
                 <div class="success-icon">${statusIcons[newStatus]}</div>
                 <div class="greeting">Request ${this.getStatusActionText(
-                  newStatus
-                )}!</div>
-                <div class="success-text">${mentorName} has ${newStatus} your mentorship request. ${
-      newStatus === "active"
+        newStatus
+      )}!</div>
+                <div class="success-text">${mentorName} has ${newStatus} your mentorship request. ${newStatus === "active"
         ? "Your mentorship session has been confirmed!"
         : "Thank you for your interest in mentorship."
-    }</div>
+      }</div>
             </div>
 
             <div class="details-section">
@@ -880,37 +967,34 @@ class MentorshipEmailService {
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Request Status</div>
-                    <div class="detail-value" style="text-transform: capitalize; font-weight: 600; color: ${
-                      statusColors[newStatus]
-                    };">${newStatus}</div>
+                    <div class="detail-value" style="text-transform: capitalize; font-weight: 600; color: ${statusColors[newStatus]
+      };">${newStatus}</div>
                 </div>
-                ${
-                  sessionDate
-                    ? `
+                ${sessionDate
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Session Date</div>
                     <div class="detail-value">${new Date(
-                      sessionDate
-                    ).toLocaleDateString("en-IN", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}</div>
+          sessionDate
+        ).toLocaleDateString("en-IN", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}</div>
                 </div>
                 `
-                    : ""
-                }
-                ${
-                  sessionTime
-                    ? `
+        : ""
+      }
+                ${sessionTime
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Session Time</div>
                     <div class="detail-value">${sessionTime}</div>
                 </div>
                 `
-                    : ""
-                }
+        : ""
+      }
             </div>
 
             <div class="status-section">
@@ -922,26 +1006,23 @@ class MentorshipEmailService {
                     </div>
                     <div class="status-item">
                         <div class="status-label">Current Status</div>
-                        <div class="status-value" style="text-transform: capitalize; font-weight: 600; color: ${
-                          statusColors[newStatus]
-                        };">${newStatus}</div>
+                        <div class="status-value" style="text-transform: capitalize; font-weight: 600; color: ${statusColors[newStatus]
+      };">${newStatus}</div>
                     </div>
-                    ${
-                      mentorNotes
-                        ? `
+                    ${mentorNotes
+        ? `
                     <div class="status-item">
                         <div class="status-label">Mentor's Message</div>
                         <div class="status-value">${mentorNotes}</div>
                     </div>
                     `
-                        : ""
-                    }
+        : ""
+      }
                 </div>
             </div>
 
-            ${
-              newStatus === "active"
-                ? `
+            ${newStatus === "active"
+        ? `
             <div class="next-steps-section">
                 <div class="next-steps-title">🎉 Next Steps - Session Confirmed!</div>
                 <div class="next-steps-item">Prepare your questions and topics for discussion</div>
@@ -951,8 +1032,8 @@ class MentorshipEmailService {
                 <div class="next-steps-item">Be respectful of the mentor's time and expertise</div>
             </div>
             `
-                : newStatus === "cancelled"
-                ? `
+        : newStatus === "cancelled"
+          ? `
             <div class="next-steps-section">
                 <div class="next-steps-title">💡 Alternative Options</div>
                 <div class="next-steps-item">You can request mentorship from other available mentors</div>
@@ -961,8 +1042,8 @@ class MentorshipEmailService {
                 <div class="next-steps-item">Contact career counseling for additional guidance</div>
             </div>
             `
-                : ""
-            }
+          : ""
+      }
 
             <div class="help-section">
                 <div class="help-title">❓ Need Assistance?</div>
@@ -983,11 +1064,11 @@ class MentorshipEmailService {
 
     const formattedSessionDate = sessionDate
       ? new Date(sessionDate).toLocaleDateString("en-IN", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
       : "Not specified";
 
     return `
@@ -1054,9 +1135,9 @@ class MentorshipEmailService {
 <body>
     <div class="email-container">
         ${this.generateHeader(
-          "Mentorship Session Updated",
-          "Session details have been modified"
-        )}
+      "Mentorship Session Updated",
+      "Session details have been modified"
+    )}
 
         <div class="content">
             <div class="success-section">
@@ -1075,16 +1156,15 @@ class MentorshipEmailService {
                     <div class="detail-label">Session Date</div>
                     <div class="detail-value">${formattedSessionDate}</div>
                 </div>
-                ${
-                  sessionTime
-                    ? `
+                ${sessionTime
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Session Time</div>
                     <div class="detail-value">${sessionTime}</div>
                 </div>
                 `
-                    : ""
-                }
+        : ""
+      }
             </div>
 
             <div class="update-section">
@@ -1092,10 +1172,9 @@ class MentorshipEmailService {
                 <div class="update-content">
                     <div class="update-item">
                         <div class="update-label">Changes Made</div>
-                        <div class="update-value">${
-                          updates ||
-                          "Session timing and details have been updated"
-                        }</div>
+                        <div class="update-value">${updates ||
+      "Session timing and details have been updated"
+      }</div>
                     </div>
                     <div class="update-item">
                         <div class="update-label">Notification Status</div>
@@ -1123,11 +1202,11 @@ class MentorshipEmailService {
 
     const formattedSessionDate = sessionDate
       ? new Date(sessionDate).toLocaleDateString("en-IN", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
       : "Not specified";
 
     return `
@@ -1199,9 +1278,9 @@ class MentorshipEmailService {
 <body>
     <div class="email-container">
         ${this.generateHeader(
-          "Mentorship Session Updated",
-          `${mentorName} has updated your session details`
-        )}
+      "Mentorship Session Updated",
+      `${mentorName} has updated your session details`
+    )}
 
         <div class="content">
             <div class="success-section">
@@ -1220,16 +1299,15 @@ class MentorshipEmailService {
                     <div class="detail-label">Session Date</div>
                     <div class="detail-value">${formattedSessionDate}</div>
                 </div>
-                ${
-                  sessionTime
-                    ? `
+                ${sessionTime
+        ? `
                 <div class="detail-item">
                     <div class="detail-label">Session Time</div>
                     <div class="detail-value">${sessionTime}</div>
                 </div>
                 `
-                    : ""
-                }
+        : ""
+      }
             </div>
 
             <div class="update-section">
@@ -1237,10 +1315,9 @@ class MentorshipEmailService {
                 <div class="update-content">
                     <div class="update-item">
                         <div class="update-label">Changes Made</div>
-                        <div class="update-value">${
-                          updates ||
-                          "Session timing and details have been updated by your mentor"
-                        }</div>
+                        <div class="update-value">${updates ||
+      "Session timing and details have been updated by your mentor"
+      }</div>
                     </div>
                     <div class="update-item">
                         <div class="update-label">Updated By</div>
@@ -1249,14 +1326,14 @@ class MentorshipEmailService {
                     <div class="update-item">
                         <div class="update-label">Update Date</div>
                         <div class="update-value">${new Date().toLocaleDateString(
-                          "en-IN",
-                          {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          }
-                        )}</div>
+        "en-IN",
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }
+      )}</div>
                     </div>
                 </div>
             </div>

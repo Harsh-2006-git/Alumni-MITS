@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import User from "../models/user.js";
 import UserProfile from "../models/UserProfile.js";
 import EmailService from "../services/NewUserEmailService.js"; // Add email service import
+import RefreshToken from "../models/refreshToken.js";
 import csv from "csv-parser";
 import multer from "multer";
 import { Readable } from "stream";
@@ -21,25 +22,33 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 // Initialize Email Service
 const emailService = new EmailService();
 
-// In-memory refresh tokens (replace with DB in production)
-let refreshTokens = [];
+// In-memory refresh tokens replaced with DB storage
 
 // ===================== GENERATE TOKENS =====================
-const generateTokens = (user) => {
+const generateTokens = async (user) => {
   const payload = {
-    id: user.id,
+    id: user.id || user._id, // Handle both id and _id
     email: user.email,
     name: user.name,
     phone: user.phone,
     userType: user.userType || "student",
   };
 
-  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: "15m" });
+  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
   const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {
     expiresIn: "7d",
   });
 
-  refreshTokens.push(refreshToken);
+  // Calculate expiry date (7 days from now)
+  const expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + 7);
+
+  // Save to Database
+  await RefreshToken.create({
+    token: refreshToken,
+    user: user.id || user._id,
+    expiryDate: expiryDate,
+  });
 
   return { accessToken, refreshToken };
 };
@@ -159,7 +168,7 @@ export const googleAuth = passport.authenticate("google", {
 });
 
 export const googleCallback = (req, res, next) => {
-  passport.authenticate("google", { session: false }, (err, user, info) => {
+  passport.authenticate("google", { session: false }, async (err, user, info) => {
     if (err || !user) {
       const error = info?.message || "unauthorized";
       return res.redirect(`${FRONTEND_URL}/login?error=${error}`);
@@ -174,13 +183,13 @@ export const googleCallback = (req, res, next) => {
       regUrl.searchParams.set("email", user.email);
       regUrl.searchParams.set("id", user.id.toString());
       // We pass the accessToken anyway so the frontend can use it to call the register endpoint
-      const { accessToken, refreshToken } = generateTokens(user);
+      const { accessToken, refreshToken } = await generateTokens(user);
       regUrl.searchParams.set("accessToken", accessToken);
 
       return res.redirect(regUrl.toString());
     }
 
-    const { accessToken, refreshToken } = generateTokens(user);
+    const { accessToken, refreshToken } = await generateTokens(user);
 
     const redirectUrl = new URL(`${FRONTEND_URL}/login`);
     redirectUrl.searchParams.set("accessToken", accessToken);
@@ -242,7 +251,7 @@ export const googleAuthAlumni = (req, res, next) => {
 };
 
 export const googleCallbackAlumni = (req, res, next) => {
-  passport.authenticate("google-alumni", { session: false }, (err, user, info) => {
+  passport.authenticate("google-alumni", { session: false }, async (err, user, info) => {
     if (err || !user) {
       const error = info?.message || "unauthorized";
       console.error("❌ Alumni OAuth Error:", error, info);
@@ -251,7 +260,7 @@ export const googleCallbackAlumni = (req, res, next) => {
 
     console.log("✅ Alumni OAuth Success - User:", { id: user.id, email: user.email, name: user.name });
 
-    const { accessToken, refreshToken } = generateTokens(user);
+    const { accessToken, refreshToken } = await generateTokens(user);
 
     console.log("🔑 Generated Tokens:", {
       accessToken: accessToken.substring(0, 20) + "...",
@@ -377,7 +386,7 @@ export const register = async (req, res) => {
       isProfileComplete: false,
     });
 
-    const { accessToken, refreshToken } = generateTokens(user);
+    const { accessToken, refreshToken } = await generateTokens(user);
 
     // ✅ Send welcome email to student (non-blocking)
     emailService.sendWelcomeEmail(user).catch((error) => {
@@ -388,7 +397,7 @@ export const register = async (req, res) => {
     // Optional: set cookies
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      maxAge: 15 * 60 * 1000,
+      maxAge: 60 * 60 * 1000,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -446,11 +455,11 @@ export const login = async (req, res) => {
     if (!isValid)
       return res.status(401).json({ message: "Invalid credentials" });
 
-    const { accessToken, refreshToken } = generateTokens(user);
+    const { accessToken, refreshToken } = await generateTokens(user);
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      maxAge: 15 * 60 * 1000,
+      maxAge: 60 * 60 * 1000,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -693,7 +702,7 @@ export const registerAlumni = async (req, res) => {
     }
 
     // Generate tokens for immediate upload capability
-    const { accessToken, refreshToken } = generateTokens(user);
+    const { accessToken, refreshToken } = await generateTokens(user);
 
     // Return response
     res.status(201).json({
@@ -835,65 +844,104 @@ export const loginAlumni = async (req, res) => {
 };
 
 // ===================== REFRESH TOKEN =====================
-export const refreshAccessToken = (req, res) => {
+// ===================== REFRESH TOKEN =====================
+export const refreshAccessToken = async (req, res) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token required" });
   }
 
-  // Verify JWT signature and expiry only
-  jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) {
-      console.log("JWT Verify Error:", err.message);
+  try {
+    // 1. Find token in DB
+    const existingToken = await RefreshToken.findOne({ token: refreshToken });
+
+    if (!existingToken) {
+      return res.status(403).json({ message: "Refresh token is not in database!" });
+    }
+
+    // 2. Verify Expiry
+    if (RefreshToken.verifyExpiration(existingToken)) {
+      await RefreshToken.findByIdAndRemove(existingToken._id, { useFindAndModify: false });
       return res.status(403).json({
-        message: "Invalid or expired token",
-        error: err.message,
+        message: "Refresh token was expired. Please make a new signin request",
       });
     }
 
-    console.log("Verified user:", user);
+    // 3. Verify JWT signature
+    jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err, user) => {
+      if (err) {
+        return res.status(403).json({
+          message: "Invalid token signature",
+          error: err.message,
+        });
+      }
 
-    // Generate new access token
-    const newAccessToken = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        userType: user.userType,
-      },
-      JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+      // 4. Generate NEW Access Token (1h)
+      const newAccessToken = jwt.sign(
+        {
+          id: user.id || user._id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          userType: user.userType,
+        },
+        JWT_SECRET,
+        { expiresIn: "1h" }
+      );
 
-    // Optional: Generate new refresh token (rotates the token)
-    const newRefreshToken = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        userType: user.userType,
-      },
-      REFRESH_TOKEN_SECRET,
-      { expiresIn: "7d" }
-    );
+      // 5. Rotate Refresh Token (Create new one, delete old one)
+      const newRefreshToken = jwt.sign(
+        {
+          id: user.id || user._id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          userType: user.userType,
+        },
+        REFRESH_TOKEN_SECRET,
+        { expiresIn: "7d" }
+      );
 
-    res.json({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
+      // Save new token
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 7);
+
+      await RefreshToken.create({
+        token: newRefreshToken,
+        user: user.id || user._id,
+        expiryDate: expiryDate,
+      });
+
+      // Delete old token (Rotation)
+      await RefreshToken.findByIdAndDelete(existingToken._id);
+
+      res.json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
     });
-  });
+  } catch (err) {
+    console.error("Refresh Token Error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 // ===================== LOGOUT =====================
-export const logout = (req, res) => {
-  const { token } = req.body;
-  refreshTokens = refreshTokens.filter((t) => t !== token);
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
-  res.json({ message: "Logged out successfully" });
+export const logout = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (token) {
+      await RefreshToken.findOneAndDelete({ token: token });
+    }
+
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error("Logout Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 // ===================== AUTH MIDDLEWARE =====================
