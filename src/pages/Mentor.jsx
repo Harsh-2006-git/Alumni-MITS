@@ -14,6 +14,11 @@ import {
   Calendar,
   MapPin,
   ExternalLink,
+  HelpCircle,
+  UploadCloud,
+  AlertCircle,
+  CreditCard,
+  Copy,
 } from "lucide-react";
 
 import Header from "../components/header";
@@ -32,6 +37,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
   const [notification, setNotification] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [myMentorships, setMyMentorships] = useState([]);
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
 
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
@@ -82,8 +88,9 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
   const authToken = getAuthToken();
 
   // Load user's existing mentorship requests
-  const loadMyMentorships = async () => {
-    if (!currentUser?.isLoggedIn || currentUser?.userType !== "student") return;
+  const loadMyMentorships = async (userParam) => {
+    const userToCheck = userParam || currentUser;
+    if (!userToCheck?.isLoggedIn || userToCheck?.userType !== "student") return;
 
     try {
       const response = await axios.get(`${API_BASE}/student/mentorships`, {
@@ -103,7 +110,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
     setCurrentUser(user);
 
     if (user?.isLoggedIn && user?.userType === "student") {
-      loadMyMentorships();
+      loadMyMentorships(user);
     }
   }, []);
 
@@ -133,26 +140,27 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
   };
 
   // Helper function to check if user already has a request with a mentor
+  // Helper function to check if user already has a request with a mentor
   const hasExistingMentorship = (mentorId) => {
-    return myMentorships.some(mentorship =>
-      mentorship.mentor_id === mentorId ||
-      mentorship.mentor?.id === mentorId
-    );
+    return myMentorships.some(mentorship => {
+      const mId = mentorship.mentor_id?._id || mentorship.mentor_id || mentorship.mentor?.id;
+      return mId?.toString() === mentorId?.toString();
+    });
   };
 
   const getExistingMentorshipStatus = (mentorId) => {
-    const existing = myMentorships.find(mentorship =>
-      mentorship.mentor_id === mentorId ||
-      mentorship.mentor?.id === mentorId
-    );
+    const existing = myMentorships.find(mentorship => {
+      const mId = mentorship.mentor_id?._id || mentorship.mentor_id || mentorship.mentor?.id;
+      return mId?.toString() === mentorId?.toString();
+    });
     return existing ? existing.status : null;
   };
 
   const getExistingMentorship = (mentorId) => {
-    return myMentorships.find(mentorship =>
-      mentorship.mentor_id === mentorId ||
-      mentorship.mentor?.id === mentorId
-    );
+    return myMentorships.find(mentorship => {
+      const mId = mentorship.mentor_id?._id || mentorship.mentor_id || mentorship.mentor?.id;
+      return mId?.toString() === mentorId?.toString();
+    });
   };
 
   const sendMentorshipRequest = async (e) => {
@@ -178,19 +186,29 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
 
     try {
       setLoading(true);
+      // Use FormData for file upload
+      const formData = new FormData();
+      formData.append("request_message", requestForm.request_message);
+      formData.append("session_date", requestForm.session_date);
+      formData.append("session_time", requestForm.session_time);
+      if (paymentScreenshot) {
+        formData.append("payment_screenshot", paymentScreenshot);
+      }
+
       const response = await axios.post(
         `${API_BASE}/mentors/${selectedMentor.id}/request`,
-        requestForm,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${authToken}`,
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       setShowRequestForm(false);
       setSelectedMentor(null);
+      setPaymentScreenshot(null);
       setRequestForm({
         request_message: "",
         session_date: "",
@@ -273,29 +291,40 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         message: `Your request to ${mentor?.name} has status: ${existingMentorship.status}`
       };
 
-      let details = `${statusInfo.title}\n${statusInfo.message}`;
+      // Map status to notification type color
+      const typeMap = {
+        active: 'success',
+        pending: 'warning',
+        cancelled: 'error',
+        completed: 'success'
+      };
 
-      // Add request message if available
-      if (existingMentorship.request_message) {
-        details += `\n\nYour message: "${existingMentorship.request_message}"`;
-      }
+      const type = typeMap[existingMentorship.status] || 'info';
 
-      // Add session details if available
-      if (existingMentorship.session_date) {
-        details += `\n\nScheduled session: ${existingMentorship.session_date}`;
-        if (existingMentorship.session_time) {
-          details += ` at ${existingMentorship.session_time}`;
-        }
-      }
+      const details = (
+        <div className="flex flex-col gap-1.5">
+          <span className="font-bold text-lg">{statusInfo.title}</span>
+          <span className="opacity-90">{statusInfo.message}</span>
+        </div>
+      );
 
-      // Add request date if available
-      if (existingMentorship.request_date) {
-        details += `\nRequested on: ${existingMentorship.request_date}`;
-      }
-
-      showNotification(details, "info");
+      showNotification(details, type);
     }
   };
+
+  // Helper date formatters for notification
+  const formatDateTime = (date, time) => {
+    if (!date) return "";
+    const d = new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    return `${d}${time ? `, ${time}` : ""}`;
+  };
+
+  const formatRequestDateTime = (date) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  };
+
+
 
   const openRequestForm = (mentor) => {
     // Check if user is logged in and is a student
@@ -353,14 +382,14 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
   const StatCard = ({ icon: Icon, label, value, color = "purple" }) => (
     <div
       className={`rounded-xl p-2 sm:p-4 border-2 shadow-lg transition-all hover:scale-105 hover:shadow-xl ${isDarkMode
-          ? `bg-gradient-to-br from-slate-900/90 via-${color}-900/30 to-blue-900/20 border-${color}-500/30`
-          : `bg-gradient-to-br from-white via-${color}-50/50 to-blue-50/50 border-${color}-300`
+        ? `bg-gradient-to-br from-slate-900/90 via-${color}-900/30 to-blue-900/20 border-${color}-500/30`
+        : `bg-gradient-to-br from-white via-${color}-50/50 to-blue-50/50 border-${color}-300`
         }`}
     >
       <div
         className={`flex items-center justify-center w-6 h-6 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl mb-1 sm:mb-3 ${isDarkMode
-            ? `bg-gradient-to-br from-${color}-500/30 to-blue-500/20`
-            : `bg-gradient-to-br from-${color}-100 to-blue-100`
+          ? `bg-gradient-to-br from-${color}-500/30 to-blue-500/20`
+          : `bg-gradient-to-br from-${color}-100 to-blue-100`
           }`}
       >
         <Icon className={`text-${color}-500`} size={14} />
@@ -381,8 +410,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
     return (
       <div
         className={`min-h-screen ${isDarkMode
-            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
-            : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50"
+          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
+          : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50"
           }`}
       >
         <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
@@ -404,8 +433,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
@@ -415,12 +444,12 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         <div className="fixed top-20 right-4 z-[60] animate-in slide-in-from-right duration-300 max-w-md">
           <div
             className={`rounded-xl shadow-2xl p-4 sm:p-5 border-2 backdrop-blur-lg whitespace-pre-line ${notification.type === "success"
-                ? "bg-gradient-to-r from-green-500/90 to-emerald-500/90 border-green-400 text-white"
-                : notification.type === "error"
-                  ? "bg-gradient-to-r from-red-500/90 to-pink-500/90 border-red-400 text-white"
-                  : notification.type === "info"
-                    ? "bg-gradient-to-r from-blue-500/90 to-purple-500/90 border-blue-400 text-white"
-                    : "bg-gradient-to-r from-yellow-500/90 to-amber-500/90 border-yellow-400 text-white"
+              ? "bg-gradient-to-r from-green-500/90 to-emerald-500/90 border-green-400 text-white"
+              : notification.type === "error"
+                ? "bg-gradient-to-r from-red-500/90 to-pink-500/90 border-red-400 text-white"
+                : notification.type === "info"
+                  ? "bg-gradient-to-r from-blue-500/90 to-purple-500/90 border-blue-400 text-white"
+                  : "bg-gradient-to-r from-yellow-500/90 to-amber-500/90 border-yellow-400 text-white"
               }`}
           >
             <div className="flex items-start gap-3">
@@ -436,9 +465,9 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm sm:text-base leading-relaxed">
+                <div className="font-semibold text-sm sm:text-base leading-relaxed">
                   {notification.message}
-                </p>
+                </div>
               </div>
               <button
                 onClick={() => setNotification(null)}
@@ -456,8 +485,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[70]">
           <div
             className={`rounded-3xl p-8 shadow-2xl ${isDarkMode
-                ? "bg-gradient-to-br from-slate-900 to-blue-900/50"
-                : "bg-gradient-to-br from-white to-blue-50"
+              ? "bg-gradient-to-br from-slate-900 to-blue-900/50"
+              : "bg-gradient-to-br from-white to-blue-50"
               }`}
           >
             <div className="flex flex-col items-center gap-4">
@@ -538,8 +567,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         <div className="max-w-7xl mx-auto">
           <div
             className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 border-2 shadow-2xl ${isDarkMode
-                ? "bg-gradient-to-br from-slate-900/90 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm border-blue-500/20"
-                : "bg-gradient-to-br from-white/90 via-cyan-50/50 to-blue-50/50 backdrop-blur-sm border-blue-300"
+              ? "bg-gradient-to-br from-slate-900/90 via-blue-900/20 to-indigo-900/20 backdrop-blur-sm border-blue-500/20"
+              : "bg-gradient-to-br from-white/90 via-cyan-50/50 to-blue-50/50 backdrop-blur-sm border-blue-300"
               }`}
           >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-6 sm:mb-8">
@@ -579,7 +608,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                         <img
                           src={
                             mentor.alumni?.profilePhoto ||
-                            "https://img.freepik.com/premium-vector/man-avatar-glasses-young_594966-9.jpg"
+                            "https://cdn-icons-png.flaticon.com/512/219/219970.png"
                           }
                           alt={mentor.name}
                           className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl object-cover border-2 border-blue-400/30 shadow-lg"
@@ -630,8 +659,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                             <span
                               key={index}
                               className={`px-2 py-1 text-xs rounded-full font-medium border ${isDarkMode
-                                  ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
-                                  : "bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 border-cyan-300"
+                                ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
+                                : "bg-gradient-to-r from-cyan-100 to-blue-100 text-cyan-700 border-cyan-300"
                                 }`}
                             >
                               {topic}
@@ -640,8 +669,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                           {mentor.topics.length > 3 && (
                             <span
                               className={`px-2 py-1 text-xs rounded-full border ${isDarkMode
-                                  ? "bg-gray-700/50 text-gray-300 border-gray-600/40"
-                                  : "bg-gray-200 text-gray-700 border-gray-400"
+                                ? "bg-gray-700/50 text-gray-300 border-gray-600/40"
+                                : "bg-gray-200 text-gray-700 border-gray-400"
                                 }`}
                             >
                               +{mentor.topics.length - 3}
@@ -716,8 +745,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                         <button
                           onClick={() => openProfilePopup(mentor)}
                           className={`flex-1 border-2 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${isDarkMode
-                              ? "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20"
-                              : "border-cyan-300 text-cyan-700 hover:bg-cyan-50"
+                            ? "border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20"
+                            : "border-cyan-300 text-cyan-700 hover:bg-cyan-50"
                             }`}
                         >
                           <ExternalLink size={12} className="sm:w-3.5 sm:h-3.5" />
@@ -730,12 +759,12 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                             <button
                               onClick={() => showExistingMentorshipDetails(mentor.id)}
                               className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${existingStatus === "active"
-                                  ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/30"
-                                  : existingStatus === "pending"
-                                    ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-white hover:shadow-lg hover:shadow-yellow-500/30"
-                                    : existingStatus === "cancelled"
-                                      ? "bg-gradient-to-r from-gray-500 to-slate-600 text-white hover:shadow-lg hover:shadow-gray-500/30"
-                                      : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/30"
+                                ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/30"
+                                : existingStatus === "pending"
+                                  ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-white hover:shadow-lg hover:shadow-yellow-500/30"
+                                  : existingStatus === "cancelled"
+                                    ? "bg-gradient-to-r from-gray-500 to-slate-600 text-white hover:shadow-lg hover:shadow-gray-500/30"
+                                    : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/30"
                                 }`}
                             >
                               {existingStatus === "active" && (
@@ -776,8 +805,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                           <button
                             disabled
                             className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${isDarkMode
-                                ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
                               }`}
                           >
                             <Send size={12} className="sm:w-3.5 sm:h-3.5" />
@@ -822,14 +851,14 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
           <div className="w-full max-w-4xl max-h-[90vh] flex flex-col">
             <div
               className={`rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col max-h-full overflow-hidden ${isDarkMode
-                  ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
-                  : "bg-gradient-to-br from-white via-cyan-50 to-blue-50/80 border-2 border-blue-200 backdrop-blur-sm"
+                ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
+                : "bg-gradient-to-br from-white via-cyan-50 to-blue-50/80 border-2 border-blue-200 backdrop-blur-sm"
                 }`}
             >
               <div
                 className={`sticky top-0 p-4 sm:p-6 border-b-2 backdrop-blur-sm ${isDarkMode
-                    ? "border-blue-500/30 bg-slate-900/90"
-                    : "border-blue-200 bg-white/90"
+                  ? "border-blue-500/30 bg-slate-900/90"
+                  : "border-blue-200 bg-white/90"
                   }`}
               >
                 <div className="flex items-center justify-between">
@@ -839,8 +868,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                   <button
                     onClick={() => setShowProfilePopup(false)}
                     className={`p-2 rounded-lg transition-colors ${isDarkMode
-                        ? "text-gray-400 hover:text-white hover:bg-slate-800"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                      ? "text-gray-400 hover:text-white hover:bg-slate-800"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                       }`}
                   >
                     <X size={20} />
@@ -956,8 +985,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                     </h4>
                     <p
                       className={`rounded-xl p-4 text-sm ${isDarkMode
-                          ? "bg-slate-800/50 text-gray-200"
-                          : "bg-white text-gray-800 border border-gray-200 shadow-sm"
+                        ? "bg-slate-800/50 text-gray-200"
+                        : "bg-white text-gray-800 border border-gray-200 shadow-sm"
                         }`}
                     >
                       {selectedMentor.expertise}
@@ -977,8 +1006,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                         <span
                           key={index}
                           className={`px-3 py-2 rounded-lg font-medium border text-sm ${isDarkMode
-                              ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
-                              : "bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-700 border-cyan-200 shadow-sm"
+                            ? "bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-cyan-200 border-cyan-400/40"
+                            : "bg-gradient-to-r from-cyan-50 to-blue-50 text-cyan-700 border-cyan-200 shadow-sm"
                             }`}
                         >
                           {topic}
@@ -1001,8 +1030,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                           <div
                             key={day}
                             className={`flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 rounded-xl gap-2 ${isDarkMode
-                                ? "bg-slate-800/50"
-                                : "bg-white border border-gray-200 shadow-sm"
+                              ? "bg-slate-800/50"
+                              : "bg-white border border-gray-200 shadow-sm"
                               }`}
                           >
                             <span
@@ -1016,8 +1045,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                                 <span
                                   key={index}
                                   className={`px-3 py-1 rounded text-sm border ${isDarkMode
-                                      ? "bg-slate-700 text-gray-200 border-slate-600"
-                                      : "bg-cyan-50 text-cyan-700 border-cyan-200"
+                                    ? "bg-slate-700 text-gray-200 border-slate-600"
+                                    : "bg-cyan-50 text-cyan-700 border-cyan-200"
                                     }`}
                                 >
                                   {formatTimeSlot(slot)}
@@ -1034,8 +1063,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
 
               <div
                 className={`sticky bottom-0 p-4 border-t-2 ${isDarkMode
-                    ? "border-blue-500/30 bg-slate-900/90"
-                    : "border-blue-200 bg-white/90"
+                  ? "border-blue-500/30 bg-slate-900/90"
+                  : "border-blue-200 bg-white/90"
                   }`}
               >
                 {canRequestMentorship ? (
@@ -1049,12 +1078,12 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                             showExistingMentorshipDetails(selectedMentor.id);
                           }}
                           className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${existingStatus === "active"
-                              ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/30"
-                              : existingStatus === "pending"
-                                ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-white hover:shadow-lg hover:shadow-yellow-500/30"
-                                : existingStatus === "cancelled"
-                                  ? "bg-gradient-to-r from-gray-500 to-slate-600 text-white hover:shadow-lg hover:shadow-gray-500/30"
-                                  : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/30"
+                            ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:shadow-lg hover:shadow-green-500/30"
+                            : existingStatus === "pending"
+                              ? "bg-gradient-to-r from-yellow-500 to-amber-600 text-white hover:shadow-lg hover:shadow-yellow-500/30"
+                              : existingStatus === "cancelled"
+                                ? "bg-gradient-to-r from-gray-500 to-slate-600 text-white hover:shadow-lg hover:shadow-gray-500/30"
+                                : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-blue-500/30"
                             }`}
                         >
                           {existingStatus === "active" && (
@@ -1102,8 +1131,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                   <button
                     disabled
                     className={`w-full py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${isDarkMode
-                        ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300"
+                      ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300"
                       }`}
                   >
                     <Send size={16} />
@@ -1122,15 +1151,15 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
       {showRequestForm && selectedMentor && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div
-            className={`rounded-2xl sm:rounded-3xl max-w-md w-full shadow-2xl ${isDarkMode
-                ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
-                : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
+            className={`rounded-2xl sm:rounded-3xl max-w-lg w-full shadow-2xl flex flex-col max-h-[90vh] ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900 via-blue-900/30 to-indigo-900/20 border-2 border-blue-500/30"
+              : "bg-gradient-to-br from-white via-cyan-50/30 to-blue-50/30 border-2 border-blue-300"
               }`}
           >
             <div
               className={`sticky top-0 p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl border-b-2 backdrop-blur-sm ${isDarkMode
-                  ? "border-blue-500/30 bg-slate-900/90"
-                  : "border-blue-300 bg-white/90"
+                ? "border-blue-500/30 bg-slate-900/90"
+                : "border-blue-300 bg-white/90"
                 }`}
             >
               <div className="flex items-center justify-between">
@@ -1148,8 +1177,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                 <button
                   onClick={() => setShowRequestForm(false)}
                   className={`p-2 rounded-lg transition-colors ${isDarkMode
-                      ? "text-gray-400 hover:text-white hover:bg-slate-800"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    ? "text-gray-400 hover:text-white hover:bg-slate-800"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                     }`}
                 >
                   <X size={20} />
@@ -1159,7 +1188,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
 
             <form
               onSubmit={sendMentorshipRequest}
-              className="p-4 sm:p-6 space-y-4 sm:space-y-6"
+              className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto custom-scrollbar flex-1"
             >
               <div>
                 <label
@@ -1177,8 +1206,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                     })
                   }
                   className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-28 sm:h-32 text-sm sm:text-base ${isDarkMode
-                      ? "bg-slate-800/50 border-blue-500/30 text-white"
-                      : "bg-white border-blue-300 text-gray-900"
+                    ? "bg-slate-800/50 border-blue-500/30 text-white"
+                    : "bg-white border-blue-300 text-gray-900"
                     }`}
                   placeholder="Introduce yourself and explain why you're interested in mentorship..."
                   required
@@ -1203,8 +1232,8 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                       })
                     }
                     className={`w-full px-2 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-xs sm:text-base ${isDarkMode
-                        ? "bg-slate-800/50 border-blue-500/30 text-white"
-                        : "bg-white border-blue-300 text-gray-900"
+                      ? "bg-slate-800/50 border-blue-500/30 text-white"
+                      : "bg-white border-blue-300 text-gray-900"
                       }`}
                   />
                 </div>
@@ -1226,20 +1255,116 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                       })
                     }
                     className={`w-full px-2 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-xs sm:text-base ${isDarkMode
-                        ? "bg-slate-800/50 border-blue-500/30 text-white"
-                        : "bg-white border-blue-300 text-gray-900"
+                      ? "bg-slate-800/50 border-blue-500/30 text-white"
+                      : "bg-white border-blue-300 text-gray-900"
                       }`}
                   />
                 </div>
               </div>
+
+              {/* Payment Section */}
+              {selectedMentor.fees > 0 && (
+                <div className={`p-4 rounded-xl border-2 ${isDarkMode ? 'bg-slate-800/30 border-blue-500/20' : 'bg-blue-50/30 border-blue-200'}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className={`text-sm font-semibold ${isDarkMode ? 'text-cyan-300' : 'text-cyan-600'}`}>Payment Details</h4>
+                    <div className="text-orange-500 font-bold">₹{selectedMentor.fees}</div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <p className={`text-xs font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Mentor's UPI ID</p>
+                      <HelpCircle size={12} className="text-gray-400" />
+                    </div>
+                    <div className={`p-3 rounded-xl border-2 flex items-center justify-between ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-blue-100'}`}>
+                      <code className="text-sm font-mono font-bold text-blue-500">{selectedMentor.upi_id || 'Not Provided'}</code>
+                      {selectedMentor.upi_id && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedMentor.upi_id);
+                            showNotification("UPI ID copied!", "success");
+                          }}
+                          className="text-blue-500 text-xs flex items-center gap-1 hover:text-blue-600"
+                        >
+                          <Copy size={14} />
+                          Copy
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {selectedMentor.upi_id && (
+                    <div className="flex flex-col items-center mb-4">
+                      <div className="bg-white p-2 rounded-lg shadow-sm mb-2">
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${selectedMentor.upi_id}&pn=${selectedMentor.name}&am=${selectedMentor.fees}&cu=INR`)}`}
+                          alt="UPI QR Code"
+                          className="w-28 h-28"
+                        />
+                      </div>
+                      <p className="text-[10px] text-gray-400">Scan to pay ₹{selectedMentor.fees}</p>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                      Payment Screenshot *
+                    </label>
+                    <div
+                      className={`cursor-pointer border-2 border-dashed rounded-xl p-6 transition-all group ${paymentScreenshot
+                        ? (isDarkMode ? 'border-green-500/50 bg-green-500/10' : 'border-green-500 bg-green-50/50')
+                        : (isDarkMode ? 'border-indigo-500/30 hover:border-indigo-500 hover:bg-indigo-500/5' : 'border-indigo-300 hover:border-indigo-500 hover:bg-indigo-50/50')
+                        }`}
+                      onClick={() => document.getElementById('payment_screenshot').click()}
+                    >
+                      <input
+                        type="file"
+                        id="payment_screenshot"
+                        accept="image/*"
+                        onChange={(e) => setPaymentScreenshot(e.target.files[0])}
+                        className="hidden"
+                        required
+                      />
+
+                      {paymentScreenshot ? (
+                        <div className="flex flex-col items-center">
+                          <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center mb-2 shadow-lg shadow-green-500/30">
+                            <CheckCircle size={24} />
+                          </div>
+                          <p className={`font-semibold ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>Screenshot Added</p>
+                          <p className={`text-xs mt-1 max-w-[200px] truncate ${isDarkMode ? 'text-green-500/70' : 'text-green-600/70'}`}>
+                            {paymentScreenshot.name}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center py-2 group-hover:scale-105 transition-transform duration-300">
+                          <div className={`p-3 rounded-full mb-3 ${isDarkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-600'}`}>
+                            <UploadCloud size={28} />
+                          </div>
+                          <p className={`text-base font-semibold mb-1 ${isDarkMode ? 'text-indigo-300' : 'text-indigo-700'}`}>
+                            Click to upload screenshot
+                          </p>
+                          <p className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                            JPG, PNG (max 5MB)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-gray-400 mt-2 italic flex items-center gap-1">
+                      <AlertCircle size={10} />
+                      Upload proof of payment before sending request
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowRequestForm(false)}
                   className={`flex-1 px-4 sm:px-6 py-2.5 sm:py-3 border-2 rounded-lg sm:rounded-xl transition-colors font-medium text-sm sm:text-base ${isDarkMode
-                      ? "border-blue-500/30 text-gray-300 hover:bg-slate-800"
-                      : "border-blue-300 text-gray-700 hover:bg-gray-50"
+                    ? "border-blue-500/30 text-gray-300 hover:bg-slate-800"
+                    : "border-blue-300 text-gray-700 hover:bg-gray-50"
                     }`}
                 >
                   Cancel
