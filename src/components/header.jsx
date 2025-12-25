@@ -887,37 +887,39 @@ export default function Header({ isDarkMode, toggleTheme }) {
                           : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200"
                           }`}
                       >
-                        <p className="font-bold flex flex-col">
-                          {auth.userType === "student" ? (
+                        <div className="flex flex-col py-0.5 overflow-hidden">
+                          {auth.userType === "student" && auth.userName && auth.userName.includes(" ") ? (
                             <>
                               <span
-                                className={`text-[10px] sm:text-sm font-bold truncate ${isDarkMode
-                                  ? "bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
-                                  : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
+                                className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider mb-0.5 ${isDarkMode
+                                  ? "text-blue-400/90"
+                                  : "text-blue-600/90"
                                   }`}
                               >
                                 {auth.userName.split(" ")[0]}
                               </span>
                               <span
-                                className={`text-[10px] sm:text-xs font-medium truncate ${isDarkMode
-                                  ? "bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
-                                  : "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                                className={`text-sm sm:text-base font-bold truncate ${isDarkMode
+                                  ? "text-gray-100"
+                                  : "text-blue-900"
                                   }`}
+                                title={auth.userName.split(" ").slice(1).join(" ")}
                               >
                                 {auth.userName.split(" ").slice(1).join(" ")}
                               </span>
                             </>
                           ) : (
                             <span
-                              className={`text-sm ${isDarkMode
-                                ? "bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
-                                : "bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                              className={`text-sm sm:text-base font-bold truncate ${isDarkMode
+                                ? "text-gray-100"
+                                : "text-blue-900"
                                 }`}
+                              title={auth.userName}
                             >
-                              {auth.userName}
+                              {auth.userName || "User"}
                             </span>
                           )}
-                        </p>
+                        </div>
                         <p
                           className={`text-xs mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"
                             }`}
