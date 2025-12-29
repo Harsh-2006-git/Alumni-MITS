@@ -150,7 +150,7 @@ export default function AlumniProfilePage() {
 
         if (response.ok) {
           const result = await response.json();
-          console.log("✅ Resume upload successful:", result);
+          console.log("✅ Resume upload successful", result);
 
           // Update user data with the new resume URL
           if (userData && result.resumeUrl) {
