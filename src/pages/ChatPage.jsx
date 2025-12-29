@@ -36,9 +36,11 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   const [isUserScrolling, setIsUserScrolling] = useState(false);
   const [isTyping, setIsTyping] = useState(false); // Typing indicator
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // Emoji picker state
+  const [longPressMessageId, setLongPressMessageId] = useState(null); // Long press state for mobile
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const longPressTimer = useRef(null);
 
   const COMMON_EMOJIS = [
     "👍", "❤️", "😂", "😮", "😢", "🔥", "🎉", "👏", "🙏", "💯",
@@ -712,7 +714,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
   return (
     <div
-      className={`h-screen flex flex-col overflow-hidden ${isDarkMode ? "bg-slate-900" : "bg-gray-100"
+      className={`h-screen flex flex-col overflow-hidden ${isDarkMode ? "bg-slate-950" : "bg-gray-200"
         }`}
     >
       {/* Header */}
@@ -982,9 +984,17 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                               className={`mb-4 flex ${isSent ? "justify-end" : "justify-start"
                                 }`}
                             >
-                              <div className={`max-w-[85%] sm:max-w-[70%] lg:max-w-md group relative`}>
+                              <div
+                                className={`max-w-[85%] sm:max-w-[70%] lg:max-w-md group relative`}
+                                onContextMenu={(e) => {
+                                  if (window.innerWidth < 1024 && isSent && !msg.isDeleted) {
+                                    e.preventDefault();
+                                    setLongPressMessageId(msg.id || msg._id);
+                                  }
+                                }}
+                              >
                                 <div
-                                  className={`rounded-2xl px-4 py-2.5 shadow-sm ${msg.isDeleted
+                                  className={`rounded-2xl px-3 py-1.5 lg:px-4 lg:py-2.5 shadow-sm ${msg.isDeleted
                                     ? "bg-gray-200 text-gray-500 italic border border-gray-300"
                                     : isSent
                                       ? "bg-purple-600 text-white rounded-tr-none sm:rounded-tr-2xl sm:rounded-br-sm"
@@ -993,7 +1003,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                                         : "bg-white text-gray-900 rounded-tl-none sm:rounded-tl-2xl sm:rounded-bl-sm border border-gray-200"
                                     }`}
                                 >
-                                  <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
+                                  <p className="text-xs lg:text-sm leading-relaxed break-words whitespace-pre-wrap">
                                     {msg.text}
                                   </p>
                                 </div>
@@ -1404,9 +1414,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       }}
                       onKeyPress={handleKeyPress}
                       placeholder="Type a message"
-                      className={`flex-1 px-4 py-2.5 rounded-full focus:outline-none ${isDarkMode
-                        ? "bg-slate-700 text-white placeholder-gray-500"
-                        : "bg-gray-100 text-gray-900 placeholder-gray-400"
+                      className={`flex-1 px-4 py-2.5 rounded-full focus:outline-none border md:border-0 ${isDarkMode
+                        ? "bg-slate-700 text-white placeholder-gray-500 border-slate-600"
+                        : "bg-gray-100 text-gray-900 placeholder-gray-400 border-gray-300"
                         }`}
                       disabled={loading}
                     />
@@ -1526,7 +1536,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmationId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className={`w-full max-w-sm rounded-2xl p-6 shadow-xl transform transition-all ${isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white"
             }`}>
             <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
@@ -1556,7 +1566,58 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         </div>
       )}
 
-      <div className="flex-shrink-0">
+      {/* Mobile Long Press Menu */}
+      {longPressMessageId && (
+        <div
+          className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-fadeIn"
+          onClick={() => setLongPressMessageId(null)}
+        >
+          <div
+            className={`w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl animate-slideUp ${isDarkMode ? "bg-slate-800 border-t sm:border border-slate-700" : "bg-white"
+              }`}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-12 h-1.5 bg-gray-300 dark:bg-slate-600 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <h3 className={`text-center font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              Message Options
+            </h3>
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  const msg = messages.find(m => (m.id || m._id) === longPressMessageId);
+                  if (msg) startEditing(msg);
+                  setLongPressMessageId(null);
+                }}
+                className={`w-full flex items-center justify-center gap-3 px-4 py-4 rounded-2xl font-semibold transition-all active:scale-95 ${isDarkMode ? "bg-slate-700 text-white hover:bg-slate-600" : "bg-purple-50 text-purple-700 hover:bg-purple-100"
+                  }`}
+              >
+                <Edit2 className="w-5 h-5" />
+                Edit Message
+              </button>
+              <button
+                onClick={() => {
+                  handleDeleteMessage(longPressMessageId);
+                  setLongPressMessageId(null);
+                }}
+                className={`w-full flex items-center justify-center gap-3 px-4 py-4 rounded-2xl font-semibold transition-all active:scale-95 ${isDarkMode ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" : "bg-red-50 text-red-600 hover:bg-red-100"
+                  }`}
+              >
+                <Trash2 className="w-5 h-5" />
+                Delete Message
+              </button>
+              <button
+                onClick={() => setLongPressMessageId(null)}
+                className={`w-full px-4 py-4 rounded-2xl font-bold transition-all mt-4 ${isDarkMode ? "bg-slate-900 text-gray-400" : "bg-gray-100 text-gray-600"
+                  }`}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="flex-shrink-0 hidden lg:block">
         <Footer isDarkMode={isDarkMode} />
       </div>
     </div>
