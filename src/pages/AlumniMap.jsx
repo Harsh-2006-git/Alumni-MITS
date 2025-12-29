@@ -23,8 +23,26 @@ export default function AlumniMap({
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
+        // Get token for authentication check
+        const storedAuth = localStorage.getItem("auth");
+        let headers = {
+          "Content-Type": "application/json",
+        };
+
+        if (storedAuth) {
+          try {
+            const authData = JSON.parse(storedAuth);
+            if (authData?.accessToken) {
+              headers["Authorization"] = `Bearer ${authData.accessToken}`;
+            }
+          } catch (e) {
+            console.error("Error parsing auth data:", e);
+          }
+        }
+
         const response = await fetch(
-          `${BASE_URL}/alumni/all-alumni`
+          `${BASE_URL}/alumni/all-alumni`,
+          { headers }
         );
         const result = await response.json();
         if (result.success) {

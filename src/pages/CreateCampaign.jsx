@@ -16,6 +16,7 @@ export default function CreateCampaignPage({
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showCampaignDialog, setShowCampaignDialog] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success Modal State
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   const [formData, setFormData] = useState({
@@ -29,6 +30,7 @@ export default function CreateCampaignPage({
     projectLink: "",
     github: "",
     contact: "",
+    upiId: "",
   });
 
   useEffect(() => {
@@ -145,6 +147,11 @@ export default function CreateCampaignPage({
       return;
     }
 
+    if (!formData.upiId) {
+      showMessage("UPI ID is required", "error");
+      return;
+    }
+
     let token = null;
     try {
       const authData = localStorage.getItem("auth");
@@ -193,9 +200,9 @@ export default function CreateCampaignPage({
       const data = await response.json();
 
       if (response.ok) {
-        showMessage("Campaign created successfully!", "success");
         resetForm();
         setShowCampaignDialog(false);
+        setShowSuccessModal(true); // Show success modal
       } else {
         showMessage(data.message || "Error creating campaign", "error");
       }
@@ -219,6 +226,7 @@ export default function CreateCampaignPage({
       projectLink: "",
       github: "",
       contact: "",
+      upiId: "",
     });
     setSelectedFiles([]);
   };
@@ -704,6 +712,25 @@ export default function CreateCampaignPage({
                     />
                   </div>
 
+                  {/* UPI ID */}
+                  <div>
+                    <label className="block mb-2 font-semibold text-sm">
+                      UPI ID for Funds *
+                    </label>
+                    <input
+                      type="text"
+                      name="upiId"
+                      value={formData.upiId}
+                      onChange={handleInputChange}
+                      placeholder="yourname@upi"
+                      required
+                      className={`w-full px-3 py-2 rounded-lg border text-sm ${isDarkMode
+                        ? "bg-slate-800 border-cyan-500/20 text-white placeholder-gray-400"
+                        : "bg-gray-50 border-blue-200 text-gray-900 placeholder-gray-500"
+                        }`}
+                    />
+                  </div>
+
                   {/* Images */}
                   <div>
                     <label className="block mb-2 font-semibold text-sm">
@@ -796,6 +823,30 @@ export default function CreateCampaignPage({
                 </form>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className={`w-full max-w-md rounded-2xl p-8 shadow-2xl text-center transform transition-all scale-100 ${isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white"
+            }`}>
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h3 className={`text-2xl font-bold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              Campaign Successfully Submitted!
+            </h3>
+            <p className={`text-base mb-8 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              Your campaign is now under verification. Once our admin verifies it, it will be visible to everyone.
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              Okay, Great!
+            </button>
           </div>
         </div>
       )}

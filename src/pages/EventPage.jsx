@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   MapPin,
@@ -65,247 +66,15 @@ const Message = ({ type, message, onClose }) => {
   );
 };
 
-function AddEventModal({ isDarkMode, onClose, onSubmit, submitting }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    date: "",
-    location: "",
 
-    organizer: "",
-    category: "educational",
-    type: "in-person",
-    maxAttendees: 50,
-    image: "",
-  });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit(formData);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        name === "maxAttendees" ? Number(value) : value,
-    }));
-  };
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div
-        className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl ${isDarkMode ? "bg-slate-900 text-white" : "bg-white text-gray-900"
-          }`}
-      >
-        <div
-          className={`sticky top-0 flex items-center justify-between p-4 sm:p-6 border-b backdrop-blur-sm z-10 ${isDarkMode
-            ? "border-slate-800 bg-slate-900/95"
-            : "border-gray-200 bg-white/95"
-            }`}
-        >
-          <h2 className="text-xl sm:text-2xl font-bold">Create New Event</h2>
-          <button
-            onClick={onClose}
-            className={`p-2 rounded-lg transition-all ${isDarkMode ? "hover:bg-slate-800" : "hover:bg-gray-100"
-              }`}
-            disabled={submitting}
-          >
-            <X className="w-5 h-5 sm:w-6 sm:h-6" />
-          </button>
-        </div>
-        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Title</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                ? "bg-slate-800 border-slate-700 text-white"
-                : "bg-white border-gray-300 text-gray-900"
-                } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Description
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              rows={3}
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                ? "bg-slate-800 border-slate-700 text-white"
-                : "bg-white border-gray-300 text-gray-900"
-                } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Date</label>
-              <input
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                  ? "bg-slate-800 border-slate-700 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Location</label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                required
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                  ? "bg-slate-800 border-slate-700 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Max Attendees
-              </label>
-              <input
-                type="number"
-                name="maxAttendees"
-                value={formData.maxAttendees}
-                onChange={handleChange}
-                required
-                min="1"
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                  ? "bg-slate-800 border-slate-700 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Category</label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                  ? "bg-slate-800 border-slate-700 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-              >
-                <option value="tech">Tech</option>
-                <option value="trainig and mentorships">
-                  Training and Mentorships
-                </option>
-                <option value="cultural">Cultural</option>
-                <option value="sports">Sports</option>
-                <option value="educational">Educational</option>
-                <option value="special">Special</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">Type</label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                  ? "bg-slate-800 border-slate-700 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-                  } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-              >
-                <option value="in-person">In-Person</option>
-                <option value="virtual">Virtual</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Organizer</label>
-            <input
-              type="text"
-              name="organizer"
-              value={formData.organizer}
-              onChange={handleChange}
-              required
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                ? "bg-slate-800 border-slate-700 text-white"
-                : "bg-white border-gray-300 text-gray-900"
-                } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Image URL</label>
-            <input
-              type="url"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              placeholder="https://example.com/image.jpg"
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border ${isDarkMode
-                ? "bg-slate-800 border-slate-700 text-white"
-                : "bg-white border-gray-300 text-gray-900"
-                } focus:outline-none focus:ring-2 focus:ring-purple-500`}
-            />
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="flex-1 px-4 sm:px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-500 text-white hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {submitting ? (
-                <>
-                  <Loader className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                  Create Event
-                </>
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={submitting}
-              className={`px-4 sm:px-6 py-3 rounded-xl font-semibold border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode
-                ? "border-gray-700 text-white hover:bg-gray-800"
-                : "border-gray-300 text-gray-700 hover:bg-gray-50"
-                }`}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [registering, setRegistering] = useState(null);
@@ -338,51 +107,6 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
       console.error("Error fetching events:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleAddEvent = async (formData) => {
-    try {
-      setSubmitting(true);
-      const authData = localStorage.getItem("auth");
-      const token = authData ? JSON.parse(authData).accessToken : null;
-      if (!token) {
-        showMessage("error", "Please login to create an event");
-        return;
-      }
-      const response = await fetch(
-        `${BASE_URL}/event/add-event`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        await fetchEvents();
-        setShowAddModal(false);
-        showMessage(
-          "success",
-          "Event created successfully! 🎉 Your event is now under varification."
-        );
-      } else {
-        showMessage(
-          "error",
-          data.message || "Failed to create event. Please try again."
-        );
-      }
-    } catch (error) {
-      console.error("Error creating event:", error);
-      showMessage(
-        "error",
-        "Error creating event. Please check your connection and try again."
-      );
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -845,7 +569,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
               selectedCategory === "all" &&
               selectedType === "all" && (
                 <button
-                  onClick={() => setShowAddModal(true)}
+                  onClick={() => navigate('/event-register')}
                   className="mt-4 px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-500 text-white transition-all hover:shadow-lg hover:scale-105 flex items-center gap-2 mx-auto text-sm sm:text-base"
                 >
                   <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -855,14 +579,6 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
           </div>
         )}
       </section>
-      {showAddModal && (
-        <AddEventModal
-          isDarkMode={isDarkMode}
-          onClose={() => setShowAddModal(false)}
-          onSubmit={handleAddEvent}
-          submitting={submitting}
-        />
-      )}
       <Footer isDarkMode={isDarkMode} />
       <style>{`
         @keyframes fadeIn {

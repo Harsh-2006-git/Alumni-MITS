@@ -32,6 +32,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import ProfilePhotoUpload from "../components/ProfilePhotoUpload";
 import { cityCoordinates } from "../data/cities";
+import { branches as branchList } from "../data/branches";
 
 // Use the environment variable - this will work in JSX without TypeScript errors
 const API_URL = import.meta.env.VITE_API_BASE_URL
@@ -289,18 +290,7 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
   const [error, setError] = useState("");
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 
-  const branches = [
-    "Computer Science Engineering",
-    "Information Technology",
-    "Electronics Engineering",
-    "Electrical Engineering",
-    "Mechanical Engineering",
-    "Civil Engineering",
-    "Chemical Engineering",
-    "Architecture",
-    "Internet of Things",
-    "Artificial Intelligence & Data Science",
-  ];
+  const branches = branchList;
 
   const years = Array.from({ length: 15 }, (_, i) => (new Date().getFullYear() + 4 - i).toString());
 
@@ -1391,7 +1381,7 @@ export default function LoginPage({
                         className={`text-[10px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
                           }`}
                       >
-                        IT, II Year
+                        Information Technology, II Year
                       </p>
                       <div className="flex gap-2 mt-2 justify-center">
                         {[

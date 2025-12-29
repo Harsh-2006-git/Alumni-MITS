@@ -18,6 +18,10 @@ import {
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+import { branches } from "../data/branches";
+
+const currentYear = new Date().getFullYear();
+const batchYears = Array.from({ length: currentYear + 5 - 1960 }, (_, i) => 1960 + i).reverse();
 
 const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
     const [myMentorProfile, setMyMentorProfile] = useState(null);
@@ -664,8 +668,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                                             >
                                                 Batch Year *
                                             </label>
-                                            <input
-                                                type="number"
+                                            <select
                                                 value={mentorForm.batch_year}
                                                 onChange={(e) =>
                                                     setMentorForm({
@@ -678,7 +681,14 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                                                     : "bg-white border-blue-300 text-gray-900"
                                                     }`}
                                                 required
-                                            />
+                                            >
+                                                <option value="">Select Batch Year</option>
+                                                {batchYears.map((year) => (
+                                                    <option key={year} value={year}>
+                                                        {year}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
 
                                         <div>
@@ -688,8 +698,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                                             >
                                                 Branch *
                                             </label>
-                                            <input
-                                                type="text"
+                                            <select
                                                 value={mentorForm.branch}
                                                 onChange={(e) =>
                                                     setMentorForm({
@@ -702,7 +711,14 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                                                     : "bg-white border-blue-300 text-gray-900"
                                                     }`}
                                                 required
-                                            />
+                                            >
+                                                <option value="">Select Branch</option>
+                                                {branches.map((branch) => (
+                                                    <option key={branch} value={branch}>
+                                                        {branch}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
 
                                         <div>

@@ -82,6 +82,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
   const [showMessage, setShowMessage] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
   const [showEventDialog, setShowEventDialog] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // Success Modal
 
   // Check if user is logged in
   const isLoggedIn = () => {
@@ -243,10 +244,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
       }
 
       if (response.ok) {
-        displayMessage(
-          "success",
-          "🎉 Event created successfully! Your event is now under verification and will be visible soon."
-        );
+        setShowSuccessModal(true); // Show success modal
 
         // Reset form
         setFormData({
@@ -876,6 +874,30 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
                 </form>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <div className={`w-full max-w-md rounded-2xl p-8 shadow-2xl text-center transform transition-all scale-100 ${isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white"
+            }`}>
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+              <CheckCircle className="h-10 w-10 text-green-600" />
+            </div>
+            <h3 className={`text-2xl font-bold mb-3 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              Event Successfully Created!
+            </h3>
+            <p className={`text-base mb-8 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              Your event created successfully! Your event is now under verification and will be visible soon.
+            </p>
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full px-6 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              Okay, Thanks!
+            </button>
           </div>
         </div>
       )}

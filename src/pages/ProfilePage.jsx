@@ -39,6 +39,7 @@ import {
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+import { branches } from "../data/branches";
 
 export default function AlumniProfilePage() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -54,16 +55,25 @@ export default function AlumniProfilePage() {
   const [uploadingResume, setUploadingResume] = useState(false);
   const [resumeFile, setResumeFile] = useState(null);
   const [showResumeModal, setShowResumeModal] = useState(false);
+  const [userType, setUserType] = useState(null);
   const [formData, setFormData] = useState({});
   const [tempSkill, setTempSkill] = useState("");
   const [tempAchievement, setTempAchievement] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoFile, setPhotoFile] = useState(null);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
-
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   useEffect(() => {
+    const authData = localStorage.getItem("auth");
+    if (authData) {
+      try {
+        const parsed = JSON.parse(authData);
+        setUserType(parsed.userType);
+      } catch (error) {
+        console.error("Error parsing auth data:", error);
+      }
+    }
     fetchUserData();
   }, []);
 
@@ -198,10 +208,16 @@ export default function AlumniProfilePage() {
         setIsLoading(false);
         return;
       }
-      console.log("✅ Access Token:", token);
+      const authData = localStorage.getItem("auth");
+      const parsedAuth = authData ? JSON.parse(authData) : null;
+      const currentUserType = parsedAuth?.userType || "student";
+
+      const endpoint = currentUserType === "alumni"
+        ? "/alumni/get-profile-alumni"
+        : "/alumni/get-profile-student";
 
       const response = await fetch(
-        `${API_BASE_URL}/alumni/get-profile-student`,
+        `${API_BASE_URL}${endpoint}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -223,7 +239,7 @@ export default function AlumniProfilePage() {
 
       const data = await response.json();
       console.log(data);
-      setUserData(data.student);
+      setUserData(data.student || data.alumni);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -244,14 +260,22 @@ export default function AlumniProfilePage() {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/alumni/profile-student`, {
+      const authData = localStorage.getItem("auth");
+      const parsedAuth = authData ? JSON.parse(authData) : null;
+      const currentUserType = parsedAuth?.userType || "student";
+
+      const endpoint = currentUserType === "alumni"
+        ? "/alumni/profile-alumni"
+        : "/alumni/profile-student";
+
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          alumniId: userData.id,
+          [currentUserType === "alumni" ? "alumniId" : "alumniId"]: userData.id,
           ...updates,
         }),
       });
@@ -932,9 +956,7 @@ export default function AlumniProfilePage() {
                     : "bg-gray-100 text-gray-900"
                     }`}
                 />
-                <input
-                  type="text"
-                  placeholder="Branch"
+                <select
                   value={formData.branch || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, branch: e.target.value })
@@ -943,7 +965,10 @@ export default function AlumniProfilePage() {
                     ? "bg-slate-800 text-white"
                     : "bg-gray-100 text-gray-900"
                     }`}
-                />
+                >
+                  <option value="">Select Branch</option>
+                  {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                </select>
               </div>
             )}
 
@@ -964,9 +989,7 @@ export default function AlumniProfilePage() {
                         : "bg-gray-100 text-gray-900"
                         }`}
                     />
-                    <input
-                      type="text"
-                      placeholder="Branch"
+                    <select
                       value={formData.branch || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, branch: e.target.value })
@@ -975,7 +998,10 @@ export default function AlumniProfilePage() {
                         ? "bg-slate-800 text-white"
                         : "bg-gray-100 text-gray-900"
                         }`}
-                    />
+                    >
+                      <option value="">Select Branch</option>
+                      {branches.map(b => <option key={b} value={b}>{b}</option>)}
+                    </select>
                   </div>
                   <textarea
                     value={formData.about || ""}
@@ -2149,14 +2175,17 @@ export default function AlumniProfilePage() {
           <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
             {/* Profile Image */}
             <div className="relative group flex-shrink-0 mx-auto md:mx-0">
-              <img
-                src={
-                  userData.profilePhoto ||
-                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.name}`
-                }
-                alt={userData.name}
-                className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-xl sm:rounded-2xl border-4 border-white shadow-xl object-cover"
-              />
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-xl sm:rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                {userData.profilePhoto ? (
+                  <img
+                    src={userData.profilePhoto}
+                    alt={userData.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400" />
+                )}
+              </div>
               <button
                 onClick={() => setShowPhotoModal(true)}
                 className="absolute inset-0 bg-black/60 rounded-xl sm:rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
@@ -2178,10 +2207,10 @@ export default function AlumniProfilePage() {
                     {userData.name}
                   </h1>
                   <p
-                    className={`text-base sm:text-lg ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    className={`text-base sm:text-lg font-semibold ${isDarkMode ? "text-blue-300" : "text-blue-600"
                       }`}
                   >
-                    {profile.branch || "Not specified"}
+                    {userData.branch || profile.branch || "Not specified"}
                   </p>
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-3 text-xs sm:text-sm flex-wrap">
                     <span

@@ -28,6 +28,14 @@ import ForgotPasswordPopup from "../components/ForgotPasswordPopup";
 import VerificationPendingPopup from "../components/VerificationPendingPopup";
 import ProfilePhotoUpload from "../components/ProfilePhotoUpload";
 import { cityCoordinates } from "../data/cities";
+import { branches } from "../data/branches";
+
+const currentYear = new Date().getFullYear();
+const batchYears = Array.from({ length: 60 }, (_, i) => {
+  const start = currentYear - i;
+  return `${start}-${start + 4}`;
+});
+
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/auth`
   : "http://localhost:3001/auth";
@@ -265,10 +273,6 @@ export default function AlumniAuth({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (regStep < 3) {
-      handleNextStep(e);
-      return;
-    }
     setError("");
     setSuccessMessage("");
     setLoading(true);
@@ -936,253 +940,203 @@ ${isDarkMode
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between mb-8 max-w-xs mx-auto">
-                      {[1, 2, 3].map((s) => (
-                        <div key={s} className="flex items-center flex-1 last:flex-none">
-                          <div
-                            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${regStep >= s
-                              ? "bg-purple-600 text-white shadow-lg"
-                              : isDarkMode
-                                ? "bg-slate-800 text-gray-500"
-                                : "bg-gray-100 text-gray-400"
-                              }`}
-                          >
-                            {regStep > s ? "✓" : s}
-                          </div>
-                          {s < 3 && (
-                            <div className={`flex-1 h-0.5 mx-2 ${regStep > s ? "bg-purple-600" : isDarkMode ? "bg-slate-800" : "bg-gray-100"}`} />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-
                     <h2
                       className={`text-xl sm:text-3xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                     >
-                      {regStep === 1 ? "Account Info" : regStep === 2 ? "Education" : "Last Steps"}
+                      Complete Your Profile
                     </h2>
+                    <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                      One final step to join the prestigious MITS Alumni Network
+                    </p>
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-5">
-                    <AnimatePresence mode="wait">
-                      {regStep === 1 && (
-                        <motion.div
-                          key="step1"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className="space-y-4"
-                        >
-                          <div>
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Full Name</label>
-                            <div className="relative">
-                              <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
-                              <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500`}
-                                placeholder="John Doe"
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Email</label>
-                            <div className="relative">
-                              <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
-                              <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                readOnly={googleVerified}
-                                className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ${googleVerified ? "opacity-75 cursor-not-allowed" : ""}`}
-                                placeholder="you@example.com"
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Phone Number</label>
-                            <div className="relative">
-                              <Phone className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
-                              <input
-                                type="tel"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500`}
-                                placeholder="+91 1234567890"
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Password</label>
-                            <div className="relative">
-                              <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
-                              <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className={`w-full pl-10 sm:pl-11 pr-12 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500`}
-                                placeholder="••••••••"
-                                required
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                              >
-                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                              </button>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-
-                      {regStep === 2 && (
-                        <motion.div
-                          key="step2"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className="space-y-4"
-                        >
-                          <div>
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Branch</label>
-                            <div className="relative">
-                              <GraduationCap className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
-                              <input
-                                type="text"
-                                name="branch"
-                                value={formData.branch}
-                                onChange={handleChange}
-                                className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500`}
-                                placeholder="Computer Science Engineering"
-                                required
-                              />
-                            </div>
-                          </div>
-
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Account Information Section */}
+                      <div className="space-y-4">
+                        <h3 className={`text-sm font-bold uppercase tracking-wider ${isDarkMode ? "text-purple-400" : "text-purple-600"}`}>Account Details</h3>
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Full Name</label>
                           <div className="relative">
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Batch Year</label>
-                            <div className="relative">
-                              <Calendar className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 z-10 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
-                              <button
-                                type="button"
-                                onClick={() => setShowYearPicker(!showYearPicker)}
-                                className={`w-full pl-10 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition-all flex items-center justify-between ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"}`}
-                              >
-                                <span className="truncate">{formData.batchYear || "Select Batch Year"}</span>
-                                <ChevronDown className={`w-4 h-4 transition-transform ${showYearPicker ? "rotate-180" : ""}`} />
-                              </button>
-                              {showYearPicker && (
-                                <div className={`absolute z-50 mt-1 w-full rounded-xl shadow-xl border overflow-hidden ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-gray-200"}`}>
-                                  <div className="p-3">
-                                    <div className="flex justify-between items-center mb-3">
-                                      <button type="button" onClick={() => setCurrentYearRange(currentYearRange - 4)} className="p-1 hover:bg-purple-100 rounded text-purple-600 font-bold">←</button>
-                                      <span className="text-xs font-bold">{currentYearRange}-{currentYearRange + 3}</span>
-                                      <button type="button" onClick={() => setCurrentYearRange(currentYearRange + 4)} className="p-1 hover:bg-purple-100 rounded text-purple-600 font-bold">→</button>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                      {Array.from({ length: 4 }, (_, i) => {
-                                        const year = currentYearRange + i;
-                                        const range = `${year}-${year + 4}`;
-                                        return (
-                                          <button
-                                            key={year}
-                                            type="button"
-                                            onClick={() => {
-                                              setFormData({ ...formData, batchYear: range });
-                                              setShowYearPicker(false);
-                                            }}
-                                            className={`p-2 rounded text-xs font-semibold ${formData.batchYear === range ? "bg-purple-600 text-white" : isDarkMode ? "bg-slate-700 text-gray-300" : "bg-gray-100 text-gray-700"}`}
-                                          >
-                                            {range}
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
+                            <User className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <input
+                              type="text"
+                              name="name"
+                              value={formData.name}
+                              onChange={handleChange}
+                              className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
+                              placeholder="John Doe"
+                              required
+                            />
                           </div>
-                        </motion.div>
-                      )}
+                        </div>
 
-                      {regStep === 3 && (
-                        <motion.div
-                          key="step3"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className="space-y-4"
-                        >
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Email</label>
                           <div className="relative">
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Location</label>
-                            <div className="relative">
-                              <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
-                              <input
-                                type="text"
-                                name="location"
-                                value={formData.location}
-                                onChange={(e) => { handleChange(e); setShowLocationDropdown(true); }}
-                                className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500`}
-                                placeholder="City, Country"
-                                required
-                              />
-                            </div>
+                            <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <input
+                              type="email"
+                              name="email"
+                              value={formData.email}
+                              readOnly={googleVerified}
+                              className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20 ${googleVerified ? "opacity-75 cursor-not-allowed" : ""}`}
+                              placeholder="you@example.com"
+                              required
+                            />
                           </div>
+                        </div>
 
-                          <div>
-                            <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>LinkedIn URL</label>
-                            <div className="relative">
-                              <Link className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
-                              <input
-                                type="url"
-                                name="linkedinUrl"
-                                value={formData.linkedinUrl}
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Phone Number</label>
+                          <div className="relative">
+                            <Phone className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleChange}
+                              className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
+                              placeholder="+91 1234567890"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Password</label>
+                          <div className="relative">
+                            <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <input
+                              type={showPassword ? "text" : "password"}
+                              name="password"
+                              value={formData.password}
+                              onChange={handleChange}
+                              className={`w-full pl-10 sm:pl-11 pr-12 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
+                              placeholder="••••••••"
+                              required
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            >
+                              {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Professional Information Section */}
+                      <div className="space-y-4">
+                        <h3 className={`text-sm font-bold uppercase tracking-wider ${isDarkMode ? "text-purple-400" : "text-purple-600"}`}>Academic & Pro</h3>
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Branch</label>
+                          <div className="relative">
+                            <GraduationCap className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <select
+                              name="branch"
+                              value={formData.branch}
+                              onChange={handleChange}
+                              className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition appearance-none ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
+                              required
+                            >
+                              <option value="">Select Branch</option>
+                              {branches.map((branch) => (
+                                <option key={branch} value={branch}>{branch}</option>
+                              ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Batch Year</label>
+                          <div className="flex gap-2">
+                            <div className="relative flex-1">
+                              <Calendar className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                              <select
+                                name="batchYear"
+                                value={formData.batchYear}
                                 onChange={handleChange}
-                                className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500`}
-                                placeholder="https://linkedin.com/in/..."
+                                className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition appearance-none ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
                                 required
-                              />
+                              >
+                                <option value="">Select Batch Year</option>
+                                {batchYears.map((year) => (
+                                  <option key={year} value={year}>{year}</option>
+                                ))}
+                              </select>
+                              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                             </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = new Date().getFullYear();
+                                const batchString = `${current}-${current + 4}`;
+                                setFormData(prev => ({ ...prev, batchYear: batchString }));
+                              }}
+                              className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors ${isDarkMode
+                                ? "bg-slate-800 text-purple-400 border border-slate-700 hover:bg-slate-700"
+                                : "bg-purple-50 text-purple-600 border border-purple-200 hover:bg-purple-100"
+                                }`}
+                            >
+                              Current Batch
+                            </button>
                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                        </div>
 
-                    <div className="flex gap-4 mt-8">
-                      {regStep > 1 && (
-                        <button
-                          type="button"
-                          onClick={handlePrevStep}
-                          className={`flex-1 py-3 rounded-xl font-semibold text-sm transition ${isDarkMode ? "bg-slate-800 text-white border border-slate-700" : "bg-gray-100 text-gray-700"}`}
-                        >
-                          Back
-                        </button>
-                      )}
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Current Location</label>
+                          <div className="relative">
+                            <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <input
+                              type="text"
+                              name="location"
+                              value={formData.location}
+                              onChange={handleChange}
+                              className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
+                              placeholder="City, Country"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>LinkedIn URL</label>
+                          <div className="relative">
+                            <Link className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <input
+                              type="url"
+                              name="linkedinUrl"
+                              value={formData.linkedinUrl}
+                              onChange={handleChange}
+                              className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
+                              placeholder="https://linkedin.com/in/..."
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-8">
                       <button
                         type="submit"
                         disabled={loading}
-                        className={`flex-[2] py-3 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${isDarkMode
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg"
-                          : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg"
+                        className={`w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-95 ${isDarkMode
+                          ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/25"
+                          : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/20"
                           }`}
                       >
                         {loading ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
-                          regStep < 3 ? "Continue" : "Complete Registration"
+                          <>
+                            <CheckCircle className="w-5 h-5" />
+                            Create Alumni Account
+                          </>
                         )}
                       </button>
                     </div>

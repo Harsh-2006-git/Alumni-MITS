@@ -45,42 +45,37 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div
-        className={`rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all ${
-          isDarkMode
-            ? "bg-slate-900 border border-slate-700"
-            : "bg-white border border-gray-100"
-        }`}
+        className={`rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all ${isDarkMode
+          ? "bg-slate-900 border border-slate-700"
+          : "bg-white border border-gray-100"
+          }`}
       >
         <div
-          className={`sticky top-0 border-b px-6 py-5 flex justify-between items-center backdrop-blur-sm ${
-            isDarkMode
-              ? "bg-slate-900/95 border-slate-700"
-              : "bg-white/95 border-gray-200"
-          }`}
+          className={`sticky top-0 border-b px-6 py-5 flex justify-between items-center backdrop-blur-sm ${isDarkMode
+            ? "bg-slate-900/95 border-slate-700"
+            : "bg-white/95 border-gray-200"
+            }`}
         >
           <div>
             <h2
-              className={`text-2xl font-semibold tracking-tight ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-2xl font-semibold tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               Edit Event
             </h2>
             <p
-              className={`text-sm mt-1 ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
-              }`}
+              className={`text-sm mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
             >
               Update event details and information
             </p>
           </div>
           <button
             onClick={onClose}
-            className={`p-2.5 rounded-xl transition-all hover:rotate-90 ${
-              isDarkMode
-                ? "hover:bg-slate-800 text-gray-400 hover:text-white"
-                : "hover:bg-gray-100 text-gray-500 hover:text-gray-900"
-            }`}
+            className={`p-2.5 rounded-xl transition-all hover:rotate-90 ${isDarkMode
+              ? "hover:bg-slate-800 text-gray-400 hover:text-white"
+              : "hover:bg-gray-100 text-gray-500 hover:text-gray-900"
+              }`}
           >
             <X size={20} />
           </button>
@@ -90,9 +85,8 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
           <div className="p-6 space-y-5">
             <div>
               <label
-                className={`block text-sm font-semibold mb-2 ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 Event Title
               </label>
@@ -101,19 +95,17 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                 value={formData.title}
                 onChange={(e) => handleChange("title", e.target.value)}
                 placeholder="Enter event title"
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
               />
             </div>
 
             <div>
               <label
-                className={`block text-sm font-semibold mb-2 ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 Description
               </label>
@@ -121,20 +113,18 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
                 placeholder="Describe your event"
-                className={`w-full px-4 py-3 rounded-xl border-2 h-28 resize-none transition-all focus:ring-4 focus:outline-none ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border-2 h-28 resize-none transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   <Calendar size={16} />
                   Event Date
@@ -143,19 +133,17 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                   type="date"
                   value={formData.date ? formData.date.split("T")[0] : ""}
                   onChange={(e) => handleChange("date", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   <MapPin size={16} />
                   Location
@@ -165,11 +153,10 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                   value={formData.location}
                   onChange={(e) => handleChange("location", e.target.value)}
                   placeholder="Event location"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
             </div>
@@ -177,9 +164,8 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   <DollarSign size={16} />
                   Price
@@ -191,19 +177,17 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                     handleChange("price", Number(e.target.value))
                   }
                   placeholder="0"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   <Users size={16} />
                   Max Attendees
@@ -215,20 +199,18 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                     handleChange("maxAttendees", Number(e.target.value))
                   }
                   placeholder="100"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
             </div>
 
             <div>
               <label
-                className={`block text-sm font-semibold mb-2 ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 Organizer
               </label>
@@ -237,31 +219,28 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                 value={formData.organizer}
                 onChange={(e) => handleChange("organizer", e.target.value)}
                 placeholder="Organizer name"
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Category
                 </label>
                 <select
                   value={formData.category}
                   onChange={(e) => handleChange("category", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 >
                   <option value="educational">Educational</option>
                   <option value="networking">Networking</option>
@@ -272,20 +251,18 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Event Type
                 </label>
                 <select
                   value={formData.type}
                   onChange={(e) => handleChange("type", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 >
                   <option value="in-person">In-Person</option>
                   <option value="online">Online</option>
@@ -296,9 +273,8 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
 
             <div>
               <label
-                className={`block text-sm font-semibold mb-2 ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 Image URL
               </label>
@@ -307,18 +283,16 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
                 value={formData.image}
                 onChange={(e) => handleChange("image", e.target.value)}
                 placeholder="https://example.com/image.jpg"
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
               />
             </div>
 
             <div
-              className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${
-                isDarkMode ? "border-slate-700" : "border-gray-200"
-              }`}
+              className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${isDarkMode ? "border-slate-700" : "border-gray-200"
+                }`}
             >
               <button
                 onClick={() => onSave(formData)}
@@ -328,11 +302,10 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
               </button>
               <button
                 onClick={onClose}
-                className={`px-6 py-3.5 rounded-xl font-semibold transition-all hover:scale-[1.02] ${
-                  isDarkMode
-                    ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200"
-                }`}
+                className={`px-6 py-3.5 rounded-xl font-semibold transition-all hover:scale-[1.02] ${isDarkMode
+                  ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200"
+                  }`}
               >
                 Cancel
               </button>
@@ -355,42 +328,37 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div
-        className={`rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all ${
-          isDarkMode
-            ? "bg-slate-900 border border-slate-700"
-            : "bg-white border border-gray-100"
-        }`}
+        className={`rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden shadow-2xl transform transition-all ${isDarkMode
+          ? "bg-slate-900 border border-slate-700"
+          : "bg-white border border-gray-100"
+          }`}
       >
         <div
-          className={`sticky top-0 border-b px-6 py-5 flex justify-between items-center backdrop-blur-sm ${
-            isDarkMode
-              ? "bg-slate-900/95 border-slate-700"
-              : "bg-white/95 border-gray-200"
-          }`}
+          className={`sticky top-0 border-b px-6 py-5 flex justify-between items-center backdrop-blur-sm ${isDarkMode
+            ? "bg-slate-900/95 border-slate-700"
+            : "bg-white/95 border-gray-200"
+            }`}
         >
           <div>
             <h2
-              className={`text-2xl font-semibold tracking-tight ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-2xl font-semibold tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               Edit Job Posting
             </h2>
             <p
-              className={`text-sm mt-1 ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
-              }`}
+              className={`text-sm mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
             >
               Update job listing information
             </p>
           </div>
           <button
             onClick={onClose}
-            className={`p-2.5 rounded-xl transition-all hover:rotate-90 ${
-              isDarkMode
-                ? "hover:bg-slate-800 text-gray-400 hover:text-white"
-                : "hover:bg-gray-100 text-gray-500 hover:text-gray-900"
-            }`}
+            className={`p-2.5 rounded-xl transition-all hover:rotate-90 ${isDarkMode
+              ? "hover:bg-slate-800 text-gray-400 hover:text-white"
+              : "hover:bg-gray-100 text-gray-500 hover:text-gray-900"
+              }`}
           >
             <X size={20} />
           </button>
@@ -400,9 +368,8 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
           <div className="p-6 space-y-5">
             <div>
               <label
-                className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 <Briefcase size={16} />
                 Job Title
@@ -412,20 +379,18 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                 value={formData.title}
                 onChange={(e) => handleChange("title", e.target.value)}
                 placeholder="Enter job title"
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   <Building2 size={16} />
                   Company Name
@@ -435,19 +400,17 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                   value={formData.company}
                   onChange={(e) => handleChange("company", e.target.value)}
                   placeholder="Company name"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Company Logo URL
                 </label>
@@ -456,11 +419,10 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                   value={formData.companyLogo}
                   onChange={(e) => handleChange("companyLogo", e.target.value)}
                   placeholder="Logo URL"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
             </div>
@@ -468,20 +430,18 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Job Type
                 </label>
                 <select
                   value={formData.type}
                   onChange={(e) => handleChange("type", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 >
                   <option value="full-time">Full-time</option>
                   <option value="part-time">Part-time</option>
@@ -492,20 +452,18 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Status
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => handleChange("status", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 >
                   <option value="active">Active</option>
                   <option value="closed">Closed</option>
@@ -515,9 +473,8 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
 
             <div>
               <label
-                className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 <MapPin size={16} />
                 Location
@@ -527,20 +484,18 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                 value={formData.location}
                 onChange={(e) => handleChange("location", e.target.value)}
                 placeholder="Job location"
-                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   <DollarSign size={16} />
                   Salary Range
@@ -550,19 +505,17 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                   value={formData.salary}
                   onChange={(e) => handleChange("salary", e.target.value)}
                   placeholder="$50k - $80k"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   <Clock size={16} />
                   Experience Required
@@ -572,20 +525,18 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                   value={formData.experience}
                   onChange={(e) => handleChange("experience", e.target.value)}
                   placeholder="2-5 years"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
             </div>
 
             <div>
               <label
-                className={`block text-sm font-semibold mb-2 ${
-                  isDarkMode ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 Job Description
               </label>
@@ -593,20 +544,18 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
                 placeholder="Describe the role and responsibilities"
-                className={`w-full px-4 py-3 rounded-xl border-2 h-28 resize-none transition-all focus:ring-4 focus:outline-none ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                }`}
+                className={`w-full px-4 py-3 rounded-xl border-2 h-28 resize-none transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Category
                 </label>
@@ -615,19 +564,17 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                   value={formData.category}
                   onChange={(e) => handleChange("category", e.target.value)}
                   placeholder="e.g., Engineering"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Company Website
                 </label>
@@ -638,11 +585,10 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                     handleChange("companyWebsite", e.target.value)
                   }
                   placeholder="https://company.com"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
             </div>
@@ -650,9 +596,8 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Application Deadline
                 </label>
@@ -666,19 +611,17 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                   onChange={(e) =>
                     handleChange("applicationDeadline", e.target.value)
                   }
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
 
               <div>
                 <label
-                  className={`block text-sm font-semibold mb-2 ${
-                    isDarkMode ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Closed Date
                 </label>
@@ -688,22 +631,20 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                     formData.closedDate ? formData.closedDate.split("T")[0] : ""
                   }
                   onChange={(e) => handleChange("closedDate", e.target.value)}
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
-                      : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
-                  }`}
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                    ? "bg-slate-800 border-slate-700 text-white focus:border-blue-500 focus:ring-blue-500/20"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-blue-500 focus:ring-blue-500/20"
+                    }`}
                 />
               </div>
             </div>
 
             <div>
               <label
-                className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 transition-all ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-700 hover:bg-slate-750"
-                    : "bg-gray-50 border-gray-200 hover:bg-gray-100"
-                }`}
+                className={`flex items-center gap-3 cursor-pointer p-4 rounded-xl border-2 transition-all ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 hover:bg-slate-750"
+                  : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                  }`}
               >
                 <input
                   type="checkbox"
@@ -718,14 +659,13 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
                       formData.verified
                         ? "text-green-500"
                         : isDarkMode
-                        ? "text-gray-500"
-                        : "text-gray-400"
+                          ? "text-gray-500"
+                          : "text-gray-400"
                     }
                   />
                   <span
-                    className={`text-sm font-semibold ${
-                      isDarkMode ? "text-gray-200" : "text-gray-800"
-                    }`}
+                    className={`text-sm font-semibold ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                      }`}
                   >
                     Verified Job Posting
                   </span>
@@ -734,9 +674,8 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
             </div>
 
             <div
-              className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${
-                isDarkMode ? "border-slate-700" : "border-gray-200"
-              }`}
+              className={`flex flex-col sm:flex-row gap-3 pt-4 border-t ${isDarkMode ? "border-slate-700" : "border-gray-200"
+                }`}
             >
               <button
                 onClick={() => onSave(formData)}
@@ -746,11 +685,10 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
               </button>
               <button
                 onClick={onClose}
-                className={`px-6 py-3.5 rounded-xl font-semibold transition-all hover:scale-[1.02] ${
-                  isDarkMode
-                    ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200"
-                }`}
+                className={`px-6 py-3.5 rounded-xl font-semibold transition-all hover:scale-[1.02] ${isDarkMode
+                  ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200"
+                  }`}
               >
                 Cancel
               </button>
@@ -761,6 +699,276 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
     </div>
   );
 };
+
+// Separate Edit Campaign Modal Component
+const EditCampaignModal = ({ campaign, onClose, onSave, isDarkMode }) => {
+  const [formData, setFormData] = useState({
+    id: campaign._id || campaign.id,
+    campaignTitle: campaign.campaignTitle || "",
+    tagline: campaign.tagline || "",
+    detailedDescription: campaign.detailedDescription || "",
+    categories: campaign.categories || "",
+    totalAmount: campaign.totalAmount || 0,
+    startDate: campaign.startDate ? new Date(campaign.startDate).toISOString().slice(0, 16) : "",
+    endDate: campaign.endDate ? new Date(campaign.endDate).toISOString().slice(0, 16) : "",
+    upiId: campaign.upiId || "",
+    projectLink: campaign.projectLink || "",
+    github: campaign.github || "",
+    contact: campaign.contact || "",
+    existingImages: campaign.images || [],
+  });
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + selectedFiles.length > 3) {
+      alert("Maximum 3 images allowed");
+      return;
+    }
+    setSelectedFiles((prev) => [...prev, ...files]);
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+
+    const data = new FormData();
+    Object.keys(formData).forEach(key => {
+      if (key !== 'existingImages') {
+        data.append(key, formData[key]);
+      }
+    });
+
+    selectedFiles.forEach(file => {
+      data.append('images', file);
+    });
+
+    try {
+      await onSave(data);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[100] animate-fadeIn">
+      <div className={`rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl transition-all ${isDarkMode ? "bg-slate-900 border border-slate-700" : "bg-white border border-gray-100"}`}>
+        <div className={`sticky top-0 border-b px-6 py-5 flex justify-between items-center backdrop-blur-sm ${isDarkMode ? "bg-slate-900/95 border-slate-700" : "bg-white/95 border-gray-200"}`}>
+          <h2 className={`text-2xl font-bold tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"}`}>Edit Campaign</h2>
+          <button onClick={onClose} className={`p-2.5 rounded-xl transition-all hover:rotate-90 ${isDarkMode ? "hover:bg-slate-800 text-gray-400 hover:text-white" : "hover:bg-gray-100 text-gray-500 hover:text-gray-900"}`}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto max-h-[calc(90vh-100px)] p-6">
+          <form className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left Column */}
+              <div className="space-y-4">
+                <div>
+                  <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Campaign Title *</label>
+                  <input
+                    type="text"
+                    name="campaignTitle"
+                    value={formData.campaignTitle}
+                    onChange={handleInputChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode ? "bg-slate-800 border-slate-700 text-white focus:border-purple-500" : "bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-500"}`}
+                  />
+                </div>
+                <div>
+                  <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Category *</label>
+                  <select
+                    name="categories"
+                    value={formData.categories}
+                    onChange={handleInputChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode ? "bg-slate-800 border-slate-700 text-white focus:border-purple-500" : "bg-gray-50 border-gray-200 text-gray-900 focus:border-purple-500"}`}
+                  >
+                    <option value="">Select Category</option>
+                    <option value="startup">Startup</option>
+                    <option value="research">Research</option>
+                    <option value="innovation">Innovation</option>
+                    <option value="infrastructure">Infrastructure</option>
+                    <option value="scholarship">Scholarship</option>
+                    <option value="community">Community</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Tagline</label>
+                  <input
+                    type="text"
+                    name="tagline"
+                    value={formData.tagline}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                  />
+                </div>
+                <div>
+                  <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Description</label>
+                  <textarea
+                    name="detailedDescription"
+                    value={formData.detailedDescription}
+                    onChange={handleInputChange}
+                    rows="4"
+                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Start Date *</label>
+                    <input
+                      type="datetime-local"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleInputChange}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>End Date *</label>
+                    <input
+                      type="datetime-local"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleInputChange}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Target Amount *</label>
+                    <input
+                      type="number"
+                      name="totalAmount"
+                      value={formData.totalAmount}
+                      onChange={handleInputChange}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>UPI ID *</label>
+                    <input
+                      type="text"
+                      name="upiId"
+                      value={formData.upiId}
+                      onChange={handleInputChange}
+                      required
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Project Link</label>
+                    <input
+                      type="url"
+                      name="projectLink"
+                      value={formData.projectLink}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>GitHub</label>
+                    <input
+                      type="url"
+                      name="github"
+                      value={formData.github}
+                      onChange={handleInputChange}
+                      className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Contact Number *</label>
+                  <input
+                    type="tel"
+                    name="contact"
+                    value={formData.contact}
+                    onChange={handleInputChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-xl border-2 ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-gray-50 border-gray-200 text-gray-900"}`}
+                  />
+                </div>
+
+                {/* Image Section */}
+                <div>
+                  <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Existing Images</label>
+                  <div className="flex gap-2 mb-4 overflow-x-auto py-2">
+                    {formData.existingImages.length > 0 ? (
+                      formData.existingImages.map((img, idx) => (
+                        <img key={idx} src={img} alt="Existing" className="w-20 h-20 object-cover rounded-lg border border-purple-500/30" />
+                      ))
+                    ) : (
+                      <p className="text-xs text-gray-500 italic">No existing images</p>
+                    )}
+                  </div>
+                  <label className={`block text-sm font-semibold mb-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>Add New Images (Replaces existing)</label>
+                  <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-all ${isDarkMode ? "border-slate-700 bg-slate-800/50" : "border-gray-200 bg-gray-50"}`}>
+                    <input type="file" id="editFile" accept="image/*" multiple onChange={handleFileChange} className="hidden" />
+                    <label htmlFor="editFile" className="cursor-pointer flex flex-col items-center gap-1">
+                      <ImageIcon className="w-6 h-6 text-purple-500" />
+                      <span className="text-xs font-medium">Click to upload</span>
+                    </label>
+                  </div>
+                  {selectedFiles.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {selectedFiles.map((f, i) => (
+                        <div key={i} className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded-full text-[10px] flex items-center gap-1">
+                          {f.name} <X size={12} className="cursor-pointer" onClick={() => removeFile(i)} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-4 pt-4 border-t border-slate-700">
+              <button
+                type="button"
+                onClick={onClose}
+                className={`flex-1 py-3 rounded-xl font-bold transition-all ${isDarkMode ? "bg-slate-800 text-white hover:bg-slate-700" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl disabled:opacity-50"
+              >
+                {loading ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 
 const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
@@ -774,12 +982,13 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
     campaigns: false,
     all: true,
   });
-  
+
   const [showRegistrationsModal, setShowRegistrationsModal] = useState(false);
   const [registrations, setRegistrations] = useState([]);
   const [loadingRegistrations, setLoadingRegistrations] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [editingJob, setEditingJob] = useState(null);
+  const [editingCampaign, setEditingCampaign] = useState(null);
   const [hasFetched, setHasFetched] = useState({
     events: false,
     jobs: false,
@@ -805,7 +1014,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
     try {
       // Fetch events
       const eventsPromise = fetch(
-       `${BASE_URL}/event/my-events`,
+        `${BASE_URL}/event/my-events`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -882,7 +1091,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           break;
         case "campaigns":
           url =
-           `${BASE_URL}/campaign/get-my-campaigns`;
+            `${BASE_URL}/campaign/get-my-campaigns`;
           dataKey = "campaigns";
           break;
         default:
@@ -1038,6 +1247,34 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
     }
   };
 
+  const handleUpdateCampaign = async (formData) => {
+    const token = getAuthToken();
+    try {
+      const res = await fetch(
+        `${BASE_URL}/campaign/update/${formData.get('id')}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData, // Sending FormData because it contains images
+        }
+      );
+
+      if (res.ok) {
+        alert("Campaign updated successfully!");
+        setEditingCampaign(null);
+        fetchSingleSection("campaigns");
+      } else {
+        const errorData = await res.json();
+        alert(`Failed to update campaign: ${errorData.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Error updating campaign:", error);
+      alert("Failed to update campaign");
+    }
+  };
+
   const fetchRegistrations = async (eventId) => {
     setLoadingRegistrations(true);
     setShowRegistrationsModal(true);
@@ -1064,6 +1301,10 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
   };
 
   const downloadExcel = (eventId, eventTitle) => {
+    if (!eventId) {
+      alert("Error: Event ID not found");
+      return;
+    }
     const token = getAuthToken();
     fetch(
       `${BASE_URL}/event/download-registrations/${eventId}`,
@@ -1073,31 +1314,34 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
         },
       }
     )
-      .then((response) => response.blob())
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to download file");
+        return response.blob();
+      })
       .then((blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.style.display = "none";
         a.href = url;
-        a.download = `${eventTitle.replace(/\s+/g, "_")}_registrations.xlsx`;
+        // The backend produces a CSV, so download it as .csv
+        a.download = `${(eventTitle || "event").replace(/\s+/g, "_")}_registrations.csv`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
-        alert("Excel file downloaded successfully!");
+        alert("Registration file downloaded successfully!");
       })
       .catch((error) => {
-        console.error("Error downloading Excel:", error);
-        alert("Failed to download Excel file");
+        console.error("Error downloading registration file:", error);
+        alert("Failed to download registration file");
       });
   };
 
   const EventCard = ({ event }) => (
     <div
-      className={`rounded-xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-500/50"
-          : "bg-white border border-gray-200 hover:border-blue-300 shadow-lg"
-      }`}
+      className={`rounded-xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-blue-500/50"
+        : "bg-white border border-gray-200 hover:border-blue-300 shadow-lg"
+        }`}
     >
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
         <img
@@ -1109,16 +1353,14 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3 sm:mb-4 gap-3">
             <div className="min-w-0 flex-1">
               <h3
-                className={`text-lg sm:text-xl font-bold mb-2 truncate ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-lg sm:text-xl font-bold mb-2 truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 {event.title}
               </h3>
               <p
-                className={`text-xs sm:text-sm mb-3 line-clamp-2 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-xs sm:text-sm mb-3 line-clamp-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 {event.description}
               </p>
@@ -1148,11 +1390,10 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
           <div className="flex flex-wrap gap-2 text-xs sm:text-sm mb-3 sm:mb-4">
             <span
-              className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full ${
-                isDarkMode
-                  ? "bg-blue-500/20 text-blue-300"
-                  : "bg-blue-100 text-blue-700"
-              }`}
+              className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+                ? "bg-blue-500/20 text-blue-300"
+                : "bg-blue-100 text-blue-700"
+                }`}
             >
               <Calendar size={14} className="flex-shrink-0" />
               <span className="truncate">
@@ -1160,29 +1401,26 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
               </span>
             </span>
             <span
-              className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full ${
-                isDarkMode
-                  ? "bg-purple-500/20 text-purple-300"
-                  : "bg-purple-100 text-purple-700"
-              }`}
+              className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+                ? "bg-purple-500/20 text-purple-300"
+                : "bg-purple-100 text-purple-700"
+                }`}
             >
               📍 <span className="truncate">{event.location}</span>
             </span>
             <span
-              className={`px-2 sm:px-3 py-1 rounded-full ${
-                isDarkMode
-                  ? "bg-cyan-500/20 text-cyan-300"
-                  : "bg-cyan-100 text-cyan-700"
-              }`}
+              className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+                ? "bg-cyan-500/20 text-cyan-300"
+                : "bg-cyan-100 text-cyan-700"
+                }`}
             >
               {event.category}
             </span>
           </div>
 
           <div
-            className={`flex flex-col xs:flex-row xs:items-center gap-2 text-xs sm:text-sm ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            }`}
+            className={`flex flex-col xs:flex-row xs:items-center gap-2 text-xs sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"
+              }`}
           >
             <span className="font-semibold text-sm sm:text-lg bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
               ₹{event.price}
@@ -1199,11 +1437,10 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
   const JobCard = ({ job }) => (
     <div
-      className={`rounded-xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-green-500/50"
-          : "bg-white border border-gray-200 hover:border-green-300 shadow-lg"
-      }`}
+      className={`rounded-xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-green-500/50"
+        : "bg-white border border-gray-200 hover:border-green-300 shadow-lg"
+        }`}
     >
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
         <div className="flex items-start gap-3 sm:gap-4 min-w-0">
@@ -1214,23 +1451,20 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           />
           <div className="min-w-0 flex-1">
             <h3
-              className={`text-lg sm:text-xl font-bold mb-1 truncate ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-lg sm:text-xl font-bold mb-1 truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               {job.title}
             </h3>
             <p
-              className={`font-semibold mb-2 text-sm sm:text-base ${
-                isDarkMode ? "text-cyan-400" : "text-cyan-600"
-              }`}
+              className={`font-semibold mb-2 text-sm sm:text-base ${isDarkMode ? "text-cyan-400" : "text-cyan-600"
+                }`}
             >
               {job.company}
             </p>
             <p
-              className={`text-xs sm:text-sm mb-3 line-clamp-2 ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`text-xs sm:text-sm mb-3 line-clamp-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               {job.description}
             </p>
@@ -1255,38 +1489,34 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
       <div className="flex flex-wrap gap-2 text-xs sm:text-sm mt-3 sm:mt-4 mb-3">
         <span
-          className={`px-2 sm:px-3 py-1 rounded-full ${
-            isDarkMode
-              ? "bg-green-500/20 text-green-300"
-              : "bg-green-100 text-green-700"
-          }`}
+          className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+            ? "bg-green-500/20 text-green-300"
+            : "bg-green-100 text-green-700"
+            }`}
         >
           {job.type}
         </span>
         <span
-          className={`px-2 sm:px-3 py-1 rounded-full ${
-            isDarkMode
-              ? "bg-purple-500/20 text-purple-300"
-              : "bg-purple-100 text-purple-700"
-          }`}
+          className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+            ? "bg-purple-500/20 text-purple-300"
+            : "bg-purple-100 text-purple-700"
+            }`}
         >
           📍 <span className="truncate">{job.location}</span>
         </span>
         <span
-          className={`px-2 sm:px-3 py-1 rounded-full ${
-            isDarkMode
-              ? "bg-amber-500/20 text-amber-300"
-              : "bg-amber-100 text-amber-700"
-          }`}
+          className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+            ? "bg-amber-500/20 text-amber-300"
+            : "bg-amber-100 text-amber-700"
+            }`}
         >
           💰 <span className="truncate">{job.salary}</span>
         </span>
         <span
-          className={`px-2 sm:px-3 py-1 rounded-full ${
-            isDarkMode
-              ? "bg-blue-500/20 text-blue-300"
-              : "bg-blue-100 text-blue-700"
-          }`}
+          className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+            ? "bg-blue-500/20 text-blue-300"
+            : "bg-blue-100 text-blue-700"
+            }`}
         >
           📅 <span className="truncate">{job.experience}</span>
         </span>
@@ -1294,25 +1524,23 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
       {job.requiredSkills && job.requiredSkills.length > 0 && (
         <div className="flex flex-wrap gap-1 sm:gap-2 mt-3">
-        {job.requiredSkills.slice(0, 4).map((skill, i) => (
-  <span
-    key={i} // Add key here
-    className={`px-2 py-1 rounded-lg text-xs ${
-      isDarkMode
-        ? "bg-slate-700 text-gray-300"
-        : "bg-gray-100 text-gray-700"
-    }`}
-  >
-    {skill}
-  </span>
-))}
+          {job.requiredSkills.slice(0, 4).map((skill, i) => (
+            <span
+              key={i} // Add key here
+              className={`px-2 py-1 rounded-lg text-xs ${isDarkMode
+                ? "bg-slate-700 text-gray-300"
+                : "bg-gray-100 text-gray-700"
+                }`}
+            >
+              {skill}
+            </span>
+          ))}
           {job.requiredSkills.length > 4 && (
             <span
-              className={`px-2 py-1 rounded-lg text-xs ${
-                isDarkMode
-                  ? "bg-slate-700 text-gray-400"
-                  : "bg-gray-100 text-gray-500"
-              }`}
+              className={`px-2 py-1 rounded-lg text-xs ${isDarkMode
+                ? "bg-slate-700 text-gray-400"
+                : "bg-gray-100 text-gray-500"
+                }`}
             >
               +{job.requiredSkills.length - 4} more
             </span>
@@ -1324,11 +1552,10 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
   const CampaignCard = ({ campaign }) => (
     <div
-      className={`rounded-xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-purple-500/50"
-          : "bg-white border border-gray-200 hover:border-purple-300 shadow-lg"
-      }`}
+      className={`rounded-xl p-4 sm:p-6 transition-all duration-300 hover:scale-105 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 hover:border-purple-500/50"
+        : "bg-white border border-gray-200 hover:border-purple-300 shadow-lg"
+        }`}
     >
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
         <img
@@ -1340,30 +1567,33 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-3 sm:mb-4 gap-3">
             <div className="min-w-0 flex-1">
               <h3
-                className={`text-lg sm:text-xl font-bold mb-2 truncate ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-lg sm:text-xl font-bold mb-2 truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 {campaign.campaignTitle}
               </h3>
               <p
-                className={`italic text-xs sm:text-sm mb-2 ${
-                  isDarkMode ? "text-purple-300" : "text-purple-600"
-                }`}
+                className={`italic text-xs sm:text-sm mb-2 ${isDarkMode ? "text-purple-300" : "text-purple-600"
+                  }`}
               >
                 {campaign.tagline}
               </p>
               <p
-                className={`text-xs sm:text-sm mb-3 line-clamp-2 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-xs sm:text-sm mb-3 line-clamp-2 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 {campaign.detailedDescription}
               </p>
             </div>
             <div className="flex gap-2 self-start lg:self-auto">
               <button
-                onClick={() => handleDelete(campaign.id, "campaigns")}
+                onClick={() => setEditingCampaign(campaign)}
+                className="p-2 sm:p-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all shadow-lg flex-shrink-0"
+              >
+                <Edit2 size={16} className="sm:w-4 sm:h-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(campaign.id || campaign._id, "campaigns")}
                 className="p-2 sm:p-3 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl hover:from-red-600 hover:to-pink-600 transition-all shadow-lg flex-shrink-0"
               >
                 <Trash2 size={16} className="sm:w-4 sm:h-4" />
@@ -1377,18 +1607,16 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
                 Funding Progress
               </span>
               <span
-                className={`font-semibold ${
-                  isDarkMode ? "text-green-400" : "text-green-600"
-                }`}
+                className={`font-semibold ${isDarkMode ? "text-green-400" : "text-green-600"
+                  }`}
               >
                 ₹{parseFloat(campaign.currentAmount).toFixed(0)} / ₹
                 {parseFloat(campaign.totalAmount).toFixed(0)}
               </span>
             </div>
             <div
-              className={`w-full rounded-full h-2 sm:h-3 ${
-                isDarkMode ? "bg-slate-700" : "bg-gray-200"
-              }`}
+              className={`w-full rounded-full h-2 sm:h-3 ${isDarkMode ? "bg-slate-700" : "bg-gray-200"
+                }`}
             >
               <div
                 className="bg-gradient-to-r from-green-400 to-cyan-400 h-2 sm:h-3 rounded-full transition-all duration-1000"
@@ -1396,7 +1624,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
                   width: `${Math.min(
                     (parseFloat(campaign.currentAmount) /
                       parseFloat(campaign.totalAmount)) *
-                      100,
+                    100,
                     100
                   )}%`,
                 }}
@@ -1406,36 +1634,33 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
           <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
             <span
-              className={`px-2 sm:px-3 py-1 rounded-full ${
-                isDarkMode
-                  ? "bg-purple-500/20 text-purple-300"
-                  : "bg-purple-100 text-purple-700"
-              }`}
+              className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+                ? "bg-purple-500/20 text-purple-300"
+                : "bg-purple-100 text-purple-700"
+                }`}
             >
               {campaign.categories}
             </span>
             {campaign.isApproved && (
               <span
-                className={`px-2 sm:px-3 py-1 rounded-full ${
-                  isDarkMode
-                    ? "bg-green-500/20 text-green-300"
-                    : "bg-green-100 text-green-700"
-                }`}
+                className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+                  ? "bg-green-500/20 text-green-300"
+                  : "bg-green-100 text-green-700"
+                  }`}
               >
                 ✓ Approved
               </span>
             )}
             <span
-              className={`px-2 sm:px-3 py-1 rounded-full ${
-                isDarkMode
-                  ? "bg-cyan-500/20 text-cyan-300"
-                  : "bg-cyan-100 text-cyan-700"
-              }`}
+              className={`px-2 sm:px-3 py-1 rounded-full ${isDarkMode
+                ? "bg-cyan-500/20 text-cyan-300"
+                : "bg-cyan-100 text-cyan-700"
+                }`}
             >
               {Math.round(
                 (parseFloat(campaign.currentAmount) /
                   parseFloat(campaign.totalAmount)) *
-                  100
+                100
               )}
               % Funded
             </span>
@@ -1462,11 +1687,10 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-6xl mx-auto">
           <div
-            className={`p-4 sm:p-6 lg:p-8 rounded-2xl border-2 transition-all hover:scale-105 ${
-              isDarkMode
-                ? "bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-600/20"
-                : "bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200"
-            }`}
+            className={`p-4 sm:p-6 lg:p-8 rounded-2xl border-2 transition-all hover:scale-105 ${isDarkMode
+              ? "bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-600/20"
+              : "bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200"
+              }`}
           >
             <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4">
               <Calendar className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-blue-400" />
@@ -1475,9 +1699,8 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
               Events
             </h3>
             <p
-              className={`text-xs sm:text-sm lg:text-base ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-xs sm:text-sm lg:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Create and manage events, track registrations, and engage with
               your audience
@@ -1485,11 +1708,10 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           </div>
 
           <div
-            className={`p-4 sm:p-6 lg:p-8 rounded-2xl border-2 transition-all hover:scale-105 ${
-              isDarkMode
-                ? "bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-600/20"
-                : "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
-            }`}
+            className={`p-4 sm:p-6 lg:p-8 rounded-2xl border-2 transition-all hover:scale-105 ${isDarkMode
+              ? "bg-gradient-to-br from-green-900/30 to-emerald-900/20 border-green-600/20"
+              : "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
+              }`}
           >
             <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4">
               <Briefcase className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-green-400" />
@@ -1498,9 +1720,8 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
               Jobs
             </h3>
             <p
-              className={`text-xs sm:text-sm lg:text-base ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-xs sm:text-sm lg:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Post career opportunities, manage applications, and connect with
               talent
@@ -1508,11 +1729,10 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           </div>
 
           <div
-            className={`p-4 sm:p-6 lg:p-8 rounded-2xl border-2 transition-all hover:scale-105 ${
-              isDarkMode
-                ? "bg-gradient-to-br from-purple-900/30 to-violet-900/20 border-purple-600/20"
-                : "bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200"
-            }`}
+            className={`p-4 sm:p-6 lg:p-8 rounded-2xl border-2 transition-all hover:scale-105 ${isDarkMode
+              ? "bg-gradient-to-br from-purple-900/30 to-violet-900/20 border-purple-600/20"
+              : "bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200"
+              }`}
           >
             <div className="flex items-center justify-center gap-3 mb-3 sm:mb-4">
               <Target className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-purple-400" />
@@ -1521,9 +1741,8 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
               Campaigns
             </h3>
             <p
-              className={`text-xs sm:text-sm lg:text-base ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-xs sm:text-sm lg:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Launch fundraising campaigns, track progress, and make an impact
             </p>
@@ -1536,99 +1755,96 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
   const LoadingSpinner = ({ size = "large" }) => (
     <div className="flex justify-center items-center py-20">
       <div
-        className={`animate-spin rounded-full border-b-2 border-blue-500 ${
-          size === "large" ? "h-16 w-16" : "h-8 w-8"
-        }`}
+        className={`animate-spin rounded-full border-b-2 border-blue-500 ${size === "large" ? "h-16 w-16" : "h-8 w-8"
+          }`}
       ></div>
     </div>
   );
-const renderContent = () => {
-  
+  const renderContent = () => {
 
-  if (loading.all) {
-    return <LoadingSpinner key="loading-all" />;
-  }
 
-  const sectionLoading = loading[activeTab];
+    if (loading.all) {
+      return <LoadingSpinner key="loading-all" />;
+    }
 
-  if (sectionLoading) {
-    return <LoadingSpinner key="loading-section" size="small" />;
-  }
+    const sectionLoading = loading[activeTab];
 
-  const items = {
-    events: events,
-    jobs: jobs,
-    campaigns: campaigns,
-  };
+    if (sectionLoading) {
+      return <LoadingSpinner key="loading-section" size="small" />;
+    }
 
-  const currentItems = items[activeTab];
-
-  if (!currentItems || currentItems.length === 0) {
-    const emptyStates = {
-      events: {
-        icon: Calendar,
-        text: "No events found",
-        subtext: "Create your first event to get started",
-      },
-      jobs: {
-        icon: Briefcase,
-        text: "No jobs found",
-        subtext: "Post your first job opportunity",
-      },
-      campaigns: {
-        icon: Target,
-        text: "No campaigns found",
-        subtext: "Launch your first fundraising campaign",
-      },
+    const items = {
+      events: events,
+      jobs: jobs,
+      campaigns: campaigns,
     };
 
-    const EmptyIcon = emptyStates[activeTab].icon;
+    const currentItems = items[activeTab];
 
-    return (
-      <div
-        key="empty-state"
-        className={`text-center py-20 rounded-2xl ${
-          isDarkMode
+    if (!currentItems || currentItems.length === 0) {
+      const emptyStates = {
+        events: {
+          icon: Calendar,
+          text: "No events found",
+          subtext: "Create your first event to get started",
+        },
+        jobs: {
+          icon: Briefcase,
+          text: "No jobs found",
+          subtext: "Post your first job opportunity",
+        },
+        campaigns: {
+          icon: Target,
+          text: "No campaigns found",
+          subtext: "Launch your first fundraising campaign",
+        },
+      };
+
+      const EmptyIcon = emptyStates[activeTab].icon;
+
+      return (
+        <div
+          key="empty-state"
+          className={`text-center py-20 rounded-2xl ${isDarkMode
             ? "bg-slate-800/50 text-gray-400"
             : "bg-white text-gray-500"
-        }`}
-      >
-        <EmptyIcon size={64} className="mx-auto mb-4 opacity-50" />
-        <p className="text-xl">{emptyStates[activeTab].text}</p>
-        <p className="text-sm mt-2">{emptyStates[activeTab].subtext}</p>
-      </div>
-    );
-  }
+            }`}
+        >
+          <EmptyIcon size={64} className="mx-auto mb-4 opacity-50" />
+          <p className="text-xl">{emptyStates[activeTab].text}</p>
+          <p className="text-sm mt-2">{emptyStates[activeTab].subtext}</p>
+        </div>
+      );
+    }
 
-  // Add React Fragment with key
-  return (
-    <React.Fragment key={`fragment-${activeTab}`}>
-      {activeTab === "events" &&
-        events.map((event, index) => (
-          <EventCard key={event.id || event._id || `event-${index}`} event={event} />
-        ))}
-      {activeTab === "jobs" &&
-        jobs.map((job, index) => {
-          // Try multiple possible ID fields
-          const jobKey = job._id || job.jobId || job.id || `job-${index}`;
-          console.log(`Job ${index} key:`, jobKey);
-          return <JobCard key={jobKey} job={job} />;
-        })}
-      {activeTab === "campaigns" &&
-        campaigns.map((campaign, index) => (
-          <CampaignCard key={campaign.id || campaign._id || `campaign-${index}`} campaign={campaign} />
-        ))}
-    </React.Fragment>
-  );
-};
+    // Add React Fragment with key
+    return (
+      <React.Fragment key={`fragment-${activeTab}`}>
+        {activeTab === "events" &&
+          events.map((event, index) => (
+            <EventCard key={event.id || event._id || `event-${index}`} event={event} />
+          ))}
+        {activeTab === "jobs" &&
+          jobs.map((job, index) => {
+            // Try multiple possible ID fields
+            const jobKey = job._id || job.jobId || job.id || `job-${index}`;
+            console.log(`Job ${index} key:`, jobKey);
+            return <JobCard key={jobKey} job={job} />;
+          })}
+        {activeTab === "campaigns" &&
+          campaigns.map((campaign, index) => (
+            <CampaignCard key={campaign.id || campaign._id || `campaign-${index}`} campaign={campaign} />
+          ))}
+      </React.Fragment>
+    );
+  };
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+        }`}
     >
       <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
@@ -1636,16 +1852,14 @@ const renderContent = () => {
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12">
         <div
-          className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 xl:p-12 border-2 shadow-2xl mb-6 sm:mb-8 ${
-            isDarkMode
-              ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 backdrop-blur-sm border-blue-600/20"
-              : "bg-gradient-to-br from-white to-blue-100/80 backdrop-blur-sm border-blue-200 shadow-xl"
-          }`}
+          className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 xl:p-12 border-2 shadow-2xl mb-6 sm:mb-8 ${isDarkMode
+            ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 backdrop-blur-sm border-blue-600/20"
+            : "bg-gradient-to-br from-white to-blue-100/80 backdrop-blur-sm border-blue-200 shadow-xl"
+            }`}
         >
           <h1
-            className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8 text-center ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8 text-center ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Manage Your Activities
           </h1>
@@ -1653,13 +1867,12 @@ const renderContent = () => {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 lg:mb-12">
             <button
               onClick={() => handleTabChange("events")}
-              className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all duration-300 ${
-                activeTab === "events"
-                  ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg scale-105"
-                  : isDarkMode
+              className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all duration-300 ${activeTab === "events"
+                ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg scale-105"
+                : isDarkMode
                   ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
                   : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow"
-              }`}
+                }`}
             >
               <Calendar size={20} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               <span className="text-sm sm:text-base lg:text-lg">
@@ -1668,13 +1881,12 @@ const renderContent = () => {
             </button>
             <button
               onClick={() => handleTabChange("jobs")}
-              className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all duration-300 ${
-                activeTab === "jobs"
-                  ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg scale-105"
-                  : isDarkMode
+              className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all duration-300 ${activeTab === "jobs"
+                ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg scale-105"
+                : isDarkMode
                   ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
                   : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow"
-              }`}
+                }`}
             >
               <Briefcase size={20} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               <span className="text-sm sm:text-base lg:text-lg">
@@ -1683,13 +1895,12 @@ const renderContent = () => {
             </button>
             <button
               onClick={() => handleTabChange("campaigns")}
-              className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all duration-300 ${
-                activeTab === "campaigns"
-                  ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg scale-105"
-                  : isDarkMode
+              className={`flex-1 flex items-center justify-center gap-2 sm:gap-3 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold transition-all duration-300 ${activeTab === "campaigns"
+                ? "bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg scale-105"
+                : isDarkMode
                   ? "bg-slate-800 text-gray-300 hover:bg-slate-700 border border-slate-700"
                   : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow"
-              }`}
+                }`}
             >
               <Target size={20} className="sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
               <span className="text-sm sm:text-base lg:text-lg">
@@ -1720,14 +1931,22 @@ const renderContent = () => {
         />
       )}
 
+      {editingCampaign && (
+        <EditCampaignModal
+          campaign={editingCampaign}
+          onClose={() => setEditingCampaign(null)}
+          onSave={handleUpdateCampaign}
+          isDarkMode={isDarkMode}
+        />
+      )}
+
       {showRegistrationsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-3 sm:p-4 z-50">
           <div
-            className={`rounded-xl sm:rounded-2xl max-w-4xl lg:max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl ${
-              isDarkMode
-                ? "bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700"
-                : "bg-white border border-gray-200"
-            }`}
+            className={`rounded-xl sm:rounded-2xl max-w-4xl lg:max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl ${isDarkMode
+              ? "bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700"
+              : "bg-white border border-gray-200"
+              }`}
           >
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 sm:p-6">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
@@ -1747,8 +1966,8 @@ const renderContent = () => {
                     <button
                       onClick={() =>
                         downloadExcel(
-                          registrations[0]?.eventId,
-                          registrations[0]?.eventTitle
+                          registrations[0]?.event?.id || registrations[0]?.eventId,
+                          registrations[0]?.event?.title || registrations[0]?.eventTitle
                         )
                       }
                       className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 transition font-semibold shadow-lg text-sm sm:text-base"
@@ -1777,13 +1996,12 @@ const renderContent = () => {
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
                   {registrations.map((reg, index) => (
                     <div
-                      
-    key={reg.id || reg.userId || `reg-${index}`} // Add key here
-                      className={`rounded-xl p-4 sm:p-6 border-2 transition-all hover:scale-105 ${
-                        isDarkMode
-                          ? "bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600 hover:border-green-400"
-                          : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-green-300 shadow-lg"
-                      }`}
+
+                      key={reg.id || reg.userId || `reg-${index}`} // Add key here
+                      className={`rounded-xl p-4 sm:p-6 border-2 transition-all hover:scale-105 ${isDarkMode
+                        ? "bg-gradient-to-br from-slate-800 to-slate-700 border-slate-600 hover:border-green-400"
+                        : "bg-gradient-to-br from-white to-gray-50 border-gray-200 hover:border-green-300 shadow-lg"
+                        }`}
                     >
                       <div className="flex items-start justify-between mb-3 sm:mb-4">
                         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -1792,19 +2010,17 @@ const renderContent = () => {
                           </div>
                           <div className="min-w-0">
                             <h3
-                              className={`font-bold text-base sm:text-lg truncate ${
-                                isDarkMode ? "text-white" : "text-gray-900"
-                              }`}
+                              className={`font-bold text-base sm:text-lg truncate ${isDarkMode ? "text-white" : "text-gray-900"
+                                }`}
                             >
                               {reg.name || reg.userName || "Unknown User"}
                             </h3>
                             {reg.userType && (
                               <span
-                                className={`inline-block px-2 sm:px-3 py-1 text-xs font-semibold rounded-full mt-1 sm:mt-2 ${
-                                  isDarkMode
-                                    ? "bg-blue-500/20 text-blue-300"
-                                    : "bg-blue-100 text-blue-700"
-                                }`}
+                                className={`inline-block px-2 sm:px-3 py-1 text-xs font-semibold rounded-full mt-1 sm:mt-2 ${isDarkMode
+                                  ? "bg-blue-500/20 text-blue-300"
+                                  : "bg-blue-100 text-blue-700"
+                                  }`}
                               >
                                 {reg.userType}
                               </span>
@@ -1813,19 +2029,18 @@ const renderContent = () => {
                         </div>
                         {reg.status && (
                           <span
-                            className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 ${
-                              reg.status === "confirmed"
-                                ? isDarkMode
-                                  ? "bg-green-500/20 text-green-300"
-                                  : "bg-green-100 text-green-700"
-                                : reg.status === "pending"
+                            className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold flex-shrink-0 ${reg.status === "confirmed"
+                              ? isDarkMode
+                                ? "bg-green-500/20 text-green-300"
+                                : "bg-green-100 text-green-700"
+                              : reg.status === "pending"
                                 ? isDarkMode
                                   ? "bg-yellow-500/20 text-yellow-300"
                                   : "bg-yellow-100 text-yellow-700"
                                 : isDarkMode
-                                ? "bg-gray-500/20 text-gray-300"
-                                : "bg-gray-100 text-gray-700"
-                            }`}
+                                  ? "bg-gray-500/20 text-gray-300"
+                                  : "bg-gray-100 text-gray-700"
+                              }`}
                           >
                             {reg.status.toUpperCase()}
                           </span>
@@ -1834,18 +2049,16 @@ const renderContent = () => {
 
                       <div className="space-y-2 sm:space-y-3">
                         <div
-                          className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${
-                            isDarkMode ? "bg-slate-700/50" : "bg-gray-100"
-                          }`}
+                          className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${isDarkMode ? "bg-slate-700/50" : "bg-gray-100"
+                            }`}
                         >
                           <Mail
                             size={16}
                             className="text-green-500 flex-shrink-0 sm:w-4 sm:h-4"
                           />
                           <span
-                            className={`text-xs sm:text-sm truncate ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`text-xs sm:text-sm truncate ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             {reg.email || reg.userEmail || "No email provided"}
                           </span>
@@ -1853,18 +2066,16 @@ const renderContent = () => {
 
                         {reg.phone && (
                           <div
-                            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${
-                              isDarkMode ? "bg-slate-700/50" : "bg-gray-100"
-                            }`}
+                            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${isDarkMode ? "bg-slate-700/50" : "bg-gray-100"
+                              }`}
                           >
                             <Phone
                               size={16}
                               className="text-green-500 flex-shrink-0 sm:w-4 sm:h-4"
                             />
                             <span
-                              className={`text-xs sm:text-sm ${
-                                isDarkMode ? "text-gray-300" : "text-gray-700"
-                              }`}
+                              className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                                }`}
                             >
                               {reg.phone}
                             </span>
@@ -1873,20 +2084,18 @@ const renderContent = () => {
 
                         {reg.registeredAt && (
                           <div
-                            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border-t ${
-                              isDarkMode
-                                ? "border-slate-600"
-                                : "border-gray-200"
-                            }`}
+                            className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border-t ${isDarkMode
+                              ? "border-slate-600"
+                              : "border-gray-200"
+                              }`}
                           >
                             <Clock
                               size={14}
                               className="text-gray-400 flex-shrink-0 sm:w-4 sm:h-4"
                             />
                             <span
-                              className={`text-xs ${
-                                isDarkMode ? "text-gray-400" : "text-gray-500"
-                              }`}
+                              className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                                }`}
                             >
                               Registered on{" "}
                               {new Date(reg.registeredAt).toLocaleString()}
@@ -1906,16 +2115,14 @@ const renderContent = () => {
                     />
                   </div>
                   <p
-                    className={`text-base sm:text-lg font-medium ${
-                      isDarkMode ? "text-gray-300" : "text-gray-500"
-                    }`}
+                    className={`text-base sm:text-lg font-medium ${isDarkMode ? "text-gray-300" : "text-gray-500"
+                      }`}
                   >
                     No registrations yet
                   </p>
                   <p
-                    className={`text-xs sm:text-sm mt-2 ${
-                      isDarkMode ? "text-gray-500" : "text-gray-400"
-                    }`}
+                    className={`text-xs sm:text-sm mt-2 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
                   >
                     Registrations will appear here once people sign up
                   </p>
@@ -1924,11 +2131,10 @@ const renderContent = () => {
             </div>
 
             <div
-              className={`border-t p-3 sm:p-4 flex justify-end ${
-                isDarkMode
-                  ? "bg-slate-800 border-slate-700"
-                  : "bg-gray-50 border-gray-200"
-              }`}
+              className={`border-t p-3 sm:p-4 flex justify-end ${isDarkMode
+                ? "bg-slate-800 border-slate-700"
+                : "bg-gray-50 border-gray-200"
+                }`}
             >
               <button
                 onClick={() => setShowRegistrationsModal(false)}

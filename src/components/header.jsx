@@ -72,7 +72,11 @@ export default function Header({ isDarkMode, toggleTheme }) {
       if (!res.ok) throw new Error("Failed to refresh token");
 
       const data = await res.json();
-      return data.accessToken;
+      // Return both tokens as the backend rotates them
+      return {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken
+      };
     } catch (err) {
       console.error("Token refresh error:", err);
       return null;
@@ -86,17 +90,18 @@ export default function Header({ isDarkMode, toggleTheme }) {
     }
 
     if (authData?.refreshToken) {
-      // Refresh token every 55 minutes (3300000 ms)
-      const refreshTime = 55 * 60 * 1000;
+      // Refresh token every 50 minutes (slightly before 1h expiry)
+      const refreshTime = 50 * 60 * 1000;
 
       refreshIntervalRef.current = setInterval(async () => {
         console.log("Auto-refreshing token...");
-        const newAccessToken = await refreshAccessToken(authData.refreshToken);
+        const tokens = await refreshAccessToken(authData.refreshToken);
 
-        if (newAccessToken) {
+        if (tokens?.accessToken) {
           const updatedAuth = {
             ...authData,
-            accessToken: newAccessToken,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken || authData.refreshToken,
             expiry: Date.now() + 60 * 60 * 1000, // 1 hour expiry
           };
 
@@ -105,6 +110,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
           console.log("Token auto-refreshed successfully");
         } else {
           // If refresh fails, logout user
+          console.error("Auto-refresh failed, logging out...");
           handleLogout();
           clearInterval(refreshIntervalRef.current);
         }
@@ -135,9 +141,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
       if (parsed.expiry && Date.now() > parsed.expiry) {
         if (parsed.refreshToken) {
-          const newAccessToken = await refreshAccessToken(parsed.refreshToken);
-          if (newAccessToken) {
-            parsed.accessToken = newAccessToken;
+          const tokens = await refreshAccessToken(parsed.refreshToken);
+          if (tokens?.accessToken) {
+            parsed.accessToken = tokens.accessToken;
+            parsed.refreshToken = tokens.refreshToken || parsed.refreshToken;
             parsed.expiry = Date.now() + 60 * 60 * 1000; // 1 hour expiry
             localStorage.setItem("auth", JSON.stringify(parsed));
             setAuth(parsed);
@@ -250,6 +257,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
     {
       label: "Job Market Analysis",
       path: "/job-trends",
+    },
+    {
+      label: "Student Recruitment",
+      path: "/recruitment",
     },
   ];
 
