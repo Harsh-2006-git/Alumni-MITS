@@ -249,10 +249,21 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
   };
 
   const calculateProgress = (campaign) => {
-    const total = parseFloat(campaign.totalAmount);
-    const current = parseFloat(campaign.currentAmount);
-    if (total === 0) return 0;
-    return Math.min(Math.round((current / total) * 100), 100);
+    const total = parseFloat(campaign?.totalAmount || 0);
+    const current = parseFloat(campaign?.currentAmount || 0);
+    if (total <= 0 || isNaN(total) || isNaN(current)) return 0;
+
+    const percentage = (current / total) * 100;
+
+    if (percentage === 0) return 0;
+    if (percentage >= 100) return 100;
+
+    // For very small amounts, show up to 2 decimal places so it's not 0%
+    if (percentage < 1) {
+      return parseFloat(percentage.toFixed(2));
+    }
+
+    return Math.round(percentage);
   };
 
   const getDaysLeft = (endDate) => {
@@ -457,6 +468,17 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
     return matchesSearch && matchesCategory;
   });
 
+  const totalRaisedValue = campaigns.reduce((acc, c) => acc + (parseFloat(c.currentAmount) || 0), 0);
+  const successRateValue = campaigns.length > 0
+    ? Math.round((campaigns.filter(c => parseFloat(c.currentAmount) >= parseFloat(c.totalAmount)).length / campaigns.length) * 100)
+    : 0;
+
+  const formatStatsAmount = (amt) => {
+    if (amt >= 10000000) return `₹${(amt / 10000000).toFixed(1)}Cr+`;
+    if (amt >= 100000) return `₹${(amt / 100000).toFixed(1)}L+`;
+    return `₹${amt.toLocaleString()}`;
+  };
+
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${isDarkMode
@@ -520,7 +542,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                 <Users className="w-6 h-6 sm:w-7 sm:h-7 text-cyan-400" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-cyan-400 mb-1">
-                500+
+                {campaigns.length * 12}+
               </h3>
               <p
                 className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -540,7 +562,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                 <DollarSign className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-400" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-emerald-400 mb-1">
-                ₹2.5M+
+                {formatStatsAmount(totalRaisedValue)}
               </h3>
               <p
                 className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -560,7 +582,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                 <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-orange-400" />
               </div>
               <h3 className="text-lg sm:text-xl font-bold text-orange-400 mb-1">
-                95%
+                {successRateValue}%
               </h3>
               <p
                 className={`text-xs sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -716,7 +738,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                       >
                         <div
                           className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all duration-500"
-                          style={{ width: `${progress}%` }}
+                          style={{ width: `${Math.max(parseFloat(progress) > 0 ? 1.5 : 0, parseFloat(progress))}%` }}
                         ></div>
                       </div>
                     </div>
