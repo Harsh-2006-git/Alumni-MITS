@@ -195,7 +195,7 @@ const CampaignManagement = () => {
                 <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                     {/* Desktop Table View */}
                     <div className="hidden md:block overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
+                        <table className="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr className="bg-gray-50 text-gray-700 text-sm font-semibold border-b border-gray-200">
                                     <th className="px-6 py-4">Campaign</th>
@@ -384,13 +384,13 @@ const CampaignManagement = () => {
                                             ) : supports.filter(s => s.status === 'pending').length > 0 ? (
                                                 <>
                                                     {supports.filter(s => s.status === 'pending').slice(0, 5).map((s, i) => (
-                                                        <div key={i} className="p-4 rounded-xl border border-amber-100 bg-amber-50/30 flex flex-col sm:flex-row justify-between gap-4">
-                                                            <div className="min-w-0 flex-1">
+                                                        <div key={i} className="p-4 rounded-xl border border-amber-100 bg-amber-50/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
+                                                            <div className="min-w-0">
                                                                 <div className="flex items-center gap-2 mb-1">
-                                                                    <p className="font-bold text-gray-900 truncate">{s.supporterName}</p>
+                                                                    <p className="font-bold text-gray-900 break-words">{s.supporterName}</p>
                                                                 </div>
-                                                                <p className="text-xs text-gray-500 truncate">{s.supporterEmail} • <span className="uppercase">{s.supporterUserType}</span></p>
-                                                                <p className="text-[10px] text-gray-400 font-mono mt-1">UTR: {s.transactionId}</p>
+                                                                <p className="text-xs text-gray-500 break-words">{s.supporterEmail} • <span className="uppercase">{s.supporterUserType}</span></p>
+                                                                <p className="text-[10px] text-gray-400 font-mono mt-1 break-all">UTR: {s.transactionId}</p>
                                                             </div>
                                                             <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2">
                                                                 <p className="font-black text-amber-600 text-lg">₹{s.amount}</p>
@@ -433,14 +433,15 @@ const CampaignManagement = () => {
                                             ) : supports.filter(s => s.status === 'verified').length > 0 ? (
                                                 <>
                                                     {supports.filter(s => s.status === 'verified').slice(0, 5).map((s, i) => (
-                                                        <div key={i} className="p-4 rounded-xl border border-emerald-100 bg-emerald-50/30 flex flex-col sm:flex-row justify-between gap-4">
-                                                            <div className="min-w-0 flex-1">
-                                                                <p className="font-bold text-gray-900 truncate">{s.supporterName}</p>
-                                                                <p className="text-xs text-gray-500 truncate">{s.supporterEmail} • <span className="uppercase">{s.supporterUserType}</span></p>
-                                                                <p className="text-[10px] text-gray-400 font-mono mt-0.5">Verified on: {new Date(s.verifiedAt).toLocaleDateString()}</p>
+                                                        <div key={i} className="p-4 rounded-xl border border-emerald-100 bg-emerald-50/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
+                                                            <div className="min-w-0">
+                                                                <p className="font-bold text-gray-900 break-words">{s.supporterName}</p>
+                                                                <p className="text-xs text-gray-500 break-words">{s.supporterEmail} • <span className="uppercase">{s.supporterUserType}</span></p>
+                                                                <p className="text-[10px] text-gray-400 font-mono mt-0.5 break-all">Verified on: {new Date(s.verifiedAt).toLocaleDateString()}</p>
                                                             </div>
-                                                            <div className="flex items-center">
-                                                                <p className="font-black text-emerald-600 text-lg">+ ₹{s.amount}</p>
+                                                            <div className="flex justify-between sm:block">
+                                                                <span className="sm:hidden text-[10px] font-bold text-gray-400 uppercase">Amount:</span>
+                                                                <p className="font-black text-emerald-600 text-lg">₹{s.amount}</p>
                                                             </div>
                                                         </div>
                                                     ))}
@@ -591,9 +592,9 @@ const CampaignManagement = () => {
 
                         {/* Modal Content - Scrollable Table */}
                         <div className="flex-1 overflow-auto custom-scrollbar p-4 sm:p-8 bg-gray-50/50">
-                            <div className="min-w-max sm:min-w-full space-y-4">
-                                {/* Table Header - Only for Desktop */}
-                                <div className="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-500 border border-gray-200">
+                            <div className="space-y-4">
+                                {/* Table Header */}
+                                <div className="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-500 border border-gray-200 min-w-[900px]">
                                     <div className="col-span-1">#</div>
                                     <div className="col-span-3">User Details</div>
                                     <div className="col-span-3">Email & Type</div>
@@ -608,7 +609,7 @@ const CampaignManagement = () => {
                                     {detailsData.items.map((item, idx) => (
                                         <div
                                             key={idx}
-                                            className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center p-4 sm:p-6 rounded-3xl border border-gray-100 bg-white hover:bg-gray-50 transition-all shadow-sm"
+                                            className="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center p-4 sm:p-6 rounded-3xl border border-gray-100 bg-white hover:bg-gray-50 transition-all shadow-sm sm:min-w-[900px]"
                                         >
                                             <div className="sm:col-span-1 flex items-center justify-between sm:justify-start">
                                                 <span className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs border border-indigo-100">
@@ -623,15 +624,15 @@ const CampaignManagement = () => {
                                                         {item.supporterName?.charAt(0) || 'U'}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <p className="font-bold text-base text-gray-900 truncate">{item.supporterName}</p>
-                                                        <p className="text-[10px] sm:hidden text-gray-500 truncate">{item.supporterEmail}</p>
+                                                        <p className="font-bold text-base text-gray-900">{item.supporterName}</p>
+                                                        <p className="text-[10px] sm:hidden text-gray-500">{item.supporterEmail}</p>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {/* Contact & Type */}
                                             <div className="sm:col-span-3 space-y-1">
-                                                <p className="hidden sm:block text-sm font-semibold truncate text-indigo-600">{item.supporterEmail || 'N/A'}</p>
+                                                <p className={`hidden sm:block text-sm font-semibold break-words ${isDarkMode ? "text-cyan-400/80" : "text-blue-600"}`}>{item.supporterEmail || 'N/A'}</p>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 uppercase border border-gray-200">
                                                         {item.supporterUserType || 'Student'}
@@ -657,7 +658,7 @@ const CampaignManagement = () => {
                                                     </div>
                                                 ) : (
                                                     <div className="space-y-1">
-                                                        <p className="text-[10px] font-mono text-gray-500 bg-gray-100 p-2 rounded-lg truncate border border-gray-200">ID: {item.transactionId || 'N/A'}</p>
+                                                        <p className="text-[10px] font-mono text-gray-500 bg-gray-100 p-2 rounded-lg break-all border border-gray-200">UTR: {item.transactionId || 'N/A'}</p>
                                                         <p className="text-[10px] text-gray-400 font-bold">{item.verifiedAt || item.createdAt ? new Date(item.verifiedAt || item.createdAt).toLocaleString() : ''}</p>
                                                     </div>
                                                 )}

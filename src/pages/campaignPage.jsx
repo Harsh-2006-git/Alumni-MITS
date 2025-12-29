@@ -343,6 +343,11 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
       return;
     }
 
+    if (!/^\d{12}$/.test(transactionId)) {
+      showMessage("UTR must be exactly 12 digits", "error");
+      return;
+    }
+
     setSupportLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/campaign/support`, {
@@ -1151,7 +1156,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                               </span>
                               <span className={`font-black text-xl ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`}>{formatAmount(s.amount)}</span>
                             </div>
-                            <p className={`text-xs font-bold font-mono mb-2 p-2 rounded-lg truncate ${isDarkMode ? "bg-black/20 text-gray-400" : "bg-gray-50 text-gray-700 border border-gray-200"}`}>UTR/Transaction ID: {s.transactionId}</p>
+                            <p className={`text-xs font-bold font-mono mb-2 p-2 rounded-lg break-all ${isDarkMode ? "bg-black/20 text-gray-400" : "bg-gray-50 text-gray-700 border border-gray-200"}`}>UTR: {s.transactionId}</p>
                             <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{new Date(s.verifiedAt || s.createdAt).toLocaleDateString()}</p>
                           </div>
 
@@ -1199,7 +1204,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                               <p className="text-xs text-red-200">"{c.complaintText}"</p>
                             </div>
                             {c.transactionId && (
-                              <p className="text-[10px] text-gray-500 font-mono bg-black/20 p-1.5 rounded truncate">ID: {c.transactionId}</p>
+                              <p className="text-[10px] text-gray-500 font-mono bg-black/20 p-1.5 rounded break-all">UTR: {c.transactionId}</p>
                             )}
                           </div>
 
@@ -1256,15 +1261,15 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                             h.supporterName.toLowerCase().includes(pendingSearch.toLowerCase()) ||
                             h.transactionId.toLowerCase().includes(pendingSearch.toLowerCase())
                           )).map((h, i) => (
-                            <div key={i} className={`p-4 rounded-2xl border flex flex-col justify-between ${isDarkMode ? "bg-amber-500/5 border-amber-500/20" : "bg-white border-amber-100 shadow-sm"}`}>
+                            <div key={i} className={`p-4 rounded-2xl border flex flex-col justify-between w-full ${isDarkMode ? "bg-amber-500/5 border-amber-500/20" : "bg-white border-amber-100 shadow-sm"}`}>
                               <div className="flex justify-between items-start mb-2">
                                 <div className="min-w-0 flex-1">
-                                  <p className={`font-bold text-sm truncate ${isDarkMode ? "text-white" : "text-gray-900"}`}>{h.supporterName}</p>
-                                  <p className="text-[10px] text-gray-500 truncate">{h.supporterEmail}</p>
+                                  <p className={`font-bold text-sm ${isDarkMode ? "text-white" : "text-gray-900"}`}>{h.supporterName}</p>
+                                  <p className="text-[10px] text-gray-500">{h.supporterEmail}</p>
                                 </div>
-                                <span className={`font-black text-lg ${isDarkMode ? "text-amber-400" : "text-amber-600"}`}>{formatAmount(h.amount)}</span>
+                                <span className={`font-black text-lg ml-4 ${isDarkMode ? "text-amber-400" : "text-amber-600"}`}>{formatAmount(h.amount)}</span>
                               </div>
-                              <p className={`text-[10px] font-mono mb-3 p-1.5 rounded truncate border ${isDarkMode ? "bg-black/30 text-gray-500 border-amber-500/10" : "bg-gray-50 text-gray-600 border-gray-100"}`}>UTR/Transaction ID: {h.transactionId}</p>
+                              <p className={`text-[10px] font-mono mb-3 p-1.5 rounded break-all border ${isDarkMode ? "bg-black/30 text-gray-500 border-amber-500/10" : "bg-gray-50 text-gray-600 border-gray-100"}`}>UTR: {h.transactionId}</p>
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => handleVerifySupport(h._id, 'verified')}
@@ -1307,8 +1312,8 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                     </div>
 
                     <div className="overflow-y-auto flex-1 pr-2 space-y-1 custom-scrollbar">
-                      {/* Header Row */}
-                      <div className={`flex items-center px-4 py-2 text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+                      {/* Header Row - Desktop Only */}
+                      <div className={`hidden sm:flex items-center px-4 py-2 text-[10px] font-bold uppercase tracking-widest gap-8 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
                         <div className="flex-1">Supporter Details</div>
                         <div className="w-24 text-right">Date</div>
                         <div className="w-28 text-right">Amount</div>
@@ -1322,19 +1327,21 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                           s.supporterName.toLowerCase().includes(boosterSearch.toLowerCase()) ||
                           (s.transactionId && s.transactionId.toLowerCase().includes(boosterSearch.toLowerCase()))
                         ).map((s, i) => (
-                          <div key={i} className={`flex items-center px-4 py-3 rounded-xl transition-all hover:scale-[1.01] ${isDarkMode ? "hover:bg-white/5 border border-transparent hover:border-white/5" : "hover:bg-gray-50 border border-transparent hover:border-blue-100"}`}>
-                            <div className="flex-1 min-w-0 pr-4">
-                              <div className={`font-bold text-sm truncate ${isDarkMode ? "text-white/90" : "text-gray-900"}`}>{s.supporterName}</div>
-                              <div className={`text-xs truncate ${isDarkMode ? "text-cyan-400/70" : "text-blue-500/70"}`}>{s.supporterEmail}</div>
+                          <div key={i} className={`flex flex-col sm:flex-row sm:items-center px-4 py-3 rounded-xl transition-all hover:scale-[1.01] gap-2 sm:gap-8 ${isDarkMode ? "hover:bg-white/5 border border-transparent hover:border-white/5" : "hover:bg-gray-50 border border-transparent hover:border-blue-100"}`}>
+                            <div className="flex-1 min-w-0">
+                              <div className={`font-bold text-sm break-words ${isDarkMode ? "text-white/90" : "text-gray-900"}`}>{s.supporterName}</div>
+                              <div className={`text-xs break-words ${isDarkMode ? "text-cyan-400/70" : "text-blue-500/70"}`}>{s.supporterEmail}</div>
                               {isHolder && s.transactionId && (
-                                <div className={`text-[10px] font-mono mt-0.5 truncate ${isDarkMode ? "text-gray-600" : "text-gray-400"}`}>UTR/Transaction ID: {s.transactionId}</div>
+                                <div className={`text-[10px] font-mono mt-0.5 break-all ${isDarkMode ? "text-gray-600" : "text-gray-400"}`}>UTR: {s.transactionId}</div>
                               )}
                             </div>
-                            <div className="w-24 text-right text-xs text-gray-500 font-bold">
-                              {new Date(s.verifiedAt || s.createdAt).toLocaleDateString()}
+                            <div className="flex justify-between sm:block sm:w-24 text-right">
+                              <span className="sm:hidden text-[10px] font-bold text-gray-400 uppercase">Date:</span>
+                              <span className="text-xs text-gray-500 font-bold">{new Date(s.verifiedAt || s.createdAt).toLocaleDateString()}</span>
                             </div>
-                            <div className={`w-28 text-right font-black ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`}>
-                              {formatAmount(s.amount)}
+                            <div className={`flex justify-between sm:block sm:w-28 text-right font-black ${isDarkMode ? "text-emerald-400" : "text-emerald-600"}`}>
+                              <span className="sm:hidden text-[10px] font-bold text-gray-400 uppercase">Amount:</span>
+                              <span>{formatAmount(s.amount)}</span>
                             </div>
                           </div>
                         ))
@@ -1763,14 +1770,18 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-black uppercase text-gray-500 mb-1 tracking-widest pl-1">Transaction ID / UTR <span className="text-red-400">*</span></label>
+                      <label className="block text-[10px] font-black uppercase text-gray-500 mb-1 tracking-widest pl-1">UTR <span className="text-red-400">*</span></label>
                       <input
                         type="text"
                         required
+                        maxLength={12}
                         value={transactionId}
-                        onChange={(e) => setTransactionId(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, "");
+                          if (val.length <= 12) setTransactionId(val);
+                        }}
                         className={`w-full p-4 rounded-xl border-2 focus:ring-2 focus:ring-cyan-500 outline-none ${isDarkMode ? "bg-black/20 border-white/10 text-white" : "bg-gray-50 border-gray-100 text-gray-900"}`}
-                        placeholder="12-digit UPI Transaction ID"
+                        placeholder="12-digit UTR Number"
                       />
                     </div>
 
@@ -1831,7 +1842,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
 
               {/* Modal Content - Scrollable Table */}
               <div className="flex-1 overflow-auto custom-scrollbar p-4 sm:p-8">
-                <div className="min-w-max sm:min-w-full space-y-4">
+                <div className="w-full space-y-4">
                   {/* Table Header - Only for Desktop */}
                   <div className={`hidden sm:grid grid-cols-12 gap-4 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest ${isDarkMode ? "bg-black/20 text-gray-400" : "bg-gray-100 text-gray-500 border border-gray-200"}`}>
                     <div className="col-span-1">#</div>
@@ -1868,16 +1879,16 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold shrink-0">
                               {item.supporterName?.charAt(0) || 'U'}
                             </div>
-                            <div className="min-w-0">
-                              <p className={`font-bold text-base truncate ${isDarkMode ? "text-white" : "text-gray-800"}`}>{item.supporterName}</p>
-                              <p className="text-[10px] sm:hidden text-gray-500 truncate">{item.supporterEmail}</p>
+                            <div className="min-w-0 flex-1">
+                              <p className={`font-bold text-base break-words ${isDarkMode ? "text-white" : "text-gray-800"}`}>{item.supporterName}</p>
+                              <p className="text-[10px] sm:hidden text-gray-500 break-words">{item.supporterEmail}</p>
                             </div>
                           </div>
                         </div>
 
                         {/* Contact & Type */}
                         <div className="sm:col-span-3 space-y-1">
-                          <p className={`hidden sm:block text-sm font-semibold truncate ${isDarkMode ? "text-cyan-400/80" : "text-blue-600"}`}>{item.supporterEmail || 'N/A'}</p>
+                          <p className={`hidden sm:block text-sm font-semibold break-words ${isDarkMode ? "text-cyan-400/80" : "text-blue-600"}`}>{item.supporterEmail || 'N/A'}</p>
                           <div className="flex items-center gap-2">
                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isDarkMode ? "bg-white/10 text-gray-400" : "bg-gray-100 text-gray-600 border border-gray-200"} uppercase`}>
                               {item.supporterUserType || 'Student'}
@@ -1903,7 +1914,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                             </div>
                           ) : (
                             <div className="space-y-1">
-                              <p className={`text-[10px] font-mono p-2 rounded-lg truncate ${isDarkMode ? "bg-black/20 text-gray-400" : "bg-gray-100 text-gray-600 border border-gray-200"}`}>ID: {item.transactionId || 'N/A'}</p>
+                              <p className={`text-[10px] font-mono p-2 rounded-lg break-all ${isDarkMode ? "bg-black/20 text-gray-400" : "bg-gray-100 text-gray-600 border border-gray-200"}`}>UTR: {item.transactionId || 'N/A'}</p>
                               <p className={`text-[10px] font-bold ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>{item.verifiedAt || item.createdAt ? new Date(item.verifiedAt || item.createdAt).toLocaleString() : ''}</p>
                             </div>
                           )}
