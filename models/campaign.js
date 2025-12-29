@@ -81,6 +81,12 @@ const CampaignSchema = new mongoose.Schema(
       match: [/^[0-9+\-() ]+$/, "Invalid phone"],
     },
 
+    upiId: {
+      type: String,
+      required: true,
+      match: [/^[\w.-]+@[\w.-]+$/, "Invalid UPI ID"],
+    },
+
     userType: {
       type: String,
       enum: ["student", "alumni", "college", "admin"],

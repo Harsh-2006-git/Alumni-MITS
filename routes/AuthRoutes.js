@@ -15,9 +15,11 @@ import {
   adminLogin,
   handleForgotPassword,
   checkAlumniEmail,
-  updateExtraEmail,
   checkExtraEmailStatus,
-  registerStudent
+  updateExtraEmail,
+  registerStudent,
+  googleAuthAdmin,
+  googleCallbackAdmin
 } from "../controller/AuthController.js";
 
 // Change this import - use default import instead of named import
@@ -45,14 +47,17 @@ router.get("/google/callback", (req, res, next) => {
     return googleCallbackAlumni(req, res, next);
   } else if (state === "alumni-register") {
     return googleCallbackAlumniRegister(req, res, next);
+  } else if (state === "admin") {
+    return googleCallbackAdmin(req, res, next);
   }
   // Default to student login
   return googleCallback(req, res, next);
 });
 
-// ========== GOOGLE OAUTH ROUTES FOR ALUMNI ==========
+// ========== GOOGLE OAUTH ROUTES FOR ALUMNI & ADMIN ==========
 router.get("/google-alumni", googleAuthAlumni);
 router.get("/google-alumni-register", googleAuthAlumniRegister);
+router.get("/google-admin", googleAuthAdmin);
 // Alumni uses same callback as students, differentiated by state parameter
 
 // ========== TOKEN MANAGEMENT ==========

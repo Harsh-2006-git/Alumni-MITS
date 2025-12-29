@@ -7,6 +7,7 @@ import {
   registerForEvent,
   deleteEvent,
   getEventRegistrations,
+  downloadRegistrations,
   getmyevents,
   getallEvents,
 } from "../controller/eventController.js";
@@ -28,6 +29,11 @@ router.get(
   "/event-registrations/:eventId",
   authenticateClient,
   getEventRegistrations
+);
+router.get(
+  "/download-registrations/:eventId",
+  authenticateClient,
+  downloadRegistrations
 );
 
 export default router;

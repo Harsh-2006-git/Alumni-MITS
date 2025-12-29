@@ -34,6 +34,19 @@ const MessageSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
     createdAt: {
       type: Date,
       default: Date.now,

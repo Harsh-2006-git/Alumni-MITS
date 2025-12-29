@@ -895,31 +895,44 @@ export const updateSessionDetails = async (req, res) => {
     });
   }
 };
-// Get all mentorship requests for a mentor
+// Get all mentorship requests for a mentor (or all for admin)
 export const getMentorshipRequests = async (req, res) => {
   try {
-    if (!req.user || req.user.userType !== "alumni") {
+    // Check if user is authenticated
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required",
+      });
+    }
+
+    const isAdmin = req.user.userType === "admin";
+
+    if (!isAdmin && req.user.userType !== "alumni") {
       return res.status(403).json({
         success: false,
-        message: "Access denied. Only mentors can view requests",
+        message: "Access denied. Only mentors and admins can view requests",
       });
     }
 
     const { status } = req.query;
+    let whereConditions = {};
 
-    // Find mentor profile for this alumni
-    const mentor = await Mentor.findOne({
-      alumni_id: req.user.id,
-    });
-
-    if (!mentor) {
-      return res.status(404).json({
-        success: false,
-        message: "Mentor profile not found",
+    if (!isAdmin) {
+      // Find mentor profile for this alumni
+      const mentor = await Mentor.findOne({
+        alumni_id: req.user.id,
       });
+
+      if (!mentor) {
+        return res.status(404).json({
+          success: false,
+          message: "Mentor profile not found",
+        });
+      }
+      whereConditions.mentor_id = mentor._id;
     }
 
-    const whereConditions = { mentor_id: mentor._id };
     if (status) whereConditions.status = status;
 
     const requests = await MentorStudent.find(whereConditions)

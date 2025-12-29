@@ -1,5 +1,6 @@
 import Event from "../models/event.js";
 import EventRegistration from "../models/eventRegistration.js";
+import User from "../models/user.js";
 import mongoose from "mongoose";
 import multer from "multer";
 import cloudinary from "cloudinary";
@@ -249,8 +250,9 @@ export const deleteEvent = async (req, res) => {
       });
     }
 
-    // Check if user owns the event
-    if (event.organizerEmail !== email && event.userType !== userType) {
+    // Check if user owns the event or is admin
+    const isAdmin = userType === "admin";
+    if (!isAdmin && event.organizerEmail !== email) {
       return res.status(403).json({
         success: false,
         message: "You can only delete your own events",
@@ -509,7 +511,7 @@ import EmailService from "../services/EmailService.js";
 export const registerForEvent = async (req, res) => {
   try {
     const { eventId } = req.body;
-    const { email, userType, name, id: userId } = req.user;
+    const { email, userType, name, id: userId, phone: userPhone } = req.user;
 
     if (!eventId) {
       return res.status(400).json({
@@ -570,6 +572,7 @@ export const registerForEvent = async (req, res) => {
       userEmail: email,
       userName: name,
       userType,
+      userPhone,
       registrationDate: new Date(),
     });
 
@@ -649,6 +652,14 @@ export const getEventRegistrations = async (req, res) => {
       .populate("eventId", "title date location organizer")
       .sort({ registrationDate: -1 });
 
+    // Fetch phone numbers for fallback
+    const userEmails = [...new Set(registrations.map(r => r.userEmail))];
+    const users = await User.find({ email: { $in: userEmails } }, "email phone");
+    const phoneMap = users.reduce((acc, u) => {
+      acc[u.email.toLowerCase()] = u.phone;
+      return acc;
+    }, {});
+
     // Process registrations to match the expected structure
     const processedRegistrations = registrations.map((registration) => {
       const regData = registration.toObject
@@ -663,8 +674,12 @@ export const getEventRegistrations = async (req, res) => {
           location: regData.eventId.location,
           organizer: regData.eventId.organizer,
         };
-        delete regData.eventId;
+        // Keep eventId but convert to string for convenience
+        regData.eventId = regData.eventId._id;
       }
+
+      // Add phone number for frontend
+      regData.phone = regData.userPhone || phoneMap[regData.userEmail?.toLowerCase()] || "N/A";
 
       regData.id = regData._id || regData.id;
       return regData;
@@ -673,6 +688,7 @@ export const getEventRegistrations = async (req, res) => {
     res.status(200).json({
       success: true,
       data: processedRegistrations,
+      registrations: processedRegistrations, // Add this for compatibility with both data and registrations keys
       count: processedRegistrations.length,
     });
   } catch (error) {
@@ -710,6 +726,74 @@ export const getPendingEvents = async (req, res) => {
     console.error("Error fetching pending events:", error);
     return res.status(500).json({
       message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+export const downloadRegistrations = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+    const { email, userType } = req.user;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(eventId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid event ID format",
+      });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ success: false, message: "Event not found" });
+    }
+
+    // Check if user is event organizer or admin
+    if (event.organizerEmail !== email && userType !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "You can only download registrations for your own events",
+      });
+    }
+
+    const registrations = await EventRegistration.find({ eventId }).sort({ registrationDate: -1 });
+
+    if (!registrations || registrations.length === 0) {
+      return res.status(404).json({ success: false, message: "No registrations found to download" });
+    }
+
+    // To handle registrations that might not have userPhone, fetch from User collection
+    const userEmails = [...new Set(registrations.map(r => r.userEmail))];
+    const users = await User.find({ email: { $in: userEmails } }, "email phone");
+    const phoneMap = users.reduce((acc, u) => {
+      acc[u.email.toLowerCase()] = u.phone;
+      return acc;
+    }, {});
+
+    // Generate CSV
+    let csv = "Name,Email,Contact Number,User Type,Registration Date\n";
+    registrations.forEach((reg) => {
+      const name = (reg.userName || "N/A").replace(/,/g, " ");
+      const email = (reg.userEmail || "N/A").replace(/,/g, " ");
+      const phone = (reg.userPhone || phoneMap[email.toLowerCase()] || "N/A").replace(/,/g, " ");
+      const type = (reg.userType || "N/A").replace(/,/g, " ");
+      const date = reg.registrationDate ? new Date(reg.registrationDate).toLocaleString() : "N/A";
+      csv += `${name},${email},${phone},${type},${date}\n`;
+    });
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${event.title.replace(/[^a-z0-9]/gi, "_")}_registrations.csv`
+    );
+
+    return res.status(200).send(csv);
+  } catch (error) {
+    console.error("Error downloading registrations:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error generating download",
       error: error.message,
     });
   }

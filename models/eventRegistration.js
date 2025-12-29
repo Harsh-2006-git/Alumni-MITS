@@ -28,7 +28,9 @@ const EventRegistrationSchema = new mongoose.Schema(
       enum: ["alumni", "student", "admin"],
       required: true,
     },
-
+    userPhone: {
+      type: String,
+    },
     registrationDate: {
       type: Date,
       default: Date.now,

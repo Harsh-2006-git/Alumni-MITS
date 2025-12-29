@@ -88,14 +88,48 @@ export const getAllAlumni = async (req, res) => {
         alumniResume: alumni.resume || null,
         profileResume: null, // Unified resume in user model
         batch: alumni.batch || profile?.batch || null, // Prefer batch from User, fallback to Profile
+        createdAt: alumni.createdAt,
         profile: profile || {},
       };
     });
 
+    // Secure the response:
+    // If user is NOT authenticated, strip sensitive details
+    let responseData = formattedAlumni;
+
+    if (!req.isAuthenticated) {
+      responseData = formattedAlumni.map((alumni) => {
+        const restricted = { ...alumni };
+
+        // Explicitly remove sensitive fields
+        delete restricted.email;
+        delete restricted.phone;
+        delete restricted.linkedin;
+        delete restricted.alumniResume;
+        delete restricted.profileResume;
+
+        // Sanitize nested profile object if present
+        if (restricted.profile) {
+          // Ensure we work with a plain object
+          const profileObj = restricted.profile.toObject
+            ? restricted.profile.toObject()
+            : { ...restricted.profile };
+
+          delete profileObj.linkedin;
+          delete profileObj.email;
+          delete profileObj.phone;
+
+          restricted.profile = profileObj;
+        }
+
+        return restricted;
+      });
+    }
+
     res.status(200).json({
       success: true,
-      count: formattedAlumni.length,
-      data: formattedAlumni,
+      count: responseData.length,
+      data: responseData,
     });
   } catch (error) {
     console.error("Error fetching all alumni:", error);
@@ -144,6 +178,7 @@ export const getAllAlumni2 = async (req, res) => {
         alumniResume: alumni.resume || null,
         profileResume: null,
         batch: alumni.batch || profile?.batch || null,
+        createdAt: alumni.createdAt,
         profile: profile || {},
       };
     });
@@ -192,6 +227,7 @@ export const getUnverifiedAlumni = async (req, res) => {
         profilePhoto: alumni.profilePhoto || null,
         alumniResume: alumni.resume || null,
         profileResume: null,
+        createdAt: alumni.createdAt,
         profile: profile || {},
       };
     });
@@ -511,6 +547,12 @@ export const saveStudentProfile = async (req, res) => {
         experience,
       });
     }
+
+    // Also update basic info in User model for easier searching
+    await User.findByIdAndUpdate(studentId, {
+      branch: branch || null,
+      batch: education?.[0]?.to?.split("-")?.[0] || null // Try to get batch from education if not provided directly
+    });
 
     res.status(200).json({
       message: "Student profile saved successfully",
@@ -899,6 +941,88 @@ export const getLinkedInProfileByUrl = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch LinkedIn profile",
+      error: error.message,
+    });
+  }
+};
+
+export const getAllStudents = async (req, res) => {
+  try {
+    const { branch, batch, skills, name } = req.query;
+
+    // Build query - only basic filters for initial fetch
+    const query = { userType: "student" };
+    if (name) query.name = { $regex: name, $options: "i" };
+    // Branch and batch will be filtered in code to handle fallback to UserProfile
+
+    const studentsList = await User.find(query)
+      .select("-password")
+      .sort({ name: 1 });
+
+    const studentIds = studentsList.map((s) => s._id);
+
+    // Build profile query
+    const profileQuery = { userId: { $in: studentIds } };
+
+    // Fetch all profiles first to filter by skills if needed
+    const profiles = await UserProfile.find(profileQuery);
+
+    const profileMap = new Map();
+    profiles.forEach((profile) => {
+      profileMap.set(profile.userId.toString(), profile);
+    });
+
+    // Combine and filter
+    const formattedStudents = studentsList
+      .map((student) => {
+        const profile = profileMap.get(student._id.toString());
+
+        const finalBranch = student.branch || profile?.branch || "N/A";
+        const finalBatch = student.batch || profile?.batch || "N/A";
+
+        // Filtering in code because branch/batch might be in either model
+        if (branch && branch !== "All Branches" && finalBranch !== branch) return null;
+        if (batch && batch !== "All Batches" && finalBatch !== batch) return null;
+
+        // Manual skills filtering if provided
+        if (skills) {
+          const skillsArray = skills.toLowerCase().split(",").map(s => s.trim());
+          const studentSkills = (profile?.skills || []).map(s => s.toLowerCase());
+          const hasAllSkills = skillsArray.every(skill => studentSkills.some(ss => ss.includes(skill)));
+          if (!hasAllSkills) return null;
+        }
+
+        return {
+          id: student._id,
+          name: student.name,
+          email: student.email,
+          phone: student.phone,
+          branch: finalBranch,
+          batch: finalBatch,
+          location: profile?.location || "N/A",
+          skills: profile?.skills || [],
+          linkedin: profile?.linkedin || null,
+          github: profile?.github || null,
+          profilePhoto: student.profilePhoto || null,
+          resume: student.resume || null,
+          about: profile?.about || "",
+          createdAt: student.createdAt,
+          education: profile?.education || [],
+          experience: profile?.experience || [],
+        };
+      })
+      .filter((s) => s !== null);
+
+    res.status(200).json({
+      success: true,
+      count: formattedStudents.length,
+      data: formattedStudents,
+    });
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching students.",
       error: error.message,
     });
   }

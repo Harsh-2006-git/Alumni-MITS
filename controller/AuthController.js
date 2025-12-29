@@ -63,7 +63,7 @@ const ADMIN_CREDENTIALS = {
 
 const generateTokensAdmin = (adminPayload) => {
   const accessToken = jwt.sign(adminPayload, JWT_SECRET, {
-    expiresIn: "30m", // short-lived token for requests
+    expiresIn: "1h", // standardized to 1 hour
   });
 
   const refreshToken = jwt.sign(adminPayload, REFRESH_TOKEN_SECRET, {
@@ -73,7 +73,6 @@ const generateTokensAdmin = (adminPayload) => {
   return { accessToken, refreshToken };
 };
 
-// ✅ Admin Login Controller
 // ✅ Admin Login Controller
 export const adminLogin = async (req, res) => {
   try {
@@ -354,6 +353,69 @@ export const googleCallbackAlumniRegister = (req, res, next) => {
     // For now, we trust the redirect parameters as they come from this successful callback
 
     console.log("🔄 Redirecting to registration form");
+    res.redirect(redirectUrl.toString());
+  })(req, res, next);
+};
+
+// ===================== GOOGLE OAUTH FOR ADMIN (Faculty Bypass) =====================
+passport.use(
+  "google-admin",
+  new GoogleStrategy(
+    {
+      clientID: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      callbackURL: CALLBACK_URL,
+      proxy: true,
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const email = profile.emails[0].value.toLowerCase();
+        if (!email.endsWith("@mitsgwalior.in")) {
+          return done(null, false, { message: "unauthorized_faculty_domain" });
+        }
+        return done(null, profile);
+      } catch (err) {
+        return done(err, null);
+      }
+    }
+  )
+);
+
+export const googleAuthAdmin = (req, res, next) => {
+  passport.authenticate("google-admin", {
+    scope: ["profile", "email"],
+    prompt: "select_account",
+    accessType: "offline",
+    state: "admin",
+  })(req, res, next);
+};
+
+export const googleCallbackAdmin = (req, res, next) => {
+  passport.authenticate("google-admin", { session: false }, async (err, profile, info) => {
+    if (err || !profile) {
+      const error = info?.message || "unauthorized";
+      return res.redirect(`${FRONTEND_URL}/login-admin?error=${error}`);
+    }
+
+    const email = profile.emails[0].value;
+    const adminPayload = {
+      name: profile.displayName,
+      username: email,
+      email: email,
+      userType: "admin",
+      loginTime: new Date().toISOString(),
+    };
+
+    const { accessToken, refreshToken } = generateTokensAdmin(adminPayload);
+
+    const redirectUrl = new URL(`${FRONTEND_URL}/login-admin`);
+    redirectUrl.searchParams.set("accessToken", accessToken);
+    redirectUrl.searchParams.set("refreshToken", refreshToken);
+    redirectUrl.searchParams.set("userName", encodeURIComponent(profile.displayName));
+    redirectUrl.searchParams.set("userEmail", email);
+    redirectUrl.searchParams.set("userType", "admin");
+    redirectUrl.searchParams.set("loginSuccess", "true");
+
     res.redirect(redirectUrl.toString());
   })(req, res, next);
 };
@@ -784,34 +846,8 @@ export const loginAlumni = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // ✅ Generate Access Token (short life)
-    const accessToken = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        userType: user.userType,
-      },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-
-    // ✅ Generate Refresh Token (long life)
-    const refreshToken = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        userType: user.userType,
-      },
-      REFRESH_TOKEN_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    // ✅ Option 1 (temporary): store in memory
-    refreshTokens.push(refreshToken);
+    // ✅ Generate tokens and save to DB
+    const { accessToken, refreshToken } = await generateTokens(user);
 
     // Send tokens
     res
@@ -835,6 +871,7 @@ export const loginAlumni = async (req, res) => {
           userType: user.userType,
           isVerified: user.isVerified,
           profilePhoto: user.profilePhoto,
+          phone: user.phone
         },
       });
   } catch (err) {

@@ -14,6 +14,7 @@ import {
   verifyAlumniStatus,
   getLinkedInProfileByUrl,
   deleteAlumni,
+  getAllStudents,
 } from "../controller/AlumniController.js";
 import multer from "multer";
 import authenticateAlumni from "../middlewares/authMiddleware.js";
@@ -26,7 +27,8 @@ router.get("/get-profile-alumni", authenticateAlumni, getAlumniProfile);
 router.get("/get-profile-student", authenticateAlumni, getStudentProfile);
 router.post("/profile-student", authenticateAlumni, saveStudentProfile);
 // For fetching all alumni (e.g., admin or public)
-router.get("/all-alumni",optionalAuth, getAllAlumni);
+router.get("/all-alumni", optionalAuth, getAllAlumni);
+router.get("/all-students", optionalAuth, getAllStudents);
 router.get("/all-alumni-admin", getAllAlumni2);
 router.get("/all-nonvarified-alumni", getUnverifiedAlumni);
 router.patch("/:id/verify", verifyAlumniStatus);
