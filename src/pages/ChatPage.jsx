@@ -235,23 +235,54 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
     const handleReceiveMessage = (newMessage) => {
       console.log("Received message via Socket:", newMessage);
 
-      // Only add if it's relevant to current conversation
+      // Use the IDs from sender/receiver objects or the raw IDs, ensuring they are compared as strings
+      const getID = (obj, rawId) => {
+        if (obj?.id) return obj.id;
+        if (rawId?._id) return rawId._id.toString();
+        if (rawId) return rawId.toString();
+        return null;
+      };
+
+      const msgSenderId = getID(newMessage.sender, newMessage.senderId);
+      const msgReceiverId = getID(newMessage.receiver, newMessage.receiverId);
+
+      // 1. Update Recent Chats Sidebar immediately
+      const chatPartnerId = msgSenderId === currentUser.id ? msgReceiverId : msgSenderId;
+      if (chatPartnerId) {
+        setRecentChats(prev => {
+          const partner = people.find(p => p.id === chatPartnerId);
+          if (!partner) return prev; // If not in people list, we can't add them yet easily without a fetch
+
+          const existing = prev.find(p => p.id === chatPartnerId);
+          const filtered = prev.filter(p => p.id !== chatPartnerId);
+          return [existing || partner, ...filtered]; // Move to top
+        });
+      }
+
+      // 2. Add to active conversation if relevant
       const isRelevant =
-        (newMessage.senderId === selectedUser.id && newMessage.receiverId === currentUser.id) ||
-        (newMessage.senderId === currentUser.id && newMessage.receiverId === selectedUser.id);
+        (msgSenderId === selectedUser.id && msgReceiverId === currentUser.id) ||
+        (msgSenderId === currentUser.id && msgReceiverId === selectedUser.id);
 
       if (isRelevant) {
         setMessages((prev) => {
-          // Avoid duplicates
-          const exists = prev.some(m => m.id === newMessage._id || m._id === newMessage._id);
+          // Avoid duplicates (check both id and _id)
+          const exists = prev.some(m =>
+            m.id === newMessage._id ||
+            m._id === newMessage._id ||
+            m.id === newMessage.id ||
+            m._id === newMessage.id
+          );
           if (exists) return prev;
 
-          return [...prev, {
+          const formattedNewMsg = {
             ...newMessage,
-            id: newMessage._id,
-            sender: newMessage.sender || { id: newMessage.senderId },
-            receiver: newMessage.receiver || { id: newMessage.receiverId },
-          }];
+            id: newMessage._id || newMessage.id,
+            sender: newMessage.sender || { id: msgSenderId },
+            receiver: newMessage.receiver || { id: msgReceiverId },
+          };
+
+          return [...prev, formattedNewMsg];
         });
         setIsUserScrolling(false); // Auto-scroll on new message
       }
@@ -464,17 +495,6 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
   // Socket.IO: Send OR Edit message
   const sendMessage = async () => {
-    if (!messageText.trim() || !selectedUser || !currentUser) return;
-
-    // Stop typing indicator
-    if (socket && selectedUser) {
-      socket.emit("stop_typing", { receiverId: selectedUser.id });
-    }
-
-    if (!socket) {
-      console.warn("Socket not available, using HTTP fallback");
-      return sendMessageHTTP();
-    }
 
     const textToSend = messageText.trim();
     if (!textToSend || !selectedUser || !currentUser) return;
