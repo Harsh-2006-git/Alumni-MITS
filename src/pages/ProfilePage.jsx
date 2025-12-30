@@ -2175,28 +2175,43 @@ export default function AlumniProfilePage() {
           <div className="flex flex-col md:flex-row items-start gap-4 sm:gap-6">
             {/* Profile Image */}
             <div className="relative group flex-shrink-0 mx-auto md:mx-0">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-xl sm:rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                {userData.profilePhoto ? (
-                  <img
-                    src={userData.profilePhoto}
-                    alt={userData.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-12 h-12 sm:w-16 sm:h-16 text-slate-400" />
-                )}
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-xl sm:rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white flex items-center justify-center">
+                <img
+                  src={userData.profilePhoto || "https://png.pngtree.com/png-vector/20240715/ourmid/pngtree-male-profile-icon-in-black-on-a-white-background-vector-png-image_7058986.png"}
+                  alt={userData.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "https://png.pngtree.com/png-vector/20240715/ourmid/pngtree-male-profile-icon-in-black-on-a-white-background-vector-png-image_7058986.png";
+                  }}
+                />
               </div>
+
+              {/* Desktop Hover Overlay */}
               <button
                 onClick={() => setShowPhotoModal(true)}
-                className="absolute inset-0 bg-black/60 rounded-xl sm:rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                className="absolute inset-0 bg-black/40 rounded-xl sm:rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer z-10"
               >
                 <Edit className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </button>
+
+              {/* Verified Badge (Repositioned to bottom-left to avoid overlap) */}
               {userData.isVerified && (
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center border-3 sm:border-4 border-white shadow-lg">
-                  <span className="text-white text-xs">✓</span>
+                <div className="absolute -bottom-2 -left-2 w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center border-2 border-white shadow-lg z-20" title="Verified Member">
+                  <span className="text-white text-[10px]">✓</span>
                 </div>
               )}
+
+              {/* Floating Edit Pencil Icon (Bottom Right) */}
+              <button
+                onClick={() => setShowPhotoModal(true)}
+                className={`absolute -bottom-2 -right-2 p-2 rounded-full shadow-xl border-2 transition-all hover:scale-110 z-20 group/edit ${isDarkMode
+                    ? "bg-slate-800 text-blue-400 border-blue-600/50 hover:bg-slate-700"
+                    : "bg-white text-blue-600 border-blue-100 hover:bg-blue-50"
+                  }`}
+                title="Change Profile Photo"
+              >
+                <Edit className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
             </div>
 
             {/* Profile Info */}

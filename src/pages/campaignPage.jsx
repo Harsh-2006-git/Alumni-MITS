@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Moon,
   Sun,
@@ -30,6 +31,7 @@ import {
 } from "lucide-react";
 import Header from "../components/header";
 import Footer from "../components/footer";
+import Toast from "../components/Toast";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 export default function CampaignPage({ isDarkMode, toggleTheme }) {
@@ -69,6 +71,9 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
   const [boosterSearch, setBoosterSearch] = useState("");
   const [pendingSearch, setPendingSearch] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false); // Success Modal State
+  const [showComplaintModal, setShowComplaintModal] = useState(false);
+  const [complaintText, setComplaintText] = useState("");
+  const [activeSupportId, setActiveSupportId] = useState(null);
 
   const [formData, setFormData] = useState({
     campaignTitle: "",
@@ -355,7 +360,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
     }
 
     if (!/^\d{12}$/.test(transactionId)) {
-      showMessage("UTR must be exactly 12 digits", "error");
+      showMessage("Invalid UTR! Transaction ID must be exactly 12 digits.", "error");
       return;
     }
 
@@ -395,6 +400,11 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
 
   const handleVerifySupport = async (supportId, status) => {
     const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+
+    // Find the current record to get the user's email for potential batch processing
+    const currentRecord = campaignHistory.find(r => r._id === supportId) || complaints.find(r => r._id === supportId);
+    const supporterEmail = currentRecord?.supporterEmail;
+
     try {
       const response = await fetch(`${BASE_URL}/campaign/support/${supportId}/status`, {
         method: "PATCH",
@@ -407,12 +417,45 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
 
       if (response.ok) {
         const result = await response.json();
-        showMessage(`Support ${status} successful`, "success");
+
+        // Batch action: If the user has other pending requests or complaints, apply the same status
+        let batchCount = 0;
+        if (supporterEmail) {
+          // Find all other pending or complained records for this user
+          const otherPending = campaignHistory.filter(r =>
+            r.supporterEmail === supporterEmail &&
+            r._id !== supportId &&
+            (r.status === 'pending' || complaints.some(c => c._id === r._id))
+          );
+
+          // Process them sequentially (since there's no batch endpoint)
+          for (const other of otherPending) {
+            await fetch(`${BASE_URL}/campaign/support/${other._id}/status`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${authData.accessToken}`
+              },
+              body: JSON.stringify({ status })
+            });
+            batchCount++;
+          }
+        }
+
+        if (batchCount > 0) {
+          showMessage(`${status.charAt(0).toUpperCase() + status.slice(1)} all ${batchCount + 1} records for ${supporterEmail}`, "success");
+        } else {
+          showMessage(`Support ${status} successful`, "success");
+        }
+
         if (status === 'verified' && result.updatedCurrentAmount !== undefined) {
           setSelectedCampaign(prev => ({ ...prev, currentAmount: result.updatedCurrentAmount }));
         }
-        fetchCampaignHistory(selectedCampaign.id || selectedCampaign._id);
-        fetchVerifiedSupporters(selectedCampaign.id || selectedCampaign._id);
+
+        const cid = selectedCampaign.id || selectedCampaign._id;
+        fetchCampaignHistory(cid);
+        fetchVerifiedSupporters(cid);
+        fetchComplaints(cid);
         fetchCampaigns(); // Update main list for currentAmount
       }
     } catch (error) {
@@ -420,24 +463,35 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
     }
   };
 
-  const handleFileComplaint = async (supportId) => {
-    const text = prompt("Enter your complaint details:");
-    if (!text) return;
+  const handleFileComplaint = (supportId) => {
+    setActiveSupportId(supportId);
+    setComplaintText("");
+    setShowComplaintModal(true);
+  };
+
+  const submitComplaint = async (e) => {
+    e.preventDefault();
+    if (!complaintText.trim()) {
+      showMessage("Please enter complaint details", "error");
+      return;
+    }
 
     const authData = JSON.parse(localStorage.getItem("auth") || "{}");
     try {
-      const response = await fetch(`${BASE_URL}/campaign/support/${supportId}/complaint`, {
+      const response = await fetch(`${BASE_URL}/campaign/support/${activeSupportId}/complaint`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authData.accessToken}`
         },
-        body: JSON.stringify({ complaintText: text })
+        body: JSON.stringify({ complaintText: complaintText })
       });
 
       if (response.ok) {
         showMessage("Complaint filed successfully", "success");
+        setShowComplaintModal(false);
         fetchComplaints(selectedCampaign.id || selectedCampaign._id);
+        fetchMySupports(selectedCampaign.id || selectedCampaign._id);
       }
     } catch (error) {
       showMessage("Failed to file complaint", "error");
@@ -1802,9 +1856,17 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
                           const val = e.target.value.replace(/\D/g, "");
                           if (val.length <= 12) setTransactionId(val);
                         }}
-                        className={`w-full p-4 rounded-xl border-2 focus:ring-2 focus:ring-cyan-500 outline-none ${isDarkMode ? "bg-black/20 border-white/10 text-white" : "bg-gray-50 border-gray-100 text-gray-900"}`}
+                        className={`w-full p-4 rounded-xl border-2 outline-none transition-all ${transactionId && transactionId.length !== 12
+                          ? "border-red-500 focus:ring-red-500/20"
+                          : "focus:ring-cyan-500 border-gray-100 dark:border-white/10"
+                          } ${isDarkMode ? "bg-black/20 text-white" : "bg-gray-50 text-gray-900"}`}
                         placeholder="12-digit UTR Number"
                       />
+                      {transactionId && transactionId.length !== 12 && (
+                        <p className="text-[10px] text-red-500 mt-1 font-bold animate-pulse pl-1">
+                          * UTR must be exactly 12 digits (currently {transactionId.length}/12)
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -1983,6 +2045,81 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Raising Complaint Modal */}
+      {showComplaintModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className={`w-full max-w-md rounded-3xl p-8 shadow-2xl overflow-hidden transform transition-all ${isDarkMode ? "bg-slate-900 border border-red-500/20" : "bg-white border border-red-100"
+              }`}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-red-500/10 rounded-2xl">
+                  <AlertCircle className="w-6 h-6 text-red-500" />
+                </div>
+                <h3 className={`text-xl font-black ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                  Raise Query
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowComplaintModal(false)}
+                className={`p-2 rounded-xl transition-colors ${isDarkMode ? "hover:bg-white/10 text-gray-400" : "hover:bg-gray-100 text-gray-500"
+                  }`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={submitComplaint} className="space-y-6">
+              <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Please explain the issue you're facing with this transaction (e.g., amount mismatch, wrong UTR, delay in verification).
+              </p>
+
+              <div className="relative">
+                <textarea
+                  required
+                  value={complaintText}
+                  onChange={(e) => setComplaintText(e.target.value)}
+                  placeholder="Type your message here..."
+                  rows="4"
+                  className={`w-full px-5 py-4 rounded-2xl border-2 transition-all focus:outline-none focus:ring-4 text-sm resize-none ${isDarkMode
+                    ? "bg-black/20 border-white/5 text-white focus:border-red-500/50 focus:ring-red-500/10 placeholder-gray-600"
+                    : "bg-gray-50 border-gray-100 text-gray-900 focus:border-red-400 focus:ring-red-400/10 placeholder-gray-400"
+                    }`}
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setShowComplaintModal(false)}
+                  className={`flex-1 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${isDarkMode ? "bg-white/5 text-gray-400 hover:bg-white/10" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 transition-all shadow-lg shadow-red-500/20 active:scale-95"
+                >
+                  Submit Query
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {message.text && (
+        <Toast
+          message={message.text}
+          type={message.type}
+          onClose={() => setMessage({ text: "", type: "" })}
+        />
       )}
 
       <Footer isDarkMode={isDarkMode} />

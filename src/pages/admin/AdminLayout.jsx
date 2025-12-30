@@ -54,6 +54,7 @@ const AdminLayout = () => {
         { id: "campaigns", label: "Campaign Management", icon: TrendingUp, path: "/admin/campaigns" },
         { id: "jobs", label: "Jobs Management", icon: Briefcase, path: "/admin/jobs" },
         { id: "mentorship", label: "Mentorship Management", icon: Handshake, path: "/admin/mentorship" },
+        { id: "bulk-register", label: "Bulk Register", icon: Upload, path: "/admin/bulk-register" },
     ];
 
     return (

@@ -32,8 +32,9 @@ import { branches } from "../data/branches";
 
 const currentYear = new Date().getFullYear();
 const batchYears = Array.from({ length: 60 }, (_, i) => {
-  const start = currentYear - i;
-  return `${start}-${start + 4}`;
+  const end = currentYear - i;
+  const start = end - 4;
+  return `${start}-${end}`;
 });
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
@@ -60,6 +61,7 @@ export default function AlumniAuth({
     Math.floor(new Date().getFullYear() / 12) * 12
   );
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [locationSearchTerm, setLocationSearchTerm] = useState("");
   const [regStep, setRegStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
@@ -1070,7 +1072,7 @@ ${isDarkMode
                               </select>
                               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                             </div>
-                            <button
+                            {/* <button
                               type="button"
                               onClick={() => {
                                 const current = new Date().getFullYear();
@@ -1083,23 +1085,80 @@ ${isDarkMode
                                 }`}
                             >
                               Current Batch
-                            </button>
+                            </button> */}
                           </div>
                         </div>
 
-                        <div>
+                        <div className="space-y-4">
                           <label className={`block text-xs sm:text-sm font-medium mb-1.5 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Current Location</label>
                           <div className="relative">
-                            <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
+                            <MapPin className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 z-10 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`} />
                             <input
                               type="text"
-                              name="location"
-                              value={formData.location}
-                              onChange={handleChange}
-                              className={`w-full pl-10 sm:pl-11 pr-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
-                              placeholder="City, Country"
-                              required
+                              value={locationSearchTerm || formData.location}
+                              onChange={(e) => {
+                                setLocationSearchTerm(e.target.value);
+                                setShowLocationDropdown(true);
+                                // Clear selection if user starts typing again
+                                if (formData.location && e.target.value !== formData.location) {
+                                  setFormData({ ...formData, location: "" });
+                                }
+                              }}
+                              onFocus={() => setShowLocationDropdown(true)}
+                              className={`w-full pl-10 sm:pl-11 pr-10 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl outline-none transition ${isDarkMode ? "bg-slate-800 border-slate-700 text-white" : "bg-white border-gray-300 text-gray-900"} focus:border-purple-500 ring-2 ring-transparent focus:ring-purple-500/20`}
+                              placeholder="Search your city..."
+                              autoComplete="off"
                             />
+                            <ChevronDown
+                              className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 transition-transform ${showLocationDropdown ? "rotate-180" : ""}`}
+                              onClick={() => setShowLocationDropdown(!showLocationDropdown)}
+                            />
+
+                            {/* Custom Searchable Dropdown */}
+                            <AnimatePresence>
+                              {showLocationDropdown && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: -10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  className={`absolute left-0 right-0 top-full mt-2 max-h-60 overflow-y-auto rounded-xl border shadow-2xl z-[100] custom-scrollbar ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-gray-200"
+                                    }`}
+                                >
+                                  {Object.keys(cityCoordinates)
+                                    .filter(city =>
+                                      city.toLowerCase().includes(locationSearchTerm.toLowerCase())
+                                    )
+                                    .sort()
+                                    .map((city) => (
+                                      <button
+                                        key={city}
+                                        type="button"
+                                        onClick={() => {
+                                          setFormData({ ...formData, location: city });
+                                          setLocationSearchTerm(city);
+                                          setShowLocationDropdown(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-3 text-sm transition-colors ${isDarkMode
+                                          ? "hover:bg-slate-800 text-gray-300"
+                                          : "hover:bg-purple-50 text-gray-700"
+                                          } ${formData.location === city ? (isDarkMode ? "bg-purple-500/20 text-purple-400" : "bg-purple-100 text-purple-700") : ""}`}
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          <MapPin className="w-4 h-4 opacity-50" />
+                                          {city}
+                                        </div>
+                                      </button>
+                                    ))}
+                                  {Object.keys(cityCoordinates).filter(city =>
+                                    city.toLowerCase().includes(locationSearchTerm.toLowerCase())
+                                  ).length === 0 && (
+                                      <div className={`p-4 text-center text-sm ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+                                        No cities found matching "{locationSearchTerm}"
+                                      </div>
+                                    )}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </div>
                         </div>
 

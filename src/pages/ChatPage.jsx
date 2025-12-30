@@ -37,8 +37,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   const [isTyping, setIsTyping] = useState(false); // Typing indicator
   const [showEmojiPicker, setShowEmojiPicker] = useState(false); // Emoji picker state
   const [longPressMessageId, setLongPressMessageId] = useState(null); // Long press state for mobile
-  const messagesEndRef = useRef(null);
-  const messagesContainerRef = useRef(null);
+  const mobileEndRef = useRef(null);
+  const desktopEndRef = useRef(null);
+  const mobileContainerRef = useRef(null);
+  const desktopContainerRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const longPressTimer = useRef(null);
 
@@ -213,6 +215,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   // Socket.IO: Real-time message handling (replaces polling)
   useEffect(() => {
     if (!socket || !selectedUser || !currentUser) return;
+
+    // When switching users, reset scrolling state to force scroll to bottom
+    setIsUserScrolling(false);
 
     console.log("Setting up Socket.IO listeners for:", selectedUser.name);
 
@@ -422,7 +427,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       console.log("Selected user phone:", selectedUser.phone);
 
       const response = await fetch(
-        `${BASE_URL}/message/my`,
+        `${BASE_URL}/message/conversation/${selectedUser.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -437,24 +442,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       }
 
       const data = await response.json();
-      console.log("All messages received:", data.data);
+      console.log("Filtered messages received from server:", data.data);
 
       if (data.success) {
-        const filtered = data.data?.filter(
-          (msg) => {
-            const senderId = msg.sender?.id || msg.sender?._id;
-            const receiverId = msg.receiver?.id || msg.receiver?._id;
-            const currentUserId = currentUser.id;
-            const selectedUserId = selectedUser.id;
-
-            return (
-              (senderId === selectedUserId && receiverId === currentUserId) ||
-              (senderId === currentUserId && receiverId === selectedUserId)
-            );
-          }
-        ) || [];
-        console.log("Filtered messages:", filtered);
-        setMessages(filtered);
+        setMessages(data.data || []);
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -475,71 +466,77 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       return sendMessageHTTP();
     }
 
-    setLoading(true);
+    const textToSend = messageText.trim();
+    if (!textToSend || !selectedUser || !currentUser) return;
+
+    // Stop typing indicator
+    if (socket && selectedUser) {
+      socket.emit("stop_typing", { receiverId: selectedUser.id });
+    }
+
+    if (!socket) {
+      console.warn("Socket not available, using HTTP fallback");
+      return sendMessageHTTP();
+    }
+
     setIsUserScrolling(false);
 
-    try {
-      if (editingMessageId) {
-        // EDIT EXISTING MESSAGE
-        socket.emit("edit_message", {
-          messageId: editingMessageId,
-          newText: messageText.trim()
-        }, (response) => {
-          if (response.success) {
-            console.log("Message edited successfully");
-            setMessages((prev) =>
-              prev.map((m) =>
-                (m.id === editingMessageId || m._id === editingMessageId)
-                  ? { ...m, text: messageText.trim(), isEdited: true }
-                  : m
-              )
-            );
-            cancelEditing();
-          } else {
-            console.error("Failed to edit message:", response.error);
-            alert("Failed to edit message");
+    if (editingMessageId) {
+      setLoading(true);
+      socket.emit("edit_message", {
+        messageId: editingMessageId,
+        newText: textToSend
+      }, (response) => {
+        if (response.success) {
+          setMessages((prev) =>
+            prev.map((m) =>
+              (m.id === editingMessageId || m._id === editingMessageId)
+                ? { ...m, text: textToSend, isEdited: true }
+                : m
+            )
+          );
+          cancelEditing();
+        } else {
+          alert("Failed to edit message");
+        }
+        setLoading(false);
+      });
+    } else {
+      // OPTIMISTIC UPDATE: Add message to UI immediately
+      const tempId = `temp-${Date.now()}`;
+      const optimisticMessage = {
+        id: tempId,
+        _id: tempId,
+        text: textToSend,
+        sender: { id: currentUser.id },
+        receiver: { id: selectedUser.id },
+        createdAt: new Date().toISOString(),
+        isSending: true
+      };
+
+      setMessages(prev => [...prev, optimisticMessage]);
+      setMessageText("");
+
+      socket.emit("send_message", {
+        receiverId: selectedUser.id,
+        text: textToSend,
+      }, (response) => {
+        if (response.success) {
+          // Replace temp message with real one from server
+          setMessages((prev) =>
+            prev.map((m) => m.id === tempId ? { ...response.data, id: response.data._id } : m)
+          );
+
+          if (!recentChats.find((rc) => rc.id === selectedUser.id)) {
+            setRecentChats([selectedUser, ...recentChats]);
           }
-          setLoading(false);
-        });
-      } else {
-        // SEND NEW MESSAGE
-        const messageData = {
-          receiverId: selectedUser.id,
-          text: messageText.trim(),
-        };
-
-        socket.emit("send_message", messageData, (response) => {
-          if (response.success) {
-            console.log("Message sent successfully via Socket:", response.data);
-            setMessageText("");
-
-            // Update state with new message (check for duplicates)
-            setMessages((prev) => {
-              const newMessage = response.data;
-              const exists = prev.some(m => m.id === newMessage._id || m._id === newMessage._id);
-              if (exists) return prev;
-
-              return [...prev, {
-                ...newMessage,
-                id: newMessage._id, // Ensure ID consistency
-                sender: newMessage.sender || { id: newMessage.senderId },
-                receiver: newMessage.receiver || { id: newMessage.receiverId },
-              }];
-            });
-
-            if (!recentChats.find((rc) => rc.id === selectedUser.id)) {
-              setRecentChats([selectedUser, ...recentChats]);
-            }
-          } else {
-            console.error("Failed to send message:", response.error);
-            alert("Failed to send message: " + response.error);
-          }
-          setLoading(false);
-        });
-      }
-    } catch (error) {
-      console.error("Error via Socket:", error);
-      setLoading(false);
+        } else {
+          // Remove optimistic message and alert on failure
+          setMessages((prev) => prev.filter((m) => m.id !== tempId));
+          alert("Failed to send message: " + response.error);
+          setMessageText(textToSend); // Restore text
+        }
+      });
     }
   };
 
@@ -651,29 +648,23 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   };
 
   const scrollToBottom = () => {
-    if (!isUserScrolling && messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (!isUserScrolling) {
+      if (mobileEndRef.current) mobileEndRef.current.scrollIntoView({ behavior: "smooth" });
+      if (desktopEndRef.current) desktopEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const handleScroll = () => {
-    const container = messagesContainerRef.current;
+  const handleScroll = (e) => {
+    const container = e.currentTarget;
     if (!container) return;
 
     const { scrollTop, scrollHeight, clientHeight } = container;
-    const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
 
     setIsUserScrolling(!isAtBottom);
   };
 
-  useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
-    }
-  }, [selectedUser]);
-
+  // Scroll events are now handled directly via onScroll in the JSX for better reliability
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -722,7 +713,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       </div>
 
-      <div className="flex-1 flex overflow-hidden mt-4 mx-4 gap-4 min-h-0">
+      <div className="flex-1 flex overflow-hidden my-4 mx-4 gap-4 min-h-0">
         {/* Mobile View */}
         <div className="flex-1 flex flex-col lg:hidden min-h-0 overflow-hidden">
           {!selectedUser ? (
@@ -795,10 +786,20 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                 >
                   {filteredChats.length === 0 ? (
                     <div
-                      className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      className={`flex flex-col items-center justify-center py-16 px-6 text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"
                         }`}
                     >
-                      <p className="text-sm">No recent conversations</p>
+                      <div className={`w-16 h-16 mb-4 rounded-full flex items-center justify-center ${isDarkMode ? "bg-slate-800" : "bg-gray-100"}`}>
+                        <Users className="w-8 h-8 opacity-50" />
+                      </div>
+                      <p className="text-sm font-medium mb-1">No recent chats yet</p>
+                      <p className="text-xs mb-6 opacity-70">Find your friends, alumni, and people you may know to start a conversation!</p>
+                      <button
+                        onClick={() => setMobileView("people")}
+                        className="px-6 py-2.5 bg-purple-600 text-white rounded-full text-sm font-bold hover:bg-purple-700 transition-all active:scale-95 shadow-lg shadow-purple-500/20"
+                      >
+                        Find People
+                      </button>
                     </div>
                   ) : (
                     filteredChats.map((person) => (
@@ -948,7 +949,8 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
               {/* Messages */}
               <div
-                ref={messagesContainerRef}
+                ref={mobileContainerRef}
+                onScroll={handleScroll}
                 className={`flex-1 overflow-y-auto p-4 min-h-0 ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
                   }`}
               >
@@ -1056,7 +1058,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                         </div>
                       </div>
                     )}
-                    <div ref={messagesEndRef} />
+                    <div ref={mobileEndRef} />
                   </>
                 )}
               </div>
@@ -1080,6 +1082,15 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                 )}
 
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className={`p-2 rounded-lg transition-colors ${isDarkMode
+                      ? "hover:bg-slate-700 text-gray-400"
+                      : "hover:bg-gray-100 text-gray-600"
+                      } ${showEmojiPicker ? "text-purple-500" : ""}`}
+                  >
+                    <Smile className="w-5 h-5 md:w-6 md:h-6" />
+                  </button>
                   <input
                     type="text"
                     value={messageText}
@@ -1107,6 +1118,28 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                     )}
                   </button>
                 </div>
+
+                {/* Mobile Emoji Picker - Horizontal Scroll */}
+                {showEmojiPicker && (
+                  <div className={`mt-3 p-2 rounded-2xl shadow-inner border flex items-center gap-1 animate-fadeIn ${isDarkMode ? "bg-slate-900/50 border-slate-700" : "bg-gray-50 border-gray-200"
+                    }`}>
+                    <div className="flex-1 flex gap-1 overflow-x-auto custom-scrollbar px-1 py-1">
+                      {COMMON_EMOJIS.map((emoji) => (
+                        <button
+                          key={emoji}
+                          onClick={() => {
+                            setMessageText((prev) => prev + emoji);
+                            handleTyping();
+                          }}
+                          className={`flex-shrink-0 hover:scale-125 transition-transform text-xl p-2 rounded-lg flex items-center justify-center ${isDarkMode ? "hover:bg-slate-700" : "hover:bg-gray-200"
+                            }`}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1145,10 +1178,18 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
             <div className="flex-1 overflow-y-auto">
               {filteredChats.length === 0 ? (
                 <div
-                  className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                  className={`flex flex-col items-center justify-center py-12 px-6 text-center ${isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                 >
-                  <p className="text-sm">No recent conversations</p>
+                  <div className={`w-14 h-14 mb-4 rounded-full flex items-center justify-center ${isDarkMode ? "bg-slate-700" : "bg-gray-100"}`}>
+                    <Users className="w-7 h-7 opacity-50" />
+                  </div>
+                  <p className="text-sm font-semibold mb-1">No recent chats</p>
+                  <p className="text-xs mb-6 opacity-70">Start connecting with your friends and alumni!</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-purple-500 mb-2">Check people you may know</p>
+                  <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center animate-bounce">
+                    <ArrowLeft className="w-4 h-4 text-purple-500 rotate-180" />
+                  </div>
                 </div>
               ) : (
                 filteredChats.map((person) => (
@@ -1248,7 +1289,8 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
                 {/* Messages */}
                 <div
-                  ref={messagesContainerRef}
+                  ref={desktopContainerRef}
+                  onScroll={handleScroll}
                   className={`flex-1 overflow-y-auto p-6 min-h-0 ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
                     }`}
                 >
@@ -1349,7 +1391,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                           </div>
                         </div>
                       )}
-                      <div ref={messagesEndRef} />
+                      <div ref={desktopEndRef} />
                     </>
                   )}
                 </div>
@@ -1617,7 +1659,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
         </div>
       )}
 
-      <div className="flex-shrink-0 hidden lg:block">
+      <div className="flex-shrink-0">
         <Footer isDarkMode={isDarkMode} />
       </div>
     </div>

@@ -21,7 +21,7 @@ import Footer from "../components/footer";
 import { branches } from "../data/branches";
 
 const currentYear = new Date().getFullYear();
-const batchYears = Array.from({ length: currentYear + 5 - 1960 }, (_, i) => 1960 + i).reverse();
+const batchYears = Array.from({ length: currentYear + 1 - 1960 }, (_, i) => 1960 + i).reverse();
 
 const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
     const [myMentorProfile, setMyMentorProfile] = useState(null);

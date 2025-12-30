@@ -30,6 +30,7 @@ import EventManagement from "./pages/admin/EventManagement";
 import CampaignManagement from "./pages/admin/CampaignManagement";
 import JobsManagement from "./pages/admin/JobsManagement";
 import MentorshipManagement from "./pages/admin/MentorshipManagement";
+import BulkRegister from "./pages/admin/BulkRegister";
 
 import MyActivityPage from "./pages/ActivityPage";
 import MentorPage from "./pages/Mentor";
@@ -214,6 +215,7 @@ export default function App() {
               <Route path="campaigns" element={<CampaignManagement />} />
               <Route path="jobs" element={<JobsManagement />} />
               <Route path="mentorship" element={<MentorshipManagement />} />
+              <Route path="bulk-register" element={<BulkRegister />} />
             </Route>
 
             {/* Profile */}
