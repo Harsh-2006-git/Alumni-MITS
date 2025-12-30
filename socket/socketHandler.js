@@ -8,10 +8,16 @@ const onlineUsers = new Map();
 export const socketHandler = (io) => {
     return (socket) => {
         const user = socket.user;
-        console.log(`User connected: ${user.id} (${user.userType})`);
-
         // 1. Add user to online map
         onlineUsers.set(user.id, socket.id);
+
+        // Notify everyone that this user is online
+        io.emit("user_online", { userId: user.id });
+
+        // Send the list of current online users to the connected user
+        socket.emit("online_users", Array.from(onlineUsers.keys()));
+
+        console.log(`User connected: ${user.id} (${user.userType})`);
 
         // 2. Handle Send Message
         socket.on("send_message", async (data, callback) => {
@@ -162,6 +168,8 @@ export const socketHandler = (io) => {
         socket.on("disconnect", () => {
             console.log(`User disconnected: ${user.id}`);
             onlineUsers.delete(user.id);
+            // Notify everyone that this user is offline
+            io.emit("user_offline", { userId: user.id });
         });
     };
 };
