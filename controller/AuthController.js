@@ -1443,7 +1443,7 @@ export const registerStudent = async (req, res) => {
     });
 
     // Generate final tokens
-    const { accessToken, refreshToken } = generateTokens(student);
+    const { accessToken, refreshToken } = await generateTokens(student);
 
     return res.status(200).json({
       success: true,

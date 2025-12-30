@@ -671,22 +671,25 @@ export const respondToMentorshipRequest = async (req, res) => {
 
     // Send email notifications
     try {
-      await emailService.sendStatusChangeEmail(
-        updatedMentorship.mentor_id.alumni_id.email, // Mentor's email
-        updatedMentorship.student_id.email, // Student's email
-        {
-          studentName: updatedMentorship.student_id.name,
-          mentorName: updatedMentorship.mentor_id.name,
-          newStatus: action === "verify_payment" ? "Payment Verified" : (action === "request_reschedule" ? "Reschedule Requested" : newStatus),
-          oldStatus: mentorship.status,
-          mentorNotes: mentor_notes,
-          sessionDate: session_date || updatedMentorship.session_date,
-          sessionTime: session_time || updatedMentorship.session_time,
-          rescheduleDate: reschedule_date,
-          rescheduleTime: reschedule_time,
-          rescheduleMessage: reschedule_message,
-        }
-      );
+      // Skip email notification for payment verification actions
+      if (action !== "verify_payment") {
+        await emailService.sendStatusChangeEmail(
+          updatedMentorship.mentor_id.alumni_id.email, // Mentor's email
+          updatedMentorship.student_id.email, // Student's email
+          {
+            studentName: updatedMentorship.student_id.name,
+            mentorName: updatedMentorship.mentor_id.name,
+            newStatus: action === "request_reschedule" ? "Reschedule Requested" : newStatus,
+            oldStatus: mentorship.status,
+            mentorNotes: mentor_notes,
+            sessionDate: session_date || updatedMentorship.session_date,
+            sessionTime: session_time || updatedMentorship.session_time,
+            rescheduleDate: reschedule_date,
+            rescheduleTime: reschedule_time,
+            rescheduleMessage: reschedule_message,
+          }
+        );
+      }
     } catch (emailError) {
       console.error("Failed to send status change emails:", emailError);
       // Continue with the response even if email fails

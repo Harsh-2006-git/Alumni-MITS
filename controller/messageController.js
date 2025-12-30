@@ -70,38 +70,67 @@ export const sendMessage = async (req, res) => {
 
 export const getMyMessages = async (req, res) => {
   try {
-    const { id: userId, userType } = req.user;
+    const { id: userId } = req.user;
+
+    // Use .populate() to get user details in a single query
+    // Limit to 500 most recent messages to improve performance
+    const messages = await Message.find({
+      $or: [{ senderId: userId }, { receiverId: userId }],
+    })
+      .populate("senderId", "name userType phone email")
+      .populate("receiverId", "name userType phone email")
+      .sort({ createdAt: 1 })
+      .limit(500);
+
+    const formattedMessages = messages.map((msg) => ({
+      id: msg._id,
+      text: msg.text,
+      createdAt: msg.createdAt,
+      sender: msg.senderId ? { ...msg.senderId.toJSON(), id: msg.senderId._id.toString() } : null,
+      receiver: msg.receiverId ? { ...msg.receiverId.toJSON(), id: msg.receiverId._id.toString() } : null,
+      isDeleted: msg.isDeleted,
+      isEdited: msg.isEdited,
+    }));
+
+    return res.status(200).json({ success: true, data: formattedMessages });
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+export const getConversation = async (req, res) => {
+  try {
+    const { id: userId } = req.user;
+    const { peerId } = req.params;
+
+    if (!peerId) {
+      return res.status(400).json({ success: false, message: "Peer ID is required" });
+    }
 
     const messages = await Message.find({
       $or: [
-        { senderId: userId, senderType: userType },
-        { receiverId: userId, receiverType: userType },
+        { senderId: userId, receiverId: peerId },
+        { senderId: peerId, receiverId: userId },
       ],
-    }).sort({ createdAt: 1 });
+    })
+      .populate("senderId", "name userType phone email")
+      .populate("receiverId", "name userType phone email")
+      .sort({ createdAt: 1 });
 
-    const messagesWithUsers = await Promise.all(
-      messages.map(async (msg) => {
-        const sender = await User.findById(
-          msg.senderId,
-          "name userType phone email"
-        );
-        const receiver = await User.findById(
-          msg.receiverId,
-          "name userType phone email"
-        );
-        return {
-          id: msg._id,
-          text: msg.text,
-          createdAt: msg.createdAt,
-          sender: sender ? { ...sender.toJSON(), id: sender._id.toString() } : null,
-          receiver: receiver ? { ...receiver.toJSON(), id: receiver._id.toString() } : null,
-        };
-      })
-    );
+    const formattedMessages = messages.map((msg) => ({
+      id: msg._id,
+      text: msg.text,
+      createdAt: msg.createdAt,
+      sender: msg.senderId ? { ...msg.senderId.toJSON(), id: msg.senderId._id.toString() } : null,
+      receiver: msg.receiverId ? { ...msg.receiverId.toJSON(), id: msg.receiverId._id.toString() } : null,
+      isDeleted: msg.isDeleted,
+      isEdited: msg.isEdited,
+    }));
 
-    return res.status(200).json({ success: true, data: messagesWithUsers });
+    return res.status(200).json({ success: true, data: formattedMessages });
   } catch (error) {
-    console.error("Error fetching messages:", error);
+    console.error("Error fetching conversation:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };

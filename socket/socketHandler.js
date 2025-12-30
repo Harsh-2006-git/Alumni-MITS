@@ -41,25 +41,31 @@ export const socketHandler = (io) => {
 
                 const newMessage = await Message.create(tempMsg);
 
-                // Populate for client
-                const populatedMsg = await Message.findById(newMessage._id)
-                    .populate("replyTo", "text senderId")
-                    .lean();
+                // Populate for client efficiently
+                await newMessage.populate([
+                    { path: "replyTo", select: "text senderId" },
+                    { path: "senderId", select: "name userType phone email" },
+                    { path: "receiverId", select: "name userType phone email" }
+                ]);
 
-                // Add sender/receiver info manually or via another populate if User model supports it
-                // For now, client usually has sender info (themselves). 
-                // We'll append basic sender info just in case
-                populatedMsg.sender = { id: user.id, userType: user.userType };
+                const populatedMsg = newMessage.toObject();
+                // Format to match frontend expectations
+                const formattedMsg = {
+                    ...populatedMsg,
+                    id: populatedMsg._id.toString(),
+                    sender: populatedMsg.senderId ? { ...populatedMsg.senderId, id: populatedMsg.senderId._id.toString() } : { id: user.id, userType: user.userType },
+                    receiver: populatedMsg.receiverId ? { ...populatedMsg.receiverId, id: populatedMsg.receiverId._id.toString() } : { id: receiverId },
+                };
 
                 // Emit to Receiver if online
                 const receiverSocketId = onlineUsers.get(receiverId);
                 if (receiverSocketId) {
-                    io.to(receiverSocketId).emit("receive_message", populatedMsg);
+                    io.to(receiverSocketId).emit("receive_message", formattedMsg);
                 }
 
                 // Emit back to Sender (so they have the real DB ID and timestamp)
                 // Or simply acknowledge with the data
-                callback && callback({ success: true, data: populatedMsg });
+                callback && callback({ success: true, data: formattedMsg });
 
             } catch (error) {
                 console.error("Socket send_message error:", error);
