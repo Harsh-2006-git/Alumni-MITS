@@ -20,7 +20,7 @@ import Footer from "../components/footer";
 import { useSocket } from "../context/SocketContext";
 
 const ChatApp = ({ isDarkMode, toggleTheme }) => {
-  const socket = useSocket(); // Socket.IO connection
+  const { socket, onlineUsers } = useSocket(); // Socket.IO connection and online status
   const [people, setPeople] = useState([]);
   const [recentChats, setRecentChats] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -31,6 +31,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [mobileView, setMobileView] = useState("chats");
   const [isUserScrolling, setIsUserScrolling] = useState(false);
@@ -65,6 +66,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
     const hash = `${person.name || ""}${person.phone}${person.email || ""}`;
     return `${baseKey}-${hash}`;
+  };
+
+  const isUserOnline = (userId) => {
+    return onlineUsers && onlineUsers.includes(userId);
   };
 
   // Date formatting helper functions
@@ -216,8 +221,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
   useEffect(() => {
     if (!socket || !selectedUser || !currentUser) return;
 
-    // When switching users, reset scrolling state to force scroll to bottom
+    // When switching users, reset scrolling state, CLEAR messages and input
     setIsUserScrolling(false);
+    setMessages([]);
+    setMessageText("");
 
     console.log("Setting up Socket.IO listeners for:", selectedUser.name);
 
@@ -415,6 +422,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
   const fetchMessages = async () => {
     if (!selectedUser || !currentUser) return;
+    setLoadingMessages(true);
     try {
       const token = getAuthToken();
       if (!token) {
@@ -449,6 +457,8 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -824,6 +834,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                               <User className="w-5 h-5 text-white" />
                             )}
                           </div>
+                          {isUserOnline(person.id) && (
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3
@@ -877,6 +890,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                               <User className="w-5 h-5 text-white" />
                             )}
                           </div>
+                          {isUserOnline(person.id) && (
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3
@@ -928,6 +944,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                         <User className="w-5 h-5 text-white" />
                       )}
                     </div>
+                    {isUserOnline(selectedUser.id) && (
+                      <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                    )}
                   </div>
                   <div>
                     <h3
@@ -937,10 +956,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                       {selectedUser.name}
                     </h3>
                     <p
-                      className={`text-xs ${isTyping ? "text-purple-500 font-semibold animate-pulse" : isDarkMode ? "text-gray-400" : "text-gray-500"
+                      className={`text-xs ${isTyping ? "text-purple-500 font-semibold animate-pulse" : isUserOnline(selectedUser.id) ? "text-green-500 font-medium" : isDarkMode ? "text-gray-400" : "text-gray-500"
                         }`}
                     >
-                      {isTyping ? "Typing..." : selectedUser.email}
+                      {isTyping ? "Typing..." : isUserOnline(selectedUser.id) ? "Online" : selectedUser.email}
                     </p>
                   </div>
                 </div>
@@ -954,7 +973,12 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                 className={`flex-1 overflow-y-auto p-4 min-h-0 ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
                   }`}
               >
-                {messages.length === 0 ? (
+                {loadingMessages ? (
+                  <div className="flex flex-col items-center justify-center py-20">
+                    <Loader className="w-10 h-10 animate-spin text-purple-600 mb-4" />
+                    <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>Loading conversation...</p>
+                  </div>
+                ) : messages.length === 0 ? (
                   <div
                     className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
                       }`}
@@ -1218,6 +1242,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                           <User className="w-6 h-6 text-white" />
                         )}
                       </div>
+                      {isUserOnline(person.id) && (
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
@@ -1267,6 +1294,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                           <User className="w-6 h-6 text-white" />
                         )}
                       </div>
+                      {isUserOnline(selectedUser.id) && (
+                        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                      )}
                     </div>
                     <div>
                       <h3
@@ -1276,10 +1306,10 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                         {selectedUser.name}
                       </h3>
                       <p
-                        className={`text-sm ${isTyping ? "text-purple-500 font-semibold animate-pulse" : isDarkMode ? "text-gray-400" : "text-gray-500"
+                        className={`text-sm ${isTyping ? "text-purple-500 font-semibold animate-pulse" : isUserOnline(selectedUser.id) ? "text-green-500 font-medium" : isDarkMode ? "text-gray-400" : "text-gray-500"
                           }`}
                       >
-                        {isTyping ? "Typing..." : selectedUser.email}
+                        {isTyping ? "Typing..." : isUserOnline(selectedUser.id) ? "Online" : selectedUser.email}
                       </p>
                     </div>
                   </div>
@@ -1294,7 +1324,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                   className={`flex-1 overflow-y-auto p-6 min-h-0 ${isDarkMode ? "bg-slate-900" : "bg-gray-50"
                     }`}
                 >
-                  {messages.length === 0 ? (
+                  {loadingMessages ? (
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <Loader className="w-12 h-12 animate-spin text-purple-600" />
+                      <p className={`mt-4 font-medium ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                        Fetching your messages...
+                      </p>
+                    </div>
+                  ) : messages.length === 0 ? (
                     <div
                       className={`text-center py-12 ${isDarkMode ? "text-gray-500" : "text-gray-400"
                         }`}
@@ -1554,6 +1591,9 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
                           <User className="w-6 h-6 text-white" />
                         )}
                       </div>
+                      {isUserOnline(person.id) && (
+                        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></span>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
