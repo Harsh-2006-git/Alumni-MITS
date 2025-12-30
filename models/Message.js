@@ -60,6 +60,10 @@ const MessageSchema = new mongoose.Schema(
   }
 );
 
+// Indexes for faster conversation lookups
+MessageSchema.index({ senderId: 1, receiverId: 1 });
+MessageSchema.index({ receiverId: 1, senderId: 1 });
+
 const Message = mongoose.model("Message", MessageSchema);
 
 export default Message;

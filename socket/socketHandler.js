@@ -8,8 +8,9 @@ const onlineUsers = new Map();
 export const socketHandler = (io) => {
     return (socket) => {
         const user = socket.user;
-        // 1. Add user to online map
-        onlineUsers.set(user.id, socket.id);
+        // 1. Join user-specific room for multi-device/tab support
+        socket.join(user.id);
+        onlineUsers.set(user.id, socket.id); // Keep the map for fast online checks if needed
 
         // Notify everyone that this user is online
         io.emit("user_online", { userId: user.id });
@@ -63,14 +64,10 @@ export const socketHandler = (io) => {
                     receiver: populatedMsg.receiverId ? { ...populatedMsg.receiverId, id: populatedMsg.receiverId._id.toString() } : { id: receiverId },
                 };
 
-                // Emit to Receiver if online
-                const receiverSocketId = onlineUsers.get(receiverId);
-                if (receiverSocketId) {
-                    io.to(receiverSocketId).emit("receive_message", formattedMsg);
-                }
+                // Emit to Receiver and all Sender sessions (except the current one if preferred, but simpler to just emit to all)
+                io.to(receiverId).emit("receive_message", formattedMsg);
+                socket.to(user.id).emit("receive_message", formattedMsg); // Notify other tabs of same user
 
-                // Emit back to Sender (so they have the real DB ID and timestamp)
-                // Or simply acknowledge with the data
                 callback && callback({ success: true, data: formattedMsg });
 
             } catch (error) {
@@ -100,14 +97,9 @@ export const socketHandler = (io) => {
 
                 const updatedMsg = await Message.findById(messageId).populate("replyTo", "text").lean();
 
-                // Notify Receiver
-                const receiverSocketId = onlineUsers.get(message.receiverId.toString());
-                if (receiverSocketId) {
-                    io.to(receiverSocketId).emit("message_updated", updatedMsg);
-                }
-
-                // Notify Sender (sync)
-                socket.emit("message_updated", updatedMsg);
+                // Notify Receiver and all Sender sessions
+                io.to(message.receiverId.toString()).emit("message_updated", updatedMsg);
+                io.to(user.id).emit("message_updated", updatedMsg);
 
                 callback && callback({ success: true, data: updatedMsg });
 
@@ -133,11 +125,9 @@ export const socketHandler = (io) => {
                 message.text = "This message was deleted"; // Optional: Clear text
                 await message.save();
 
-                // Notify Receiver
-                const receiverSocketId = onlineUsers.get(message.receiverId.toString());
-                if (receiverSocketId) {
-                    io.to(receiverSocketId).emit("message_deleted", { messageId });
-                }
+                // Notify Receiver and all Sender sessions
+                io.to(message.receiverId.toString()).emit("message_deleted", { messageId });
+                io.to(user.id).emit("message_deleted", { messageId });
 
                 callback && callback({ success: true, messageId });
 
@@ -150,18 +140,12 @@ export const socketHandler = (io) => {
         // 5. Typing Indicators
         socket.on("typing", (data) => {
             const { receiverId } = data;
-            const receiverSocketId = onlineUsers.get(receiverId);
-            if (receiverSocketId) {
-                io.to(receiverSocketId).emit("user_typing", { userId: user.id });
-            }
+            io.to(receiverId).emit("user_typing", { userId: user.id });
         });
 
         socket.on("stop_typing", (data) => {
             const { receiverId } = data;
-            const receiverSocketId = onlineUsers.get(receiverId);
-            if (receiverSocketId) {
-                io.to(receiverSocketId).emit("user_stop_typing", { userId: user.id });
-            }
+            io.to(receiverId).emit("user_stop_typing", { userId: user.id });
         });
 
         // 6. Disconnect
