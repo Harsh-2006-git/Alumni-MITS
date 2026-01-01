@@ -61,23 +61,6 @@ const BlogDetail = ({ isDarkMode, toggleTheme, isAuthenticated }) => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-slate-950 text-white" : "bg-white text-gray-900"}`}>
-                <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
-            </div>
-        );
-    }
-
-    if (error || !blog) {
-        return (
-            <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${isDarkMode ? "bg-slate-900 text-white" : "bg-white text-gray-900"}`}>
-                <h2 className="text-2xl font-bold">{error || "Blog not found"}</h2>
-                <button onClick={() => navigate("/blogs")} className="px-6 py-2 bg-blue-600 text-white rounded-xl">Back to Blogs</button>
-            </div>
-        );
-    }
-
     return (
         <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white" : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"}`}>
             <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
@@ -93,15 +76,16 @@ const BlogDetail = ({ isDarkMode, toggleTheme, isAuthenticated }) => {
             />
 
             {loading ? (
-                <div className="flex items-center justify-center min-h-screen">
+                <div className="flex items-center justify-center min-h-[60vh]">
                     <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
                 </div>
-            ) : error ? (
-                <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+            ) : error || !blog ? (
+                <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-4 text-center">
                     <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                    <p className="text-xl font-bold">{error}</p>
+                    <h2 className="text-2xl font-bold">{error || "Blog not found"}</h2>
+                    <button onClick={() => navigate("/blogs")} className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">Back to Blogs</button>
                 </div>
-            ) : !blog ? null : (
+            ) : (
                 <main className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 md:py-10">
                     <button
                         onClick={() => navigate("/blogs")}

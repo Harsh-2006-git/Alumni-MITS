@@ -410,11 +410,10 @@ const BlogManagement = ({ isDarkMode }) => {
                                     <img src={previewBlog.blogImage} alt={previewBlog.title} className="w-full aspect-video object-cover" />
                                 </div>
 
-                                <div className={`space-y-6 text-lg leading-relaxed ${isDarkMode ? "text-slate-300" : "text-slate-700 font-medium"}`}>
-                                    {previewBlog.content.split('\n').map((para, i) => (
-                                        <p key={i}>{para}</p>
-                                    ))}
-                                </div>
+                                <div
+                                    className={`text-lg leading-relaxed ${isDarkMode ? "text-slate-300" : "text-slate-700 font-medium"} [&_p]:mb-4 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mb-4 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mb-3 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-4 [&_li]:mb-1 [&_a]:text-blue-500 [&_a]:underline hover:[&_a]:text-blue-600 [&_blockquote]:border-l-4 [&_blockquote]:border-blue-500 [&_blockquote]:pl-4 [&_blockquote]:italic [&_img]:rounded-xl [&_img]:max-w-full [&_img]:h-auto [&_img]:shadow-md`}
+                                    dangerouslySetInnerHTML={{ __html: previewBlog.content }}
+                                />
                             </article>
                         </div>
 

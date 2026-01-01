@@ -26,6 +26,7 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [status, setStatus] = useState({ type: "", message: "" });
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const [formData, setFormData] = useState({
         title: "",
@@ -120,8 +121,7 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
 
             const data = await response.json();
             if (data.success) {
-                setStatus({ type: "success", message: "Blog submitted successfully! Pending admin approval." });
-                setTimeout(() => navigate("/blogs"), 2000);
+                setShowSuccessModal(true);
             } else {
                 setStatus({ type: "error", message: data.message || "Failed to submit blog." });
             }
@@ -141,21 +141,21 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
         <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? "bg-slate-900 text-white" : "bg-slate-50 text-slate-900"}`}>
             <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
 
-            <main className="max-w-4xl mx-auto px-4 py-12">
+            <main className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-12">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 mb-8 text-blue-600 hover:text-blue-700 transition-colors font-semibold"
+                    className="flex items-center gap-2 mb-6 sm:mb-8 text-blue-600 hover:text-blue-700 transition-colors font-semibold text-sm sm:text-base"
                 >
-                    <ArrowLeft className="w-5 h-5" /> Back to Insights
+                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" /> Back to Insights
                 </button>
 
-                <div className={`rounded-2xl p-6 sm:p-10 border shadow-2xl ${isDarkMode ? "bg-slate-900/50 border-slate-800 backdrop-blur-xl" : "bg-white border-slate-200"
+                <div className={`rounded-2xl p-4 sm:p-10 border shadow-2xl ${isDarkMode ? "bg-slate-900/50 border-slate-800 backdrop-blur-xl" : "bg-white border-slate-200"
                     }`}>
-                    <div className="mb-10 text-center sm:text-left">
-                        <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    <div className="mb-6 sm:mb-10 text-center sm:text-left">
+                        <h1 className="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                             Create New Alumni Story
                         </h1>
-                        <p className={isDarkMode ? "text-slate-400" : "text-slate-500 font-medium"}>
+                        <p className={`text-sm sm:text-base ${isDarkMode ? "text-slate-400" : "text-slate-500 font-medium"}`}>
                             Share your journey, insights, and professional experiences.
                         </p>
                     </div>
@@ -165,32 +165,38 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
                             ? "bg-green-500/10 text-green-500 border-green-500/20"
                             : "bg-red-500/10 text-red-500 border-red-500/20"
                             }`}>
-                            {status.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-                            <span className="font-semibold">{status.message}</span>
-                            <button className="ml-auto" onClick={() => setStatus({ type: "", message: "" })}>
+                            {status.type === "success" ? <CheckCircle2 className="w-5 h-5 flex-shrink-0" /> : <AlertCircle className="w-5 h-5 flex-shrink-0" />}
+                            <span className="font-semibold text-sm sm:text-base">{status.message}</span>
+                            <button className="ml-auto flex-shrink-0" onClick={() => setStatus({ type: "", message: "" })}>
                                 <X className="w-4 h-4" />
                             </button>
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-8">
-                        {/* User Info (Read-only) */}
-                        <div className={`flex items-center gap-4 p-5 rounded-2xl border ${isDarkMode ? "bg-slate-800/30 border-slate-700" : "bg-slate-50 border-slate-100"}`}>
-                            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-blue-500/20 shadow-lg">
+                    <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
+                        {/* User Info (Compact) */}
+                        <div className={`flex items-center gap-3 p-3 sm:p-4 rounded-xl border ${isDarkMode ? "bg-slate-800/30 border-slate-700" : "bg-slate-50 border-slate-100"}`}>
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border border-blue-500/20 shrink-0">
                                 <img
                                     src={profilePhoto || `https://ui-avatars.com/api/?name=${userName}&background=random`}
                                     alt={userName}
                                     className="w-full h-full object-cover"
                                 />
                             </div>
-                            <div className="flex-1">
-                                <p className={`text-base font-bold leading-tight ${isDarkMode ? "text-white" : "text-slate-900"}`}>{userName}</p>
-                                <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500 font-medium"}`}>{userEmail}</p>
-                            </div>
-                            <div>
-                                <span className="text-[10px] uppercase tracking-widest bg-blue-600 text-white px-3 py-1.5 rounded-full font-bold shadow-lg shadow-blue-500/20">
-                                    Verified Author
-                                </span>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                    <p className={`text-sm sm:text-base font-bold truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>
+                                        {userName}
+                                    </p>
+                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-600/10 text-blue-600 border border-blue-600/10">
+                                        <CheckCircle2 className="w-3 h-3" />
+                                        <span className="text-[9px] font-bold uppercase tracking-wider hidden sm:inline">Verified Author</span>
+                                        <span className="text-[9px] font-bold uppercase tracking-wider sm:hidden">Verified</span>
+                                    </div>
+                                </div>
+                                <p className={`text-xs sm:text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"} truncate`}>
+                                    {userEmail}
+                                </p>
                             </div>
                         </div>
 
@@ -206,8 +212,8 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
                                 value={formData.title}
                                 onChange={handleInputChange}
                                 placeholder="Give your story a powerful title..."
-                                className={`w-full px-5 py-4 rounded-xl border transition-all duration-300 ${isDarkMode ? "bg-slate-800/50 border-slate-700 focus:border-blue-500" : "bg-white border-slate-200 focus:border-blue-500 shadow-sm"
-                                    } focus:outline-none focus:ring-4 focus:ring-blue-500/10 font-semibold text-lg`}
+                                className={`w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl border transition-all duration-300 ${isDarkMode ? "bg-slate-800/50 border-slate-700 focus:border-blue-500" : "bg-white border-slate-200 focus:border-blue-500 shadow-sm"
+                                    } focus:outline-none focus:ring-4 focus:ring-blue-500/10 font-semibold text-base sm:text-lg`}
                             />
                         </div>
 
@@ -371,6 +377,39 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
             </main>
 
             <Footer isDarkMode={isDarkMode} />
+
+            {/* Success Confirmation Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+                        onClick={() => navigate("/blogs")}
+                    />
+                    <div className={`relative w-full max-w-md p-6 rounded-2xl shadow-2xl transform transition-all scale-100 ${isDarkMode ? "bg-slate-900 border border-slate-700" : "bg-white"
+                        }`}>
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-6">
+                                <CheckCircle2 className="w-8 h-8 text-green-500" />
+                            </div>
+
+                            <h3 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
+                                Submission successful!
+                            </h3>
+
+                            <p className={`text-sm mb-8 leading-relaxed ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
+                                Your story has been submitted for review. Our admin team will verify it shortly, after which it will be publicly visible to the community.
+                            </p>
+
+                            <button
+                                onClick={() => navigate("/blogs")}
+                                className="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-sm tracking-wide hover:bg-blue-700 transition-colors"
+                            >
+                                Back to Insights
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
