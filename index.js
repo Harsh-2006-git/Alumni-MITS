@@ -19,6 +19,7 @@ import ProjectRoute from "./routes/projectRoutes.js";
 import autoJobRoutes from "./routes/autoJobRoutes.js";
 import MentorRoutes from "./routes/mentorRoutes.js";
 import BlogRoutes from "./routes/BlogRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 
 // ✅ Import Socket items
@@ -100,6 +101,7 @@ app.use("/project", ProjectRoute);
 app.use("/mentor", MentorRoutes);
 app.use("/api/blogs", BlogRoutes);
 app.use("/api/jobs", JobRoute);
+app.use("/notification", notificationRoutes);
 
 app.use("/api/auto-jobs", autoJobRoutes);
 
