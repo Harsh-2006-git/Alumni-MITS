@@ -563,7 +563,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
       {/* Main Header Content - preserved from original file logic but ensuring imports are correct */}
       <header
-        className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-300 ${isDarkMode
+        className={`sticky top-0 z-40 w-full max-w-[100vw] backdrop-blur-md border-b transition-colors duration-300 ${isDarkMode
           ? "bg-gray-900/95 border-gray-800"
           : "bg-white/80 border-blue-200"
           }`}
