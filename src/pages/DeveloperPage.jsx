@@ -180,8 +180,8 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
             <div
               key={i}
               className={`p-4 sm:p-6 rounded-xl sm:rounded-2xl border sm:border-2 shadow-lg transition-all hover:scale-105 ${isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-amber-900/20 border-amber-600/20"
-                  : "bg-gradient-to-br from-white to-amber-50 border-amber-200"
+                ? "bg-gradient-to-br from-slate-900/80 to-amber-900/20 border-amber-600/20"
+                : "bg-gradient-to-br from-white to-amber-50 border-amber-200"
                 }`}
             >
               <div className="flex items-start gap-3">
@@ -208,8 +208,8 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
             <div
               key={i}
               className={`rounded-2xl sm:rounded-3xl p-4 sm:p-8 border sm:border-2 shadow-xl transition-all hover:scale-105 ${isDarkMode
-                  ? "bg-gradient-to-br from-slate-900/80 to-blue-900/20 border-blue-600/20"
-                  : "bg-gradient-to-br from-white to-blue-50 border-blue-200"
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/20 border-blue-600/20"
+                : "bg-gradient-to-br from-white to-blue-50 border-blue-200"
                 }`}
             >
               <div className="flex flex-col md:flex-row items-center gap-6 sm:gap-8">
@@ -252,8 +252,8 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
           {/* First Mentor Box */}
           <div
             className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 border sm:border-2 shadow-2xl transition-all hover:scale-105 ${isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-purple-900/20 border-purple-600/20"
-                : "bg-gradient-to-br from-white to-purple-50 border-purple-200"
+              ? "bg-gradient-to-br from-slate-900/80 to-purple-900/20 border-purple-600/20"
+              : "bg-gradient-to-br from-white to-purple-50 border-purple-200"
               }`}
           >
             <div className="flex flex-col items-center gap-4 sm:gap-6 text-center">
@@ -284,8 +284,8 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
           {/* Second Mentor Box */}
           <div
             className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 border sm:border-2 shadow-2xl transition-all hover:scale-105 ${isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-indigo-900/20 border-indigo-600/20"
-                : "bg-gradient-to-br from-white to-indigo-50 border-indigo-200"
+              ? "bg-gradient-to-br from-slate-900/80 to-indigo-900/20 border-indigo-600/20"
+              : "bg-gradient-to-br from-white to-indigo-50 border-indigo-200"
               }`}
           >
             <div className="flex flex-col items-center gap-4 sm:gap-6 text-center">
@@ -317,8 +317,8 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
       <section className="container mx-auto px-4 sm:px-10 lg:px-16 py-8 sm:py-12">
         <div
           className={`max-w-4xl mx-auto rounded-2xl sm:rounded-3xl p-6 sm:p-8 border sm:border-2 shadow-2xl ${isDarkMode
-              ? "bg-gradient-to-br from-slate-900/80 to-indigo-900/20 border-indigo-600/20"
-              : "bg-gradient-to-br from-white to-indigo-50 border-indigo-200"
+            ? "bg-gradient-to-br from-slate-900/80 to-indigo-900/20 border-indigo-600/20"
+            : "bg-gradient-to-br from-white to-indigo-50 border-indigo-200"
             }`}
         >
           <div className="text-center mb-6 sm:mb-8">
@@ -339,16 +339,16 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
               <button
                 className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all hover:scale-105 ${isDarkMode
-                    ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
-                    : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg"
+                  : "bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg"
                   }`}
               >
                 Join Network →
               </button>
               <button
                 className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base transition-all hover:scale-105 ${isDarkMode
-                    ? "bg-slate-800 text-indigo-300 border border-indigo-500/30"
-                    : "bg-white text-indigo-600 border border-indigo-300 shadow-lg"
+                  ? "bg-slate-800 text-indigo-300 border border-indigo-500/30"
+                  : "bg-white text-indigo-600 border border-indigo-300 shadow-lg"
                   }`}
               >
                 Explore Events

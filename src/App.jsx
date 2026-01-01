@@ -16,7 +16,7 @@ import EventPage from "./pages/EventPage";
 import Chatpage from "./pages/ChatPage";
 import AlumniAuth from "./pages/auth-alumni";
 
-import AdminDashboard from "./pages/AdminDashboard";
+
 import AdminLoginPage from "./pages/AdminLogin";
 import CampaignPage from "./pages/campaignPage";
 

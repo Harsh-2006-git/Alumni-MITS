@@ -21,11 +21,75 @@ import {
 } from "lucide-react";
 
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+
 const AdminLayout = ({ isDarkMode, toggleTheme }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Notification State
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [showNotificationInput, setShowNotificationInput] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState("");
+    const [isSending, setIsSending] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+
+    const getAuthToken = () => {
+        const authData = localStorage.getItem("auth");
+        return authData ? JSON.parse(authData).accessToken : null;
+    };
+
+    const fetchNotifications = async () => {
+        try {
+            const token = getAuthToken();
+            const response = await fetch(`${BASE_URL}/notification/all`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                // Map backend data to UI format if needed, assuming data.data is array of { message, createdAt }
+                setNotifications(data.data.map(n => ({
+                    message: n.message,
+                    time: new Date(n.createdAt).toLocaleString() // Simple formatting
+                })));
+            }
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []);
+
+    const handleSendNotification = async () => {
+        if (!notificationMessage.trim()) return;
+        setIsSending(true);
+
+        try {
+            const token = getAuthToken();
+            const response = await fetch(`${BASE_URL}/notification/create`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ message: notificationMessage })
+            });
+
+            if (response.ok) {
+                setNotificationMessage("");
+                setShowNotificationInput(false);
+                fetchNotifications(); // Refresh list
+            }
+        } catch (error) {
+            console.error("Error creating notification:", error);
+        } finally {
+            setIsSending(false);
+        }
+    };
 
     useEffect(() => {
         const handleResize = () => {
@@ -85,6 +149,90 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-4">
+                    {/* Notification System */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowNotifications(!showNotifications)}
+                            className={`p-2 rounded-lg transition relative ${isDarkMode
+                                ? "text-slate-300 hover:bg-slate-800"
+                                : "text-slate-600 hover:bg-slate-100"
+                                }`}
+                        >
+                            <Bell className="w-5 h-5" />
+                            {notifications.length > 0 && (
+                                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-slate-900"></span>
+                            )}
+                        </button>
+
+                        {showNotifications && (
+                            <div className={`absolute right-0 mt-2 w-80 rounded-xl shadow-xl border animate-in slide-in-from-top-2 fade-in-0 z-50 overflow-hidden ${isDarkMode ? "bg-slate-900 border-slate-700" : "bg-white border-slate-200"
+                                }`}>
+                                <div className={`p-4 border-b flex justify-between items-center ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}>
+                                    <h3 className={`font-semibold text-sm ${isDarkMode ? "text-white" : "text-slate-900"}`}>
+                                        Notifications
+                                    </h3>
+                                    <button
+                                        onClick={() => setShowNotificationInput(!showNotificationInput)}
+                                        className={`text-xs px-2 py-1 rounded transition font-medium ${isDarkMode
+                                            ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
+                                            : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                                            }`}
+                                    >
+                                        {showNotificationInput ? "Cancel" : "+ New"}
+                                    </button>
+                                </div>
+
+                                {showNotificationInput && (
+                                    <div className={`p-4 border-b ${isDarkMode ? "bg-slate-800/50 border-slate-800" : "bg-slate-50 border-slate-100"}`}>
+                                        <textarea
+                                            value={notificationMessage}
+                                            onChange={(e) => setNotificationMessage(e.target.value)}
+                                            placeholder="Type message to push..."
+                                            className={`w-full text-sm p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none ${isDarkMode
+                                                ? "bg-slate-900 border-slate-700 text-white placeholder-slate-500"
+                                                : "bg-white border-slate-200 text-slate-900 placeholder-slate-400"
+                                                }`}
+                                            rows="2"
+                                        />
+                                        <button
+                                            onClick={handleSendNotification}
+                                            disabled={!notificationMessage.trim() || isSending}
+                                            className={`mt-3 w-full py-2 text-xs font-bold uppercase tracking-wider text-white rounded-lg transition flex items-center justify-center gap-2 ${!notificationMessage.trim() || isSending
+                                                ? "bg-slate-400 cursor-not-allowed"
+                                                : "bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg"
+                                                }`}
+                                        >
+                                            {isSending ? "Sending..." : "Push Alert"}
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-700">
+                                    {notifications.length > 0 ? (
+                                        notifications.map((notif, index) => (
+                                            <div
+                                                key={index}
+                                                className={`p-4 border-b last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}
+                                            >
+                                                <p className={`text-sm ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>
+                                                    {notif.message}
+                                                </p>
+                                                <p className={`text-xs mt-1.5 ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
+                                                    {notif.time}
+                                                </p>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className={`p-8 text-center ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
+                                            <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                            <p className="text-sm">No notifications yet</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium text-sm"

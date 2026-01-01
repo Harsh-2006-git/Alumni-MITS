@@ -9,6 +9,7 @@ import {
   Activity,
   MessageCircle,
   ChevronDown,
+  Bell, // Added Bell
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
@@ -23,6 +24,11 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const [showCampaignDropdown, setShowCampaignDropdown] = useState(false);
   const [showMentorDropdown, setShowMentorDropdown] = useState(false);
   const [showAboutDropdown, setShowAboutDropdown] = useState(false);
+
+  // Notification State
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
   const [auth, setAuth] = useState(null);
@@ -35,6 +41,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const mobileMenuRef = useRef(null);
   const refreshIntervalRef = useRef(null);
   const aboutDropdownRef = useRef(null);
+  const notificationsModalRef = useRef(null); // Ref for modal click outside
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
@@ -82,6 +89,30 @@ export default function Header({ isDarkMode, toggleTheme }) {
       return null;
     }
   };
+
+  const fetchNotifications = async () => {
+    if (!auth?.accessToken) return;
+    try {
+      const response = await fetch(`${BASE_URL}/notification/all`, {
+        headers: { Authorization: `Bearer ${auth.accessToken}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (auth && auth.accessToken) {
+      fetchNotifications();
+      // Poll every 60 seconds
+      const interval = setInterval(fetchNotifications, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [auth]);
 
   const setupTokenRefresh = (authData) => {
     // Clear any existing interval
@@ -199,6 +230,21 @@ export default function Header({ isDarkMode, toggleTheme }) {
     navigate("/chat");
     setIsMenuOpen(false);
   };
+
+  // Handling click outside for Notification Modal
+  useEffect(() => {
+    const handleClickOutsideModal = (event) => {
+      if (notificationsModalRef.current && !notificationsModalRef.current.contains(event.target)) {
+        setShowNotificationsModal(false);
+      }
+    }
+    if (showNotificationsModal) {
+      document.addEventListener("mousedown", handleClickOutsideModal)
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideModal)
+    }
+  }, [showNotificationsModal])
 
   // Alumni dropdown options with their navigation handlers
   const alumniOptions = [
@@ -450,6 +496,72 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
   return (
     <>
+      {/* NOTIFICATION MODAL */}
+      {showNotificationsModal && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-end p-4 sm:p-6 lg:p-12 pointer-events-none">
+          {/* Click away layer - Transparent */}
+          <div
+            className="fixed inset-0 pointer-events-auto"
+            onClick={() => setShowNotificationsModal(false)}
+          ></div>
+          <div
+            ref={notificationsModalRef}
+            className={`w-full max-w-sm rounded-xl shadow-2xl pointer-events-auto transform transition-all animate-in slide-in-from-right-5 fade-in-0 duration-200 mt-12 bg-white border border-gray-200 z-[101] ${isDarkMode ? "!bg-gray-900 !border-gray-700" : ""
+              }`}
+          >
+            <div className={`p-4 border-b flex items-center justify-between ${isDarkMode ? "border-gray-800" : "border-blue-50"}`}>
+              <div className="flex items-center gap-2">
+                <Bell className={`w-5 h-5 ${isDarkMode ? "text-indigo-400" : "text-blue-600"}`} />
+                <h3 className={`font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Notifications</h3>
+              </div>
+              <button
+                onClick={() => setShowNotificationsModal(false)}
+                className={`p-1 rounded-lg ${isDarkMode ? "hover:bg-gray-800 text-gray-400" : "hover:bg-blue-50 text-gray-500"}`}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="max-h-[400px] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+              {notifications.length > 0 ? (
+                notifications.map((notif, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3 rounded-lg mb-1 last:mb-0 transition-colors ${isDarkMode
+                      ? "hover:bg-gray-800 border border-transparent hover:border-gray-700"
+                      : "hover:bg-blue-50/50 border border-transparent hover:border-blue-100"
+                      }`}
+                  >
+                    <p className={`text-sm leading-relaxed ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                      {notif.message}
+                    </p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${notif.type === 'alert'
+                        ? "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400"
+                        : isDarkMode ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"
+                        }`}>
+                        {notif.type || 'System'}
+                      </span>
+                      <span className={`text-[10px] ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+                        {new Date(notif.createdAt).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="py-12 flex flex-col items-center justify-center text-center opacity-50">
+                  <Bell className="w-12 h-12 mb-3 text-gray-400" />
+                  <p className={`text-sm font-medium ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                    No new notifications
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Header Content - preserved from original file logic but ensuring imports are correct */}
       <header
         className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors duration-300 ${isDarkMode
           ? "bg-gray-900/95 border-gray-800"
@@ -963,6 +1075,24 @@ export default function Header({ isDarkMode, toggleTheme }) {
                         >
                           <Activity className="w-4 h-4" />
                           My Activity
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowNotificationsModal(true);
+                            setShowProfileMenu(false);
+                          }}
+                          className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors duration-200 rounded-lg cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
+                            }`}
+                        >
+                          <div className="relative">
+                            <Bell className="w-4 h-4" />
+                            {notifications.length > 0 && (
+                              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                            )}
+                          </div>
+                          Notifications
                         </button>
                         <button
                           onClick={handleMessages}
