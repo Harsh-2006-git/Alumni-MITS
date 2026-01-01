@@ -69,7 +69,7 @@ export default function AdminLoginPage({
         userEmail,
         userType: "admin",
         loginTime: new Date().toISOString(),
-        expiry: Date.now() + 1000 * 60 * 15, // 15 minutes
+        expiry: Date.now() + 1000 * 60 * 30, // 30 minutes
       };
 
       console.log("✅ Admin Google Login Successful");
@@ -108,7 +108,7 @@ export default function AdminLoginPage({
         username: data.admin.username,
         userType: "admin",
         loginTime: data.admin.loginTime,
-        expiry: Date.now() + 1000 * 60 * 15, // 15 minutes
+        expiry: Date.now() + 1000 * 60 * 30, // 30 minutes
       };
 
       console.log("✅ Admin Login Successful");

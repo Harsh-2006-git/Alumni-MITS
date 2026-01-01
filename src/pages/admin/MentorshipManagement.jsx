@@ -24,7 +24,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     );
 };
 
-const MentorshipManagement = () => {
+const MentorshipManagement = ({ isDarkMode }) => {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -169,9 +169,9 @@ const MentorshipManagement = () => {
                                             <td className="px-6 py-4 text-right">
                                                 <button
                                                     onClick={() => setSelectedItem(item)}
-                                                    className="inline-flex items-center gap-1 px-3 py-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition text-xs font-medium"
+                                                    className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"}`}
                                                 >
-                                                    <Eye className="w-3.5 h-3.5" /> View Details
+                                                    <Eye className="w-4 h-4" /> View
                                                 </button>
                                             </td>
                                         </tr>
@@ -188,39 +188,41 @@ const MentorshipManagement = () => {
                     </div>
 
                     {/* Mobile Card View */}
-                    <div className="md:hidden divide-y divide-slate-100">
+                    <div className={`md:hidden divide-y ${isDarkMode ? "divide-slate-800" : "divide-slate-100"}`}>
                         {filteredData.length > 0 ? (
                             filteredData.map((item) => (
-                                <div key={item.id} className="p-4 space-y-4 hover:bg-slate-50/50 transition-colors">
+                                <div key={item.id} className={`p-4 space-y-4 transition-colors ${isDarkMode ? "hover:bg-slate-800/30" : "hover:bg-slate-50/50"}`}>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold overflow-hidden border border-indigo-200 flex-shrink-0">
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold overflow-hidden border flex-shrink-0 ${isDarkMode ? "bg-slate-800 text-indigo-400 border-slate-700" : "bg-indigo-100 text-indigo-600 border-indigo-200"}`}>
                                                 {item.alumni?.profilePhoto ? (
                                                     <img src={item.alumni.profilePhoto} alt={item.name} className="w-full h-full object-cover" />
                                                 ) : item.name[0]}
                                             </div>
                                             <div className="min-w-0">
-                                                <div className="font-bold text-slate-900 leading-tight truncate">{item.name}</div>
-                                                <div className="text-xs text-slate-500 flex items-center gap-1 mt-1 truncate">
+                                                <div className={`font-bold leading-tight truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{item.name}</div>
+                                                <div className={`text-xs flex items-center gap-1 mt-1 truncate ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>
                                                     <Briefcase className="w-3 h-3" /> {item.company}
                                                 </div>
                                             </div>
                                         </div>
                                         <button
                                             onClick={() => setSelectedItem(item)}
-                                            className="p-2 text-indigo-600 bg-indigo-50 rounded-lg shrink-0"
+                                            className={`p-2 rounded-lg shrink-0 ${isDarkMode ? "bg-slate-800 text-indigo-400 border border-slate-700" : "bg-indigo-50 text-indigo-600"}`}
                                         >
                                             <Eye className="w-5 h-5" />
                                         </button>
                                     </div>
                                     <div className="flex items-center justify-between gap-4 pt-1">
                                         <div className="flex-1 min-w-0">
-                                            <div className="text-[10px] text-gray-400 uppercase font-black tracking-tight mb-0.5">Expertise</div>
-                                            <div className="text-xs text-slate-700 font-medium line-clamp-1">{item.expertise}</div>
+                                            <div className={`text-[10px] uppercase font-black tracking-tight mb-0.5 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Expertise</div>
+                                            <div className={`text-xs font-medium line-clamp-1 ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>{item.expertise}</div>
                                         </div>
                                         <div className="text-right shrink-0">
-                                            <div className="text-[10px] text-gray-400 uppercase font-black tracking-tight mb-1">Mentees</div>
-                                            <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${item.mentees > 0 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>
+                                            <div className={`text-[10px] uppercase font-black tracking-tight mb-1 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Mentees</div>
+                                            <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${item.mentees > 0
+                                                ? (isDarkMode ? 'bg-green-500/10 text-green-400 border-green-500/20' : 'bg-green-50 text-green-700 border-green-200')
+                                                : (isDarkMode ? 'bg-slate-800 text-slate-500 border-slate-700' : 'bg-slate-100 text-slate-500 border-slate-200')}`}>
                                                 {item.mentees} {item.mentees === 1 ? 'Student' : 'Students'}
                                             </div>
                                         </div>

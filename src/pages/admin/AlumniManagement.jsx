@@ -7,18 +7,20 @@ import {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, isDarkMode }) => {
     if (!isOpen) return null;
     return (
-        <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto pt-16 sm:pt-4">
-            <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl w-full max-w-5xl max-h-none sm:max-h-[95vh] overflow-hidden flex flex-col mb-8 sm:mb-0">
-                <div className="p-4 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
-                    <h2 className="text-lg sm:text-xl font-bold text-slate-800">{title}</h2>
-                    <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition">
-                        <X className="w-5 h-5 text-slate-500" />
+        <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto pt-16 sm:pt-4">
+            <div className={`rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-5xl max-h-none sm:max-h-[95vh] overflow-hidden flex flex-col mb-8 sm:mb-0 border ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+                }`}>
+                <div className={`p-4 sm:p-6 border-b flex items-center justify-between sticky top-0 z-10 ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-100"
+                    }`}>
+                    <h2 className={`text-lg sm:text-xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}>{title}</h2>
+                    <button onClick={onClose} className={`p-2 rounded-full transition ${isDarkMode ? "hover:bg-slate-800 text-slate-400" : "hover:bg-slate-100 text-slate-500"}`}>
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
-                <div className="p-3 sm:p-6 overflow-y-auto bg-slate-50">
+                <div className={`p-3 sm:p-6 overflow-y-auto ${isDarkMode ? "bg-slate-950" : "bg-slate-50"}`}>
                     {children}
                 </div>
             </div>
@@ -26,7 +28,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     );
 };
 
-const AlumniManagement = () => {
+const AlumniManagement = ({ isDarkMode }) => {
     const [alumni, setAlumni] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -100,17 +102,21 @@ const AlumniManagement = () => {
         <div className="space-y-6">
             <div className="flex flex-col gap-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Alumni Directory</h2>
-                    <p className="text-sm text-slate-500">Managing verified alumni credentials and professional achievements.</p>
+                    <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}>Alumni Directory</h2>
+                    <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Managing verified alumni credentials and professional achievements.</p>
                 </div>
 
-                <div className="bg-white p-3 rounded-xl border border-gray-200 shadow-sm grid grid-cols-2 md:flex md:flex-row gap-2 sm:gap-4 items-center">
+                <div className={`p-3 rounded-xl border shadow-sm grid grid-cols-2 md:flex md:flex-row gap-2 sm:gap-4 items-center ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-gray-200"
+                    }`}>
                     <div className="relative col-span-2 md:flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+                        <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`} />
                         <input
                             type="text"
                             placeholder="Filter by name, email..."
-                            className="pl-9 pr-4 py-1.5 sm:py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-indigo-500 outline-none text-sm text-gray-700"
+                            className={`pl-9 pr-4 py-1.5 sm:py-2 border rounded-lg w-full outline-none text-sm transition-all ${isDarkMode
+                                ? "bg-slate-800 border-slate-700 text-white focus:ring-2 focus:ring-blue-500/50"
+                                : "bg-white border-gray-300 text-gray-700 focus:ring-2 focus:ring-indigo-500"
+                                }`}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -156,7 +162,8 @@ const AlumniManagement = () => {
                     <p className="text-slate-500 font-medium">Validating network nodes...</p>
                 </div>
             ) : (
-                <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                <div className={`border rounded-2xl overflow-hidden shadow-sm transition-colors ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"
+                    }`}>
                     {/* Desktop Table View */}
                     <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left border-collapse">
@@ -192,36 +199,34 @@ const AlumniManagement = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm font-black text-indigo-600 underline-offset-4 decoration-indigo-100">{alum.currentRole}</div>
-                                            <div className="text-xs text-slate-500 font-bold">{alum.company}</div>
+                                            <div className={`text-sm font-black underline-offset-4 decoration-indigo-100 ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>{alum.currentRole}</div>
+                                            <div className={`text-xs font-bold ${isDarkMode ? "text-slate-500" : "text-slate-500"}`}>{alum.company}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-slate-700 font-medium">{alum.email}</div>
-                                            <div className="text-[10px] text-slate-400 font-mono tracking-tight">{alum.phone}</div>
+                                            <div className={`text-sm font-medium ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>{alum.email}</div>
+                                            <div className={`text-[10px] font-mono tracking-tight ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>{alum.phone}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-gray-800">Branch: {alum.branch || alum.profile?.branch || "-"}</div>
-                                            <div className="text-sm text-gray-500">Batch: {alum.batch}</div>
-                                            <div className="text-xs text-gray-400 mt-1">{alum.location}</div>
+                                            <div className={`text-sm ${isDarkMode ? "text-slate-300" : "text-gray-800"}`}>Branch: {alum.branch || alum.profile?.branch || "-"}</div>
+                                            <div className={`text-sm ${isDarkMode ? "text-slate-400" : "text-gray-500"}`}>Batch: {alum.batch}</div>
+                                            <div className={`text-xs mt-1 ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>{alum.location}</div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => setSelectedAlumni(alum)}
-                                                    className="p-2.5 text-indigo-600 hover:bg-white hover:shadow-md border border-transparent hover:border-indigo-100 rounded-xl transition-all"
-                                                    title="View Profile"
+                                                    className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"}`}
                                                 >
-                                                    <Eye className="w-5 h-5" />
+                                                    <Eye className="w-4 h-4" /> View
                                                 </button>
                                                 <button
                                                     onClick={() => {
                                                         setAlumniToDelete(alum);
                                                         setIsDeleteModalOpen(true);
                                                     }}
-                                                    className="p-2.5 text-rose-600 hover:bg-white hover:shadow-md border border-transparent hover:border-rose-100 rounded-xl transition-all"
-                                                    title="Delete Alumni"
+                                                    className={`px-3 py-1.5 rounded-lg border font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-slate-800 border-rose-900/50 text-rose-400 hover:bg-rose-500/10" : "bg-white text-rose-600 border-rose-100 hover:bg-rose-50"}`}
                                                 >
-                                                    <Trash2 className="w-5 h-5" />
+                                                    <Trash2 className="w-4 h-4" /> Delete
                                                 </button>
                                             </div>
                                         </td>
@@ -232,45 +237,45 @@ const AlumniManagement = () => {
                     </div>
 
                     {/* Mobile Card View */}
-                    <div className="md:hidden divide-y divide-gray-100">
+                    <div className={`md:hidden divide-y ${isDarkMode ? "divide-slate-800" : "divide-gray-100"}`}>
                         {filteredAlumni.map((alum) => (
-                            <div key={alum.id} className="p-4 space-y-4 hover:bg-slate-50/50 transition-colors">
+                            <div key={alum.id} className={`p-4 space-y-4 transition-colors ${isDarkMode ? "hover:bg-slate-800/30" : "hover:bg-slate-50/50"}`}>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-xl overflow-hidden flex items-center justify-center">
+                                        <div className={`w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center border ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-indigo-50 border-indigo-100"}`}>
                                             {alum.profilePhoto ? (
                                                 <img src={alum.profilePhoto} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <span className="text-xl font-bold text-indigo-600">{alum.name?.[0]}</span>
+                                                <span className={`text-xl font-bold ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>{alum.name?.[0]}</span>
                                             )}
                                         </div>
                                         <div>
-                                            <div className="font-bold text-slate-800 text-lg leading-tight">{alum.name}</div>
-                                            <div className="text-[10px] bg-green-50 text-green-600 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter w-fit mt-1">Verified</div>
+                                            <div className={`font-bold text-lg leading-tight ${isDarkMode ? "text-white" : "text-slate-800"}`}>{alum.name}</div>
+                                            <div className={`text-[10px] px-1.5 py-0.5 rounded font-black uppercase tracking-tighter w-fit mt-1 ${isDarkMode ? "bg-green-500/10 text-green-400" : "bg-green-50 text-green-600"}`}>Verified</div>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
-                                        <button onClick={() => setSelectedAlumni(alum)} className="p-2 text-indigo-600 bg-indigo-50 rounded-lg"><Eye className="w-5 h-5" /></button>
-                                        <button onClick={() => { setAlumniToDelete(alum); setIsDeleteModalOpen(true); }} className="p-2 text-rose-600 bg-rose-50 rounded-lg"><Trash2 className="w-5 h-5" /></button>
+                                        <button onClick={() => setSelectedAlumni(alum)} className={`p-2 rounded-lg ${isDarkMode ? "bg-slate-800 text-indigo-400" : "bg-indigo-50 text-indigo-600"}`}><Eye className="w-5 h-5" /></button>
+                                        <button onClick={() => { setAlumniToDelete(alum); setIsDeleteModalOpen(true); }} className={`p-2 rounded-lg ${isDarkMode ? "bg-slate-800 text-rose-400" : "bg-rose-50 text-rose-600"}`}><Trash2 className="w-5 h-5" /></button>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 pt-2">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Current Role</p>
-                                        <p className="text-sm font-bold text-indigo-600 leading-tight">{alum.currentRole}</p>
-                                        <p className="text-xs text-slate-500">{alum.company}</p>
+                                        <p className={`text-[10px] uppercase font-bold tracking-wider ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Current Role</p>
+                                        <p className={`text-sm font-bold leading-tight ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>{alum.currentRole}</p>
+                                        <p className={`text-xs ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>{alum.company}</p>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Education</p>
-                                        <p className="text-sm text-gray-800 leading-tight">Batch {alum.batch}</p>
-                                        <p className="text-xs text-gray-500 truncate">{alum.branch || alum.profile?.branch || "-"}</p>
+                                        <p className={`text-[10px] uppercase font-bold tracking-wider ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Education</p>
+                                        <p className={`text-sm leading-tight ${isDarkMode ? "text-slate-200" : "text-gray-800"}`}>Batch {alum.batch}</p>
+                                        <p className={`text-xs truncate ${isDarkMode ? "text-slate-400" : "text-gray-500"}`}>{alum.branch || alum.profile?.branch || "-"}</p>
                                     </div>
                                 </div>
                                 <div className="pt-2 flex flex-col gap-1">
-                                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                                    <div className={`flex items-center gap-2 text-xs ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                                         <Mail className="w-3.5 h-3.5" /> {alum.email}
                                     </div>
-                                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                                    <div className={`flex items-center gap-2 text-xs ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                                         <Phone className="w-3.5 h-3.5" /> {alum.phone}
                                     </div>
                                 </div>
@@ -281,12 +286,13 @@ const AlumniManagement = () => {
             )}
 
             {/* Alumni Profile Modal */}
-            <Modal isOpen={!!selectedAlumni} onClose={() => setSelectedAlumni(null)} title="Alumni Details">
+            <Modal isOpen={!!selectedAlumni} onClose={() => setSelectedAlumni(null)} title="Alumni Details" isDarkMode={isDarkMode}>
                 {selectedAlumni && (
                     <div className="space-y-6 pb-6">
                         {/* Header Info */}
                         <div className="flex flex-col md:flex-row gap-4 sm:gap-6 items-center sm:items-start text-center sm:text-left">
-                            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+                            <div className={`w-24 h-24 sm:w-32 sm:h-32 rounded-lg overflow-hidden flex-shrink-0 border ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-gray-100 border-gray-200"
+                                }`}>
                                 {selectedAlumni.profilePhoto ? (
                                     <img
                                         src={selectedAlumni.profilePhoto}
@@ -295,16 +301,17 @@ const AlumniManagement = () => {
                                         onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                                     />
                                 ) : null}
-                                <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-500 text-4xl font-semibold" style={{ display: selectedAlumni.profilePhoto ? 'none' : 'flex' }}>
+                                <div className={`w-full h-full flex items-center justify-center text-4xl font-semibold ${isDarkMode ? "bg-slate-800 text-slate-500" : "bg-gray-200 text-gray-500"
+                                    }`} style={{ display: selectedAlumni.profilePhoto ? 'none' : 'flex' }}>
                                     {selectedAlumni.name?.[0]}
                                 </div>
                             </div>
 
                             <div className="flex-1 space-y-2 sm:space-y-3 w-full">
                                 <div>
-                                    <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{selectedAlumni.name}</h2>
-                                    <div className="flex items-center justify-center sm:justify-start gap-2 text-base sm:text-lg text-gray-700 mt-0.5 sm:mt-1 font-medium">
-                                        <Briefcase className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                                    <h2 className={`text-xl sm:text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>{selectedAlumni.name}</h2>
+                                    <div className={`flex items-center justify-center sm:justify-start gap-2 text-base sm:text-lg mt-0.5 sm:mt-1 font-medium ${isDarkMode ? "text-slate-300" : "text-gray-700"}`}>
+                                        <Briefcase className={`w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-slate-500" : "text-gray-500"}`} />
                                         <span>{selectedAlumni.currentRole} at <span className="font-semibold">{selectedAlumni.company}</span></span>
                                     </div>
                                     <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 mt-2 sm:mt-2">
@@ -319,7 +326,7 @@ const AlumniManagement = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1.5 sm:gap-4 text-[11px] sm:text-sm text-gray-700 pt-1">
+                                <div className={`flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1.5 sm:gap-4 text-[11px] sm:text-sm pt-1 ${isDarkMode ? "text-slate-400" : "text-gray-700"}`}>
                                     <div className="flex items-center gap-2">
                                         <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" /> {selectedAlumni.email}
                                     </div>
@@ -362,28 +369,30 @@ const AlumniManagement = () => {
                             {/* Left Column */}
                             <div className="space-y-6">
                                 {/* About */}
-                                <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                                    <h3 className="text-lg font-bold text-indigo-600 mb-3 flex items-center gap-2">
+                                <div className={`border rounded-lg p-5 shadow-sm ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-gray-200"
+                                    }`}>
+                                    <h3 className="text-lg font-bold text-indigo-500 mb-3 flex items-center gap-2">
                                         <Activity className="w-5 h-5 text-indigo-500" /> About
                                     </h3>
-                                    <p className="text-gray-700 whitespace-pre-line leading-relaxed">
+                                    <p className={`whitespace-pre-line leading-relaxed ${isDarkMode ? "text-slate-300" : "text-gray-700"}`}>
                                         {selectedAlumni.profile?.about || "No bio provided."}
                                     </p>
                                 </div>
 
                                 {/* Experience */}
-                                <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                                    <h3 className="text-lg font-bold text-indigo-600 mb-4 flex items-center gap-2">
+                                <div className={`border rounded-lg p-5 shadow-sm ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-gray-200"
+                                    }`}>
+                                    <h3 className="text-lg font-bold text-indigo-500 mb-4 flex items-center gap-2">
                                         <Briefcase className="w-5 h-5 text-indigo-500" /> Work Experience
                                     </h3>
                                     <div className="space-y-4">
                                         {selectedAlumni.profile?.experience?.length > 0 ? (
                                             selectedAlumni.profile.experience.map((exp, i) => (
-                                                <div key={i} className="border-l-2 border-gray-200 pl-4 py-1">
-                                                    <h4 className="font-semibold text-gray-800">{exp.role}</h4>
-                                                    <p className="text-sm font-medium text-indigo-600">{exp.company}</p>
-                                                    <p className="text-xs text-gray-500 mb-2">{exp.from} - {exp.to}</p>
-                                                    <p className="text-sm text-gray-600">{exp.description}</p>
+                                                <div key={i} className={`border-l-2 pl-4 py-1 ${isDarkMode ? "border-slate-800" : "border-gray-200"}`}>
+                                                    <h4 className={`font-semibold ${isDarkMode ? "text-slate-200" : "text-gray-800"}`}>{exp.role}</h4>
+                                                    <p className="text-sm font-medium text-indigo-500">{exp.company}</p>
+                                                    <p className={`text-xs mb-2 ${isDarkMode ? "text-slate-500" : "text-gray-500"}`}>{exp.from} - {exp.to}</p>
+                                                    <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-gray-600"}`}>{exp.description}</p>
                                                 </div>
                                             ))
                                         ) : (
@@ -396,8 +405,9 @@ const AlumniManagement = () => {
                             {/* Right Column */}
                             <div className="space-y-6">
                                 {/* Education - Now consistent in size with other sections */}
-                                <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                                    <h3 className="text-lg font-bold text-indigo-600 mb-4 flex items-center gap-2">
+                                <div className={`border rounded-lg p-5 shadow-sm ${isDarkMode ? "bg-slate-900 border-slate-800" : "bg-white border-gray-200"
+                                    }`}>
+                                    <h3 className="text-lg font-bold text-indigo-500 mb-4 flex items-center gap-2">
                                         <GraduationCap className="w-5 h-5 text-indigo-500" /> Education
                                     </h3>
                                     <div className="space-y-4">
@@ -435,18 +445,20 @@ const AlumniManagement = () => {
                                                 const isCompleted = edu.to && new Date(edu.to) <= new Date();
 
                                                 return (
-                                                    <div key={i} className="border border-gray-100 rounded-lg p-4 bg-white hover:bg-gray-50 transition-colors">
+                                                    <div key={i} className={`border rounded-lg p-4 transition-colors ${isDarkMode ? "border-slate-800 bg-slate-800/20 hover:bg-slate-800/40" : "border-gray-100 bg-white hover:bg-gray-50"
+                                                        }`}>
                                                         <div className="flex items-start gap-3">
                                                             <div className="flex-shrink-0">
-                                                                <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                                                                    <GraduationCap className="w-5 h-5 text-indigo-600" />
+                                                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${isDarkMode ? "bg-indigo-500/20" : "bg-indigo-100"
+                                                                    }`}>
+                                                                    <GraduationCap className={`w-5 h-5 ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`} />
                                                                 </div>
                                                             </div>
 
                                                             <div className="flex-1 min-w-0">
                                                                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-2">
                                                                     <div>
-                                                                        <h4 className="font-bold text-gray-900 text-base">{institution}</h4>
+                                                                        <h4 className={`font-bold text-base ${isDarkMode ? "text-white" : "text-gray-900"}`}>{institution}</h4>
                                                                         <div className="flex flex-wrap items-center gap-2 mt-1">
                                                                             {degree && (
                                                                                 <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded">
@@ -568,15 +580,15 @@ const AlumniManagement = () => {
             </Modal>
 
             {/* Delete Confirmation Modal */}
-            <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="Confirm Deletion">
+            <Modal isOpen={isDeleteModalOpen} onClose={() => setIsDeleteModalOpen(false)} title="Confirm Deletion" isDarkMode={isDarkMode}>
                 <div className="space-y-4 text-center py-4">
                     <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto">
                         <AlertCircle className="w-8 h-8" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-gray-900">Are you sure?</h3>
-                        <p className="text-gray-500 mt-2">
-                            Do you really want to delete <span className="font-semibold text-gray-900">{alumniToDelete?.name}</span>? This process cannot be undone.
+                        <h3 className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Are you sure?</h3>
+                        <p className={`mt-2 ${isDarkMode ? "text-slate-400" : "text-gray-500"}`}>
+                            Do you really want to delete <span className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"}`}>{alumniToDelete?.name}</span>? This process cannot be undone.
                         </p>
                     </div>
                     <div className="flex gap-3 pt-4 px-4 justify-center">

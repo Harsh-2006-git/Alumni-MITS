@@ -48,8 +48,13 @@ import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorshipRequestsPage from "./pages/MentorshipRequestsPage";
 import ContactUsPage from "./pages/ContactUsPage";
 import RecruitmentPage from "./pages/RecruitmentPage";
+import BlogListing from "./pages/BlogListing";
+import CreateBlog from "./pages/CreateBlog";
+import BlogDetail from "./pages/BlogDetail";
+import BlogManagement from "./pages/admin/BlogManagement";
 
 import ProfilePhotoUpload from "./components/ProfilePhotoUpload";
+
 import { Contact } from "lucide-react";
 
 import { SocketProvider } from "./context/SocketContext";
@@ -201,22 +206,38 @@ export default function App() {
               path="/admin"
               element={
                 isAuthenticated && currentUser?.userType === "admin" ? (
-                  <AdminLayout />
+                  <AdminLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
                 ) : (
                   <Navigate to="/login-admin" replace />
                 )
               }
             >
-              <Route index element={<AdminDashboardMain />} />
-              <Route path="alumni" element={<AlumniManagement />} />
-              <Route path="pending" element={<PendingRequests />} />
-              <Route path="students" element={<StudentManagement />} />
-              <Route path="events" element={<EventManagement />} />
-              <Route path="campaigns" element={<CampaignManagement />} />
-              <Route path="jobs" element={<JobsManagement />} />
-              <Route path="mentorship" element={<MentorshipManagement />} />
-              <Route path="bulk-register" element={<BulkRegister />} />
+              <Route index element={<AdminDashboardMain isDarkMode={isDarkMode} />} />
+              <Route path="alumni" element={<AlumniManagement isDarkMode={isDarkMode} />} />
+              <Route path="pending" element={<PendingRequests isDarkMode={isDarkMode} />} />
+              <Route path="students" element={<StudentManagement isDarkMode={isDarkMode} />} />
+              <Route path="events" element={<EventManagement isDarkMode={isDarkMode} />} />
+              <Route path="campaigns" element={<CampaignManagement isDarkMode={isDarkMode} />} />
+              <Route path="jobs" element={<JobsManagement isDarkMode={isDarkMode} />} />
+              <Route path="mentorship" element={<MentorshipManagement isDarkMode={isDarkMode} />} />
+              <Route path="blogs" element={<BlogManagement isDarkMode={isDarkMode} />} />
+              <Route path="bulk-register" element={<BulkRegister isDarkMode={isDarkMode} />} />
             </Route>
+
+            {/* Blogs */}
+            <Route
+              path="/blogs"
+              element={<BlogListing isDarkMode={isDarkMode} toggleTheme={toggleTheme} isAuthenticated={isAuthenticated} />}
+            />
+            <Route
+              path="/blog/:id"
+              element={<BlogDetail isDarkMode={isDarkMode} toggleTheme={toggleTheme} isAuthenticated={isAuthenticated} />}
+            />
+            <Route
+              path="/create-blog"
+              element={<CreateBlog isDarkMode={isDarkMode} toggleTheme={toggleTheme} />}
+            />
+
 
             {/* Profile */}
             <Route

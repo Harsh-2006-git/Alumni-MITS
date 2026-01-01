@@ -222,6 +222,10 @@ export default function Header({ isDarkMode, toggleTheme }) {
       label: "Alumni Analytics",
       path: "/alumni-analytics",
     },
+    {
+      label: "Alumni Insights (Blogs)",
+      path: "/blogs",
+    },
   ];
 
   // Events dropdown options with their navigation handlers

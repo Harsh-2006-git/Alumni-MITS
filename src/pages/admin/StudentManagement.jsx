@@ -26,7 +26,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     );
 };
 
-const StudentManagement = () => {
+const StudentManagement = ({ isDarkMode }) => {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -192,29 +192,27 @@ const StudentManagement = () => {
                                             <div className="text-[11px] text-slate-500 font-mono">{student.phone}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-1.5 text-sm text-slate-600 font-medium">
+                                            <div className="flex items-center gap-1.5 text-sm font-medium">
                                                 <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                                                {student.location}
+                                                <span className={isDarkMode ? "text-slate-300" : "text-slate-600"}>{student.location}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => setSelectedStudent(student)}
-                                                    className="p-2.5 text-indigo-600 hover:bg-white hover:shadow-md border border-transparent hover:border-indigo-100 rounded-xl transition-all"
-                                                    title="View Profile"
+                                                    className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"}`}
                                                 >
-                                                    <Eye className="w-5 h-5" />
+                                                    <Eye className="w-4 h-4" /> View
                                                 </button>
                                                 <button
                                                     onClick={() => {
                                                         setStudentToDelete(student);
                                                         setIsDeleteModalOpen(true);
                                                     }}
-                                                    className="p-2.5 text-rose-600 hover:bg-white hover:shadow-md border border-transparent hover:border-rose-100 rounded-xl transition-all"
-                                                    title="Delete Student"
+                                                    className={`px-3 py-1.5 rounded-lg border font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-slate-800 border-rose-900/50 text-rose-400 hover:bg-rose-500/10" : "bg-white text-rose-600 border-rose-100 hover:bg-rose-50"}`}
                                                 >
-                                                    <Trash2 className="w-5 h-5" />
+                                                    <Trash2 className="w-4 h-4" /> Delete
                                                 </button>
                                             </div>
                                         </td>
@@ -225,47 +223,47 @@ const StudentManagement = () => {
                     </div>
 
                     {/* Mobile Card View */}
-                    <div className="md:hidden divide-y divide-gray-100">
+                    <div className={`md:hidden divide-y ${isDarkMode ? "divide-slate-800" : "divide-gray-100"}`}>
                         {filteredStudents.map((student) => (
-                            <div key={student.id} className="p-4 space-y-4 hover:bg-slate-50/50 transition-colors">
+                            <div key={student.id} className={`p-4 space-y-4 transition-colors ${isDarkMode ? "hover:bg-slate-800/30" : "hover:bg-slate-50/50"}`}>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-xl overflow-hidden flex items-center justify-center">
+                                        <div className={`w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center border ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-indigo-50 border-indigo-100"}`}>
                                             {student.profilePhoto ? (
                                                 <img src={student.profilePhoto} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <span className="text-xl font-bold text-indigo-600">{student.name?.[0]}</span>
+                                                <span className={`text-xl font-bold ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>{student.name?.[0]}</span>
                                             )}
                                         </div>
                                         <div>
-                                            <div className="font-bold text-slate-800 text-lg leading-tight">{student.name}</div>
-                                            <div className="text-[10px] text-slate-400 font-mono tracking-tighter mt-1 overflow-hidden">ID: {student.id}</div>
+                                            <div className={`font-bold text-lg leading-tight ${isDarkMode ? "text-white" : "text-slate-800"}`}>{student.name}</div>
+                                            <div className={`text-[10px] font-mono tracking-tighter mt-1 overflow-hidden ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>ID: {student.id}</div>
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
-                                        <button onClick={() => setSelectedStudent(student)} className="p-2 text-indigo-600 bg-indigo-50 rounded-lg"><Eye className="w-5 h-5" /></button>
-                                        <button onClick={() => { setStudentToDelete(student); setIsDeleteModalOpen(true); }} className="p-2 text-rose-600 bg-rose-50 rounded-lg"><Trash2 className="w-5 h-5" /></button>
+                                        <button onClick={() => setSelectedStudent(student)} className={`p-2 rounded-lg ${isDarkMode ? "bg-slate-800 text-indigo-400" : "bg-indigo-50 text-indigo-600"}`}><Eye className="w-5 h-5" /></button>
+                                        <button onClick={() => { setStudentToDelete(student); setIsDeleteModalOpen(true); }} className={`p-2 rounded-lg ${isDarkMode ? "bg-slate-800 text-rose-400" : "bg-rose-50 text-rose-600"}`}><Trash2 className="w-5 h-5" /></button>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4 pt-2">
                                     <div className="space-y-1">
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Academic</p>
-                                        <p className="text-sm font-bold text-indigo-600 leading-tight">Class of {student.batch}</p>
-                                        <p className="text-xs text-slate-500 font-medium truncate">{student.branch}</p>
+                                        <p className={`text-[10px] uppercase font-bold tracking-wider ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Academic</p>
+                                        <p className={`text-sm font-bold leading-tight ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>Class of {student.batch}</p>
+                                        <p className={`text-xs font-medium truncate ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>{student.branch}</p>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Location</p>
-                                        <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
+                                        <p className={`text-[10px] uppercase font-bold tracking-wider ${isDarkMode ? "text-slate-500" : "text-gray-400"}`}>Location</p>
+                                        <div className={`flex items-center gap-1.5 text-xs font-medium ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                                             <MapPin className="w-3.5 h-3.5 text-rose-400" />
                                             {student.location}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="pt-2 flex flex-col gap-1">
-                                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                                    <div className={`flex items-center gap-2 text-xs ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                                         <Mail className="w-3.5 h-3.5" /> {student.email}
                                     </div>
-                                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                                    <div className={`flex items-center gap-2 text-xs ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                                         <Phone className="w-3.5 h-3.5" /> {student.phone}
                                     </div>
                                 </div>

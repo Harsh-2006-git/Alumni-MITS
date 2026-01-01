@@ -29,6 +29,7 @@ import {
   Eye,
   ArrowRight,
   Building,
+  Plus,
 } from "lucide-react";
 
 import { useRef } from "react";
@@ -43,6 +44,52 @@ interface HomePageProps {
   isDarkMode: boolean;
   toggleTheme: () => void;
 }
+
+const FAQItem = ({ question, answer, isDarkMode }: { question: string, answer: string, isDarkMode: boolean }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div
+      className={`group rounded-xl border transition-all duration-300 overflow-hidden ${isOpen
+        ? (isDarkMode ? "bg-slate-800/90 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.2)]" : "bg-white border-blue-600 shadow-[0_10px_40px_rgba(59,130,246,0.12)]")
+        : (isDarkMode ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20" : "bg-blue-600/5 border-blue-200/60 hover:bg-blue-600/10 hover:border-blue-300")
+        }`}
+    >
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-3.5 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between gap-3 text-left"
+      >
+        <span className={`text-[13px] sm:text-sm md:text-base font-bold transition-colors duration-300 ${isOpen
+          ? (isDarkMode ? "text-blue-400" : "text-blue-600")
+          : (isDarkMode ? "text-slate-300" : "text-gray-700")
+          }`}>
+          {question}
+        </span>
+        <div className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300 ${isOpen
+          ? "bg-blue-500 text-white rotate-45"
+          : (isDarkMode ? "bg-slate-800 text-slate-400 group-hover:bg-slate-700" : "bg-blue-50 text-blue-500 group-hover:bg-blue-100")
+          }`}>
+          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        </div>
+      </button>
+      <motion.div
+        initial={false}
+        animate={{
+          height: isOpen ? "auto" : 0,
+          opacity: isOpen ? 1 : 0
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="overflow-hidden"
+      >
+        <div className={`px-3.5 pb-3.5 sm:px-5 sm:pb-4 text-[12px] sm:text-[13px] md:text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-gray-600"}`}>
+          <div className={`pt-2.5 border-t ${isDarkMode ? "border-slate-800" : "border-blue-50"}`}>
+            {answer}
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 
 export default function AlumniHomePage({
   isDarkMode,
@@ -1602,6 +1649,93 @@ export default function AlumniHomePage({
           </motion.div>
         </div>
       </motion.section>
+
+
+      {/* FAQ Section */}
+      <section className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-16 md:py-24">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          {/* Left Column - Heading & Description */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 sm:space-y-6"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20">
+              <span className={`text-[10px] sm:text-xs font-semibold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+                Questions & Answers
+              </span>
+            </div>
+            <h2 className={`text-2xl sm:text-3xl md:text-5xl font-black leading-tight ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+              Common <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Queries</span> <span className="hidden sm:inline">About Our Network</span>
+            </h2>
+            <p className={`hidden sm:block text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+              Everything you need to know about joining, contributing, and thriving in the MITS Alumni ecosystem. Can't find what you're looking for? Reach out to our support team.
+            </p>
+            <div className={`w-full max-w-md p-4 sm:p-5 rounded-2xl border ${isDarkMode ? "bg-slate-900/50 border-slate-800" : "bg-white border-blue-100 shadow-xl"}`}>
+              <div className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                  ?
+                </div>
+                <div className="text-left">
+                  <h4 className={`text-sm sm:text-base font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>Still have questions?</h4>
+                  <p className={`text-[11px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>We're here to help you 24/7.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate("/contact-us")}
+                className="mt-3 sm:mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600/10 to-purple-600/10 hover:from-blue-600 hover:to-purple-600 border border-blue-500/20 text-blue-500 hover:text-white text-[11px] sm:text-xs font-semibold transition-all duration-300"
+              >
+                Contact Support
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Right Column - FAQ Accordion */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="space-y-3 w-full"
+          >
+            {[
+              {
+                q: "How can I join the MITS Alumni Network?",
+                a: "Simply click on the 'Sign Up' or 'Join Now' buttons. You'll need to provide your graduation year, department, and roll number for verification. Once verified, you'll gain full access."
+              },
+              {
+                q: "What are the benefits of being a verified alumnus?",
+                a: "Verified members can access the exclusive job board, mentor students, message other alumni directly, participate in premium events, and get special campus entry privileges."
+              },
+              {
+                q: "How can I create an event?",
+                a: "Go to the 'Events' section, create your event, and submit it. After admin approval, it will go live and users can register."
+              },
+              {
+                q: "How can I mentor current students?",
+                a: "Once logged in, head to the 'Mentorship' section in your profile. You can set your availability, expertise areas, and start accepting requests from deserving students."
+              },
+              {
+                q: "How do I post a job opportunity?",
+                a: "Alumni can post jobs directly through the 'Job Portal' section. Your posting will be visible to all verified alumni and final-year students, helping you hire from your alma mater."
+              },
+              {
+                q: "How can I start a campaign or fundraiser?",
+                a: "Create a campaign from the 'Campaigns' section. After admin verification, it will go live and users can upload payment screenshots, which are then verified."
+              }
+            ].map((faq, index) => (
+              <FAQItem
+                key={index}
+                question={faq.q}
+                answer={faq.a}
+                isDarkMode={isDarkMode}
+              />
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
       {/* Footer */}
       <Footer isDarkMode={isDarkMode} />

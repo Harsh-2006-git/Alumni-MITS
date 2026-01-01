@@ -25,7 +25,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     );
 };
 
-const EventManagement = () => {
+const EventManagement = ({ isDarkMode }) => {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -189,11 +189,26 @@ const EventManagement = () => {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <button onClick={() => setSelectedEvent(event)} className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all" title="View Details"><Eye className="w-5 h-5" /></button>
+                                                <button
+                                                    onClick={() => setSelectedEvent(event)}
+                                                    className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"}`}
+                                                >
+                                                    <Eye className="w-4 h-4" /> View
+                                                </button>
                                                 {!event.isScheduled && (
-                                                    <button onClick={() => handleEventAction(event.id, "accept")} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Approve"><Check className="w-5 h-5" /></button>
+                                                    <button
+                                                        onClick={() => handleEventAction(event.id, "accept")}
+                                                        className={`px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 hover:bg-emerald-700 transition-all active:scale-95`}
+                                                    >
+                                                        <Check className="w-4 h-4" /> Approve
+                                                    </button>
                                                 )}
-                                                <button onClick={() => handleEventAction(event.id, "delete")} className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Delete"><Trash2 className="w-5 h-5" /></button>
+                                                <button
+                                                    onClick={() => handleEventAction(event.id, "delete")}
+                                                    className={`px-3 py-1.5 rounded-lg border font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-slate-800 border-rose-900/50 text-rose-400 hover:bg-rose-500/10" : "bg-white text-rose-600 border-rose-100 hover:bg-rose-50"}`}
+                                                >
+                                                    <Trash2 className="w-4 h-4" /> Delete
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

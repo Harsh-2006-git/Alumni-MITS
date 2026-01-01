@@ -25,7 +25,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     );
 };
 
-const JobsManagement = () => {
+const JobsManagement = ({ isDarkMode }) => {
     const [jobs, setJobs] = useState([]); // Replace [] with initial state if testing without API
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -186,17 +186,15 @@ const JobsManagement = () => {
                                                 <div className="flex items-center justify-end gap-2">
                                                     <button
                                                         onClick={() => setSelectedJob(job)}
-                                                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
-                                                        title="View Details"
+                                                        className={`px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20" : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"}`}
                                                     >
-                                                        <Eye className="w-4 h-4" />
+                                                        <Eye className="w-4 h-4" /> View
                                                     </button>
                                                     <button
                                                         onClick={() => { setJobToDelete(job); setIsDeleteModalOpen(true); }}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                                        title="Delete Job"
+                                                        className={`px-3 py-1.5 rounded-lg border font-bold text-[10px] uppercase tracking-wider flex items-center gap-1.5 transition-all active:scale-95 ${isDarkMode ? "bg-slate-800 border-rose-900/50 text-rose-400 hover:bg-rose-500/10" : "bg-white text-rose-600 border-rose-100 hover:bg-rose-50"}`}
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-4 h-4" /> Delete
                                                     </button>
                                                 </div>
                                             </td>

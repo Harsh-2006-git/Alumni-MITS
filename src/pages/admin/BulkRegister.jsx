@@ -5,7 +5,7 @@ import {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-const BulkRegister = () => {
+const BulkRegister = ({ isDarkMode }) => {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState(null);
@@ -104,8 +104,8 @@ Neha Verma,neha.verma@example.com,9876543215,Electrical Engineering,2021-2025,Pu
         <div className="space-y-6">
             <div className="flex flex-col gap-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-800">Bulk Register Alumni</h2>
-                    <p className="text-sm text-slate-500">Upload CSV files to register multiple alumni accounts simultaneously.</p>
+                    <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}>Bulk Register Alumni</h2>
+                    <p className={`text-sm ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Upload CSV files to register multiple alumni accounts simultaneously.</p>
                 </div>
             </div>
 
@@ -118,21 +118,21 @@ Neha Verma,neha.verma@example.com,9876543215,Electrical Engineering,2021-2025,Pu
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+                <div className={`lg:col-span-2 rounded-2xl shadow-sm border p-6 sm:p-8 ${isDarkMode ? "bg-slate-900 border-slate-800 shadow-slate-950/20" : "bg-white border-slate-200"}`}>
                     <div
                         onDragOver={handleDragOver}
                         onDragLeave={() => setDragOver(false)}
                         onDrop={handleDrop}
                         className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 ${dragOver
-                                ? "border-indigo-500 bg-indigo-50/50"
-                                : "border-slate-200 bg-slate-50/50"
-                            } group hover:border-indigo-400 hover:bg-slate-50 transition`}
+                            ? (isDarkMode ? "border-indigo-500 bg-indigo-500/10" : "border-indigo-500 bg-indigo-50/50")
+                            : (isDarkMode ? "border-slate-800 bg-slate-800/50" : "border-slate-200 bg-slate-50/50")
+                            } group hover:border-indigo-400 hover:bg-slate-800/10 transition`}
                     >
-                        <div className="w-20 h-20 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition duration-300">
-                            <Upload className={`w-10 h-10 ${dragOver ? "text-indigo-600" : "text-slate-400"}`} />
+                        <div className={`w-20 h-20 rounded-2xl shadow-sm border flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition duration-300 ${isDarkMode ? "bg-slate-800 border-slate-700" : "bg-white border-slate-100"}`}>
+                            <Upload className={`w-10 h-10 ${dragOver ? "text-indigo-400" : (isDarkMode ? "text-slate-500" : "text-slate-400")}`} />
                         </div>
-                        <h4 className="text-xl font-bold text-slate-800 mb-2">Drag & Drop CSV Here</h4>
-                        <p className="text-slate-500 mb-8 max-w-sm mx-auto">Upload your prepared alumni data file. Ensure it follows the template format for successful processing.</p>
+                        <h4 className={`text-xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-slate-800"}`}>Drag & Drop CSV Here</h4>
+                        <p className={`mb-8 max-w-sm mx-auto ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Upload your prepared alumni data file. Ensure it follows the template format for successful processing.</p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                             <label className="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2">
