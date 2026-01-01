@@ -63,7 +63,7 @@ const ADMIN_CREDENTIALS = {
 
 const generateTokensAdmin = (adminPayload) => {
   const accessToken = jwt.sign(adminPayload, JWT_SECRET, {
-    expiresIn: "1h", // standardized to 1 hour
+    expiresIn: "30m", // standardized to 30 minutes
   });
 
   const refreshToken = jwt.sign(adminPayload, REFRESH_TOKEN_SECRET, {

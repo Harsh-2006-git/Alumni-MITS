@@ -18,6 +18,8 @@ import campaignRoutes from "./routes/campaignRoutes.js";
 import ProjectRoute from "./routes/projectRoutes.js";
 import autoJobRoutes from "./routes/autoJobRoutes.js";
 import MentorRoutes from "./routes/mentorRoutes.js";
+import BlogRoutes from "./routes/BlogRoutes.js";
+
 
 // ✅ Import Socket items
 import socketAuthMiddleware from "./middlewares/socketAuthMiddleware.js";
@@ -96,7 +98,9 @@ app.use("/event", eventRoutes);
 app.use("/campaign", campaignRoutes);
 app.use("/project", ProjectRoute);
 app.use("/mentor", MentorRoutes);
+app.use("/api/blogs", BlogRoutes);
 app.use("/api/jobs", JobRoute);
+
 app.use("/api/auto-jobs", autoJobRoutes);
 
 // Start the automated scheduler
