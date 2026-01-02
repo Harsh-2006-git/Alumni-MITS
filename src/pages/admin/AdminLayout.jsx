@@ -18,6 +18,8 @@ import {
     Briefcase,
     Handshake,
     FileText,
+    Trash2,
+    Pencil,
 } from "lucide-react";
 
 
@@ -35,6 +37,7 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
     const [notificationMessage, setNotificationMessage] = useState("");
     const [isSending, setIsSending] = useState(false);
     const [notifications, setNotifications] = useState([]);
+    const [editNotificationId, setEditNotificationId] = useState(null);
 
     const getAuthToken = () => {
         const authData = localStorage.getItem("auth");
@@ -49,10 +52,11 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
             });
             if (response.ok) {
                 const data = await response.json();
-                // Map backend data to UI format if needed, assuming data.data is array of { message, createdAt }
                 setNotifications(data.data.map(n => ({
+                    id: n._id,
                     message: n.message,
-                    time: new Date(n.createdAt).toLocaleString() // Simple formatting
+                    type: n.type,
+                    time: new Date(n.createdAt).toLocaleString()
                 })));
             }
         } catch (error) {
@@ -70,8 +74,16 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
 
         try {
             const token = getAuthToken();
-            const response = await fetch(`${BASE_URL}/notification/create`, {
-                method: "POST",
+            let url = `${BASE_URL}/notification/create`;
+            let method = "POST";
+
+            if (editNotificationId) {
+                url = `${BASE_URL}/notification/${editNotificationId}`;
+                method = "PUT";
+            }
+
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
@@ -81,14 +93,45 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
 
             if (response.ok) {
                 setNotificationMessage("");
+                setEditNotificationId(null);
                 setShowNotificationInput(false);
-                fetchNotifications(); // Refresh list
+                fetchNotifications();
             }
         } catch (error) {
-            console.error("Error creating notification:", error);
+            console.error("Error saving notification:", error);
         } finally {
             setIsSending(false);
         }
+    };
+
+    const handleDeleteNotification = async (id, e) => {
+        e.stopPropagation();
+        if (!window.confirm("Are you sure you want to delete this notification?")) return;
+        try {
+            const token = getAuthToken();
+            const response = await fetch(`${BASE_URL}/notification/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+                fetchNotifications();
+            }
+        } catch (error) {
+            console.error("Error deleting notification:", error);
+        }
+    };
+
+    const startEditNotification = (notif, e) => {
+        e.stopPropagation();
+        setNotificationMessage(notif.message);
+        setEditNotificationId(notif.id);
+        setShowNotificationInput(true);
+    };
+
+    const handleCancelInput = () => {
+        setShowNotificationInput(false);
+        setNotificationMessage("");
+        setEditNotificationId(null);
     };
 
     useEffect(() => {
@@ -172,7 +215,7 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
                                         Notifications
                                     </h3>
                                     <button
-                                        onClick={() => setShowNotificationInput(!showNotificationInput)}
+                                        onClick={handleCancelInput}
                                         className={`text-xs px-2 py-1 rounded transition font-medium ${isDarkMode
                                             ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
                                             : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
@@ -202,7 +245,7 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
                                                 : "bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg"
                                                 }`}
                                         >
-                                            {isSending ? "Sending..." : "Push Alert"}
+                                            {isSending ? "Processing..." : (editNotificationId ? "Update Alert" : "Push Alert")}
                                         </button>
                                     </div>
                                 )}
@@ -212,11 +255,29 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
                                         notifications.map((notif, index) => (
                                             <div
                                                 key={index}
-                                                className={`p-4 border-b last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}
+                                                className={`p-4 border-b last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group/item ${isDarkMode ? "border-slate-800" : "border-slate-100"}`}
                                             >
-                                                <p className={`text-sm ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>
-                                                    {notif.message}
-                                                </p>
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <p className={`text-sm flex-1 ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>
+                                                        {notif.message}
+                                                    </p>
+                                                    <div className="flex gap-1">
+                                                        <button
+                                                            onClick={(e) => startEditNotification(notif, e)}
+                                                            className={`p-1 rounded text-blue-500`}
+                                                            title="Edit"
+                                                        >
+                                                            <Pencil className="w-3 h-3" />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => handleDeleteNotification(notif.id, e)}
+                                                            className={`p-1 rounded text-red-500`}
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                                 <p className={`text-xs mt-1.5 ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>
                                                     {notif.time}
                                                 </p>
