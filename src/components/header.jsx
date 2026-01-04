@@ -577,11 +577,11 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <img
                 src="/assets/images/mits-logo.png"
                 alt="MITS Logo"
-                className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 object-contain flex-shrink-0"
+                className="w-11 h-11 sm:w-10 sm:h-10 md:w-11 md:h-11 object-contain flex-shrink-0"
               />
               <div className="flex flex-col justify-center leading-none min-w-0">
                 <h1
-                  className={`text-sm sm:text-base md:text-lg font-bold truncate ${isDarkMode
+                  className={`text-base sm:text-base md:text-lg font-bold truncate ${isDarkMode
                     ? "text-white"
                     : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
                     }`}
@@ -589,7 +589,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   MITS Alumni
                 </h1>
                 <p
-                  className={`text-[9px] sm:text-[11px] truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  className={`text-[10px] sm:text-[11px] truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                 >
                   Connect & Grow
