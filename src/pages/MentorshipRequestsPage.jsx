@@ -78,6 +78,26 @@ const formatRequestDateTime = (dateString, timeString) => {
   return `${formattedDate} • ${formattedTime}`;
 };
 
+const formatDateForInput = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  } catch (e) {
+    return "";
+  }
+};
+
+const formatTimeForInput = (timeString) => {
+  if (!timeString) return "";
+  // Ensure we only have HH:MM
+  return timeString.split(":").slice(0, 2).join(":");
+};
+
 // Check if session is upcoming
 const isUpcomingSession = (sessionDate, sessionTime) => {
   if (!sessionDate) return false;
@@ -200,6 +220,7 @@ const MentorshipRequestsPage = ({
           reschedule_message: sessionForm.reschedule_message,
           reschedule_date: sessionForm.reschedule_date,
           reschedule_time: sessionForm.reschedule_time,
+          meeting_link: sessionForm.meeting_link,
         },
         {
           headers: {
@@ -288,23 +309,24 @@ const MentorshipRequestsPage = ({
   };
 
   const handleVerifyPayment = async (mentorship) => {
-    if (confirm("Are you sure you want to verify this payment?")) {
-      await respondToRequest(mentorship.id, "verify_payment");
-    }
+    await respondToRequest(mentorship.id, "verify_payment");
   };
 
   const openSessionForm = (mentorship, action = "update") => {
     setSelectedMentorship(mentorship);
     setFormAction(action);
 
+    // If it's a student responding to a reschedule, pre-fill with the mentor's proposed time
+    const isStudentRescheduleResponse = userType === "student" && mentorship.reschedule_requested;
+
     // Pre-fill form with existing data
     setSessionForm({
-      session_date: mentorship.session_date || "",
-      session_time: mentorship.session_time || "",
+      session_date: formatDateForInput(isStudentRescheduleResponse ? (mentorship.reschedule_date || mentorship.session_date) : (mentorship.session_date || "")),
+      session_time: formatTimeForInput(isStudentRescheduleResponse ? (mentorship.reschedule_time || mentorship.session_time) : (mentorship.session_time || "")),
       mentor_notes: mentorship.mentor_notes || "",
       reschedule_message: "",
-      reschedule_date: "",
-      reschedule_time: "",
+      reschedule_date: formatDateForInput(mentorship.reschedule_date || ""),
+      reschedule_time: formatTimeForInput(mentorship.reschedule_time || ""),
       meeting_link: mentorship.meeting_link || "",
     });
 
@@ -730,11 +752,11 @@ const MentorshipRequestsPage = ({
                 </div>
               )}
 
-              {/* Meeting Link Field */}
-              {formAction === "add_link" && (
+              {/* Meeting Link Field - show for accept action OR add_link action */}
+              {(formAction === "add_link" || (userType === "alumni" && formAction === "accept")) && (
                 <div>
                   <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-                    Google Meet Link
+                    Google Meet Link {formAction === "accept" ? "(Optional)" : ""}
                   </label>
                   <div className="relative">
                     <Video className={`absolute left-4 top-3.5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} size={20} />
@@ -747,12 +769,12 @@ const MentorshipRequestsPage = ({
                         : "bg-white border-blue-300 text-gray-900"
                         }`}
                       placeholder="https://meet.google.com/..."
-                      required
+                      required={formAction === "add_link"}
                     />
                   </div>
-                  <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
-                    <AlertTriangle size={12} />
-                    Warning: Once the link is added, the session is finalized and no further changes can be made.
+                  <p className={`text-xs mt-2 flex items-center gap-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <AlertTriangle size={12} className="text-orange-500" />
+                    {formAction === "add_link" ? "Once the link is added, the session is finalized." : "You can add the meeting link now or later."}
                   </p>
                 </div>
               )}
@@ -846,16 +868,17 @@ const MentorshipCard = ({
   userType,
 }) => {
   const isStudent = userType === "student";
-  const showPaymentVerify = !isStudent && mentorship.payment_screenshot && mentorship.payment_status !== 'completed';
-  const showReschedule = !isStudent && (mentorship.status === 'pending' || mentorship.status === 'active');
-  const showAddLink = !isStudent && mentorship.status === 'active' && !mentorship.meeting_link;
-  const showStudentRescheduleResponse = isStudent && mentorship.reschedule_requested;
+  const isFinalStatus = mentorship.status === 'cancelled' || mentorship.status === 'rejected' || mentorship.status === 'completed';
+  const showPaymentVerify = !isStudent && mentorship.payment_screenshot && mentorship.payment_status !== 'completed' && !isFinalStatus;
+  const showReschedule = !isStudent && (mentorship.status === 'pending' || mentorship.status === 'active') && !isFinalStatus;
+  const showAddLink = !isStudent && mentorship.status === 'active' && !mentorship.meeting_link && !isFinalStatus;
+  const showStudentRescheduleResponse = isStudent && mentorship.reschedule_requested && !isFinalStatus;
 
   // Only show update session button (which opens modal without specific action) if:
   // 1. It is a student
   // 2. Status is active or pending
   // 3. NO meeting link has been added yet (finalized)
-  const showUpdateSession = isStudent && (mentorship.status === 'active' || mentorship.status === 'pending') && !mentorship.meeting_link;
+  const showUpdateSession = isStudent && (mentorship.status === 'active' || mentorship.status === 'pending') && !mentorship.meeting_link && !isFinalStatus;
 
   return (
 
@@ -927,7 +950,7 @@ const MentorshipCard = ({
                     : "bg-slate-100 text-slate-600 border-slate-200"
               }`}
           >
-            {mentorship.reschedule_requested ? "Reschedule Requested" : (mentorship.status.charAt(0).toUpperCase() + mentorship.status.slice(1))}
+            {mentorship.reschedule_requested && !isFinalStatus ? "Reschedule Requested" : (mentorship.status.charAt(0).toUpperCase() + mentorship.status.slice(1))}
           </span>
           {mentorship.payment_status === 'completed' && (
             <span className={`text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1.5 ${isDarkMode ? "bg-green-500/20 text-green-400" : "bg-green-100 text-green-700"}`}>
@@ -1036,7 +1059,7 @@ const MentorshipCard = ({
           </div>
         )}
 
-        {mentorship.reschedule_message && mentorship.reschedule_requested && (
+        {mentorship.reschedule_message && mentorship.reschedule_requested && mentorship.status !== 'cancelled' && mentorship.status !== 'rejected' && mentorship.status !== 'completed' && (
           <div className={`p-3 rounded-lg border-2 border-dashed ${isDarkMode ? 'border-orange-500/50 bg-orange-500/10' : 'border-orange-300 bg-orange-50'}`}>
             <h4 className="text-orange-500 font-bold text-sm mb-1 flex items-center gap-2">
               <AlertTriangle size={14} /> Reschedule Requested
@@ -1053,6 +1076,24 @@ const MentorshipCard = ({
 
       {/* consolidated Action Buttons */}
       <div className="relative z-10 flex flex-col gap-3 mt-4 sm:mt-6">
+        {/* Closed/Finalized Status Message */}
+        {(mentorship.status === 'cancelled' || mentorship.status === 'rejected' || mentorship.status === 'completed') && (
+          <div className={`p-4 rounded-xl text-center border-2 ${mentorship.status === 'completed'
+            ? (isDarkMode ? 'bg-blue-500/10 border-blue-500/20 text-blue-400' : 'bg-blue-50 border-blue-200 text-blue-700')
+            : (isDarkMode ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-red-50 border-red-200 text-red-700')
+            }`}>
+            <p className="font-bold flex items-center justify-center gap-2">
+              {mentorship.status === 'completed' ? <CheckCircle size={18} /> : <XCircle size={18} />}
+              {mentorship.status === 'completed' ? 'Session Completed' : 'Request Closed & Declined'}
+            </p>
+            <p className="text-xs mt-1 opacity-80">
+              {mentorship.status === 'completed'
+                ? 'This mentorship session has been successfully completed.'
+                : 'This request is no longer active. No further actions can be taken.'}
+            </p>
+          </div>
+        )}
+
         {/* Student Actions */}
         {isStudent && (
           <div className="flex gap-2">

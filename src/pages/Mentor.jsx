@@ -30,6 +30,7 @@ import AuthPopup from "../components/AuthPopup"; // Make sure this path is corre
 const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
@@ -140,19 +141,32 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
   };
 
   // Helper function to check if user already has a request with a mentor
-  // Helper function to check if user already has a request with a mentor
   const hasExistingMentorship = (mentorId) => {
     return myMentorships.some(mentorship => {
       const mId = mentorship.mentor_id?._id || mentorship.mentor_id || mentorship.mentor?.id;
-      return mId?.toString() === mentorId?.toString();
+      return mId?.toString() === mentorId?.toString() && (mentorship.status === 'pending' || mentorship.status === 'active');
     });
   };
 
   const getExistingMentorshipStatus = (mentorId) => {
+    // Prioritize active or pending statuses
+    const now = new Date();
     const existing = myMentorships.find(mentorship => {
+      const mId = mentorship.mentor_id?._id || mentorship.mentor_id || mentorship.mentor?.id;
+      const isStillValid = (mentorship.status === 'pending' || mentorship.status === 'active') &&
+        (!mentorship.session_date || new Date(mentorship.session_date) >= now);
+      return mId?.toString() === mentorId?.toString() && isStillValid;
+    }) || myMentorships.find(mentorship => {
       const mId = mentorship.mentor_id?._id || mentorship.mentor_id || mentorship.mentor?.id;
       return mId?.toString() === mentorId?.toString();
     });
+
+    // If we found an active/pending one that is actually expired, treat it as completed
+    if (existing && (existing.status === 'active' || existing.status === 'pending') &&
+      existing.session_date && new Date(existing.session_date) < now) {
+      return 'completed';
+    }
+
     return existing ? existing.status : null;
   };
 
@@ -206,6 +220,12 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         }
       );
 
+      // Refresh the mentorship list in background
+      loadMyMentorships();
+
+      showNotification("🚀 Mentorship request sent successfully! Confirmation email will arrive shortly.", "success");
+
+      // Reset form and close modal FIRST for immediate feedback
       setShowRequestForm(false);
       setSelectedMentor(null);
       setPaymentScreenshot(null);
@@ -214,11 +234,6 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         session_date: "",
         session_time: "",
       });
-
-      // Refresh the mentorship list
-      await loadMyMentorships();
-
-      showNotification("🚀 Mentorship request sent successfully!", "success");
     } catch (error) {
       console.error("Error sending mentorship request:", error);
 
@@ -338,11 +353,23 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
       return;
     }
 
-    // Check if there's already a mentorship with this mentor
-    const existingStatus = getExistingMentorshipStatus(mentor.id);
-    if (existingStatus) {
+    // Check if there's already an active or pending mentorship with this mentor
+    const currentStatus = getExistingMentorshipStatus(mentor.id);
+    if (currentStatus === "pending" || currentStatus === "active") {
       showExistingMentorshipDetails(mentor.id);
       return;
+    }
+
+    // Check if previous request was rejected to show warning
+    const wasRejected = myMentorships.some(mentorship => {
+      const mId = mentorship.mentor_id?._id || mentorship.mentor_id || mentorship.mentor?.id;
+      return mId?.toString() === mentor.id?.toString() && mentorship.status === 'rejected';
+    });
+
+    if (wasRejected) {
+      if (!window.confirm("⚠️ Your previous session request was rejected. Spamming or misuse will lead to a permanent block from the platform. Do you still want to proceed?")) {
+        return;
+      }
     }
 
     setSelectedMentor(mentor);
@@ -755,7 +782,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
 
                         {/* Conditionally render Request/Status button */}
                         {canRequestMentorship ? (
-                          existingStatus ? (
+                          (existingStatus === "active" || existingStatus === "pending") ? (
                             <button
                               onClick={() => showExistingMentorshipDetails(mentor.id)}
                               className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-xs sm:text-sm ${existingStatus === "active"
@@ -1070,7 +1097,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                 {canRequestMentorship ? (
                   (() => {
                     const existingStatus = getExistingMentorshipStatus(selectedMentor.id);
-                    if (existingStatus) {
+                    if (existingStatus === "active" || existingStatus === "pending") {
                       return (
                         <button
                           onClick={() => {
@@ -1321,17 +1348,30 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                         type="file"
                         id="payment_screenshot"
                         accept="image/*"
-                        onChange={(e) => setPaymentScreenshot(e.target.files[0])}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setIsUploadingImage(true);
+                            setPaymentScreenshot(file);
+                            // Simulate upload feedback delay
+                            setTimeout(() => setIsUploadingImage(false), 800);
+                          }
+                        }}
                         className="hidden"
                         required
                       />
 
-                      {paymentScreenshot ? (
+                      {isUploadingImage ? (
+                        <div className="flex flex-col items-center py-4">
+                          <div className="w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mb-3"></div>
+                          <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Uploading to Cloudinary...</p>
+                        </div>
+                      ) : paymentScreenshot ? (
                         <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center mb-2 shadow-lg shadow-green-500/30">
-                            <CheckCircle size={24} />
+                          <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center mb-2 shadow-lg shadow-green-500/30 font-bold text-xl">
+                            ✓
                           </div>
-                          <p className={`font-semibold ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>Screenshot Added</p>
+                          <p className={`font-semibold ${isDarkMode ? 'text-green-400' : 'text-green-700'}`}>Screenshot Ready</p>
                           <p className={`text-xs mt-1 max-w-[200px] truncate ${isDarkMode ? 'text-green-500/70' : 'text-green-600/70'}`}>
                             {paymentScreenshot.name}
                           </p>
