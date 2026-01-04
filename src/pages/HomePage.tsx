@@ -1783,15 +1783,31 @@ export default function AlumniHomePage({
                 Share your journey, professional insights, and campus memories. Your experiences could be the guiding light for the next generation of students.
               </p>
 
-              <motion.button
-                onClick={() => navigate("/create-blog")}
-                whileHover={{ scale: 1.05, x: 5 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-6 py-2.5 lg:px-8 lg:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs lg:text-sm font-bold shadow-lg flex items-center gap-2 w-fit group"
-              >
-                Write a Blog
-                <ArrowRight className="w-4 h-4 lg:w-4 lg:h-4 group-hover:translate-x-1 transition-transform" />
-              </motion.button>
+              <div className="flex flex-row flex-wrap justify-center gap-2 sm:gap-4 pt-2">
+                <motion.button
+                  onClick={() => navigate("/blogs")}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-4 sm:px-6 py-2.5 lg:px-8 lg:py-3 rounded-xl border-2 font-bold text-[10px] sm:text-xs lg:text-sm shadow-md flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-300 whitespace-nowrap ${isDarkMode
+                    ? "bg-slate-800/50 border-blue-500/20 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/50"
+                    : "bg-white border-blue-100 text-blue-600 hover:bg-blue-50 hover:border-blue-200"
+                    }`}
+                >
+                  <Search className="w-3.5 h-3.5 sm:w-4 h-4" />
+                  Explore Blogs
+                </motion.button>
+                <motion.button
+                  onClick={() => navigate("/create-blog")}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 sm:px-6 py-2.5 lg:px-8 lg:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-[10px] sm:text-xs lg:text-sm font-bold shadow-lg flex items-center justify-center gap-1.5 sm:gap-2 group whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5 sm:w-4 h-4" />
+                  Create Blog
+                </motion.button>
+
+
+              </div>
             </div>
 
             {/* Image Side - Desktop only */}
