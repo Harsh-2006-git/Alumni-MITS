@@ -30,6 +30,9 @@ import {
   ArrowRight,
   Building,
   Plus,
+  BookOpen,
+  Video,
+  Camera,
 } from "lucide-react";
 
 import { useRef } from "react";
@@ -730,6 +733,18 @@ export default function AlumniHomePage({
   `}</style>
       </section>
 
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
+
       {/* Features Section - Same as Video Section */}
       {/* Features Section - Same as Video Section */}
       <section className="hidden md:block w-full px-6 md:px-10 lg:px-14 py-10 mt-10">
@@ -794,6 +809,19 @@ export default function AlumniHomePage({
       <div className="block lg:hidden">
         <ScrollingAlumni isDarkMode={isDarkMode} />
       </div>
+
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
+
       {/* Campus Glimpse Video Section */}
       <section className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-8 md:py-12">
         <div className="text-center mb-8">
@@ -907,6 +935,18 @@ export default function AlumniHomePage({
           </div>
         </div>
       </section>
+
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
 
       {/* Professional Journey Section with Parallax */}
       <motion.section
@@ -1025,6 +1065,18 @@ export default function AlumniHomePage({
           ))}
         </div>
       </motion.section>
+
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
 
       {/* Job Opportunities Section with Parallax */}
       <motion.section
@@ -1254,6 +1306,18 @@ export default function AlumniHomePage({
         </div>
       </motion.section>
 
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
+
       {/* Upcoming Events Section with Parallax */}
       <motion.section
         initial={{ opacity: 0, scale: 0.95 }}
@@ -1467,6 +1531,18 @@ export default function AlumniHomePage({
         </div>
       </motion.section>
 
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
+
       {/* Active Campaigns Section with Parallax */}
       <motion.section
         initial={{ opacity: 0, y: 80 }}
@@ -1650,6 +1726,98 @@ export default function AlumniHomePage({
         </div>
       </motion.section>
 
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
+
+      {/* Blog Services Banner - Centered Section */}
+      {/* Blog Section Heading */}
+      <div className="text-center mb-8 px-4">
+        <h2
+          className={`text-xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+        >
+          Insights & Stories
+        </h2>
+        <p
+          className={`text-sm max-w-2xl mx-auto ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            }`}
+        >
+          Explore the voices of our community and share your own experiences
+        </p>
+      </div>
+
+      {/* Blog Services Banner - Compact Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="max-w-4xl lg:max-w-6xl mx-auto px-4 sm:px-6 py-6 md:py-10"
+      >
+        <div className={`relative rounded-3xl overflow-hidden border ${isDarkMode ? "bg-slate-900/40 border-slate-800" : "bg-white border-blue-100 shadow-xl"
+          }`}>
+          <div className="grid md:grid-cols-2 items-stretch min-h-[160px] md:min-h-[220px] lg:min-h-[250px]">
+            {/* Text Content */}
+            <div className="p-5 md:p-8 lg:p-8 flex flex-col justify-center items-center text-center space-y-4 lg:space-y-4">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 lg:px-3 lg:py-1 rounded-full bg-blue-500/10 border border-blue-500/20 w-fit">
+                <BookOpen className={`w-3 h-3 lg:w-4 lg:h-4 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+                <span className={`text-[9px] lg:text-[11px] font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+                  Blog Portal
+                </span>
+              </div>
+
+              <h2 className={`text-xl md:text-2xl lg:text-3xl font-black leading-tight ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                Inspire with Your <br className="hidden lg:block" /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Alumni Blog</span>
+              </h2>
+
+              <p className={`text-[12px] md:text-sm lg:text-base leading-relaxed max-w-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                Share your journey, professional insights, and campus memories. Your experiences could be the guiding light for the next generation of students.
+              </p>
+
+              <motion.button
+                onClick={() => navigate("/create-blog")}
+                whileHover={{ scale: 1.05, x: 5 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-2.5 lg:px-8 lg:py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs lg:text-sm font-bold shadow-lg flex items-center gap-2 w-fit group"
+              >
+                Write a Blog
+                <ArrowRight className="w-4 h-4 lg:w-4 lg:h-4 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </div>
+
+            {/* Image Side - Desktop only */}
+            <div className="relative hidden md:block overflow-hidden">
+              <img
+                src="/assets/images/blog_banner.png"
+                alt="Blog Service"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-slate-900/10"></div>
+            </div>
+
+            {/* Mobile Image (Taller style) */}
+            <div className="md:hidden h-64 relative overflow-hidden">
+              <img
+                src="/assets/images/blog_banner.png"
+                alt="Blog Service"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+
 
       {/* FAQ Section */}
       <section className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-16 md:py-24">
@@ -1724,7 +1892,12 @@ export default function AlumniHomePage({
               {
                 q: "How can I start a campaign or fundraiser?",
                 a: "Create a campaign from the 'Campaigns' section. After admin verification, it will go live and users can upload payment screenshots, which are then verified."
+              },
+              {
+                "q": "How can I create a blog?",
+                "a": "Go to the 'Blogs' section and create your blog post. Once submitted, it will be reviewed and verified by the admin. After approval, the blog will be published and made accessible to all users publicly."
               }
+
             ].map((faq, index) => (
               <FAQItem
                 key={index}

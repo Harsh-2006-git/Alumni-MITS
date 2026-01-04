@@ -563,13 +563,13 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
       {/* Main Header Content - preserved from original file logic but ensuring imports are correct */}
       <header
-        className={`sticky top-0 z-40 w-full max-w-[100vw] backdrop-blur-md border-b transition-colors duration-300 ${isDarkMode
-          ? "bg-gray-900/95 border-gray-800"
-          : "bg-white/80 border-blue-200"
+        className={`sticky top-0 z-50 w-full border-b transition-colors duration-300 ${isDarkMode
+          ? "bg-gray-900 border-gray-800 shadow-lg"
+          : "bg-white border-blue-100 shadow-sm"
           }`}
       >
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-16 transition-all duration-300">
             <div
               className="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0"
               onClick={() => navigate("/")}
@@ -577,9 +577,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
               <img
                 src="/assets/images/mits-logo.png"
                 alt="MITS Logo"
-                className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain"
+                className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 object-contain"
               />
-              <div>
+              <div className="flex flex-col justify-center leading-none">
                 <h1
                   className={`text-base sm:text-base md:text-lg font-bold ${isDarkMode
                     ? "text-white"
@@ -1174,7 +1174,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-y-0 right-0 z-50 w-[65%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed inset-y-0 right-0 z-50 w-[60%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
       >
         {/* Backdrop */}
@@ -1267,21 +1267,24 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
                 {showAlumniDropdown && (
                   <div className="ml-4 mt-1 flex flex-col gap-1">
-                    {alumniOptions.map((option, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleAlumniOptionClick(option.path)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
-                          ? "text-gray-300 hover:bg-gray-800"
-                          : "text-gray-600 hover:bg-blue-50"
-                          }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
+                    {alumniOptions
+                      .filter((option) => option.path !== "/blogs")
+                      .map((option, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleAlumniOptionClick(option.path)}
+                          className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors cursor-pointer ${isDarkMode
+                            ? "text-gray-300 hover:bg-gray-800"
+                            : "text-gray-600 hover:bg-blue-50"
+                            }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
                   </div>
                 )}
               </div>
+
 
               {/* Events Dropdown for Mobile */}
               <div className="flex flex-col">
@@ -1480,6 +1483,22 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 )}
               </div>
               <button
+                onClick={() => handleNavClick("/blogs")}
+                className={`w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer ${isDarkMode
+                  ? "bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 hover:from-cyan-500/20 hover:via-blue-500/20 hover:to-indigo-500/20"
+                  : "bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-teal-500/10 hover:from-blue-500/20 hover:via-cyan-500/20 hover:to-teal-500/20"
+                  }`}
+              >
+                <span
+                  className={`bg-clip-text text-transparent bg-gradient-to-r ${isDarkMode
+                    ? "from-cyan-400 via-blue-400 to-indigo-400"
+                    : "from-blue-600 via-cyan-500 to-teal-500"
+                    }`}
+                >
+                  📝 Blogs
+                </span>
+              </button>
+              <button
                 onClick={() => handleNavClick("/developer")}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-300 cursor-pointer ${isDarkMode
                   ? "bg-gradient-to-r from-pink-500/10 via-purple-500/10 to-indigo-500/10 hover:from-pink-500/20 hover:via-purple-500/20 hover:to-indigo-500/20"
@@ -1530,13 +1549,13 @@ export default function Header({ isDarkMode, toggleTheme }) {
             ) : (
               <button
                 onClick={handleSignIn}
-                className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm transition-all ${isDarkMode
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium text-xs transition-all ${isDarkMode
                   ? "bg-white hover:bg-gray-100 text-gray-800"
                   : "bg-white hover:bg-gray-50 text-gray-800 border border-gray-200"
                   } hover:scale-105`}
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-4 h-4"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
                 >

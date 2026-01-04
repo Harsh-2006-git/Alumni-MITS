@@ -215,7 +215,7 @@ const AdminLayout = ({ isDarkMode, toggleTheme }) => {
                                         Notifications
                                     </h3>
                                     <button
-                                        onClick={handleCancelInput}
+                                        onClick={() => showNotificationInput ? handleCancelInput() : setShowNotificationInput(true)}
                                         className={`text-xs px-2 py-1 rounded transition font-medium ${isDarkMode
                                             ? "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
                                             : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
