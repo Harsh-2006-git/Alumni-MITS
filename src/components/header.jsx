@@ -563,25 +563,25 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
       {/* Main Header Content - preserved from original file logic but ensuring imports are correct */}
       <header
-        className={`sticky top-0 z-50 w-full border-b transition-colors duration-300 ${isDarkMode
+        className={`sticky top-0 z-50 w-full h-16 min-h-[64px] border-b ${isDarkMode
           ? "bg-gray-900 border-gray-800 shadow-lg"
           : "bg-white border-blue-100 shadow-sm"
           }`}
       >
-        <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
-          <div className="flex items-center justify-between h-16 transition-all duration-300">
+        <div className="w-full h-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+          <div className="flex items-center justify-between h-full min-h-[64px] flex-shrink-0">
             <div
-              className="flex items-center gap-1.5 sm:gap-3 cursor-pointer min-w-0 flex-shrink"
+              className="flex items-center gap-1.5 sm:gap-3 cursor-pointer min-w-0"
               onClick={() => navigate("/")}
             >
               <img
                 src="/assets/images/mits-logo.png"
                 alt="MITS Logo"
-                className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain flex-shrink-0"
+                className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 object-contain flex-shrink-0"
               />
-              <div className="flex flex-col justify-center leading-none min-w-0 overflow-hidden">
+              <div className="flex flex-col justify-center leading-none min-w-0">
                 <h1
-                  className={`text-[13px] sm:text-base md:text-lg font-bold truncate ${isDarkMode
+                  className={`text-sm sm:text-base md:text-lg font-bold truncate ${isDarkMode
                     ? "text-white"
                     : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
                     }`}
@@ -589,7 +589,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   MITS Alumni
                 </h1>
                 <p
-                  className={`text-[9px] sm:text-xs truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  className={`text-[9px] sm:text-[11px] truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                 >
                   Connect & Grow
@@ -952,9 +952,9 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   }`}
               >
                 {isDarkMode ? (
-                  <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Sun className="w-5 h-5 sm:w-5 sm:h-5" />
                 ) : (
-                  <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <Moon className="w-5 h-5 sm:w-5 sm:h-5" />
                 )}
               </button>
 
@@ -981,7 +981,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       : "bg-blue-100 hover:bg-blue-200 text-blue-600"
                       }`}
                   >
-                    <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <MessageCircle className="w-5 h-5 sm:w-5 sm:h-5" />
                   </button>
                 </>
               )}
@@ -995,7 +995,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                       : "bg-blue-100 hover:bg-blue-200 text-blue-700"
                       }`}
                   >
-                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <User className="w-5 h-5 sm:w-5 sm:h-5" />
                     <span className="hidden xl:inline text-sm font-medium">
                       Profile
                     </span>
