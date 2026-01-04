@@ -498,15 +498,15 @@ export default function Header({ isDarkMode, toggleTheme }) {
     <>
       {/* NOTIFICATION MODAL */}
       {showNotificationsModal && (
-        <div className="fixed inset-0 z-[100] flex items-start justify-end p-4 sm:p-6 lg:p-12 pointer-events-none">
+        <div className="fixed inset-0 z-[100] flex items-start justify-center sm:justify-end p-3 sm:p-6 lg:p-12 pointer-events-none">
           {/* Click away layer - Transparent */}
           <div
-            className="fixed inset-0 pointer-events-auto"
+            className="fixed inset-0 pointer-events-auto bg-black/5 sm:bg-transparent"
             onClick={() => setShowNotificationsModal(false)}
           ></div>
           <div
             ref={notificationsModalRef}
-            className={`w-full max-w-sm rounded-xl shadow-2xl pointer-events-auto transform transition-all animate-in slide-in-from-right-5 fade-in-0 duration-200 mt-12 bg-white border border-gray-200 z-[101] ${isDarkMode ? "!bg-gray-900 !border-gray-700" : ""
+            className={`w-[calc(100vw-24px)] sm:w-full max-w-sm rounded-xl shadow-2xl pointer-events-auto transform transition-all animate-in slide-in-from-right-5 fade-in-0 duration-200 mt-12 sm:mt-0 bg-white border border-gray-200 z-[101] ${isDarkMode ? "!bg-gray-900 !border-gray-700" : ""
               }`}
           >
             <div className={`p-4 border-b flex items-center justify-between ${isDarkMode ? "border-gray-800" : "border-blue-50"}`}>
@@ -571,17 +571,17 @@ export default function Header({ isDarkMode, toggleTheme }) {
         <div className="w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
           <div className="flex items-center justify-between h-16 transition-all duration-300">
             <div
-              className="flex items-center gap-2 sm:gap-3 cursor-pointer flex-shrink-0"
+              className="flex items-center gap-1.5 sm:gap-3 cursor-pointer min-w-0 flex-shrink"
               onClick={() => navigate("/")}
             >
               <img
                 src="/assets/images/mits-logo.png"
                 alt="MITS Logo"
-                className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 object-contain"
+                className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain flex-shrink-0"
               />
-              <div className="flex flex-col justify-center leading-none">
+              <div className="flex flex-col justify-center leading-none min-w-0 overflow-hidden">
                 <h1
-                  className={`text-base sm:text-base md:text-lg font-bold ${isDarkMode
+                  className={`text-[13px] sm:text-base md:text-lg font-bold truncate ${isDarkMode
                     ? "text-white"
                     : "bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
                     }`}
@@ -589,7 +589,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   MITS Alumni
                 </h1>
                 <p
-                  className={`text-[11px] sm:text-xs ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  className={`text-[9px] sm:text-xs truncate ${isDarkMode ? "text-gray-400" : "text-gray-600"
                     }`}
                 >
                   Connect & Grow
@@ -943,18 +943,18 @@ export default function Header({ isDarkMode, toggleTheme }) {
               </button>
             </nav>
 
-            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0 ml-auto">
               <button
                 onClick={toggleTheme}
-                className={`p-1.5 sm:p-2 rounded-lg transition-all duration-300 ${isDarkMode
+                className={`p-1.5 sm:p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${isDarkMode
                   ? "bg-gray-800 hover:bg-gray-700 text-yellow-400"
                   : "bg-blue-100 hover:bg-blue-200 text-blue-600"
                   }`}
               >
                 {isDarkMode ? (
-                  <Sun className="w-5 h-5 sm:w-5 sm:h-5" />
+                  <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
-                  <Moon className="w-5 h-5 sm:w-5 sm:h-5" />
+                  <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
                 )}
               </button>
 
@@ -976,12 +976,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
                   {/* Mobile Messages Button - Show below 1250px */}
                   <button
                     onClick={handleMessages}
-                    className={`xl:hidden p-1.5 sm:p-2 rounded-lg transition-all duration-300 ${isDarkMode
+                    className={`xl:hidden p-1.5 sm:p-2 rounded-lg transition-all duration-300 flex-shrink-0 ${isDarkMode
                       ? "bg-gray-800 hover:bg-gray-700 text-indigo-400"
                       : "bg-blue-100 hover:bg-blue-200 text-blue-600"
                       }`}
                   >
-                    <MessageCircle className="w-5 h-5 sm:w-5 sm:h-5" />
+                    <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </>
               )}
@@ -990,12 +990,12 @@ export default function Header({ isDarkMode, toggleTheme }) {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={toggleProfileMenu}
-                    className={`flex items-center gap-2 p-1.5 sm:p-2 rounded-lg transition-all duration-300 focus:outline-none ${isDarkMode
+                    className={`flex items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-lg transition-all duration-300 focus:outline-none flex-shrink-0 ${isDarkMode
                       ? "bg-gray-800 hover:bg-gray-700 text-white"
                       : "bg-blue-100 hover:bg-blue-200 text-blue-700"
                       }`}
                   >
-                    <User className="w-5 h-5 sm:w-5 sm:h-5" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5" />
                     <span className="hidden xl:inline text-sm font-medium">
                       Profile
                     </span>
