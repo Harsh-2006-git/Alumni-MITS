@@ -463,17 +463,29 @@ export const requestMentorship = [
         });
       }
 
-      // Check if mentorship request already exists
-      const existingRequest = await MentorStudent.findOne({
+      // Check if mentorship request already exists (only pending or active)
+      let currentMentorship = await MentorStudent.findOne({
         mentor_id: mentorId,
         student_id: studentId,
-      });
+        status: { $in: ["pending", "active"] },
+      }).sort({ createdAt: -1 });
 
-      if (existingRequest) {
-        return res.status(400).json({
-          success: false,
-          message: `Mentorship request already exists with status: ${existingRequest.status}`,
-        });
+      if (currentMentorship) {
+        // Auto-complete if date is past
+        const now = new Date();
+        const sessionDate = currentMentorship.session_date ? new Date(currentMentorship.session_date) : null;
+
+        // Only auto-complete if session date is provided and is in the past
+        if (sessionDate && sessionDate < now) {
+          currentMentorship.status = "completed";
+          await currentMentorship.save();
+          currentMentorship = null; // Clear so new request can be made
+        } else {
+          return res.status(400).json({
+            success: false,
+            message: `You already have an active or pending mentorship request with this mentor (Status: ${currentMentorship.status}).`,
+          });
+        }
       }
 
       // Upload payment screenshot if provided
@@ -503,25 +515,23 @@ export const requestMentorship = [
         request_time: new Date().toTimeString().split(" ")[0],
       });
 
-      // Send email notifications
-      try {
-        await emailService.sendMentorshipRequestEmail(
-          mentor.alumni_id.email, // Mentor's email
-          student.email, // Student's email
-          {
-            studentName: student.name,
-            studentEmail: student.email,
-            mentorName: mentor.name,
-            requestMessage: request_message,
-            sessionDate: session_date,
-            sessionTime: session_time,
-            requestDate: new Date(),
-          }
-        );
-      } catch (emailError) {
+      // Send email notifications in background (non-blocking)
+      emailService.sendMentorshipRequestEmail(
+        mentor.alumni_id.email, // Mentor's email
+        student.email, // Student's email
+        {
+          studentName: student.name,
+          studentEmail: student.email,
+          mentorName: mentor.name,
+          requestMessage: request_message,
+          sessionDate: session_date,
+          sessionTime: session_time,
+          requestDate: new Date(),
+        }
+      ).catch((emailError) => {
         console.error("Failed to send email notifications:", emailError);
-        // Continue with the response even if email fails
-      }
+        // Email failure doesn't affect the registration
+      });
 
       // Fetch created relationship with details
       const mentorshipWithDetails = await MentorStudent.findById(mentorship._id)
@@ -585,7 +595,7 @@ export const respondToMentorshipRequest = async (req, res) => {
     }
 
     const { requestId } = req.params;
-    const { action, mentor_notes, session_date, session_time, reschedule_message, reschedule_date, reschedule_time } = req.body;
+    const { action, mentor_notes, session_date, session_time, reschedule_message, reschedule_date, reschedule_time, meeting_link } = req.body;
 
     // Find mentorship request
     const mentorship = await MentorStudent.findById(requestId)
@@ -638,11 +648,12 @@ export const respondToMentorshipRequest = async (req, res) => {
         // Only update if explicitly provided, otherwise keep existing
         ...(session_date && { session_date }),
         ...(session_time && { session_time }),
+        meeting_link: meeting_link || null,
         mentor_notes: mentor_notes || null,
         reschedule_requested: false, // Clear reschedule flag
       };
     } else if (action === "reject") {
-      newStatus = "cancelled";
+      newStatus = "rejected";
       updateData = {
         status: newStatus,
         mentor_notes: mentor_notes || null,
@@ -669,30 +680,28 @@ export const respondToMentorshipRequest = async (req, res) => {
       })
       .populate("student_id", "name email phone profilePhoto");
 
-    // Send email notifications
-    try {
-      // Skip email notification for payment verification actions
-      if (action !== "verify_payment") {
-        await emailService.sendStatusChangeEmail(
-          updatedMentorship.mentor_id.alumni_id.email, // Mentor's email
-          updatedMentorship.student_id.email, // Student's email
-          {
-            studentName: updatedMentorship.student_id.name,
-            mentorName: updatedMentorship.mentor_id.name,
-            newStatus: action === "request_reschedule" ? "Reschedule Requested" : newStatus,
-            oldStatus: mentorship.status,
-            mentorNotes: mentor_notes,
-            sessionDate: session_date || updatedMentorship.session_date,
-            sessionTime: session_time || updatedMentorship.session_time,
-            rescheduleDate: reschedule_date,
-            rescheduleTime: reschedule_time,
-            rescheduleMessage: reschedule_message,
-          }
-        );
-      }
-    } catch (emailError) {
-      console.error("Failed to send status change emails:", emailError);
-      // Continue with the response even if email fails
+    // Send email notifications in background (non-blocking)
+    if (action !== "verify_payment") {
+      emailService.sendStatusChangeEmail(
+        updatedMentorship.mentor_id.alumni_id.email, // Mentor's email
+        updatedMentorship.student_id.email, // Student's email
+        {
+          studentName: updatedMentorship.student_id.name,
+          mentorName: updatedMentorship.mentor_id.name,
+          newStatus: action === "request_reschedule" ? "Reschedule Requested" : newStatus,
+          oldStatus: mentorship.status,
+          mentorNotes: mentor_notes,
+          sessionDate: session_date || updatedMentorship.session_date,
+          sessionTime: session_time || updatedMentorship.session_time,
+          rescheduleDate: reschedule_date,
+          rescheduleTime: reschedule_time,
+          rescheduleMessage: reschedule_message,
+          meetingLink: meeting_link || updatedMentorship.meeting_link,
+        }
+      ).catch((emailError) => {
+        console.error("Failed to send status change emails:", emailError);
+        // Email failure doesn't affect the status update
+      });
     }
 
     // Structure response to match Sequelize include format
@@ -818,46 +827,47 @@ export const updateSessionDetails = async (req, res) => {
       })
       .populate("student_id", "name email phone profilePhoto");
 
-    // Send email notifications for updates
-    // Send email notifications for updates
-    try {
+    // Send email notifications for updates in background (non-blocking)
+    if (meeting_link) {
       // If meeting link is being added/updated, send finalized email
-      if (meeting_link) {
-        await emailService.sendMentorshipFinalizedEmail(
+      emailService.sendMentorshipFinalizedEmail(
+        updatedMentorship.mentor_id.alumni_id.email,
+        updatedMentorship.student_id.email,
+        {
+          studentName: updatedMentorship.student_id.name,
+          mentorName: updatedMentorship.mentor_id.name,
+          sessionDate: session_date || updatedMentorship.session_date,
+          sessionTime: session_time || updatedMentorship.session_time,
+          meetingLink: meeting_link,
+          mentorNotes: mentor_notes || updatedMentorship.mentor_notes,
+        }
+      ).catch((emailError) => {
+        console.error("Failed to send finalized email:", emailError);
+        // Email failure doesn't affect the update
+      });
+    } else {
+      // Normal update email
+      const updates = [];
+      if (session_date) updates.push("session date");
+      if (session_time) updates.push("session time");
+      if (mentor_notes) updates.push("mentor notes");
+
+      if (updates.length > 0) {
+        emailService.sendMentorshipUpdateEmail(
           updatedMentorship.mentor_id.alumni_id.email,
           updatedMentorship.student_id.email,
           {
             studentName: updatedMentorship.student_id.name,
             mentorName: updatedMentorship.mentor_id.name,
+            updates: updates.join(", "),
             sessionDate: session_date || updatedMentorship.session_date,
             sessionTime: session_time || updatedMentorship.session_time,
-            meetingLink: meeting_link,
-            mentorNotes: mentor_notes || updatedMentorship.mentor_notes,
           }
-        );
-      } else {
-        // Normal update email
-        const updates = [];
-        if (session_date) updates.push("session date");
-        if (session_time) updates.push("session time");
-        if (mentor_notes) updates.push("mentor notes");
-
-        if (updates.length > 0) {
-          await emailService.sendMentorshipUpdateEmail(
-            updatedMentorship.mentor_id.alumni_id.email,
-            updatedMentorship.student_id.email,
-            {
-              studentName: updatedMentorship.student_id.name,
-              mentorName: updatedMentorship.mentor_id.name,
-              updates: updates.join(", "),
-              sessionDate: session_date || updatedMentorship.session_date,
-              sessionTime: session_time || updatedMentorship.session_time,
-            }
-          );
-        }
+        ).catch((emailError) => {
+          console.error("Failed to send update email:", emailError);
+          // Email failure doesn't affect the update
+        });
       }
-    } catch (emailError) {
-      console.error("Failed to send update emails:", emailError);
     }
 
     // Structure response to match Sequelize include format
@@ -949,6 +959,21 @@ export const getMentorshipRequests = async (req, res) => {
       })
       .sort({ createdAt: -1 });
 
+    // Auto-complete requests where the session date is in the past
+    const now = new Date();
+    await Promise.all(
+      requests.map(async (request) => {
+        if (
+          (request.status === "active" || request.status === "pending") &&
+          request.session_date &&
+          new Date(request.session_date) < now
+        ) {
+          request.status = "completed";
+          await request.save();
+        }
+      })
+    );
+
     // Process requests to match Sequelize response structure
     const processedRequests = requests.map((request) => {
       const requestData = processMentorshipData(request);
@@ -1020,6 +1045,21 @@ export const getStudentMentorships = async (req, res) => {
       })
       .populate("student_id", "name email phone profilePhoto")
       .sort({ createdAt: -1 });
+
+    // Auto-complete mentorships where the session date is in the past
+    const now = new Date();
+    await Promise.all(
+      mentorships.map(async (mentorship) => {
+        if (
+          (mentorship.status === "active" || mentorship.status === "pending") &&
+          mentorship.session_date &&
+          new Date(mentorship.session_date) < now
+        ) {
+          mentorship.status = "completed";
+          await mentorship.save();
+        }
+      })
+    );
 
     // Process mentorships to match Sequelize response structure
     const processedMentorships = mentorships.map((mentorship) => {

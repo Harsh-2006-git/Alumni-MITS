@@ -1023,10 +1023,16 @@ class MentorshipEmailService {
 
             ${newStatus === "active"
         ? `
+            ${statusData.meetingLink ? `
+            <div style="background: #e8f5e9; border: 2px solid #4caf50; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+                <div style="font-weight: bold; color: #2e7d32; margin-bottom: 5px; text-transform: uppercase; font-size: 12px;">Google Meet Link</div>
+                <a href="${statusData.meetingLink}" style="color: #2e7d32; font-weight: bold; word-break: break-all; font-size: 16px;">${statusData.meetingLink}</a>
+            </div>
+            ` : ''}
             <div class="next-steps-section">
                 <div class="next-steps-title">🎉 Next Steps - Session Confirmed!</div>
                 <div class="next-steps-item">Prepare your questions and topics for discussion</div>
-                <div class="next-steps-item">Join the session 5 minutes before the scheduled time</div>
+                ${statusData.meetingLink ? '<div class="next-steps-item">Use the meeting link provided above to join the session</div>' : '<div class="next-steps-item">Join the session 5 minutes before the scheduled time</div>'}
                 <div class="next-steps-item">Have your college ID ready for verification</div>
                 <div class="next-steps-item">Take notes during the session for future reference</div>
                 <div class="next-steps-item">Be respectful of the mentor's time and expertise</div>

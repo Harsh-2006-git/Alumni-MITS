@@ -15,7 +15,7 @@ const MentorStudentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "active", "completed", "cancelled"],
+      enum: ["pending", "active", "completed", "cancelled", "rejected"],
       default: "pending",
     },
     request_date: {
@@ -79,7 +79,8 @@ const MentorStudentSchema = new mongoose.Schema(
   }
 );
 
-MentorStudentSchema.index({ mentor_id: 1, student_id: 1 }, { unique: true });
+// MentorStudentSchema.index({ mentor_id: 1, student_id: 1 }, { unique: true });
+MentorStudentSchema.index({ mentor_id: 1, student_id: 1 });
 
 const MentorStudent = mongoose.model("MentorStudent", MentorStudentSchema);
 

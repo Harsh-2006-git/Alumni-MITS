@@ -323,10 +323,44 @@ export const getUpcomingEvents = async (req, res) => {
         .json({ message: "No upcoming scheduled events found" });
     }
 
+    // Check if user is logged in and get their registration status
+    let eventsWithRegistrationStatus = upcomingEvents;
+
+    if (req.user && req.user.email) {
+      const userEmail = req.user.email;
+      console.log(`✅ User logged in: ${userEmail}`);
+
+      // Get all registrations for this user
+      const userRegistrations = await EventRegistration.find({
+        userEmail: userEmail,
+      }).select('eventId');
+
+      console.log(`📊 Found ${userRegistrations.length} registrations for user`);
+
+      const registeredEventIds = new Set(
+        userRegistrations.map(reg => reg.eventId.toString())
+      );
+
+      // Add isRegistered flag to each event
+      eventsWithRegistrationStatus = upcomingEvents.map(event => {
+        const eventObj = event.toObject();
+        eventObj.isRegistered = registeredEventIds.has(event._id.toString());
+        return eventObj;
+      });
+    } else {
+      console.log('👤 No user logged in, setting all isRegistered to false');
+      // For non-logged-in users, set isRegistered to false
+      eventsWithRegistrationStatus = upcomingEvents.map(event => {
+        const eventObj = event.toObject();
+        eventObj.isRegistered = false;
+        return eventObj;
+      });
+    }
+
     return res.status(200).json({
       message: "Upcoming scheduled events fetched successfully",
-      count: upcomingEvents.length,
-      events: upcomingEvents,
+      count: eventsWithRegistrationStatus.length,
+      events: eventsWithRegistrationStatus,
     });
   } catch (error) {
     console.error("Error fetching upcoming events:", error);

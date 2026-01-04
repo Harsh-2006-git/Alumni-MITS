@@ -11,13 +11,13 @@ import {
   getmyevents,
   getallEvents,
 } from "../controller/eventController.js";
-import authenticateClient from "../middlewares/authMiddleware.js";
+import authenticateClient, { optionalAuthenticateClient } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
 // Protected route
 router.post("/add-event", authenticateClient, addEvent);
 router.get("/my-events", authenticateClient, getmyevents);
-router.get("/upcoming-event", getUpcomingEvents);
+router.get("/upcoming-event", optionalAuthenticateClient, getUpcomingEvents);
 router.get("/all-event", getallEvents);
 router.put("/review/:eventId", authenticateClient, reviewEvent);
 router.put("/update/:id", authenticateClient, updateEvent);
