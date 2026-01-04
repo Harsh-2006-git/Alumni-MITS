@@ -117,7 +117,7 @@ export default function App() {
   }
 
   return (
-    <div className={`min-h-screen w-full ${isDarkMode ? "dark" : "light"}`}>
+    <div className={`min-h-screen w-full overflow-x-hidden ${isDarkMode ? "dark" : "light"}`}>
       <SocketProvider>
         <Router>
           <Routes>

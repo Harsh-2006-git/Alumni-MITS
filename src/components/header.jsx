@@ -506,7 +506,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
           ></div>
           <div
             ref={notificationsModalRef}
-            className={`w-[calc(100vw-24px)] sm:w-full max-w-sm rounded-xl shadow-2xl pointer-events-auto transform transition-all animate-in slide-in-from-right-5 fade-in-0 duration-200 mt-12 sm:mt-0 bg-white border border-gray-200 z-[101] ${isDarkMode ? "!bg-gray-900 !border-gray-700" : ""
+            className={`w-[calc(100%-24px)] sm:w-full max-w-sm rounded-xl shadow-2xl pointer-events-auto transform transition-all animate-in slide-in-from-right-5 fade-in-0 duration-200 mt-12 sm:mt-0 bg-white border border-gray-200 z-[101] ${isDarkMode ? "!bg-gray-900 !border-gray-700" : ""
               }`}
           >
             <div className={`p-4 border-b flex items-center justify-between ${isDarkMode ? "border-gray-800" : "border-blue-50"}`}>
@@ -1174,7 +1174,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
       <div
         ref={mobileMenuRef}
-        className={`fixed inset-y-0 right-0 z-50 w-[60%] max-w-sm transform transition-transform duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed inset-y-0 right-0 z-50 w-[60%] max-w-sm transform transition-all duration-300 ease-in-out xl:hidden ${isMenuOpen ? "translate-x-0 opacity-100 visible" : "translate-x-[110%] opacity-0 invisible"
           }`}
       >
         {/* Backdrop */}

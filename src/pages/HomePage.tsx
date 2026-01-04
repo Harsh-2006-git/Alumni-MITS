@@ -431,7 +431,7 @@ export default function AlumniHomePage({
 
             {/* Stats Section with Stagger Animation */}
             <div
-              className="grid grid-cols-4 gap-2 sm:gap-4 pt-3 sm:pt-4"
+              className="grid grid-cols-4 gap-1.5 sm:gap-4 pt-3 sm:pt-4"
               style={{ animationDelay: "1s" }}
             >
               {[

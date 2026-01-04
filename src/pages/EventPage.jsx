@@ -24,6 +24,7 @@ import {
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+import AuthPopup from "../components/AuthPopup";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
 const Message = ({ type, message, onClose }) => {
@@ -83,8 +84,41 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [registeringInModal, setRegisteringInModal] = useState(false);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [currentUser, setCurrentUser] = useState({
+    isLoggedIn: false,
+    userType: null,
+    userId: null,
+    name: null,
+  });
+
+  const getCurrentUser = () => {
+    try {
+      const authData = localStorage.getItem("auth");
+      if (authData) {
+        const parsedData = JSON.parse(authData);
+        if (parsedData && parsedData.accessToken) {
+          return {
+            isLoggedIn: true,
+            userType: parsedData.userType,
+            userId: parsedData.userId,
+            name: parsedData.name,
+          };
+        }
+      }
+    } catch (e) {
+      console.error("Error getting current user:", e);
+    }
+    return {
+      isLoggedIn: false,
+      userType: null,
+      userId: null,
+      name: null,
+    };
+  };
 
   useEffect(() => {
+    setCurrentUser(getCurrentUser());
     fetchEvents();
   }, []);
 
@@ -121,7 +155,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
       const authData = localStorage.getItem("auth");
       const token = authData ? JSON.parse(authData).accessToken : null;
       if (!token) {
-        showMessage("error", "Please login to register for this event");
+        setShowAuthPopup(true);
         return;
       }
       const response = await fetch(
@@ -594,7 +628,14 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
                       </p>
                     </div>
                     <button
-                      onClick={() => setSelectedEvent(event)}
+                      onClick={() => {
+                        const user = getCurrentUser();
+                        if (!user.isLoggedIn) {
+                          setShowAuthPopup(true);
+                        } else {
+                          setSelectedEvent(event);
+                        }
+                      }}
                       className="ml-3 px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold text-xs sm:text-sm hover:shadow-lg transition-all flex items-center gap-1 sm:gap-2 hover:scale-105"
                     >
                       <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -918,6 +959,13 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
       )}
 
       <Footer isDarkMode={isDarkMode} />
+      {showAuthPopup && (
+        <AuthPopup
+          isOpen={showAuthPopup}
+          onClose={() => setShowAuthPopup(false)}
+          isDarkMode={isDarkMode}
+        />
+      )}
       <style>{`
         @keyframes fadeIn {
           from {
