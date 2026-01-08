@@ -37,12 +37,83 @@ import {
 
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { ScrollingAlumni } from "./DistinguishAlumni";
+import ScrollingChapters from "../components/ScrollingChapters";
 
 
 import Header from "../components/header";
 import Footer from "../components/footer";
+
+
+interface ParallaxProps {
+  isDarkMode: boolean;
+}
+
+const ParallaxImageSection = () => {
+  const [textIndex, setTextIndex] = useState(0);
+  const changingTexts = [
+    "Fostering Innovation",
+    "Building Leaders",
+    "Connecting Generations",
+    "Creating Impact"
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTextIndex((prev) => (prev + 1) % changingTexts.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div
+      className="w-full h-[400px] md:h-[500px] my-16 md:my-24 bg-fixed bg-center bg-cover bg-no-repeat relative shadow-inner flex items-center justify-center text-center px-4"
+      style={{
+        backgroundImage: "url('/assets/uploaded_parallax_bg.png')"
+      }}
+    >
+      {/* Overlay for readability */}
+      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[1px]"></div>
+
+      <div className="relative z-10 text-white space-y-4 md:space-y-6 max-w-4xl mx-auto">
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]"
+        >
+          Welcome to MITS Gwalior
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-lg sm:text-xl md:text-2xl font-medium text-blue-100/90 tracking-wide drop-shadow-md"
+        >
+          Mission to Innovate Technology for Society
+        </motion.p>
+
+        <div className="h-10 md:h-14 flex items-center justify-center overflow-hidden pt-2">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={textIndex}
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -40, opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="text-xl sm:text-2xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-white to-purple-400 drop-shadow-sm"
+            >
+              {changingTexts[textIndex]}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 interface HomePageProps {
   isDarkMode: boolean;
   toggleTheme: () => void;
@@ -53,43 +124,47 @@ const FAQItem = ({ question, answer, isDarkMode }: { question: string, answer: s
 
   return (
     <div
-      className={`group rounded-xl border transition-all duration-300 overflow-hidden ${isOpen
-        ? (isDarkMode ? "bg-slate-800/90 border-blue-500 shadow-[0_0_25px_rgba(59,130,246,0.2)]" : "bg-white border-blue-600 shadow-[0_10px_40px_rgba(59,130,246,0.12)]")
-        : (isDarkMode ? "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20" : "bg-blue-600/5 border-blue-200/60 hover:bg-blue-600/10 hover:border-blue-300")
+      className={`group rounded-2xl border transition-all duration-500 overflow-hidden ${isOpen
+        ? (isDarkMode ? "bg-slate-900/80 border-blue-500/50 shadow-[0_20px_50px_rgba(30,58,138,0.4)]" : "bg-white border-blue-600 shadow-[0_20px_50px_rgba(59,130,246,0.1)]")
+        : (isDarkMode ? "bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/20" : "bg-white border-gray-200 hover:border-blue-300 hover:shadow-lg")
         }`}
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3.5 py-3 sm:px-5 sm:py-3.5 flex items-center justify-between gap-3 text-left"
+        className="w-full px-5 py-4 sm:px-6 sm:py-5 flex items-center justify-between gap-4 text-left"
       >
-        <span className={`text-[13px] sm:text-sm md:text-base font-bold transition-colors duration-300 ${isOpen
-          ? (isDarkMode ? "text-blue-400" : "text-blue-600")
+        <span className={`text-sm sm:text-base font-bold transition-all duration-300 ${isOpen
+          ? (isDarkMode ? "text-blue-400 translate-x-1" : "text-blue-600 translate-x-1")
           : (isDarkMode ? "text-slate-300" : "text-gray-700")
           }`}>
           {question}
         </span>
-        <div className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center transition-all duration-300 ${isOpen
-          ? "bg-blue-500 text-white rotate-45"
-          : (isDarkMode ? "bg-slate-800 text-slate-400 group-hover:bg-slate-700" : "bg-blue-50 text-blue-500 group-hover:bg-blue-100")
-          }`}>
-          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        </div>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 ${isOpen
+            ? "bg-blue-500 text-white shadow-lg shadow-blue-500/40"
+            : (isDarkMode ? "bg-white/10 text-slate-400 group-hover:bg-white/20" : "bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-600")
+            }`}
+        >
+          <ChevronDown className="w-4 h-4" />
+        </motion.div>
       </button>
-      <motion.div
-        initial={false}
-        animate={{
-          height: isOpen ? "auto" : 0,
-          opacity: isOpen ? 1 : 0
-        }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="overflow-hidden"
-      >
-        <div className={`px-3.5 pb-3.5 sm:px-5 sm:pb-4 text-[12px] sm:text-[13px] md:text-sm leading-relaxed ${isDarkMode ? "text-slate-400" : "text-gray-600"}`}>
-          <div className={`pt-2.5 border-t ${isDarkMode ? "border-slate-800" : "border-blue-50"}`}>
-            {answer}
-          </div>
-        </div>
-      </motion.div>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+          >
+            <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-sm sm:text-base leading-relaxed">
+              <div className={`pt-4 border-t ${isDarkMode ? "border-white/5 text-slate-400" : "border-gray-100 text-gray-600"}`}>
+                {answer}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -732,9 +807,8 @@ export default function AlumniHomePage({
     }
   `}</style>
       </section>
-
       {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 md:py-6">
         <div className="relative flex items-center">
           <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
           <div className="mx-6 flex items-center justify-center relative">
@@ -745,19 +819,43 @@ export default function AlumniHomePage({
         </div>
       </div>
 
+      {/* Scrolling Alumni - Visible on all screens */}
+      <div className="w-full">
+        <ScrollingAlumni isDarkMode={isDarkMode} />
+      </div>
+
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-4 md:py-6">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
+
+
+
       {/* Features Section - Same as Video Section */}
       {/* Features Section - Same as Video Section */}
       <section className="hidden md:block w-full px-6 md:px-10 lg:px-14 py-10 mt-10">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-6">
+          <div className="text-center mb-10 sm:mb-14">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4">
+              <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+                Global Connections
+              </span>
+            </div>
             <h2
-              className={`text-xl md:text-3xl font-bold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+              className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
                 }`}
             >
-              Our Global Network
+              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Global Network</span>
             </h2>
             <p
-              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
             >
               Connect with alumni worldwide and explore endless opportunities
@@ -806,10 +904,149 @@ export default function AlumniHomePage({
         </div>
       </section>
 
-      <div className="block lg:hidden">
-        <ScrollingAlumni isDarkMode={isDarkMode} />
+
+
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
       </div>
 
+
+
+
+
+      {/* Professional Journey Section with Parallax */}
+      <motion.section
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-10 lg:px-16 py-12"
+      >
+        <div className="text-center mb-10 sm:mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4"
+          >
+            <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+              Success Tools
+            </span>
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
+          >
+            Empower Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Professional Journey</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}
+          >
+            Discover powerful tools and resources designed to accelerate your career growth
+          </motion.p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4 md:gap-8">
+          {[
+            {
+              icon: Briefcase,
+              title: "Job Opportunities",
+              description:
+                "Access exclusive job and career opportunities globally.",
+              color: "from-blue-500 to-cyan-500",
+              image:
+                "https://static.vecteezy.com/system/resources/previews/010/821/730/original/search-job-find-vacancy-employment-go-to-career-people-seek-opportunity-for-vacancy-or-work-position-search-new-work-in-internet-illustration-vector.jpg",
+            },
+            {
+              icon: Users,
+              title: "Alumni Network",
+              description:
+                "Connect with a diverse community of successful graduates across industries.",
+              color: "from-purple-500 to-red-500",
+              image:
+                "https://image.shutterstock.com/z/stock-vector-group-of-students-concept-illustration-college-or-university-students-sitting-on-pile-of-books-and-2127455960.jpg",
+            },
+            {
+              icon: GraduationCap,
+              title: "Mentorship",
+              description:
+                "Get guidance from experienced professionals in your field of interest.",
+              color: "from-green-500 to-emerald-500",
+              image:
+                "https://thumbs.dreamstime.com/b/mentoring-concept-illustration-mentoring-concept-idea-leadership-teamwork-support-giving-advice-to-employee-isolated-123662327.jpg?w=1200",
+            },
+          ].map((item, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.6, delay: idx * 0.2 }}
+              whileHover={{ scale: 1.05, y: -10 }}
+              className={`p-4 sm:p-5 md:p-6 pt-6 sm:pt-7 md:pt-8 rounded-xl sm:rounded-2xl border transition-all hover:shadow-2xl overflow-hidden ${isDarkMode
+                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
+                : "bg-white border-blue-200 shadow-lg"
+                }`}
+            >
+              <div className="relative mb-10">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="relative h-28 sm:h-32 md:h-40 rounded-lg sm:rounded-xl overflow-hidden"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-20`}
+                  ></div>
+                </motion.div>
+                <div
+                  className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg z-10`}
+                >
+                  <item.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
+                </div>
+              </div>
+              <h3
+                className={`text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 text-center ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+              >
+                {item.title}
+              </h3>
+              <p
+                className={`text-xs sm:text-sm mb-3 sm:mb-4 text-center ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
+                {item.description}
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05, x: 5 }}
+                whileTap={{ scale: 0.95 }}
+                className={`text-xs sm:text-sm font-semibold mx-auto block ${isDarkMode
+                  ? "text-blue-400 hover:text-blue-300"
+                  : "text-blue-600 hover:text-blue-700"
+                  }`}
+              >
+                Learn More →
+              </motion.button>
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
       {/* Section Divider */}
       <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
         <div className="relative flex items-center">
@@ -824,15 +1061,20 @@ export default function AlumniHomePage({
 
       {/* Campus Glimpse Video Section */}
       <section className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-8 md:py-12">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10 sm:mb-14">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4">
+            <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+              Campus Tour
+            </span>
+          </div>
           <h2
-            className={`text-lg sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
-            A Glimpse of Our Campus
+            A Glimpse of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Our Campus</span>
           </h2>
           <p
-            className={`text-xs sm:text-sm md:text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
             Take an aerial tour of our beautiful campus and facilities
@@ -948,135 +1190,6 @@ export default function AlumniHomePage({
         </div>
       </div>
 
-      {/* Professional Journey Section with Parallax */}
-      <motion.section
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="container mx-auto px-10 lg:px-16 py-12"
-      >
-        <div className="text-center mb-12">
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className={`text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
-              }`}
-          >
-            Empower Your Professional Journey
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className={`text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
-          >
-            Discover powerful tools and resources designed to accelerate your
-            career growth
-          </motion.p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4 md:gap-8">
-          {[
-            {
-              icon: Briefcase,
-              title: "Job Opportunities",
-              description:
-                "Access exclusive job and career opportunities globally.",
-              color: "from-blue-500 to-cyan-500",
-              image:
-                "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-            },
-            {
-              icon: Users,
-              title: "Alumni Network",
-              description:
-                "Connect with a diverse community of successful graduates across industries.",
-              color: "from-purple-500 to-red-500",
-              image:
-                "https://images.unsplash.com/photo-1559028012-481c04fa702d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-            },
-            {
-              icon: GraduationCap,
-              title: "Mentorship",
-              description:
-                "Get guidance from experienced professionals in your field of interest.",
-              color: "from-green-500 to-emerald-500",
-              image:
-                "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
-            },
-          ].map((item, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, delay: idx * 0.2 }}
-              whileHover={{ scale: 1.05, y: -10 }}
-              className={`p-4 sm:p-5 md:p-6 pt-6 sm:pt-7 md:pt-8 rounded-xl sm:rounded-2xl border transition-all hover:shadow-2xl overflow-hidden ${isDarkMode
-                ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
-                : "bg-white border-blue-200 shadow-lg"
-                }`}
-            >
-              <div className="relative mb-10">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="relative h-28 sm:h-32 md:h-40 rounded-lg sm:rounded-xl overflow-hidden"
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-20`}
-                  ></div>
-                </motion.div>
-                <div
-                  className={`absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-14 h-14 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-lg z-10`}
-                >
-                  <item.icon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
-                </div>
-              </div>
-              <h3
-                className={`text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 text-center ${isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
-              >
-                {item.title}
-              </h3>
-              <p
-                className={`text-xs sm:text-sm mb-3 sm:mb-4 text-center ${isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
-              >
-                {item.description}
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05, x: 5 }}
-                whileTap={{ scale: 0.95 }}
-                className={`text-xs sm:text-sm font-semibold mx-auto block ${isDarkMode
-                  ? "text-blue-400 hover:text-blue-300"
-                  : "text-blue-600 hover:text-blue-700"
-                  }`}
-              >
-                Learn More →
-              </motion.button>
-            </motion.div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
-        <div className="relative flex items-center">
-          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
-          <div className="mx-6 flex items-center justify-center relative">
-            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
-            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
-          </div>
-          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
-        </div>
-      </div>
 
       {/* Job Opportunities Section with Parallax */}
       <motion.section
@@ -1086,21 +1199,30 @@ export default function AlumniHomePage({
         viewport={{ once: true }}
         className="container mx-auto px-10 lg:px-16 py-12"
       >
-        <div className="text-center mb-12">
+        <div className="text-center mb-10 sm:mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4"
+          >
+            <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+              Career Growth
+            </span>
+          </motion.div>
           <motion.h2
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            className={`text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
-            Latest Opportunities
+            Latest <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Opportunities</span>
           </motion.h2>
           <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className={`text-xs sm:text-sm md:text-base lg:text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
             Exclusive positions from top companies in your network
@@ -1326,21 +1448,30 @@ export default function AlumniHomePage({
         viewport={{ once: true }}
         className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-8 md:py-12"
       >
-        <div className="text-center mb-12">
+        <div className="text-center mb-10 sm:mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4"
+          >
+            <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+              Networking
+            </span>
+          </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className={`text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
-            Upcoming Events
+            Upcoming <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Events</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className={`text-xs sm:text-sm md:text-base lg:text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
             Join exciting events and connect with your community
@@ -1551,21 +1682,30 @@ export default function AlumniHomePage({
         viewport={{ once: true }}
         className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-6 sm:py-8 md:py-12"
       >
-        <div className="text-center mb-12">
+        <div className="text-center mb-10 sm:mb-14">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4"
+          >
+            <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+              Making A Difference
+            </span>
+          </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className={`text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 md:mb-4 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
-            Active Campaigns
+            Active <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Campaigns</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className={`text-xs sm:text-sm md:text-base lg:text-lg ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
             Support meaningful initiatives in your community
@@ -1738,17 +1878,25 @@ export default function AlumniHomePage({
         </div>
       </div>
 
+
+
+
       {/* Blog Services Banner - Centered Section */}
       {/* Blog Section Heading */}
-      <div className="text-center mb-8 px-4">
+      <div className="text-center mb-10 sm:mb-14 px-4">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4">
+          <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+            Community Voices
+          </span>
+        </div>
         <h2
-          className={`text-xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+          className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
             }`}
         >
-          Insights & Stories
+          Insights & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Stories</span>
         </h2>
         <p
-          className={`text-sm max-w-2xl mx-auto ${isDarkMode ? "text-gray-400" : "text-gray-600"
+          className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
             }`}
         >
           Explore the voices of our community and share your own experiences
@@ -1834,6 +1982,24 @@ export default function AlumniHomePage({
       </motion.section>
 
 
+
+      {/* Section Divider */}
+      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+        <div className="relative flex items-center">
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+          <div className="mx-6 flex items-center justify-center relative">
+            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+          </div>
+          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+        </div>
+      </div>
+      {/* Chapters & Associations */}
+      <ScrollingChapters isDarkMode={isDarkMode} />
+
+
+      {/* Empty Parallax Scroll Section - Moved to Bottom */}
+      <ParallaxImageSection />
 
       {/* FAQ Section */}
       <section className="container mx-auto px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-16 md:py-24">

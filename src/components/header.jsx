@@ -42,6 +42,15 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const refreshIntervalRef = useRef(null);
   const aboutDropdownRef = useRef(null);
   const notificationsModalRef = useRef(null); // Ref for modal click outside
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfileMenu = () => setShowProfileMenu(!showProfileMenu);
@@ -138,6 +147,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
 
           localStorage.setItem("auth", JSON.stringify(updatedAuth));
           setAuth(updatedAuth);
+          window.dispatchEvent(new Event("auth-change"));
           console.log("Token auto-refreshed successfully");
         } else {
           // If refresh fails, logout user
@@ -179,13 +189,16 @@ export default function Header({ isDarkMode, toggleTheme }) {
             parsed.expiry = Date.now() + 60 * 60 * 1000; // 1 hour expiry
             localStorage.setItem("auth", JSON.stringify(parsed));
             setAuth(parsed);
+            window.dispatchEvent(new Event("auth-change"));
           } else {
             localStorage.removeItem("auth");
             setAuth(null);
+            window.dispatchEvent(new Event("auth-change"));
           }
         } else {
           localStorage.removeItem("auth");
           setAuth(null);
+          window.dispatchEvent(new Event("auth-change"));
         }
       } else {
         setAuth(parsed);
@@ -215,6 +228,7 @@ export default function Header({ isDarkMode, toggleTheme }) {
   const handleLogout = () => {
     localStorage.removeItem("auth");
     setAuth(null);
+    window.dispatchEvent(new Event("auth-change"));
     setShowProfileMenu(false);
     setIsMenuOpen(false);
     if (refreshIntervalRef.current) {
@@ -562,10 +576,16 @@ export default function Header({ isDarkMode, toggleTheme }) {
       )}
 
       {/* Main Header Content - preserved from original file logic but ensuring imports are correct */}
+      {/* Spacer to maintain layout flow when header is fixed */}
+      <div className="h-16 min-h-[64px] w-full" />
       <header
-        className={`sticky top-0 z-50 w-full h-16 min-h-[64px] border-b ${isDarkMode
-          ? "bg-gray-900 border-gray-800 shadow-lg"
-          : "bg-white border-blue-100 shadow-sm"
+        className={`fixed top-0 left-0 right-0 z-50 w-full h-16 min-h-[64px] transition-all duration-300 ${scrolled
+          ? (isDarkMode
+            ? "bg-slate-950/80 backdrop-blur-xl border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
+            : "bg-white/80 backdrop-blur-xl border-b border-blue-100 shadow-[0_4px_30px_rgba(0,0,0,0.05)]")
+          : (isDarkMode
+            ? "bg-gray-900/10 backdrop-blur-sm border-b border-white/5"
+            : "bg-white/10 backdrop-blur-sm border-b border-blue-50")
           }`}
       >
         <div className="w-full h-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">

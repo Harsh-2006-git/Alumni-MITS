@@ -13,59 +13,91 @@ export const SocketProvider = ({ children }) => {
     const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
     useEffect(() => {
-        // Get token from local storage
-        const authData = localStorage.getItem("auth");
+        const initializeSocket = () => {
+            // Get token from local storage
+            const authData = localStorage.getItem("auth");
 
-        if (authData) {
-            try {
-                const parsedAuth = JSON.parse(authData);
-                const token = parsedAuth.accessToken;
+            if (authData) {
+                try {
+                    const parsedAuth = JSON.parse(authData);
+                    const token = parsedAuth.accessToken;
 
-                if (token) {
-                    console.log("Initializing Socket.IO connection...");
+                    if (token) {
+                        // Avoid reconnecting if token hasn't changed (basic check)
+                        if (socket && socket.auth.token === token && socket.connected) return;
 
-                    const newSocket = io(BASE_URL, {
-                        auth: { token },
-                        transports: ["websocket", "polling"],
-                        reconnection: true,
-                        reconnectionAttempts: 10,
-                        reconnectionDelay: 1000,
-                    });
+                        if (socket) socket.close();
 
-                    newSocket.on("connect", () => {
-                        console.log("Socket connected:", newSocket.id);
-                    });
+                        console.log("Initializing Socket.IO connection...");
 
-                    newSocket.on("online_users", (users) => {
-                        console.log("Initial online users:", users);
-                        setOnlineUsers(users);
-                    });
+                        const newSocket = io(BASE_URL, {
+                            auth: { token },
+                            transports: ["websocket", "polling"],
+                            reconnection: true,
+                            reconnectionAttempts: 10,
+                            reconnectionDelay: 1000,
+                        });
 
-                    newSocket.on("user_online", ({ userId }) => {
-                        console.log("User online:", userId);
-                        setOnlineUsers((prev) => [...new Set([...prev, userId])]);
-                    });
+                        newSocket.on("connect", () => {
+                            console.log("Socket connected:", newSocket.id);
+                        });
 
-                    newSocket.on("user_offline", ({ userId }) => {
-                        console.log("User offline:", userId);
-                        setOnlineUsers((prev) => prev.filter((id) => id !== userId));
-                    });
+                        newSocket.on("online_users", (users) => {
+                            console.log("Initial online users:", users);
+                            setOnlineUsers(users);
+                        });
 
-                    newSocket.on("connect_error", (err) => {
-                        console.error("Socket connect error:", err.message);
-                    });
+                        newSocket.on("user_online", ({ userId }) => {
+                            console.log("User online:", userId);
+                            setOnlineUsers((prev) => [...new Set([...prev, userId])]);
+                        });
 
-                    setSocket(newSocket);
+                        newSocket.on("user_offline", ({ userId }) => {
+                            console.log("User offline:", userId);
+                            setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+                        });
 
-                    return () => {
-                        console.log("Closing socket connection...");
-                        newSocket.close();
-                    };
+                        newSocket.on("connect_error", (err) => {
+                            console.error("Socket connect error:", err.message);
+                            // Prevent infinite retries on auth failure
+                            if (err.message.includes("Authentication error") || err.message.includes("Invalid")) {
+                                newSocket.close();
+                            }
+                        });
+
+                        setSocket(newSocket);
+                    }
+                } catch (error) {
+                    console.error("Error parsing auth for socket:", error);
                 }
-            } catch (error) {
-                console.error("Error parsing auth for socket:", error);
+            } else {
+                // No auth data, close socket if open
+                if (socket) {
+                    console.log("No auth token found, closing socket...");
+                    socket.close();
+                    setSocket(null);
+                }
             }
-        }
+        };
+
+        initializeSocket();
+
+        const handleAuthChange = () => {
+            console.log("Auth changed, re-initializing socket...");
+            initializeSocket();
+        };
+
+        window.addEventListener("auth-change", handleAuthChange);
+        window.addEventListener("storage", handleAuthChange);
+
+        return () => {
+            window.removeEventListener("auth-change", handleAuthChange);
+            window.removeEventListener("storage", handleAuthChange);
+            if (socket) {
+                console.log("Closing socket connection...");
+                socket.close();
+            }
+        };
     }, [BASE_URL]);
 
     return (

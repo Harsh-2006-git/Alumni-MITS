@@ -294,43 +294,39 @@ const alumni = [
 // Compact Scrolling Alumni Component
 export function ScrollingAlumni({ isDarkMode }) {
   return (
-    <section className="w-full py-8 mt-8">
+    <section className={`w-full py-8 mt-8 ${isDarkMode ? "bg-transparent" : ""}`}>
       <div className="max-w-7xl mx-auto px-4">
         {/* Section Header - Compact */}
-        <div className="text-center mb-6 sm:mb-8">
+        <div className="text-center mb-10 sm:mb-14">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-3 sm:mb-4">
+            <span className={`text-[10px] sm:text-xs font-bold tracking-wider uppercase ${isDarkMode ? "text-blue-400" : "text-blue-600"}`}>
+              Hall of Fame
+            </span>
+          </div>
           <h2
-            className={`text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3 ${isDarkMode ? "text-white" : "text-gray-900"
+            className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
-            Our Distinguished Alumni
+            Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Distinguished Alumni</span>
           </h2>
           <p
-            className={`text-xs sm:text-sm md:text-base ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
           >
-            Meet our distinguished alumni shaping industries and driving
-            innovation worldwide.
+            Meet our distinguished alumni shaping industries and driving innovation worldwide.
           </p>
         </div>
 
         {/* Scrolling Container */}
         <div className="relative">
-          {/* Light gradient overlays */}
+          {/* Scrolling Content with CSS Mask for fade effect */}
           <div
-            className={`absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${isDarkMode
-              ? "bg-gradient-to-r from-slate-900 to-transparent"
-              : "bg-gradient-to-r from-white to-transparent"
-              }`}
-          ></div>
-          <div
-            className={`absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none ${isDarkMode
-              ? "bg-gradient-to-l from-slate-900 to-transparent"
-              : "bg-gradient-to-l from-white to-transparent"
-              }`}
-          ></div>
-
-          {/* Scrolling Content */}
-          <div className="overflow-hidden">
+            className="overflow-hidden"
+            style={{
+              maskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)",
+              WebkitMaskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)"
+            }}
+          >
             <div className="flex animate-scroll">
               {/* First Set */}
               <div className="flex space-x-4 pr-4">
@@ -389,7 +385,7 @@ function AlumniCard({ alumnus, isDarkMode }) {
   return (
     <div
       className={`flex-shrink-0 w-40 sm:w-56 rounded-xl border transition-all ${isDarkMode
-        ? "bg-slate-800 border-blue-600/20"
+        ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 border-blue-600/20"
         : "bg-white border-blue-200"
         }`}
     >
