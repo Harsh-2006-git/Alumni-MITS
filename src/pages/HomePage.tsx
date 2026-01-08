@@ -902,21 +902,22 @@ export default function AlumniHomePage({
             ))}
           </div>
         </div>
+        {/* Section Divider */}
+        <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
+          <div className="relative flex items-center">
+            <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
+            <div className="mx-6 flex items-center justify-center relative">
+              <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
+              <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
+            </div>
+            <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
+          </div>
+        </div>
       </section>
 
 
 
-      {/* Section Divider */}
-      <div className="max-w-7xl mx-auto px-4 md:px-10 lg:px-16 py-8 md:py-12">
-        <div className="relative flex items-center">
-          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-r from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-r from-transparent via-blue-100 to-blue-300"}`}></div>
-          <div className="mx-6 flex items-center justify-center relative">
-            <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-20 ${isDarkMode ? "bg-blue-500" : "bg-blue-400"}`}></div>
-            <div className={`w-3 h-3 rounded-full rotate-45 border-2 ${isDarkMode ? "bg-slate-900 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" : "bg-white border-blue-400 shadow-sm"}`}></div>
-          </div>
-          <div className={`flex-grow h-px ${isDarkMode ? "bg-gradient-to-l from-transparent via-blue-500/10 to-blue-500/40" : "bg-gradient-to-l from-transparent via-blue-100 to-blue-300"}`}></div>
-        </div>
-      </div>
+
 
 
 
