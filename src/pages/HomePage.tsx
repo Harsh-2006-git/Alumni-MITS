@@ -73,15 +73,15 @@ const ParallaxImageSection = () => {
         backgroundImage: "url('/assets/uploaded_parallax_bg.png')"
       }}
     >
-      {/* Overlay for readability */}
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[1px]"></div>
+      {/* Light Overlay for text contrast (Image remains clear, text pops) */}
+      <div className="absolute inset-0 bg-slate-900/40"></div>
 
       <div className="relative z-10 text-white space-y-4 md:space-y-6 max-w-4xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]"
+          className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]"
         >
           Welcome to MITS Gwalior
         </motion.h2>
@@ -90,7 +90,7 @@ const ParallaxImageSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-lg sm:text-xl md:text-2xl font-medium text-blue-100/90 tracking-wide drop-shadow-md"
+          className="text-lg sm:text-xl md:text-2xl font-medium text-blue-100/90 tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]"
         >
           Mission to Innovate Technology for Society
         </motion.p>

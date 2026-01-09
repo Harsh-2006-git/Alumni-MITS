@@ -60,6 +60,8 @@ import { SocketProvider } from "./context/SocketContext";
 
 import { useTheme } from "./context/ThemeContext";
 
+import ScrollToTop from "./components/ScrollToTop";
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -117,6 +119,7 @@ export default function App() {
     <div className={`min-h-screen w-full overflow-x-hidden ${isDarkMode ? "dark" : "light"}`}>
       <SocketProvider>
         <Router>
+          <ScrollToTop />
           <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center bg-gray-950">
               <div className="text-center">
