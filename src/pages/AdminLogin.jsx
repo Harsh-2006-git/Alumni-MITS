@@ -14,6 +14,7 @@ import {
   BarChart3,
   ArrowRight,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 
@@ -23,6 +24,7 @@ const API_URL = `${BASE_URL}/auth`;
 export default function AdminLoginPage({
   setIsAuthenticated,
 }) {
+  const navigate = useNavigate();
   const { isDarkMode, toggleTheme } = useTheme();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +40,7 @@ export default function AdminLoginPage({
     const auth = JSON.parse(localStorage.getItem("auth") || "{}");
     if (auth.accessToken && auth.userType === "admin") {
       setIsAuthenticated(true);
-      window.location.href = "/admin";
+      navigate("/admin");
       return;
     }
 
@@ -65,7 +67,7 @@ export default function AdminLoginPage({
       const userData = {
         accessToken,
         refreshToken,
-        userName: decodeURIComponent(userName),
+        userName: decodeURIComponent(userName || ""),
         userEmail,
         userType: "admin",
         loginTime: new Date().toISOString(),
@@ -75,9 +77,9 @@ export default function AdminLoginPage({
       console.log("✅ Admin Google Login Successful");
       localStorage.setItem("auth", JSON.stringify(userData));
       setIsAuthenticated(true);
-      window.location.href = "/admin";
+      navigate("/admin");
     }
-  }, [setIsAuthenticated]);
+  }, [setIsAuthenticated, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -112,13 +114,9 @@ export default function AdminLoginPage({
       };
 
       console.log("✅ Admin Login Successful");
-      console.log("🔐 Access Token:", data.accessToken);
-      console.log("🔄 Refresh Token:", data.refreshToken);
-      console.log("Storing admin auth data:", userData);
-
       localStorage.setItem("auth", JSON.stringify(userData));
       setIsAuthenticated(true);
-      window.location.href = "/admin";
+      navigate("/admin");
     } catch (err) {
       console.error("Login error:", err);
       setError(err.message || "Invalid credentials. Please try again.");

@@ -316,24 +316,6 @@ export default function AlumniHomePage() {
     };
   }, []);
 
-  // Close dropdown if click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowProfileMenu(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${isDarkMode
@@ -879,6 +861,7 @@ export default function AlumniHomePage() {
                       <img
                         src={feature.icon}
                         alt={feature.title}
+                        loading="lazy"
                         className={`w-14 h-14 object-contain ${isDarkMode ? "filter invert brightness-0" : ""
                           }`}
                       />
@@ -1011,6 +994,7 @@ export default function AlumniHomePage() {
                   <img
                     src={item.image}
                     alt={item.title}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                   <div
@@ -1155,7 +1139,7 @@ export default function AlumniHomePage() {
                   loop
                   muted
                   playsInline
-                  preload="auto"
+                  preload="metadata"
                   onLoadedMetadata={(e) => {
                     const video = e.target as HTMLVideoElement;
                     video.play().catch(() => {
@@ -1298,6 +1282,7 @@ export default function AlumniHomePage() {
                   transition={{ duration: 0.6 }}
                   src={job.image}
                   alt={job.company}
+                  loading="lazy"
                   className="w-12 h-12 rounded-lg object-cover border-2 border-blue-500"
                 />
                 <div className="flex-1">
@@ -1551,6 +1536,7 @@ export default function AlumniHomePage() {
                 <img
                   src={event.image}
                   alt={event.title}
+                  loading="lazy"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/30"></div>

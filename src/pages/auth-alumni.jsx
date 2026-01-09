@@ -173,12 +173,10 @@ export default function AlumniAuth({
       setShowMessage(true);
       setLoading(false);
 
-      // Wait a bit to ensure localStorage is fully written
-      setTimeout(() => {
-        console.log("🔄 Setting authentication and navigating...");
-        setIsAuthenticated(true);
-        navigate("/");
-      }, 500);
+      // Immediate navigation
+      console.log("🔄 Setting authentication and navigating...");
+      setIsAuthenticated(true);
+      navigate("/");
 
       window.history.replaceState({}, "", "/auth-alumni");
     }

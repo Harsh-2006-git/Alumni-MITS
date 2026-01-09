@@ -722,7 +722,7 @@ export default function LoginPage({
     console.log("✅ Final Login:", userData);
     localStorage.setItem("auth", JSON.stringify(userData));
     setIsAuthenticated(true);
-    window.location.href = "/";
+    navigate("/");
   };
 
   const handleRegistrationComplete = (data) => {
