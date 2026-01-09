@@ -6,22 +6,45 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// Lazy load all page components
-const LoginPage = lazy(() => import("./pages/LoginPage"));
-const HomePage = lazy(() => import("./pages/HomePage"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
-const DeveloperPage = lazy(() => import("./pages/DeveloperPage"));
-const AboutPage = lazy(() => import("./pages/AboutPage"));
-const JobPage = lazy(() => import("./pages/JobPage"));
-const AlumniPage = lazy(() => import("./pages/AlumniPage"));
-const EventPage = lazy(() => import("./pages/EventPage"));
-const Chatpage = lazy(() => import("./pages/ChatPage"));
-const AlumniAuth = lazy(() => import("./pages/auth-alumni"));
+// Standard imports for normal navigation speed
+import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
+import ProfilePage from "./pages/ProfilePage";
+import DeveloperPage from "./pages/DeveloperPage";
+import AboutPage from "./pages/AboutPage";
+import JobPage from "./pages/JobPage";
+import AlumniPage from "./pages/AlumniPage";
+import EventPage from "./pages/EventPage";
+import Chatpage from "./pages/ChatPage";
+import AlumniAuth from "./pages/auth-alumni";
+import AdminLoginPage from "./pages/AdminLogin";
+import CampaignPage from "./pages/campaignPage";
 
-const AdminLoginPage = lazy(() => import("./pages/AdminLogin"));
-const CampaignPage = lazy(() => import("./pages/campaignPage"));
+// Function-specific pages - also switched to standard for consistent UX
+import MyActivityPage from "./pages/ActivityPage";
+import MentorPage from "./pages/Mentor";
+import DistinguishedPage from "./pages/DistinguishAlumni";
+import ALumniMapPage from "./pages/AlumniMap";
+import BatchmatesPage from "./pages/Alumni-Batchmates";
+import CreateEventPage from "./pages/CreateEventPage";
+import EventGalleryPage from "./pages/EventGallary";
+import AlumniJobsPage from "./pages/AlumniJobs";
+import CreateJobPage from "./pages/CreateJob";
+import JobTrendPage from "./pages/JobTrend";
+import AlumniAnalyticsPage from "./pages/AlumniAnalytics";
+import CreateCampaignPage from "./pages/CreateCampaign";
+import MentorProfilePage from "./pages/MentorProfilePage";
+import MentorshipRequestsPage from "./pages/MentorshipRequestsPage";
+import ContactUsPage from "./pages/ContactUsPage";
+import RecruitmentPage from "./pages/RecruitmentPage";
+import BlogListing from "./pages/BlogListing";
+import CreateBlog from "./pages/CreateBlog";
+import BlogDetail from "./pages/BlogDetail";
 
-// Admin New Structure Imports
+// Admin New Structure Imports - keeping these lazy for now as they are a separate heavy section
+// Use standard imports only if the user complains about admin area speed too, but mostly they are checking main site.
+// Wait, if I mix lazy and standard, I still need Suspense for the lazy ones.
+// I'll keep Suspense wrapper but it won't trigger for standard components.
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const AdminDashboardMain = lazy(() => import("./pages/admin/Dashboard"));
 const AlumniManagement = lazy(() => import("./pages/admin/AlumniManagement"));
@@ -32,26 +55,6 @@ const CampaignManagement = lazy(() => import("./pages/admin/CampaignManagement")
 const JobsManagement = lazy(() => import("./pages/admin/JobsManagement"));
 const MentorshipManagement = lazy(() => import("./pages/admin/MentorshipManagement"));
 const BulkRegister = lazy(() => import("./pages/admin/BulkRegister"));
-
-const MyActivityPage = lazy(() => import("./pages/ActivityPage"));
-const MentorPage = lazy(() => import("./pages/Mentor"));
-const DistinguishedPage = lazy(() => import("./pages/DistinguishAlumni"));
-const ALumniMapPage = lazy(() => import("./pages/AlumniMap"));
-const BatchmatesPage = lazy(() => import("./pages/Alumni-Batchmates"));
-const CreateEventPage = lazy(() => import("./pages/CreateEventPage"));
-const EventGalleryPage = lazy(() => import("./pages/EventGallary"));
-const AlumniJobsPage = lazy(() => import("./pages/AlumniJobs"));
-const CreateJobPage = lazy(() => import("./pages/CreateJob"));
-const JobTrendPage = lazy(() => import("./pages/JobTrend"));
-const AlumniAnalyticsPage = lazy(() => import("./pages/AlumniAnalytics"));
-const CreateCampaignPage = lazy(() => import("./pages/CreateCampaign"));
-const MentorProfilePage = lazy(() => import("./pages/MentorProfilePage"));
-const MentorshipRequestsPage = lazy(() => import("./pages/MentorshipRequestsPage"));
-const ContactUsPage = lazy(() => import("./pages/ContactUsPage"));
-const RecruitmentPage = lazy(() => import("./pages/RecruitmentPage"));
-const BlogListing = lazy(() => import("./pages/BlogListing"));
-const CreateBlog = lazy(() => import("./pages/CreateBlog"));
-const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const BlogManagement = lazy(() => import("./pages/admin/BlogManagement"));
 
 import ProfilePhotoUpload from "./components/ProfilePhotoUpload";
