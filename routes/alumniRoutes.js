@@ -7,7 +7,6 @@ import {
   getStudentProfile,
   saveStudentProfile,
   uploadResume,
-  analyzeSkillsMatch,
   getAllAlumni,
   getAllAlumni2,
   getUnverifiedAlumni,
@@ -60,7 +59,6 @@ router.post(
   upload2.single("resume"),
   uploadResume
 );
-router.post("/analyze", authenticateAlumni, analyzeSkillsMatch);
 
 router.get("/profile", getLinkedInProfileByUrl);
 
