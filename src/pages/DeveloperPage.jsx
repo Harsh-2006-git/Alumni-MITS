@@ -22,7 +22,10 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function DeveloperPage({ isDarkMode, toggleTheme }) {
+import { useTheme } from "../context/ThemeContext";
+
+export default function DeveloperPage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   // Internships data
   const internships = [
     {
@@ -42,7 +45,7 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
         }`}
     >
       {/* Header */}
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Hero Section with Enhanced Profile Box */}
       <section className="container mx-auto px-4 sm:px-6 py-6 sm:py-10 text-center relative">
@@ -405,7 +408,7 @@ export default function DeveloperPage({ isDarkMode, toggleTheme }) {
       </section>
 
       {/* Footer */}
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
 
       {/* Custom CSS for shine animation */}
       <style>{`

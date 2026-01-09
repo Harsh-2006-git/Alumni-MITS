@@ -59,16 +59,14 @@ import { Contact } from "lucide-react";
 
 import { SocketProvider } from "./context/SocketContext";
 
+import { useTheme } from "./context/ThemeContext";
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
 
   // Simple auth check
   const checkAuth = () => {
@@ -125,8 +123,6 @@ export default function App() {
               path="/"
               element={
                 <HomePage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -142,8 +138,6 @@ export default function App() {
                 ) : (
                   <LoginPage
                     setIsAuthenticated={setIsAuthenticated}
-                    isDarkMode={isDarkMode}
-                    toggleTheme={toggleTheme}
                   />
                 )
               }
@@ -158,8 +152,6 @@ export default function App() {
                 ) : (
                   <AlumniAuth
                     setIsAuthenticated={setIsAuthenticated}
-                    isDarkMode={isDarkMode}
-                    toggleTheme={toggleTheme}
                   />
                 )
               }
@@ -174,8 +166,6 @@ export default function App() {
                 ) : (
                   <AlumniAuth
                     setIsAuthenticated={setIsAuthenticated}
-                    isDarkMode={isDarkMode}
-                    toggleTheme={toggleTheme}
                   />
                 )
               }
@@ -194,8 +184,6 @@ export default function App() {
                 ) : (
                   <AdminLoginPage
                     setIsAuthenticated={setIsAuthenticated}
-                    isDarkMode={isDarkMode}
-                    toggleTheme={toggleTheme}
                   />
                 );
               })()}
@@ -206,36 +194,36 @@ export default function App() {
               path="/admin"
               element={
                 isAuthenticated && currentUser?.userType === "admin" ? (
-                  <AdminLayout isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+                  <AdminLayout />
                 ) : (
                   <Navigate to="/login-admin" replace />
                 )
               }
             >
-              <Route index element={<AdminDashboardMain isDarkMode={isDarkMode} />} />
-              <Route path="alumni" element={<AlumniManagement isDarkMode={isDarkMode} />} />
-              <Route path="pending" element={<PendingRequests isDarkMode={isDarkMode} />} />
-              <Route path="students" element={<StudentManagement isDarkMode={isDarkMode} />} />
-              <Route path="events" element={<EventManagement isDarkMode={isDarkMode} />} />
-              <Route path="campaigns" element={<CampaignManagement isDarkMode={isDarkMode} />} />
-              <Route path="jobs" element={<JobsManagement isDarkMode={isDarkMode} />} />
-              <Route path="mentorship" element={<MentorshipManagement isDarkMode={isDarkMode} />} />
-              <Route path="blogs" element={<BlogManagement isDarkMode={isDarkMode} />} />
-              <Route path="bulk-register" element={<BulkRegister isDarkMode={isDarkMode} />} />
+              <Route index element={<AdminDashboardMain />} />
+              <Route path="alumni" element={<AlumniManagement />} />
+              <Route path="pending" element={<PendingRequests />} />
+              <Route path="students" element={<StudentManagement />} />
+              <Route path="events" element={<EventManagement />} />
+              <Route path="campaigns" element={<CampaignManagement />} />
+              <Route path="jobs" element={<JobsManagement />} />
+              <Route path="mentorship" element={<MentorshipManagement />} />
+              <Route path="blogs" element={<BlogManagement />} />
+              <Route path="bulk-register" element={<BulkRegister />} />
             </Route>
 
             {/* Blogs */}
             <Route
               path="/blogs"
-              element={<BlogListing isDarkMode={isDarkMode} toggleTheme={toggleTheme} isAuthenticated={isAuthenticated} />}
+              element={<BlogListing isAuthenticated={isAuthenticated} />}
             />
             <Route
               path="/blog/:id"
-              element={<BlogDetail isDarkMode={isDarkMode} toggleTheme={toggleTheme} isAuthenticated={isAuthenticated} />}
+              element={<BlogDetail isAuthenticated={isAuthenticated} />}
             />
             <Route
               path="/create-blog"
-              element={<CreateBlog isDarkMode={isDarkMode} toggleTheme={toggleTheme} />}
+              element={<CreateBlog />}
             />
 
 
@@ -270,8 +258,6 @@ export default function App() {
               path="/developer"
               element={
                 <DeveloperPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -281,8 +267,6 @@ export default function App() {
               path="/about"
               element={
                 <AboutPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -292,8 +276,6 @@ export default function App() {
               path="/contact-us"
               element={
                 <ContactUsPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -303,8 +285,6 @@ export default function App() {
               path="/distinguished-alumni"
               element={
                 <DistinguishedPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -314,8 +294,6 @@ export default function App() {
               path="/alumni-map"
               element={
                 <ALumniMapPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -326,8 +304,6 @@ export default function App() {
               path="/batchmates"
               element={
                 <BatchmatesPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -337,8 +313,6 @@ export default function App() {
               path="/alumni-analytics"
               element={
                 <AlumniAnalyticsPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -348,8 +322,6 @@ export default function App() {
               path="/mentor"
               element={
                 <MentorPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -359,8 +331,6 @@ export default function App() {
               path="/mentor-profile"
               element={
                 <MentorProfilePage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -370,8 +340,6 @@ export default function App() {
               path="/mentorship-requests"
               element={
                 <MentorshipRequestsPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -381,8 +349,6 @@ export default function App() {
               path="/job"
               element={
                 <AlumniJobsPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -392,8 +358,6 @@ export default function App() {
               path="/autoposted-jobs"
               element={
                 <JobPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -403,8 +367,6 @@ export default function App() {
               path="/create-job"
               element={
                 <CreateJobPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -414,8 +376,6 @@ export default function App() {
               path="/job-trends"
               element={
                 <JobTrendPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -425,8 +385,6 @@ export default function App() {
               path="/alumni"
               element={
                 <AlumniPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -436,8 +394,6 @@ export default function App() {
               path="/event"
               element={
                 <EventPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -447,8 +403,6 @@ export default function App() {
               path="/event-register"
               element={
                 <CreateEventPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -458,8 +412,6 @@ export default function App() {
               path="/event-gallery"
               element={
                 <EventGalleryPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -469,8 +421,6 @@ export default function App() {
               path="/campaign"
               element={
                 <CampaignPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -480,8 +430,6 @@ export default function App() {
               path="/campaigns"
               element={
                 <CampaignPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                   setIsAuthenticated={setIsAuthenticated}
                 />
@@ -491,8 +439,6 @@ export default function App() {
               path="/create-campaign"
               element={
                 <CreateCampaignPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                 />
               }
@@ -504,8 +450,6 @@ export default function App() {
               path="/recruitment"
               element={
                 <RecruitmentPage
-                  isDarkMode={isDarkMode}
-                  toggleTheme={toggleTheme}
                   isAuthenticated={isAuthenticated}
                 />
               }
@@ -517,8 +461,6 @@ export default function App() {
               element={
                 isAuthenticated ? (
                   <Chatpage
-                    isDarkMode={isDarkMode}
-                    toggleTheme={toggleTheme}
                     isAuthenticated={isAuthenticated}
                     setIsAuthenticated={setIsAuthenticated}
                   />
@@ -533,8 +475,6 @@ export default function App() {
               element={
                 isAuthenticated ? (
                   <MyActivityPage
-                    isDarkMode={isDarkMode}
-                    toggleTheme={toggleTheme}
                     isAuthenticated={isAuthenticated}
                     setIsAuthenticated={setIsAuthenticated}
                   />
@@ -566,7 +506,6 @@ export default function App() {
             setShowPhotoUpload(false);
             sessionStorage.setItem("skippedPhotoUpload", "true");
           }}
-          isDarkMode={isDarkMode}
         />
       </SocketProvider>
     </div>

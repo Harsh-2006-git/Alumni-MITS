@@ -18,7 +18,10 @@ import AuthPopup from "../components/AuthPopup";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-const BlogListing = ({ isDarkMode, toggleTheme, isAuthenticated }) => {
+import { useTheme } from "../context/ThemeContext";
+
+const BlogListing = ({ isAuthenticated }) => {
+    const { isDarkMode, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -73,12 +76,11 @@ const BlogListing = ({ isDarkMode, toggleTheme, isAuthenticated }) => {
 
     return (
         <div className={`min-h-screen transition-all duration-300 ${isDarkMode ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950" : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"}`}>
-            <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            <Header />
 
             <AuthPopup
                 isOpen={isAuthPopupOpen}
                 onClose={() => setIsAuthPopupOpen(false)}
-                isDarkMode={isDarkMode}
                 isAuthenticated={isAuthenticated}
             />
 
@@ -237,7 +239,7 @@ const BlogListing = ({ isDarkMode, toggleTheme, isAuthenticated }) => {
                 </div>
             </main>
 
-            <Footer isDarkMode={isDarkMode} />
+            <Footer />
         </div>
     );
 };

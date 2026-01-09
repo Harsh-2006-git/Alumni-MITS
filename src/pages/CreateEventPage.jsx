@@ -62,7 +62,10 @@ const Message = ({ type, message, onClose }) => {
   );
 };
 
-export default function CreateEventPage({ isDarkMode, toggleTheme }) {
+import { useTheme } from "../context/ThemeContext";
+
+export default function CreateEventPage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -398,12 +401,12 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+      className={`min-h-screen transition-colors duration-300 ${isDarkMode
         ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
         : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Global Message Display */}
       {showMessage && (
@@ -902,7 +905,7 @@ export default function CreateEventPage({ isDarkMode, toggleTheme }) {
         </div>
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
 
       <style>{`
         @keyframes fadeIn {

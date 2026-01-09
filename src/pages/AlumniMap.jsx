@@ -6,11 +6,12 @@ import AuthPopup from "../components/AuthPopup";
 import AlumniProfileModal from "../components/AlumniProfileModal";
 import { cityCoordinates } from "../data/cities";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+import { useTheme } from "../context/ThemeContext";
+
 export default function AlumniMap({
-  isDarkMode,
-  toggleTheme,
   isAuthenticated,
 }) {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [alumniData, setAlumniData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAlumni, setSelectedAlumni] = useState(null);
@@ -311,7 +312,7 @@ export default function AlumniMap({
         : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       <section className="container mx-auto px-4 sm:px-10 lg:px-16 py-0">
         <div className="relative z-10">
@@ -393,7 +394,6 @@ export default function AlumniMap({
       <AuthPopup
         isOpen={showAuthPopup}
         onClose={() => setShowAuthPopup(false)}
-        isDarkMode={isDarkMode}
         isAuthenticated={isAuthenticated}
       />
 
@@ -402,14 +402,13 @@ export default function AlumniMap({
         <AlumniProfileModal
           alumni={selectedAlumni}
           onClose={closeModal}
-          isDarkMode={isDarkMode}
           getCurrentCompany={getCurrentCompany}
           getCurrentDesignation={getCurrentDesignation}
           isAuthenticated={isAuthenticated}
         />
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 }

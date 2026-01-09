@@ -19,7 +19,10 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { useSocket } from "../context/SocketContext";
 
-const ChatApp = ({ isDarkMode, toggleTheme }) => {
+import { useTheme } from "../context/ThemeContext";
+
+const ChatApp = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
   const { socket, onlineUsers } = useSocket(); // Socket.IO connection and online status
   const [people, setPeople] = useState([]);
   const [recentChats, setRecentChats] = useState([]);
@@ -735,12 +738,14 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
 
   return (
     <div
-      className={`h-screen flex flex-col overflow-hidden ${isDarkMode ? "bg-slate-950" : "bg-gray-200"
+      className={`h-screen flex flex-col overflow-hidden transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
       {/* Header */}
       <div className="flex-shrink-0">
-        <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+        <Header />
       </div>
 
       <div className="flex-1 flex overflow-hidden my-4 mx-4 gap-4 min-h-0">
@@ -1720,7 +1725,7 @@ const ChatApp = ({ isDarkMode, toggleTheme }) => {
       )}
 
       <div className="flex-shrink-0">
-        <Footer isDarkMode={isDarkMode} />
+        <Footer />
       </div>
     </div>
   );

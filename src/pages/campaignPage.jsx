@@ -34,7 +34,10 @@ import Footer from "../components/footer";
 import Toast from "../components/Toast";
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-export default function CampaignPage({ isDarkMode, toggleTheme }) {
+import { useTheme } from "../context/ThemeContext";
+
+export default function CampaignPage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
@@ -540,7 +543,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
         : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Hero Section */}
       <section className="text-center py-12 sm:py-16 lg:py-8 px-4 sm:px-6">
@@ -2122,7 +2125,7 @@ export default function CampaignPage({ isDarkMode, toggleTheme }) {
         />
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div >
   );
 }

@@ -17,11 +17,12 @@ import Footer from "../components/footer";
 import AuthPopup from "../components/AuthPopup";
 import AlumniProfileModal from "../components/AlumniProfileModal";
 
+import { useTheme } from "../context/ThemeContext";
+
 export default function BatchmatesFinder({
-  isDarkMode,
-  toggleTheme,
   isAuthenticated,
 }) {
+  const { isDarkMode } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedBatch, setSelectedBatch] = useState("All Batches");
   const [selectedDepartment, setSelectedDepartment] =
@@ -252,7 +253,7 @@ export default function BatchmatesFinder({
         : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-0">
         <div className="relative z-10">
@@ -827,7 +828,7 @@ export default function BatchmatesFinder({
         />
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 }

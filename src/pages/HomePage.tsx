@@ -119,7 +119,10 @@ interface HomePageProps {
   toggleTheme: () => void;
 }
 
-const FAQItem = ({ question, answer, isDarkMode }: { question: string, answer: string, isDarkMode: boolean }) => {
+import { useTheme } from "../context/ThemeContext";
+
+const FAQItem = ({ question, answer }: { question: string, answer: string }) => {
+  const { isDarkMode } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -169,10 +172,8 @@ const FAQItem = ({ question, answer, isDarkMode }: { question: string, answer: s
   );
 };
 
-export default function AlumniHomePage({
-  isDarkMode,
-  toggleTheme,
-}: HomePageProps) {
+export default function AlumniHomePage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -341,7 +342,7 @@ export default function AlumniHomePage({
         }`}
     >
       {/* Header / Navbar */}
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
       {/* Hero Section */}
       <section
         className={`w-full px-4 sm:px-6 md:px-12 lg:px-16 py-8 sm:py-12 relative overflow-hidden transition-colors duration-500 ${isDarkMode
@@ -1466,7 +1467,7 @@ export default function AlumniHomePage({
             className={`text-2xl sm:text-3xl md:text-5xl font-black mb-3 sm:mb-4 tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
               }`}
           >
-            Upcoming <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Events</span>
+            Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500">Events</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -1485,43 +1486,43 @@ export default function AlumniHomePage({
               title: "Fusion Fiesta",
               description:
                 "Annual alumni reunion with networking, music, and cultural performances",
-              type: "reunion",
-              status: "Upcoming",
-              venue: "LDRP-ITR",
-              location: "Gandhinagar",
-              date: "December 4th, 2024",
-              time: "9:10 AM",
+              type: "fest",
+              status: "Done",
+              venue: "SAC Hall",
+              location: "MITS Gwalior",
+              date: "April 5th, 2024",
+              time: "5:00 PM",
               spots: "200 spots left",
               image:
-                "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                "https://cdn.evbuc.com/images/731735339/1351181975143/1/logo.20240330-023221",
             },
             {
               title: "Data Science Bootcamp",
               description:
                 "A 3-day hands-on workshop on Machine Learning and Data Analytics",
               type: "webinar",
-              status: "Upcoming",
-              venue: "Conference Hall",
-              location: "Ahmedabad",
-              date: "December 9th, 2024",
-              time: "6:55 PM",
+              status: "Done",
+              venue: "Online",
+              location: "Delhi",
+              date: "December 9th, 2025",
+              time: "6:00 PM",
               spots: "200 spots left",
               image:
-                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                "https://mathematicalmysteries.org/wp-content/uploads/2022/01/dataquest-what-is-data-science.jpg",
             },
             {
-              title: "AI ML Webinar",
+              title: "MITS-AA Ehsas",
               description:
-                "A comprehensive webinar on Artificial Intelligence and Machine Learning trends",
-              type: "webinar",
-              status: "Upcoming",
+                "A MITS Alumni Association Annual meet",
+              type: "Event",
+              status: "Done",
               venue: "Venue TBA",
-              location: "Location TBA",
+              location: "New Delhi",
               date: "December 12th, 2024",
               time: "3:15 PM",
               spots: "199 spots left",
               image:
-                "https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+                "https://th.bing.com/th/id/OIP.SnbWEqTM-MnZ8UUgHScqGAHaCy?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3",
             },
           ].map((event, idx) => (
             <motion.div
@@ -1996,7 +1997,7 @@ export default function AlumniHomePage({
         </div>
       </div>
       {/* Chapters & Associations */}
-      <ScrollingChapters isDarkMode={isDarkMode} />
+      <ScrollingChapters />
 
 
       {/* Empty Parallax Scroll Section - Moved to Bottom */}
@@ -2086,7 +2087,6 @@ export default function AlumniHomePage({
                 key={index}
                 question={faq.q}
                 answer={faq.a}
-                isDarkMode={isDarkMode}
               />
             ))}
           </motion.div>
@@ -2094,7 +2094,7 @@ export default function AlumniHomePage({
       </section>
 
       {/* Footer */}
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 }

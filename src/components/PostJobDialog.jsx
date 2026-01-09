@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { X, Plus, Loader2 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 // Post Job Dialog Component
-const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
+const PostJobDialog = ({ isOpen, onClose, onSubmit }) => {
+  const { isDarkMode } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -78,44 +80,39 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div
-        className={`relative w-[90vw] h-[90vh] sm:w-full sm:max-w-4xl sm:h-auto sm:max-h-[90vh] overflow-hidden rounded-xl border ${
-          isDarkMode
-            ? "bg-slate-900 border-slate-700"
-            : "bg-white border-gray-200"
-        } shadow-2xl transform transition-all duration-300`}
+        className={`relative w-[90vw] h-[90vh] sm:w-full sm:max-w-4xl sm:h-auto sm:max-h-[90vh] overflow-hidden rounded-xl border ${isDarkMode
+          ? "bg-slate-900 border-slate-700"
+          : "bg-white border-gray-200"
+          } shadow-2xl transform transition-all duration-300`}
       >
         {/* Header - Sticky */}
         <div
-          className={`sticky top-0 z-10 p-4 sm:p-6 border-b backdrop-blur-lg ${
-            isDarkMode
-              ? "bg-slate-900/95 border-slate-700"
-              : "bg-white/95 border-gray-200"
-          }`}
+          className={`sticky top-0 z-10 p-4 sm:p-6 border-b backdrop-blur-lg ${isDarkMode
+            ? "bg-slate-900/95 border-slate-700"
+            : "bg-white/95 border-gray-200"
+            }`}
         >
           <div className="flex items-center justify-between">
             <div className="flex-1">
               <h2
-                className={`text-xl sm:text-2xl font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}
+                className={`text-xl sm:text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
               >
                 Post a New Job
               </h2>
               <p
-                className={`text-sm mt-1 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Fill in the details to create a job posting
               </p>
             </div>
             <button
               onClick={onClose}
-              className={`p-2 rounded-lg transition-all hover:scale-110 ${
-                isDarkMode
-                  ? "bg-slate-800 hover:bg-slate-700 text-gray-300"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-600"
-              }`}
+              className={`p-2 rounded-lg transition-all hover:scale-110 ${isDarkMode
+                ? "bg-slate-800 hover:bg-slate-700 text-gray-300"
+                : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                }`}
             >
               <X className="w-5 h-5" />
             </button>
@@ -129,9 +126,8 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
               {/* Job Title */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Job Title *
                 </label>
@@ -142,20 +138,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="e.g., Senior Software Engineer"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Company Name */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Company Name *
                 </label>
@@ -166,20 +160,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="e.g., Google"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Company Logo URL */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Company Logo URL *
                 </label>
@@ -190,20 +182,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="https://example.com/logo.png"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Job Type */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Job Type *
                 </label>
@@ -212,11 +202,10 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   value={formData.type}
                   onChange={handleChange}
                   required
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 >
                   <option value="full-time">Full Time</option>
                   <option value="part-time">Part Time</option>
@@ -228,9 +217,8 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
               {/* Location */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Location *
                 </label>
@@ -241,20 +229,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="e.g., Bangalore, India"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Salary Range */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Salary Range *
                 </label>
@@ -265,20 +251,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="e.g., ₹20.0L - ₹22.0L"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Experience Required */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Experience Required *
                 </label>
@@ -289,20 +273,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="e.g., 4-6 years"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Category */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Category *
                 </label>
@@ -313,20 +295,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="e.g., AI Analysis"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Application Deadline */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Application Deadline *
                 </label>
@@ -336,20 +316,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   value={formData.applicationDeadline}
                   onChange={handleChange}
                   required
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Closed Date */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Closed Date *
                 </label>
@@ -359,20 +337,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   value={formData.closedDate}
                   onChange={handleChange}
                   required
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
               {/* Company Website */}
               <div className="space-y-2">
                 <label
-                  className={`block text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Company Website *
                 </label>
@@ -383,11 +359,10 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   onChange={handleChange}
                   required
                   placeholder="https://www.company.com"
-                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                    isDarkMode
-                      ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                      : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                  className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                    } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
                 />
               </div>
 
@@ -403,9 +378,8 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                 />
                 <label
                   htmlFor="verified"
-                  className={`text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Verified Job Posting
                 </label>
@@ -415,9 +389,8 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
             {/* Job Description */}
             <div className="space-y-2">
               <label
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
               >
                 Job Description *
               </label>
@@ -428,20 +401,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                 required
                 rows={4}
                 placeholder="Describe the job role, responsibilities, and what makes this opportunity great..."
-                className={`w-full px-3 py-2.5 rounded-lg border transition-all resize-none text-sm ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                className={`w-full px-3 py-2.5 rounded-lg border transition-all resize-none text-sm ${isDarkMode
+                  ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                  : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
               />
             </div>
 
             {/* Required Skills */}
             <div className="space-y-2">
               <label
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
               >
                 Required Skills * (comma-separated)
               </label>
@@ -452,20 +423,18 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                 onChange={handleChange}
                 required
                 placeholder="e.g., Python, Machine Learning, TensorFlow"
-                className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                  ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                  : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
               />
             </div>
 
             {/* Qualifications */}
             <div className="space-y-2">
               <label
-                className={`block text-sm font-medium ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`block text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
               >
                 Qualifications * (comma-separated)
               </label>
@@ -476,11 +445,10 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                 onChange={handleChange}
                 required
                 placeholder="e.g., Bachelor's in Computer Science, 4+ years experience"
-                className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${
-                  isDarkMode
-                    ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
-                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
-                } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
+                className={`w-full px-3 py-2.5 rounded-lg border transition-all text-sm ${isDarkMode
+                  ? "bg-slate-800 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500"
+                  : "bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500"
+                  } focus:ring-2 focus:ring-blue-500/20 focus:outline-none`}
               />
             </div>
 
@@ -492,11 +460,10 @@ const PostJobDialog = ({ isOpen, onClose, isDarkMode, onSubmit }) => {
                   resetForm();
                   onClose();
                 }}
-                className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all text-sm ${
-                  isDarkMode
-                    ? "bg-slate-800 hover:bg-slate-700 text-white"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-900"
-                }`}
+                className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all text-sm ${isDarkMode
+                  ? "bg-slate-800 hover:bg-slate-700 text-white"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-900"
+                  }`}
               >
                 Cancel
               </button>

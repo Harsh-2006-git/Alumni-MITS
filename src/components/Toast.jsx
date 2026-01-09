@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { CheckCircle2, XCircle, AlertCircle, X } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 const Toast = ({ message, type, onClose }) => {
+  const { isDarkMode } = useTheme();
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -13,14 +15,14 @@ const Toast = ({ message, type, onClose }) => {
     type === "success"
       ? "bg-green-500"
       : type === "error"
-      ? "bg-red-500"
-      : "bg-blue-500";
+        ? "bg-red-500"
+        : "bg-blue-500";
   const Icon =
     type === "success"
       ? CheckCircle2
       : type === "error"
-      ? XCircle
-      : AlertCircle;
+        ? XCircle
+        : AlertCircle;
 
   return (
     <div

@@ -4,11 +4,12 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import AuthPopup from "../components/AuthPopup";
 
+import { useTheme } from "../context/ThemeContext";
+
 export default function CreateCampaignPage({
-  isDarkMode,
-  toggleTheme,
   isAuthenticated,
 }) {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [createLoading, setCreateLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -233,105 +234,106 @@ export default function CreateCampaignPage({
 
   // Custom hero section for create campaign page
   const CreateCampaignHeroSection = ({
-    isDarkMode,
     onCreateCampaign,
     isUserLoggedIn,
-  }) => (
-    <section className="text-center py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
-          <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
-            Create Campaign
-          </h1>
-          <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
-        </div>
-
-        <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
-          Launch Your Vision, Inspire Change
-        </p>
-
-        <p
-          className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"
-            }`}
-        >
-          Share your innovative project with the MITS community and get the
-          support you need to make it happen.
-        </p>
-
-        <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
-
-        {!isUserLoggedIn && (
-          <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 max-w-md mx-auto">
-            <p
-              className={`text-sm ${isDarkMode ? "text-yellow-300" : "text-yellow-700"
-                }`}
-            >
-              💡 Please login to create campaigns and access all features
-            </p>
+  }) => {
+    const { isDarkMode } = useTheme();
+    return (
+      <section className="text-center py-12 sm:py-16 lg:py-20 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500 bg-clip-text text-transparent leading-tight pb-1">
+              Create Campaign
+            </h1>
+            <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
           </div>
-        )}
 
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-          <button
-            onClick={onCreateCampaign}
-            className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
-          >
-            <Plus className="w-5 h-5" /> Create Campaign
-          </button>
-        </div>
+          <p className="text-lg sm:text-xl lg:text-2xl mb-2 sm:mb-3 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent font-semibold">
+            Launch Your Vision, Inspire Change
+          </p>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-          <div
-            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+          <p
+            className={`text-sm sm:text-base md:text-lg mb-4 sm:mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
           >
-            <Upload className="w-8 h-8 text-blue-500 mb-2" />
-            <h3 className="font-semibold mb-2">Easy Campaign Creation</h3>
-            <p
-              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+            Share your innovative project with the MITS community and get the
+            support you need to make it happen.
+          </p>
+
+          <div className="w-24 sm:w-32 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 mx-auto rounded-full mb-6 sm:mb-8"></div>
+
+          {!isUserLoggedIn && (
+            <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 max-w-md mx-auto">
+              <p
+                className={`text-sm ${isDarkMode ? "text-yellow-300" : "text-yellow-700"
+                  }`}
+              >
+                💡 Please login to create campaigns and access all features
+              </p>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <button
+              onClick={onCreateCampaign}
+              className="flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-full font-semibold shadow-xl hover:scale-105 transition-all active:scale-95"
             >
-              Fill out a simple form to launch your campaign and start receiving
-              support.
-            </p>
+              <Plus className="w-5 h-5" /> Create Campaign
+            </button>
           </div>
 
-          <div
-            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-              }`}
-          >
-            <Sparkles className="w-8 h-8 text-green-500 mb-2" />
-            <h3 className="font-semibold mb-2">Reach Supporters</h3>
-            <p
-              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+            <div
+              className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
                 }`}
             >
-              Your campaign will be visible to MITS alumni and students who want
-              to support great ideas.
-            </p>
-          </div>
+              <Upload className="w-8 h-8 text-blue-500 mb-2" />
+              <h3 className="font-semibold mb-2">Easy Campaign Creation</h3>
+              <p
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
+                Fill out a simple form to launch your campaign and start receiving
+                support.
+              </p>
+            </div>
 
-          <div
-            className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
-              }`}
-          >
-            <Users className="w-8 h-8 text-purple-500 mb-2" />
-            <h3 className="font-semibold mb-2">Build Community</h3>
-            <p
-              className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+            <div
+              className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
                 }`}
             >
-              Connect with like-minded individuals from the MITS community and
-              grow your network.
-            </p>
+              <Sparkles className="w-8 h-8 text-green-500 mb-2" />
+              <h3 className="font-semibold mb-2">Reach Supporters</h3>
+              <p
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
+                Your campaign will be visible to MITS alumni and students who want
+                to support great ideas.
+              </p>
+            </div>
+
+            <div
+              className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-white shadow-sm"
+                }`}
+            >
+              <Users className="w-8 h-8 text-purple-500 mb-2" />
+              <h3 className="font-semibold mb-2">Build Community</h3>
+              <p
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
+              >
+                Connect with like-minded individuals from the MITS community and
+                grow your network.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
+      </section>
+    );
+  };
 
-  // Show loading while checking authentication
   if (isCheckingAuth) {
     return (
       <div
@@ -355,19 +357,17 @@ export default function CreateCampaignPage({
         : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {showAuthPopup && (
         <AuthPopup
           isOpen={showAuthPopup}
           onClose={() => setShowAuthPopup(false)}
-          isDarkMode={isDarkMode}
           isAuthenticated={!!userInfo}
         />
       )}
 
       <CreateCampaignHeroSection
-        isDarkMode={isDarkMode}
         onCreateCampaign={handleCreateCampaignClick}
         isUserLoggedIn={!!userInfo}
       />
@@ -851,7 +851,7 @@ export default function CreateCampaignPage({
         </div>
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 }

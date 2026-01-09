@@ -71,7 +71,10 @@ const Message = ({ type, message, onClose }) => {
 
 
 
-export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
+import { useTheme } from "../context/ThemeContext";
+
+export default function AlumniEventsPage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
@@ -327,7 +330,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
       <Message
         type={message.type}
         message={message.text}
@@ -958,7 +961,7 @@ export default function AlumniEventsPage({ isDarkMode, toggleTheme }) {
         </div>
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
       {showAuthPopup && (
         <AuthPopup
           isOpen={showAuthPopup}

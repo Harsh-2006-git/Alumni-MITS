@@ -1,7 +1,8 @@
-
+import { useTheme } from "../context/ThemeContext";
 import { CheckCircle, ArrowRight } from "lucide-react";
 
-export default function VerificationPendingPopup({ isOpen, onClose, isDarkMode }) {
+export default function VerificationPendingPopup({ isOpen, onClose }) {
+    const { isDarkMode } = useTheme();
     if (!isOpen) return null;
 
     return (
@@ -28,8 +29,8 @@ export default function VerificationPendingPopup({ isOpen, onClose, isDarkMode }
                     <button
                         onClick={onClose}
                         className={`w-full py-3 rounded-xl font-semibold text-white shadow-lg shadow-purple-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 ${isDarkMode
-                                ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
-                                : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                            ? "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+                            : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                             }`}
                     >
                         Return to Home

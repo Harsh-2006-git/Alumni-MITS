@@ -35,11 +35,12 @@ import {
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
+import { useTheme } from "../context/ThemeContext";
+
 export default function AlumniAnalytics({
-  isDarkMode,
-  toggleTheme,
   isAuthenticated,
 }) {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [alumniData, setAlumniData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("all");
@@ -411,7 +412,7 @@ export default function AlumniAnalytics({
           </div>
         </section>
 
-        <Footer isDarkMode={isDarkMode} />
+        <Footer />
       </div>
     );
   }

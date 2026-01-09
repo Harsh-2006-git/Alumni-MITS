@@ -41,8 +41,10 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { branches } from "../data/branches";
 
+import { useTheme } from "../context/ThemeContext";
+
 export default function AlumniProfilePage() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showPhotoUpload, setShowPhotoUpload] = useState(false);
   const [activeSection, setActiveSection] = useState("overview");
@@ -470,7 +472,6 @@ export default function AlumniProfilePage() {
     setFormData({ ...formData, [field]: updated });
   };
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const renderPhotoUploadModal = () => {
@@ -2151,7 +2152,7 @@ export default function AlumniProfilePage() {
       {renderPhotoUploadModal()}
       {renderEditModal()}
       {renderResumeUploadModal()}
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Hero Banner */}
       <div
@@ -2205,8 +2206,8 @@ export default function AlumniProfilePage() {
               <button
                 onClick={() => setShowPhotoModal(true)}
                 className={`absolute -bottom-2 -right-2 p-2 rounded-full shadow-xl border-2 transition-all hover:scale-110 z-20 group/edit ${isDarkMode
-                    ? "bg-slate-800 text-blue-400 border-blue-600/50 hover:bg-slate-700"
-                    : "bg-white text-blue-600 border-blue-100 hover:bg-blue-50"
+                  ? "bg-slate-800 text-blue-400 border-blue-600/50 hover:bg-slate-700"
+                  : "bg-white text-blue-600 border-blue-100 hover:bg-blue-50"
                   }`}
                 title="Change Profile Photo"
               >
@@ -2386,7 +2387,7 @@ export default function AlumniProfilePage() {
         <div className="mt-4 sm:mt-6">{renderContent()}</div>
       </div>
 
-      {<Footer isDarkMode={isDarkMode} />}
+      <Footer />
     </div>
   );
 }

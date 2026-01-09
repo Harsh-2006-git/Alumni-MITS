@@ -23,7 +23,10 @@ import { branches } from "../data/branches";
 const currentYear = new Date().getFullYear();
 const batchYears = Array.from({ length: currentYear + 1 - 1960 }, (_, i) => 1960 + i).reverse();
 
-const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
+import { useTheme } from "../context/ThemeContext";
+
+const MentorProfile = () => {
+    const { isDarkMode, toggleTheme } = useTheme();
     const [myMentorProfile, setMyMentorProfile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showMentorForm, setShowMentorForm] = useState(false);
@@ -228,11 +231,11 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         return (
             <div
                 className={`min-h-screen transition-colors duration-500 ${isDarkMode
-                    ? "bg-slate-950 text-white"
-                    : "bg-slate-50 text-gray-900"
+                    ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+                    : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
                     }`}
             >
-                <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+                <Header />
 
                 <section className="container mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 text-center">
                     <div className="max-w-4xl mx-auto">
@@ -272,7 +275,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                     </div>
                 </div>
 
-                <Footer isDarkMode={isDarkMode} />
+                <Footer />
             </div>
         );
     }
@@ -282,11 +285,11 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         return (
             <div
                 className={`min-h-screen transition-colors duration-500 ${isDarkMode
-                    ? "bg-slate-950 text-white"
-                    : "bg-slate-50 text-gray-900"
+                    ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+                    : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
                     }`}
             >
-                <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+                <Header />
 
                 <section className="container mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 text-center">
                     <div className="max-w-4xl mx-auto">
@@ -321,7 +324,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                     </div>
                 </div>
 
-                <Footer isDarkMode={isDarkMode} />
+                <Footer />
             </div>
         );
     }
@@ -330,12 +333,12 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
     if (loading && !myMentorProfile) {
         return (
             <div
-                className={`min-h-screen ${isDarkMode
-                    ? "bg-slate-950"
-                    : "bg-slate-50"
+                className={`min-h-screen transition-colors duration-500 ${isDarkMode
+                    ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+                    : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
                     }`}
             >
-                <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+                <Header />
 
                 <div className="flex items-center justify-center min-h-[60vh]">
                     <div className="text-center">
@@ -349,7 +352,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                     </div>
                 </div>
 
-                <Footer isDarkMode={isDarkMode} />
+                <Footer />
             </div>
         );
     }
@@ -362,7 +365,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                 : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
                 }`}
         >
-            <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            <Header />
 
             {/* Notification Toast */}
             {notification && (
@@ -617,7 +620,7 @@ const MentorProfile = ({ isDarkMode = false, toggleTheme = () => { } }) => {
                 </div>
             </section>
 
-            <Footer isDarkMode={isDarkMode} />
+            <Footer />
 
             {/* Mentor Profile Form Modal */}
             {showMentorForm && (

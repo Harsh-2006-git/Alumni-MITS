@@ -434,8 +434,11 @@ function AlumniCard({ alumnus, isDarkMode }) {
   );
 }
 
+import { useTheme } from "../context/ThemeContext";
+
 // Main Component (your original component)
-export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
+export default function DistinguishedAlumni() {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCity, setSelectedCity] = useState("All");
 
@@ -470,8 +473,11 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
   const totalAlumni = alumni.length;
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? "bg-slate-900" : "bg-white"}`}>
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+    <div className={`min-h-screen transition-colors duration-500 ${isDarkMode
+      ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+      : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+      }`}>
+      <Header />
 
       {/* Hero Section */}
       <section className="w-full px-4 py-8">
@@ -681,7 +687,7 @@ export default function DistinguishedAlumni({ isDarkMode, toggleTheme }) {
         </div>
       </section>
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 }

@@ -14,7 +14,10 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function ContactPage({ isDarkMode, toggleTheme }) {
+import { useTheme } from "../context/ThemeContext";
+
+export default function ContactPage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -110,14 +113,13 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
     >
       {/* Header */}
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16 text-center">
@@ -140,11 +142,10 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-16">
         <div className="max-w-6xl mx-auto">
           <div
-            className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12 border-2 shadow-2xl transition-all ${
-              isDarkMode
+            className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12 border-2 shadow-2xl transition-all ${isDarkMode
                 ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 backdrop-blur-sm border-blue-600/20"
                 : "bg-gradient-to-br from-white to-blue-100/80 backdrop-blur-sm border-blue-200 shadow-xl"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 lg:mb-8">
               <Building className="w-7 h-7 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-cyan-400 flex-shrink-0" />
@@ -153,9 +154,8 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
               </h2>
             </div>
             <p
-              className={`text-base sm:text-base lg:text-lg mb-6 sm:mb-8 ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-base sm:text-base lg:text-lg mb-6 sm:mb-8 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               Our flagship campus is conveniently located in the heart of the
               city, offering state-of-the-art facilities in a modern academic
@@ -177,16 +177,14 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                       <a
                         key={index}
                         href={item.link}
-                        className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg sm:rounded-xl transition-all hover:scale-105 ${
-                          isDarkMode
+                        className={`flex items-start gap-3 sm:gap-4 p-3 sm:p-4 rounded-lg sm:rounded-xl transition-all hover:scale-105 ${isDarkMode
                             ? "bg-slate-800/50 hover:bg-slate-700/50 border border-slate-700"
                             : "bg-white hover:bg-gray-50 border border-gray-200 shadow"
-                        }`}
+                          }`}
                       >
                         <div
-                          className={`p-2 sm:p-3 rounded-full flex-shrink-0 ${
-                            isDarkMode ? "bg-cyan-500/20" : "bg-cyan-100"
-                          }`}
+                          className={`p-2 sm:p-3 rounded-full flex-shrink-0 ${isDarkMode ? "bg-cyan-500/20" : "bg-cyan-100"
+                            }`}
                         >
                           <Icon className="w-5 h-5 sm:w-5 sm:h-5 text-cyan-400" />
                         </div>
@@ -195,9 +193,8 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                             {item.label}
                           </p>
                           <p
-                            className={`text-sm sm:text-sm lg:text-base break-words ${
-                              isDarkMode ? "text-gray-300" : "text-gray-700"
-                            }`}
+                            className={`text-sm sm:text-sm lg:text-base break-words ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                              }`}
                           >
                             {item.value}
                           </p>
@@ -214,11 +211,10 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     <span>Department Contacts</span>
                   </h3>
                   <div
-                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
-                      isDarkMode
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
-                    }`}
+                      }`}
                   >
                     {contactInfo.departments.map((dept, index) => (
                       <div
@@ -231,9 +227,8 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <span
-                          className={`text-sm sm:text-sm lg:text-base ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`text-sm sm:text-sm lg:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                           {dept.department}
                         </span>
@@ -255,11 +250,10 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     <span>Email Contacts</span>
                   </h3>
                   <div
-                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
-                      isDarkMode
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
-                    }`}
+                      }`}
                   >
                     {contactInfo.emails.map((email, index) => (
                       <div
@@ -272,9 +266,8 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <p
-                          className={`text-sm sm:text-sm lg:text-base mb-1 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`text-sm sm:text-sm lg:text-base mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                           {email.department}:
                         </p>
@@ -299,9 +292,8 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     <span>Campus Location</span>
                   </h3>
                   <div
-                    className={`rounded-lg sm:rounded-xl overflow-hidden border-2 ${
-                      isDarkMode ? "border-slate-700" : "border-gray-200"
-                    }`}
+                    className={`rounded-lg sm:rounded-xl overflow-hidden border-2 ${isDarkMode ? "border-slate-700" : "border-gray-200"
+                      }`}
                   >
                     {/* Google Maps Embed */}
                     <div className="w-full h-48 sm:h-56 lg:h-64">
@@ -320,26 +312,22 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
 
                     {/* Location Info Overlay */}
                     <div
-                      className={`p-3 sm:p-4 ${
-                        isDarkMode ? "bg-slate-800" : "bg-white"
-                      } border-t ${
-                        isDarkMode ? "border-slate-700" : "border-gray-200"
-                      }`}
+                      className={`p-3 sm:p-4 ${isDarkMode ? "bg-slate-800" : "bg-white"
+                        } border-t ${isDarkMode ? "border-slate-700" : "border-gray-200"
+                        }`}
                     >
                       <div className="flex items-start gap-2 sm:gap-3">
                         <MapPin className="w-5 h-5 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                         <div className="min-w-0 flex-1">
                           <p
-                            className={`font-semibold text-base sm:text-base ${
-                              isDarkMode ? "text-white" : "text-gray-900"
-                            }`}
+                            className={`font-semibold text-base sm:text-base ${isDarkMode ? "text-white" : "text-gray-900"
+                              }`}
                           >
                             Madhav Institute of Technology and Science
                           </p>
                           <p
-                            className={`text-sm sm:text-sm ${
-                              isDarkMode ? "text-gray-300" : "text-gray-600"
-                            }`}
+                            className={`text-sm sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"
+                              }`}
                           >
                             Gola ka Mandir, Gwalior - 474005, Madhya Pradesh,
                             India
@@ -355,11 +343,10 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                       href="https://www.google.com/maps/place/Madhav+Institute+of+Technology+%26+Science,+Gwalior/@26.232364,78.21004,15z/data=!4m14!1m7!3m6!1s0x3976c14c64938e5f:0x87b3d6a725f7b077!2sMadhav+Institute+of+Technology+%26+Science,+Gwalior!8m2!3d26.2302254!4d78.207152!16s%2Fm%2F02qxs_p!3m5!1s0x3976c14c64938e5f:0x87b3d6a725f7b077!8m2!3d26.2302254!4d78.207152!16s%2Fm%2F02qxs_p?hl=en&entry=ttu&g_ep=EgoyMDI1MTExMi4wIKXMDSoASAFQAw%3D%3D"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-lg text-sm sm:text-sm lg:text-base transition-all hover:scale-105 ${
-                        isDarkMode
+                      className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-lg text-sm sm:text-sm lg:text-base transition-all hover:scale-105 ${isDarkMode
                           ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30"
                           : "bg-emerald-100 text-emerald-600 border border-emerald-200 hover:bg-emerald-200"
-                      }`}
+                        }`}
                     >
                       Open in Maps
                     </a>
@@ -367,11 +354,10 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                       href="https://www.google.com/maps/dir//Madhav+Institute+of+Technology+%26+Science,+Gwalior/@26.2302254,78.207152,15z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3976c14c64938e5f:0x87b3d6a725f7b077!2m2!1d78.207152!2d26.2302254?hl=en&entry=ttu&g_ep=EgoyMDI1MTExMi4wIKXMDSoASAFQAw%3D%3D"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-lg text-sm sm:text-sm lg:text-base transition-all hover:scale-105 ${
-                        isDarkMode
+                      className={`flex-1 text-center py-2 px-3 sm:px-4 rounded-lg text-sm sm:text-sm lg:text-base transition-all hover:scale-105 ${isDarkMode
                           ? "bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30"
                           : "bg-blue-100 text-blue-600 border border-blue-200 hover:bg-blue-200"
-                      }`}
+                        }`}
                     >
                       Get Directions
                     </a>
@@ -385,11 +371,10 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     <span>Office Hours</span>
                   </h3>
                   <div
-                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
-                      isDarkMode
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
-                    }`}
+                      }`}
                   >
                     {contactInfo.hours.map((hour, index) => (
                       <div
@@ -402,18 +387,16 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <span
-                          className={`text-sm sm:text-sm lg:text-base ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`text-sm sm:text-sm lg:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                           {hour.day}
                         </span>
                         <span
-                          className={`font-semibold text-sm sm:text-sm lg:text-base ${
-                            hour.time === "Closed"
+                          className={`font-semibold text-sm sm:text-sm lg:text-base ${hour.time === "Closed"
                               ? "text-red-400"
                               : "text-amber-400"
-                          }`}
+                            }`}
                         >
                           {hour.time}
                         </span>
@@ -429,11 +412,10 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                     <span>Online Resources</span>
                   </h3>
                   <div
-                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${
-                      isDarkMode
+                    className={`p-4 sm:p-6 rounded-lg sm:rounded-xl ${isDarkMode
                         ? "bg-slate-800/50 border border-slate-700"
                         : "bg-white border border-gray-200 shadow"
-                    }`}
+                      }`}
                   >
                     {contactInfo.websites.map((site, index) => (
                       <div
@@ -446,9 +428,8 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
                         }}
                       >
                         <p
-                          className={`text-sm sm:text-sm lg:text-base mb-1 ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
+                          className={`text-sm sm:text-sm lg:text-base mb-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                            }`}
                         >
                           {site.name}:
                         </p>
@@ -471,7 +452,7 @@ export default function ContactPage({ isDarkMode, toggleTheme }) {
       </section>
 
       {/* Footer */}
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 }

@@ -122,10 +122,10 @@ const isUpcomingSession = (sessionDate, sessionTime) => {
   }
 };
 
-const MentorshipRequestsPage = ({
-  isDarkMode = false,
-  toggleTheme = () => { },
-}) => {
+import { useTheme } from "../context/ThemeContext";
+
+const MentorshipRequestsPage = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [myMentorships, setMyMentorships] = useState([]);
   const [mentorRequests, setMentorRequests] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -372,7 +372,7 @@ const MentorshipRequestsPage = ({
         : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-12 lg:py-16 text-center">
@@ -483,7 +483,6 @@ const MentorshipRequestsPage = ({
                         <MentorshipCard
                           key={mentorship.id}
                           mentorship={mentorship}
-                          isDarkMode={isDarkMode}
                           onUpdateSession={openSessionForm}
                           userType="student"
                         />
@@ -525,7 +524,6 @@ const MentorshipRequestsPage = ({
                         <MentorshipCard
                           key={mentorship.id}
                           mentorship={mentorship}
-                          isDarkMode={isDarkMode}
                           onUpdateSession={openSessionForm}
                           userType="student"
                         />
@@ -569,7 +567,6 @@ const MentorshipRequestsPage = ({
                       <MentorshipCard
                         key={request.id}
                         mentorship={request}
-                        isDarkMode={isDarkMode}
                         onAccept={(req) => openSessionForm(req, "accept")}
                         onReject={(req) => openSessionForm(req, "reject")}
                         onVerifyPayment={(req) => handleVerifyPayment(req)}
@@ -586,7 +583,7 @@ const MentorshipRequestsPage = ({
         </div>
       </section>
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
 
       {/* Notification Toast */}
       {notification && (
@@ -858,7 +855,6 @@ const MentorshipRequestsPage = ({
 // Mentorship Card Component for reusability
 const MentorshipCard = ({
   mentorship,
-  isDarkMode,
   onUpdateSession,
   onAccept,
   onReject,
@@ -867,6 +863,7 @@ const MentorshipCard = ({
   onAddMeetingLink,
   userType,
 }) => {
+  const { isDarkMode } = useTheme();
   const isStudent = userType === "student";
   const isFinalStatus = mentorship.status === 'cancelled' || mentorship.status === 'rejected' || mentorship.status === 'completed';
   const showPaymentVerify = !isStudent && mentorship.payment_screenshot && mentorship.payment_status !== 'completed' && !isFinalStatus;

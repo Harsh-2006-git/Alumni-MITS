@@ -22,11 +22,12 @@ import { branches } from "../data/branches";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
+import { useTheme } from "../context/ThemeContext";
+
 export default function RecruitmentPage({
-    isDarkMode,
-    toggleTheme,
     isAuthenticated,
 }) {
+    const { isDarkMode, toggleTheme } = useTheme();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedBranch, setSelectedBranch] = useState("All Branches");
     const [selectedBatch, setSelectedBatch] = useState("All Batches");
@@ -113,7 +114,7 @@ export default function RecruitmentPage({
                 : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
                 }`}
         >
-            <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            <Header />
 
             <main className="container mx-auto px-4 md:px-10 lg:px-16 py-8">
                 <div className="relative z-10">
@@ -343,7 +344,6 @@ export default function RecruitmentPage({
             <AuthPopup
                 isOpen={showAuthPopup}
                 onClose={() => setShowAuthPopup(false)}
-                isDarkMode={isDarkMode}
                 isAuthenticated={isAuthenticated}
             />
 
@@ -355,14 +355,13 @@ export default function RecruitmentPage({
                         profile: selectedStudent // Pass student as profile since we flattened them
                     }}
                     onClose={closeModal}
-                    isDarkMode={isDarkMode}
                     getCurrentCompany={() => ""}
                     getCurrentDesignation={() => ""}
                     isAuthenticated={isAuthenticated}
                 />
             )}
 
-            <Footer isDarkMode={isDarkMode} />
+            <Footer />
         </div>
     );
 }

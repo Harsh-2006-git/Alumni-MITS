@@ -15,15 +15,15 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+import { useTheme } from "../context/ThemeContext";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 const API_URL = `${BASE_URL}/auth`;
 
 export default function AdminLoginPage({
   setIsAuthenticated,
-  isDarkMode,
-  toggleTheme,
 }) {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 

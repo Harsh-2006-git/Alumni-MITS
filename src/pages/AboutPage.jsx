@@ -25,7 +25,10 @@ import {
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function AboutPage({ isDarkMode, toggleTheme }) {
+import { useTheme } from "../context/ThemeContext";
+
+export default function AboutPage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();
   const [activeSection, setActiveSection] = useState("history");
 
@@ -219,9 +222,8 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
           {section.content.paragraphs.map((para, index) => (
             <p
               key={index}
-              className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               {para}
             </p>
@@ -229,11 +231,10 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
 
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8 lg:mt-12">
             <div
-              className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 transition-all hover:scale-105 ${
-                isDarkMode
+              className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 transition-all hover:scale-105 ${isDarkMode
                   ? "bg-gradient-to-br from-blue-900/30 to-cyan-900/20 border-blue-600/20"
                   : "bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200"
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
                 <Building className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-blue-400 flex-shrink-0" />
@@ -242,20 +243,18 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                 </h4>
               </div>
               <p
-                className={`text-[15px] sm:text-base ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`text-[15px] sm:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
               >
                 Established as a premier technical institution
               </p>
             </div>
 
             <div
-              className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 transition-all hover:scale-105 ${
-                isDarkMode
+              className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 transition-all hover:scale-105 ${isDarkMode
                   ? "bg-gradient-to-br from-cyan-900/30 to-blue-900/20 border-cyan-600/20"
                   : "bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200"
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
                 <Award className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-cyan-400 flex-shrink-0" />
@@ -264,9 +263,8 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                 </h4>
               </div>
               <p
-                className={`text-base sm:text-base ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`text-base sm:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
               >
                 Declared "Deemed to be University" under Distinct Category
               </p>
@@ -280,11 +278,10 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       return (
         <div className="space-y-6 sm:space-y-8">
           <div
-            className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 ${
-              isDarkMode
+            className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 ${isDarkMode
                 ? "bg-gradient-to-br from-purple-900/30 to-indigo-900/20 border-purple-600/20"
                 : "bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <Eye className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-purple-400 flex-shrink-0" />
@@ -293,20 +290,18 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
               </h4>
             </div>
             <p
-              className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
+              className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
             >
               {section.content.vision.text}
             </p>
           </div>
 
           <div
-            className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 ${
-              isDarkMode
+            className={`p-4 sm:p-6 lg:p-8 rounded-xl sm:rounded-2xl border-2 ${isDarkMode
                 ? "bg-gradient-to-br from-indigo-900/30 to-purple-900/20 border-indigo-600/20"
                 : "bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <Target className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-indigo-400 flex-shrink-0" />
@@ -318,16 +313,14 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
               {section.content.mission.points.map((point, index) => (
                 <li key={index} className="flex items-start gap-2 sm:gap-3">
                   <div
-                    className={`p-1.5 sm:p-2 rounded-full mt-0.5 sm:mt-1 flex-shrink-0 ${
-                      isDarkMode ? "bg-indigo-500/20" : "bg-indigo-100"
-                    }`}
+                    className={`p-1.5 sm:p-2 rounded-full mt-0.5 sm:mt-1 flex-shrink-0 ${isDarkMode ? "bg-indigo-500/20" : "bg-indigo-100"
+                      }`}
                   >
                     <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-400" />
                   </div>
                   <p
-                    className={`text-[15px] sm:text-base lg:text-lg flex-1 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`text-[15px] sm:text-base lg:text-lg flex-1 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {point}
                   </p>
@@ -343,9 +336,8 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       return (
         <div className="space-y-6 sm:space-y-8">
           <p
-            className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
-              isDarkMode ? "text-gray-300" : "text-gray-700"
-            }`}
+            className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
           >
             {section.content.intro}
           </p>
@@ -354,16 +346,14 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
             {section.content.initiatives.map((initiative, index) => (
               <div
                 key={index}
-                className={`p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border-2 transition-all hover:scale-105 ${
-                  isDarkMode
+                className={`p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl border-2 transition-all hover:scale-105 ${isDarkMode
                     ? "bg-gradient-to-br from-slate-900/80 to-emerald-900/20 border-emerald-600/20"
                     : "bg-gradient-to-br from-white to-emerald-50 border-emerald-200"
-                }`}
+                  }`}
               >
                 <div
-                  className={`inline-flex p-2 sm:p-3 rounded-full mb-3 sm:mb-4 ${
-                    isDarkMode ? "bg-emerald-500/20" : "bg-emerald-100"
-                  }`}
+                  className={`inline-flex p-2 sm:p-3 rounded-full mb-3 sm:mb-4 ${isDarkMode ? "bg-emerald-500/20" : "bg-emerald-100"
+                    }`}
                 >
                   <initiative.icon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
                 </div>
@@ -371,9 +361,8 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                   {initiative.title}
                 </h4>
                 <p
-                  className={`text-[14px] sm:text-sm lg:text-base ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`text-[14px] sm:text-sm lg:text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   {initiative.text}
                 </p>
@@ -388,9 +377,8 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       return (
         <div className="space-y-8 sm:space-y-10">
           <p
-            className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${
-              isDarkMode ? "text-gray-300" : "text-gray-700"
-            }`}
+            className={`text-[15px] sm:text-base lg:text-lg leading-relaxed ${isDarkMode ? "text-gray-300" : "text-gray-700"
+              }`}
           >
             {section.content.intro}
           </p>
@@ -405,16 +393,14 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
               {section.content.administration.map((member, index) => (
                 <div
                   key={index}
-                  className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 border-2 shadow-lg transition-all hover:scale-105 text-center ${
-                    isDarkMode
+                  className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 border-2 shadow-lg transition-all hover:scale-105 text-center ${isDarkMode
                       ? "bg-gradient-to-br from-slate-900/80 to-amber-900/20 border-amber-600/20"
                       : "bg-gradient-to-br from-white to-amber-50 border-amber-200"
-                  }`}
+                    }`}
                 >
                   <div
-                    className={`w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto rounded-full flex items-center justify-center mb-3 sm:mb-4 overflow-hidden border-2 ${
-                      isDarkMode ? "border-amber-500/20" : "border-amber-200"
-                    }`}
+                    className={`w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto rounded-full flex items-center justify-center mb-3 sm:mb-4 overflow-hidden border-2 ${isDarkMode ? "border-amber-500/20" : "border-amber-200"
+                      }`}
                   >
                     {member.image ? (
                       <img
@@ -430,9 +416,8 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                     {member.name}
                   </h5>
                   <p
-                    className={`text-[14px] sm:text-sm lg:text-base font-semibold ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`text-[14px] sm:text-sm lg:text-base font-semibold ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {member.role}
                   </p>
@@ -451,11 +436,10 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
               {section.content.deans.map((dean, index) => (
                 <div
                   key={index}
-                  className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 border-2 shadow-lg transition-all hover:scale-105 text-center ${
-                    isDarkMode
+                  className={`rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 border-2 shadow-lg transition-all hover:scale-105 text-center ${isDarkMode
                       ? "bg-gradient-to-br from-slate-900/80 to-orange-900/20 border-orange-600/20"
                       : "bg-gradient-to-br from-white to-orange-50 border-orange-200"
-                  }`}
+                    }`}
                 >
                   <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 rounded-full overflow-hidden border-2 border-orange-300">
                     <img
@@ -470,9 +454,8 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                     {dean.name}
                   </h5>
                   <p
-                    className={`text-[14px] sm:text-sm ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
+                    className={`text-[14px] sm:text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
                   >
                     {dean.role}
                   </p>
@@ -487,14 +470,13 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-          : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+        }`}
     >
       {/* Header */}
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 sm:px-8 lg:px-12 py-8 sm:py-12 lg:py-16 text-center">
@@ -523,15 +505,14 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
                 <button
                   key={key}
                   onClick={() => handleSectionChange(key)}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-full font-semibold transition-all text-sm sm:text-sm lg:text-base flex-shrink-0 ${
-                    activeSection === key
+                  className={`flex items-center gap-1.5 sm:gap-2 px-4 py-2.5 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3 rounded-full font-semibold transition-all text-sm sm:text-sm lg:text-base flex-shrink-0 ${activeSection === key
                       ? isDarkMode
                         ? `bg-gradient-to-r ${section.color} text-white shadow-lg scale-105`
                         : `bg-gradient-to-r ${section.color} text-white shadow-lg scale-105`
                       : isDarkMode
-                      ? "bg-slate-800/50 text-gray-300 hover:bg-slate-700/50 border border-slate-700"
-                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow"
-                  }`}
+                        ? "bg-slate-800/50 text-gray-300 hover:bg-slate-700/50 border border-slate-700"
+                        : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 shadow"
+                    }`}
                 >
                   <Icon className="w-4 h-4 sm:w-4 sm:h-4 lg:w-5 lg:h-5 flex-shrink-0" />
                   <span className="whitespace-nowrap">{section.title}</span>
@@ -546,11 +527,10 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       <section className="container mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12 lg:pb-16">
         <div className="max-w-5xl mx-auto">
           <div
-            className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12 border-2 shadow-2xl transition-all ${
-              isDarkMode
+            className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 lg:p-12 border-2 shadow-2xl transition-all ${isDarkMode
                 ? "bg-gradient-to-br from-slate-900/80 to-blue-900/30 backdrop-blur-sm border-blue-600/20"
                 : "bg-gradient-to-br from-white to-blue-100/80 backdrop-blur-sm border-blue-200 shadow-xl"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6 lg:mb-8">
               {(() => {
@@ -579,7 +559,7 @@ export default function AboutPage({ isDarkMode, toggleTheme }) {
       </section>
 
       {/* Footer */}
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 }

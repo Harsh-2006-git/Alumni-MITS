@@ -27,7 +27,10 @@ import Footer from "../components/footer";
 // Import or define AuthPopup component
 import AuthPopup from "../components/AuthPopup"; // Make sure this path is correct
 
-const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
+import { useTheme } from "../context/ThemeContext";
+
+const MentorMentee = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [mentors, setMentors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -441,7 +444,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
           : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50"
           }`}
       >
-        <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+        <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-t-cyan-500 border-r-blue-500 border-b-indigo-500 border-l-transparent mx-auto mb-4"></div>
@@ -461,10 +464,10 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
     <div
       className={`min-h-screen transition-colors duration-500 ${isDarkMode
         ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
-        : "bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 text-gray-900"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Notification Toast - Enhanced for longer messages */}
       {notification && (
@@ -870,7 +873,7 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
         </div>
       </section>
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
 
       {/* Profile Details Popup */}
       {showProfilePopup && selectedMentor && (
@@ -1440,7 +1443,6 @@ const MentorMentee = ({ isDarkMode = false, toggleTheme = () => { } }) => {
             setShowAuthPopup(false);
             setSelectedMentor(null);
           }}
-          isDarkMode={isDarkMode}
           isAuthenticated={currentUser?.isLoggedIn || false}
           onLoginSuccess={() => {
             if (selectedMentor) {

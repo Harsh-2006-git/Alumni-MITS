@@ -39,8 +39,11 @@ const API_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/auth`
   : "http://localhost:3001/auth";
 
+import { useTheme } from "../context/ThemeContext";
+
 // Extra Email Popup Component
-const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
+const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave }) => {
+  const { isDarkMode } = useTheme();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -276,7 +279,8 @@ const ExtraEmailPopup = ({ isOpen, onClose, userData, onSave, isDarkMode }) => {
 };
 
 // Student Registration Popup Component
-const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) => {
+const StudentRegistrationPopup = ({ isOpen, userData, onComplete }) => {
+  const { isDarkMode } = useTheme();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     extraEmail: userData?.userEmail || "",
@@ -668,9 +672,8 @@ const StudentRegistrationPopup = ({ isOpen, userData, onComplete, isDarkMode }) 
 
 export default function LoginPage({
   setIsAuthenticated,
-  isDarkMode,
-  toggleTheme,
 }) {
+  const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -975,14 +978,12 @@ export default function LoginPage({
         onClose={handleClosePopup}
         userData={tempUserData}
         onSave={handleExtraEmailSave}
-        isDarkMode={isDarkMode}
       />
 
       <StudentRegistrationPopup
         isOpen={showRegistrationPopup}
         userData={tempUserData}
         onComplete={handleRegistrationComplete}
-        isDarkMode={isDarkMode}
       />
 
       <ProfilePhotoUpload
@@ -990,7 +991,6 @@ export default function LoginPage({
         token={registrationUserData?.accessToken}
         onComplete={handlePhotoUploadComplete}
         onSkip={() => { }} // Should not be accessible since canSkip={false}
-        isDarkMode={isDarkMode}
         canSkip={false}
       />
 

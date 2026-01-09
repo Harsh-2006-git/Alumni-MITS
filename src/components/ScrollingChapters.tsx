@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 const chapters = [
     { name: 'Infosys Campus Connect', image: '/assets/chapters/infosys_logo.jpg' },
@@ -22,13 +23,10 @@ const chapters = [
     { name: 'IIT BombayX', image: '/assets/chapters/iitbombayx.jpg' },
 ];
 
-const ChapterCard = ({ chapter, isDarkMode }: { chapter: { name: string; image: string }; isDarkMode: boolean }) => {
+const ChapterCard = ({ chapter }: { chapter: { name: string; image: string } }) => {
     return (
         <div
-            className={`flex-shrink-0 w-20 h-20 sm:w-28 sm:h-28 rounded-xl border flex items-center justify-center p-2 sm:p-3 transition-all hover:scale-105 ${isDarkMode
-                ? "bg-slate-900/50 border-blue-600/20"
-                : "bg-white border-gray-200 shadow-sm"
-                }`}
+            className="flex-shrink-0 w-20 h-20 sm:w-28 sm:h-28 rounded-xl border flex items-center justify-center p-2 sm:p-3 transition-all hover:scale-105 bg-white border-gray-200 shadow-sm"
         >
             <img
                 src={chapter.image}
@@ -39,7 +37,8 @@ const ChapterCard = ({ chapter, isDarkMode }: { chapter: { name: string; image: 
     );
 };
 
-const ScrollingChapters = ({ isDarkMode }: { isDarkMode: boolean }) => {
+const ScrollingChapters = () => {
+    const { isDarkMode } = useTheme();
     return (
         <section className="w-full py-6 overflow-hidden">
             <div className="max-w-7xl mx-auto px-4">
@@ -64,11 +63,11 @@ const ScrollingChapters = ({ isDarkMode }: { isDarkMode: boolean }) => {
                         <div className="flex animate-scroll-chapters gap-4 sm:gap-6 w-max">
                             {/* First Set */}
                             {chapters.map((chapter, index) => (
-                                <ChapterCard key={index} chapter={chapter} isDarkMode={isDarkMode} />
+                                <ChapterCard key={index} chapter={chapter} />
                             ))}
                             {/* Duplicate Set for Continuous Scroll */}
                             {chapters.map((chapter, index) => (
-                                <ChapterCard key={`dup-${index}`} chapter={chapter} isDarkMode={isDarkMode} />
+                                <ChapterCard key={`dup-${index}`} chapter={chapter} />
                             ))}
                         </div>
                     </div>

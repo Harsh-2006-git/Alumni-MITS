@@ -20,7 +20,10 @@ import 'react-quill/dist/quill.snow.css';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-const CreateBlog = ({ isDarkMode, toggleTheme }) => {
+import { useTheme } from "../context/ThemeContext";
+
+const CreateBlog = () => {
+    const { isDarkMode, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -138,8 +141,11 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
     const profilePhoto = user?.profilePhoto || user?.user?.profilePhoto;
 
     return (
-        <div className={`min-h-screen transition-colors duration-500 ${isDarkMode ? "bg-slate-900 text-white" : "bg-slate-50 text-slate-900"}`}>
-            <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+        <div className={`min-h-screen transition-colors duration-500 ${isDarkMode
+            ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+            : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
+            }`}>
+            <Header />
 
             <main className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-12">
                 <button
@@ -376,7 +382,7 @@ const CreateBlog = ({ isDarkMode, toggleTheme }) => {
                 </div>
             </main>
 
-            <Footer isDarkMode={isDarkMode} />
+            <Footer />
 
             {/* Success Confirmation Modal */}
             {showSuccessModal && (

@@ -3,7 +3,10 @@ import { Sparkles, X, ZoomIn } from "lucide-react";
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-export default function EventGalleryPage({ isDarkMode, toggleTheme }) {
+import { useTheme } from "../context/ThemeContext";
+
+export default function EventGalleryPage() {
+  const { isDarkMode, toggleTheme } = useTheme();
   // Sample image URLs array - replace with your actual image URLs
   const [imageUrls] = useState([
     "assets/Events/Screenshot 2025-11-14 003755.png",
@@ -39,13 +42,12 @@ export default function EventGalleryPage({ isDarkMode, toggleTheme }) {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-500 ${
-        isDarkMode
+      className={`min-h-screen transition-colors duration-500 ${isDarkMode
           ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
           : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
-      }`}
+        }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       {/* Hero Section */}
       <section className="text-center py-12 sm:py-16 px-4 sm:px-6">
@@ -63,9 +65,8 @@ export default function EventGalleryPage({ isDarkMode, toggleTheme }) {
           </p>
 
           <p
-            className={`text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
-            }`}
+            className={`text-sm sm:text-base lg:text-lg mb-4 sm:mb-6 ${isDarkMode ? "text-gray-300" : "text-gray-600"
+              }`}
           >
             Relive the special moments and experiences we've shared together
           </p>
@@ -80,11 +81,10 @@ export default function EventGalleryPage({ isDarkMode, toggleTheme }) {
           {imageUrls.map((imageUrl, index) => (
             <div
               key={index}
-              className={`relative rounded-2xl border transition-all hover:scale-105 hover:shadow-xl overflow-hidden group cursor-pointer ${
-                isDarkMode
+              className={`relative rounded-2xl border transition-all hover:scale-105 hover:shadow-xl overflow-hidden group cursor-pointer ${isDarkMode
                   ? "bg-slate-900/40 border-slate-700"
                   : "bg-white border-gray-200 shadow-md"
-              }`}
+                }`}
               onClick={() => openModal(imageUrl)}
             >
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-600"></div>
@@ -111,16 +111,14 @@ export default function EventGalleryPage({ isDarkMode, toggleTheme }) {
               <div className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <span
-                    className={`text-xs font-medium ${
-                      isDarkMode ? "text-cyan-300" : "text-cyan-600"
-                    }`}
+                    className={`text-xs font-medium ${isDarkMode ? "text-cyan-300" : "text-cyan-600"
+                      }`}
                   >
                     Event #{index + 1}
                   </span>
                   <span
-                    className={`text-xs ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+                    className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
                   >
                     {Math.floor(Math.random() * 12) + 1}/
                     {Math.floor(Math.random() * 28) + 1}/2024
@@ -135,27 +133,23 @@ export default function EventGalleryPage({ isDarkMode, toggleTheme }) {
         {imageUrls.length === 0 && (
           <div className="text-center py-16">
             <div
-              className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-4 ${
-                isDarkMode ? "bg-slate-800" : "bg-gray-100"
-              }`}
+              className={`inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-4 ${isDarkMode ? "bg-slate-800" : "bg-gray-100"
+                }`}
             >
               <Sparkles
-                className={`w-8 h-8 sm:w-10 sm:h-10 ${
-                  isDarkMode ? "text-gray-600" : "text-gray-400"
-                }`}
+                className={`w-8 h-8 sm:w-10 sm:h-10 ${isDarkMode ? "text-gray-600" : "text-gray-400"
+                  }`}
               />
             </div>
             <h3
-              className={`text-lg sm:text-xl font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
-              }`}
+              className={`text-lg sm:text-xl font-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-900"
+                }`}
             >
               No photos yet
             </h3>
             <p
-              className={`max-w-md mx-auto text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
+              className={`max-w-md mx-auto text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
             >
               Check back later for event photos and memories
             </p>
@@ -182,7 +176,7 @@ export default function EventGalleryPage({ isDarkMode, toggleTheme }) {
         </div>
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
 
       <style>{`
         @keyframes fadeIn {

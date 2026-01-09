@@ -14,15 +14,16 @@ import {
   Globe,
   Sparkles,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function AlumniProfileModal({
   alumni,
   onClose,
-  isDarkMode,
   getCurrentCompany,
   getCurrentDesignation,
   isAuthenticated, // Add this prop
 }) {
+  const { isDarkMode } = useTheme();
   // Add authentication check - if not authenticated, don't render the modal
   if (!isAuthenticated) {
     return null;
@@ -34,20 +35,18 @@ export default function AlumniProfileModal({
       onClick={onClose}
     >
       <div
-        className={`relative w-full max-w-6xl h-[95vh] rounded-3xl shadow-2xl border overflow-hidden ${
-          isDarkMode
-            ? "bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-500/30"
-            : "bg-gradient-to-br from-white via-blue-50 to-purple-50 border-blue-200/50"
-        }`}
+        className={`relative w-full max-w-6xl h-[95vh] rounded-3xl shadow-2xl border overflow-hidden ${isDarkMode
+          ? "bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 border-blue-500/30"
+          : "bg-gradient-to-br from-white via-blue-50 to-purple-50 border-blue-200/50"
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className={`absolute top-4 right-4 z-10 p-2.5 rounded-full transition-all hover:scale-110 shadow-lg ${
-            isDarkMode
-              ? "bg-slate-800/80 hover:bg-slate-700"
-              : "bg-white/80 hover:bg-gray-100"
-          }`}
+          className={`absolute top-4 right-4 z-10 p-2.5 rounded-full transition-all hover:scale-110 shadow-lg ${isDarkMode
+            ? "bg-slate-800/80 hover:bg-slate-700"
+            : "bg-white/80 hover:bg-gray-100"
+            }`}
         >
           <X
             className={

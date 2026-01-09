@@ -1,10 +1,11 @@
-
 import { useState } from "react";
 import { Upload, X, Check, Image as ImageIcon, Loader2 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-export default function ProfilePhotoUpload({ isOpen, token, onComplete, onSkip, isDarkMode, canSkip = true }) {
+export default function ProfilePhotoUpload({ isOpen, token, onComplete, onSkip, canSkip = true }) {
+    const { isDarkMode } = useTheme();
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [uploading, setUploading] = useState(false);

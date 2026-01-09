@@ -41,11 +41,12 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
   ? `${import.meta.env.VITE_API_BASE_URL}/auth`
   : "http://localhost:3001/auth";
 
+import { useTheme } from "../context/ThemeContext";
+
 export default function AlumniAuth({
   setIsAuthenticated,
-  isDarkMode,
-  toggleTheme,
 }) {
+  const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -1282,12 +1283,10 @@ ${isDarkMode
       <ForgotPasswordPopup
         isOpen={showForgotPassword}
         onClose={() => setShowForgotPassword(false)}
-        isDarkMode={isDarkMode}
       />
       <VerificationPendingPopup
         isOpen={showVerificationPopup}
         onClose={() => navigate("/")}
-        isDarkMode={isDarkMode}
       />
 
       <ProfilePhotoUpload
@@ -1303,7 +1302,6 @@ ${isDarkMode
           setTempAuthToken(null);
           setShowVerificationPopup(true);
         }}
-        isDarkMode={isDarkMode}
       />
     </div >
   );

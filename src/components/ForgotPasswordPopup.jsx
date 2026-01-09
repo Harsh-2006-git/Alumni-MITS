@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { X, Mail, Lock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
-const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
+const ForgotPasswordPopup = ({ isOpen, onClose }) => {
+  const { isDarkMode } = useTheme();
   const [step, setStep] = useState(1); // 1: Email check, 2: OTP send, 3: Reset password
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
@@ -27,7 +29,7 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
     try {
       const response = await fetch(
-       `${BASE_URL}/auth/check`,
+        `${BASE_URL}/auth/check`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -74,7 +76,7 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
     try {
       const response = await fetch(
-       `${BASE_URL}/auth/forgot-password`,
+        `${BASE_URL}/auth/forgot-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -196,32 +198,28 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div
-        className={`relative w-full max-w-md rounded-2xl shadow-2xl border ${
-          isDarkMode
-            ? "bg-slate-900 border-slate-700"
-            : "bg-white border-gray-200"
-        }`}
+        className={`relative w-full max-w-md rounded-2xl shadow-2xl border ${isDarkMode
+          ? "bg-slate-900 border-slate-700"
+          : "bg-white border-gray-200"
+          }`}
       >
         {/* Header */}
         <div
-          className={`flex items-center justify-between p-6 border-b ${
-            isDarkMode ? "border-slate-700" : "border-gray-200"
-          }`}
+          className={`flex items-center justify-between p-6 border-b ${isDarkMode ? "border-slate-700" : "border-gray-200"
+            }`}
         >
           <h2
-            className={`text-xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
+            className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+              }`}
           >
             Reset Password
           </h2>
           <button
             onClick={handleClose}
-            className={`p-2 rounded-lg transition-colors ${
-              isDarkMode
-                ? "hover:bg-slate-800 text-gray-400"
-                : "hover:bg-gray-100 text-gray-500"
-            }`}
+            className={`p-2 rounded-lg transition-colors ${isDarkMode
+              ? "hover:bg-slate-800 text-gray-400"
+              : "hover:bg-gray-100 text-gray-500"
+              }`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -233,25 +231,23 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
             {[1, 2, 3].map((stepNumber) => (
               <div key={stepNumber} className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 ${
-                    step >= stepNumber
-                      ? "bg-purple-600 border-purple-600 text-white"
-                      : isDarkMode
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold border-2 ${step >= stepNumber
+                    ? "bg-purple-600 border-purple-600 text-white"
+                    : isDarkMode
                       ? "border-slate-600 text-slate-400"
                       : "border-gray-300 text-gray-400"
-                  }`}
+                    }`}
                 >
                   {stepNumber}
                 </div>
                 {stepNumber < 3 && (
                   <div
-                    className={`w-12 h-1 mx-2 ${
-                      step > stepNumber
-                        ? "bg-purple-600"
-                        : isDarkMode
+                    className={`w-12 h-1 mx-2 ${step > stepNumber
+                      ? "bg-purple-600"
+                      : isDarkMode
                         ? "bg-slate-600"
                         : "bg-gray-300"
-                    }`}
+                      }`}
                   />
                 )}
               </div>
@@ -275,15 +271,14 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
           {/* Message Display */}
           {message.text && (
             <div
-              className={`flex items-center gap-3 p-3 rounded-lg mb-4 ${
-                message.type === "error"
-                  ? isDarkMode
-                    ? "bg-red-500/10 border border-red-500/20 text-red-300"
-                    : "bg-red-50 border border-red-200 text-red-700"
-                  : isDarkMode
+              className={`flex items-center gap-3 p-3 rounded-lg mb-4 ${message.type === "error"
+                ? isDarkMode
+                  ? "bg-red-500/10 border border-red-500/20 text-red-300"
+                  : "bg-red-50 border border-red-200 text-red-700"
+                : isDarkMode
                   ? "bg-green-500/10 border border-green-500/20 text-green-300"
                   : "bg-green-50 border border-green-200 text-green-700"
-              }`}
+                }`}
             >
               {message.type === "error" ? (
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -299,27 +294,24 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
             <form onSubmit={handleCheckEmail} className="space-y-4">
               <div>
                 <label
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Alumni Email Address
                 </label>
                 <div className="relative">
                   <Mail
-                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                      isDarkMode ? "text-gray-500" : "text-gray-400"
-                    }`}
+                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
                   />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                      isDarkMode
-                        ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                        : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                      ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                      : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                      }`}
                     placeholder="Enter your registered email"
                     required
                   />
@@ -329,11 +321,10 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isDarkMode
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "bg-purple-600 hover:bg-purple-700 text-white"
-                }`}
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : "bg-purple-600 hover:bg-purple-700 text-white"
+                  }`}
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -351,34 +342,29 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
           {step === 2 && userData && (
             <div className="space-y-4">
               <div
-                className={`p-4 rounded-lg ${
-                  isDarkMode ? "bg-slate-800" : "bg-gray-50"
-                }`}
+                className={`p-4 rounded-lg ${isDarkMode ? "bg-slate-800" : "bg-gray-50"
+                  }`}
               >
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
-                    }`}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
+                      }`}
                   >
                     <CheckCircle
-                      className={`w-5 h-5 ${
-                        isDarkMode ? "text-purple-400" : "text-purple-600"
-                      }`}
+                      className={`w-5 h-5 ${isDarkMode ? "text-purple-400" : "text-purple-600"
+                        }`}
                     />
                   </div>
                   <div>
                     <p
-                      className={`font-semibold ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
+                      className={`font-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
                     >
                       {userData.name}
                     </p>
                     <p
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}
+                      className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
                     >
                       {userData.email}
                     </p>
@@ -387,9 +373,8 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
               </div>
 
               <p
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                  }`}
               >
                 Click the button below to receive an OTP on your registered
                 email.
@@ -398,11 +383,10 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
               <button
                 onClick={handleSendOTP}
                 disabled={loading}
-                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isDarkMode
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "bg-purple-600 hover:bg-purple-700 text-white"
-                }`}
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : "bg-purple-600 hover:bg-purple-700 text-white"
+                  }`}
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -421,9 +405,8 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div>
                 <label
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Enter OTP
                 </label>
@@ -495,11 +478,10 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
                         }
                       }}
                       onFocus={(e) => e.target.select()}
-                      className={`w-12 h-12 text-center text-lg font-semibold rounded-xl outline-none transition-all ${
-                        isDarkMode
-                          ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                          : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                      }`}
+                      className={`w-12 h-12 text-center text-lg font-semibold rounded-xl outline-none transition-all ${isDarkMode
+                        ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                        : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                        }`}
                       maxLength={1}
                       id={`otp-${index}`}
                     />
@@ -509,27 +491,24 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
               <div>
                 <label
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   New Password
                 </label>
                 <div className="relative">
                   <Lock
-                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                      isDarkMode ? "text-gray-500" : "text-gray-400"
-                    }`}
+                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
                   />
                   <input
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                      isDarkMode
-                        ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                        : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                      ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                      : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                      }`}
                     placeholder="Enter new password"
                     required
                   />
@@ -538,27 +517,24 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
               <div>
                 <label
-                  className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Confirm Password
                 </label>
                 <div className="relative">
                   <Lock
-                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${
-                      isDarkMode ? "text-gray-500" : "text-gray-400"
-                    }`}
+                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
                   />
                   <input
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${
-                      isDarkMode
-                        ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                        : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 rounded-xl outline-none transition ${isDarkMode
+                      ? "bg-slate-800 border border-slate-700 text-white focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                      : "bg-white border border-gray-300 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/50"
+                      }`}
                     placeholder="Confirm new password"
                     required
                   />
@@ -568,11 +544,10 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  isDarkMode
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "bg-purple-600 hover:bg-purple-700 text-white"
-                }`}
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${isDarkMode
+                  ? "bg-purple-600 hover:bg-purple-700 text-white"
+                  : "bg-purple-600 hover:bg-purple-700 text-white"
+                  }`}
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
@@ -589,14 +564,12 @@ const ForgotPasswordPopup = ({ isOpen, onClose, isDarkMode }) => {
 
         {/* Footer */}
         <div
-          className={`p-4 border-t ${
-            isDarkMode ? "border-slate-700" : "border-gray-200"
-          }`}
+          className={`p-4 border-t ${isDarkMode ? "border-slate-700" : "border-gray-200"
+            }`}
         >
           <p
-            className={`text-xs text-center ${
-              isDarkMode ? "text-gray-500" : "text-gray-600"
-            }`}
+            className={`text-xs text-center ${isDarkMode ? "text-gray-500" : "text-gray-600"
+              }`}
           >
             Need help? Contact alumni support
           </p>

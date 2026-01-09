@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
-export default function Footer({ isDarkMode }) {
+export default function Footer() {
+  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   return (

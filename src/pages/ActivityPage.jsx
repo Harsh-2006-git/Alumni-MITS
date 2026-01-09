@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Trash2,
@@ -8,7 +9,6 @@ import {
   X,
   Save,
   MapPin,
-  DollarSign,
   CheckCircle,
   Users,
   Mail,
@@ -31,11 +31,13 @@ import {
   TrendingUp,
   Link,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 import Header from "../components/header";
 import Footer from "../components/footer";
 
 // Separate Edit Event Modal Component
-const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
+const EditEventModal = ({ event, onClose, onSave }) => {
+  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState(event);
 
   const handleChange = (field, value) => {
@@ -161,50 +163,26 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
-                    }`}
-                >
-                  <DollarSign size={16} />
-                  Price
-                </label>
-                <input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) =>
-                    handleChange("price", Number(e.target.value))
-                  }
-                  placeholder="0"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                    }`}
-                />
-              </div>
-
-              <div>
-                <label
-                  className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
-                    }`}
-                >
-                  <Users size={16} />
-                  Max Attendees
-                </label>
-                <input
-                  type="number"
-                  value={formData.maxAttendees}
-                  onChange={(e) =>
-                    handleChange("maxAttendees", Number(e.target.value))
-                  }
-                  placeholder="100"
-                  className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
-                    ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
-                    : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
-                    }`}
-                />
-              </div>
+            <div>
+              <label
+                className={`block text-sm font-semibold mb-2 flex items-center gap-2 ${isDarkMode ? "text-gray-200" : "text-gray-800"
+                  }`}
+              >
+                <Users size={16} />
+                Max Attendees
+              </label>
+              <input
+                type="number"
+                value={formData.maxAttendees}
+                onChange={(e) =>
+                  handleChange("maxAttendees", Number(e.target.value))
+                }
+                placeholder="100"
+                className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:ring-4 focus:outline-none ${isDarkMode
+                  ? "bg-slate-800 border-slate-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500/20"
+                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                  }`}
+              />
             </div>
 
             <div>
@@ -318,7 +296,8 @@ const EditEventModal = ({ event, onClose, onSave, isDarkMode }) => {
 };
 
 // Separate Edit Job Modal Component
-const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
+const EditJobModal = ({ job, onClose, onSave }) => {
+  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState(job);
 
   const handleChange = (field, value) => {
@@ -701,7 +680,8 @@ const EditJobModal = ({ job, onClose, onSave, isDarkMode }) => {
 };
 
 // Separate Edit Campaign Modal Component
-const EditCampaignModal = ({ campaign, onClose, onSave, isDarkMode }) => {
+const EditCampaignModal = ({ campaign, onClose, onSave }) => {
+  const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState({
     id: campaign._id || campaign.id,
     campaignTitle: campaign.campaignTitle || "",
@@ -970,7 +950,8 @@ const EditCampaignModal = ({ campaign, onClose, onSave, isDarkMode }) => {
 
 
 
-const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
+const MyActivityPage = () => {
+  const { isDarkMode, toggleTheme } = useTheme();
   const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
   const [activeTab, setActiveTab] = useState("events");
   const [events, setEvents] = useState([]);
@@ -1422,10 +1403,6 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
             className={`flex flex-col xs:flex-row xs:items-center gap-2 text-xs sm:text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"
               }`}
           >
-            <span className="font-semibold text-sm sm:text-lg bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
-              ₹{event.price}
-            </span>
-            <span className="hidden xs:block">•</span>
             <span>{event.maxAttendees} seats available</span>
             <span className="hidden xs:block">•</span>
             <span className="truncate">Organized by {event.organizer}</span>
@@ -1842,11 +1819,11 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
   return (
     <div
       className={`min-h-screen transition-colors duration-500 ${isDarkMode
-        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950"
-        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50"
+        ? "bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white"
+        : "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900"
         }`}
     >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Header />
 
       <HeroSection />
 
@@ -1918,7 +1895,6 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           event={editingEvent}
           onClose={() => setEditingEvent(null)}
           onSave={handleUpdateEvent}
-          isDarkMode={isDarkMode}
         />
       )}
 
@@ -1927,7 +1903,6 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           job={editingJob}
           onClose={() => setEditingJob(null)}
           onSave={handleUpdateJob}
-          isDarkMode={isDarkMode}
         />
       )}
 
@@ -1936,7 +1911,6 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
           campaign={editingCampaign}
           onClose={() => setEditingCampaign(null)}
           onSave={handleUpdateCampaign}
-          isDarkMode={isDarkMode}
         />
       )}
 
@@ -2147,7 +2121,7 @@ const MyActivityPage = ({ isDarkMode, toggleTheme }) => {
         </div>
       )}
 
-      <Footer isDarkMode={isDarkMode} />
+      <Footer />
     </div>
   );
 };
