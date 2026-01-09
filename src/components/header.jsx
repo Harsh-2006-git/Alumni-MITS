@@ -582,13 +582,9 @@ export default function Header() {
       {/* Spacer to maintain layout flow when header is fixed */}
       <div className="h-16 min-h-[64px] w-full" />
       <header
-        className={`fixed top-0 left-0 right-0 z-50 w-full h-16 min-h-[64px] transition-all duration-300 ${scrolled
-          ? (isDarkMode
-            ? "bg-slate-950/80 backdrop-blur-xl border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
-            : "bg-white/80 backdrop-blur-xl border-b border-blue-100 shadow-[0_4px_30px_rgba(0,0,0,0.05)]")
-          : (isDarkMode
-            ? "bg-gray-900/10 backdrop-blur-sm border-b border-white/5"
-            : "bg-white/10 backdrop-blur-sm border-b border-blue-50")
+        className={`fixed top-0 left-0 right-0 z-50 w-full h-16 min-h-[64px] transition-all duration-300 ${isDarkMode
+          ? "bg-slate-950 border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]"
+          : "bg-white border-b border-blue-100 shadow-[0_4px_30px_rgba(0,0,0,0.05)]"
           }`}
       >
         <div className="w-full h-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
