@@ -187,6 +187,17 @@ export default function AlumniHomePage() {
   const testimonialRef = useRef(null);
   const [isTestimonialVisible, setIsTestimonialVisible] = useState(false);
 
+  // Video control state
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+  const handlePlayVideo = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setIsVideoPlaying(true);
+    }
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -1134,27 +1145,32 @@ export default function AlumniHomePage() {
                 style={{ paddingBottom: "56.25%" }}
               >
                 <video
+                  ref={videoRef}
                   className="absolute top-0 left-0 w-full h-full object-cover"
-                  autoPlay
                   loop
                   muted
                   playsInline
-                  preload="metadata"
-                  onLoadedMetadata={(e) => {
-                    const video = e.target as HTMLVideoElement;
-                    video.play().catch(() => {
-                      // Auto-play was prevented, user interaction needed
-                    });
-                  }}
-                  onEnded={(e) => {
-                    const video = e.target as HTMLVideoElement;
-                    video.currentTime = 0;
-                    video.play();
-                  }}
+                  preload="metadata" // Load metadata but don't start downloading video data aggressively
                 >
                   <source src="/assets/video.mp4" type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
+
+                {/* Play Button Overlay */}
+                {!isVideoPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/10">
+                    <button
+                      onClick={handlePlayVideo}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center group hover:bg-white/40 hover:scale-110 transition-all duration-300 cursor-pointer shadow-lg border border-white/50"
+                      aria-label="Play Campus Video"
+                    >
+                      <div className="w-0 h-0 border-t-[12px] sm:border-t-[15px] border-t-transparent border-l-[22px] sm:border-l-[28px] border-l-white border-b-[12px] sm:border-b-[15px] border-b-transparent ml-2 shadow-sm"></div>
+                    </button>
+                    <div className="absolute bottom-4 sm:bottom-8 text-white text-xs sm:text-sm font-medium px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm">
+                      Click to Explore Campus
+                    </div>
+                  </div>
+                )}
                 <div
                   className={`absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none`}
                 ></div>

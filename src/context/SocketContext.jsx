@@ -12,79 +12,93 @@ export const SocketProvider = ({ children }) => {
     const [onlineUsers, setOnlineUsers] = useState([]);
     const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-    useEffect(() => {
-        const initializeSocket = () => {
-            // Get token from local storage
-            const authData = localStorage.getItem("auth");
+    // Helper to initialize socket connection
+    const connectSocket = () => {
+        // Get token from local storage
+        const authData = localStorage.getItem("auth");
 
-            if (authData) {
-                try {
-                    const parsedAuth = JSON.parse(authData);
-                    const token = parsedAuth.accessToken;
+        if (authData) {
+            try {
+                const parsedAuth = JSON.parse(authData);
+                const token = parsedAuth.accessToken;
 
-                    if (token) {
-                        // Avoid reconnecting if token hasn't changed (basic check)
-                        if (socket && socket.auth.token === token && socket.connected) return;
+                if (token) {
+                    // Avoid reconnecting if token hasn't changed (basic check)
+                    if (socket && socket.auth.token === token && socket.connected) return;
 
-                        if (socket) socket.close();
+                    if (socket) socket.close();
 
-                        console.log("Initializing Socket.IO connection...");
+                    console.log("Initializing Socket.IO connection...");
 
-                        const newSocket = io(BASE_URL, {
-                            auth: { token },
-                            transports: ["websocket", "polling"],
-                            reconnection: true,
-                            reconnectionAttempts: 10,
-                            reconnectionDelay: 1000,
-                        });
+                    const newSocket = io(BASE_URL, {
+                        auth: { token },
+                        transports: ["websocket", "polling"],
+                        reconnection: true,
+                        reconnectionAttempts: 10,
+                        reconnectionDelay: 1000,
+                    });
 
-                        newSocket.on("connect", () => {
-                            console.log("Socket connected:", newSocket.id);
-                        });
+                    newSocket.on("connect", () => {
+                        console.log("Socket connected:", newSocket.id);
+                    });
 
-                        newSocket.on("online_users", (users) => {
-                            console.log("Initial online users:", users);
-                            setOnlineUsers(users);
-                        });
+                    newSocket.on("online_users", (users) => {
+                        console.log("Initial online users:", users);
+                        setOnlineUsers(users);
+                    });
 
-                        newSocket.on("user_online", ({ userId }) => {
-                            console.log("User online:", userId);
-                            setOnlineUsers((prev) => [...new Set([...prev, userId])]);
-                        });
+                    newSocket.on("user_online", ({ userId }) => {
+                        console.log("User online:", userId);
+                        setOnlineUsers((prev) => [...new Set([...prev, userId])]);
+                    });
 
-                        newSocket.on("user_offline", ({ userId }) => {
-                            console.log("User offline:", userId);
-                            setOnlineUsers((prev) => prev.filter((id) => id !== userId));
-                        });
+                    newSocket.on("user_offline", ({ userId }) => {
+                        console.log("User offline:", userId);
+                        setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+                    });
 
-                        newSocket.on("connect_error", (err) => {
-                            console.error("Socket connect error:", err.message);
-                            // Prevent infinite retries on auth failure
-                            if (err.message.includes("Authentication error") || err.message.includes("Invalid")) {
-                                newSocket.close();
-                            }
-                        });
+                    newSocket.on("connect_error", (err) => {
+                        console.error("Socket connect error:", err.message);
+                        // Prevent infinite retries on auth failure
+                        if (err.message.includes("Authentication error") || err.message.includes("Invalid")) {
+                            newSocket.close();
+                        }
+                    });
 
-                        setSocket(newSocket);
-                    }
-                } catch (error) {
-                    console.error("Error parsing auth for socket:", error);
+                    setSocket(newSocket);
                 }
-            } else {
-                // No auth data, close socket if open
-                if (socket) {
-                    console.log("No auth token found, closing socket...");
-                    socket.close();
-                    setSocket(null);
-                }
+            } catch (error) {
+                console.error("Error parsing auth for socket:", error);
             }
-        };
+        } else {
+            console.log("No auth token found, cannot connect socket.");
+        }
+    };
 
-        initializeSocket();
+    const disconnectSocket = () => {
+        if (socket) {
+            console.log("Disconnecting socket...");
+            socket.close();
+            setSocket(null);
+            setOnlineUsers([]);
+        }
+    };
 
+    useEffect(() => {
         const handleAuthChange = () => {
-            console.log("Auth changed, re-initializing socket...");
-            initializeSocket();
+            // Only reconnect if we were already connected or supposed to be connected. 
+            // Since we want strict manual control, we might skip auto-reconnect here 
+            // unless we track a "shouldConnect" state. 
+            // But for now, if the user logs out, we should definitely disconnect.
+
+            const authData = localStorage.getItem("auth");
+            if (!authData && socket) {
+                disconnectSocket();
+            } else if (authData && socket) {
+                // If token changed, might need to reconnect. 
+                // connectSocket checks token diff.
+                connectSocket();
+            }
         };
 
         window.addEventListener("auth-change", handleAuthChange);
@@ -94,14 +108,14 @@ export const SocketProvider = ({ children }) => {
             window.removeEventListener("auth-change", handleAuthChange);
             window.removeEventListener("storage", handleAuthChange);
             if (socket) {
-                console.log("Closing socket connection...");
+                console.log("Closing socket connection on unmount...");
                 socket.close();
             }
         };
-    }, [BASE_URL]);
+    }, [BASE_URL, socket]);
 
     return (
-        <SocketContext.Provider value={{ socket, onlineUsers }}>
+        <SocketContext.Provider value={{ socket, onlineUsers, connectSocket, disconnectSocket }}>
             {children}
         </SocketContext.Provider>
     );

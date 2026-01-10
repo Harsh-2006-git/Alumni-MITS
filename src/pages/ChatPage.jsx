@@ -23,7 +23,15 @@ import { useTheme } from "../context/ThemeContext";
 
 const ChatApp = () => {
   const { isDarkMode, toggleTheme } = useTheme();
-  const { socket, onlineUsers } = useSocket(); // Socket.IO connection and online status
+  const { socket, onlineUsers, connectSocket, disconnectSocket } = useSocket(); // Socket.IO connection and online status
+
+  // Connect socket on mount, disconnect on unmount
+  useEffect(() => {
+    connectSocket();
+    return () => {
+      disconnectSocket();
+    };
+  }, []);
   const [people, setPeople] = useState([]);
   const [recentChats, setRecentChats] = useState([]);
   const [messages, setMessages] = useState([]);
@@ -57,7 +65,7 @@ const ChatApp = () => {
   ];
   const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  console.log("BASE_URL from env:", BASE_URL);
+
 
   // Update the helper function to ensure uniqueness
   const getPersonKey = (person, prefix = "") => {
@@ -167,7 +175,7 @@ const ChatApp = () => {
 
         if (authData) {
           const parsedAuth = JSON.parse(authData);
-          console.log("Auth data found:", parsedAuth);
+
 
           try {
             const response = await fetch(
@@ -386,7 +394,7 @@ const ChatApp = () => {
         }
       );
 
-      console.log("People API response status:", response.status);
+
 
       if (response.status === 401) {
         console.error("401 Unauthorized - token may be expired");
@@ -400,7 +408,7 @@ const ChatApp = () => {
       }
 
       const data = await response.json();
-      console.log("People data received:", data);
+
 
       if (data.success && currentUser) {
         const filteredPeople = data.data?.filter(

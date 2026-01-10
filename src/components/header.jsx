@@ -117,14 +117,7 @@ export default function Header() {
     }
   };
 
-  useEffect(() => {
-    if (auth && auth.accessToken) {
-      fetchNotifications();
-      // Poll every 60 seconds
-      const interval = setInterval(fetchNotifications, 60000);
-      return () => clearInterval(interval);
-    }
-  }, [auth]);
+
 
   const setupTokenRefresh = (authData) => {
     // Clear any existing interval
@@ -1097,6 +1090,7 @@ export default function Header() {
                         </button>
                         <button
                           onClick={() => {
+                            fetchNotifications();
                             setShowNotificationsModal(true);
                             setShowProfileMenu(false);
                           }}
