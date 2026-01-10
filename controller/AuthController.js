@@ -370,9 +370,16 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value.toLowerCase();
-        if (!email.endsWith("@mitsgwalior.in")) {
-          return done(null, false, { message: "unauthorized_faculty_domain" });
+
+        const isCollegeEmail = email.endsWith("@mitsgwalior.in");
+        const isAllowedPersonal = email === "harshmanmode79@gmail.com";
+
+        if (!isCollegeEmail && !isAllowedPersonal) {
+          return done(null, false, {
+            message: "unauthorized_faculty_domain",
+          });
         }
+
         return done(null, profile);
       } catch (err) {
         return done(err, null);
@@ -380,6 +387,7 @@ passport.use(
     }
   )
 );
+
 
 export const googleAuthAdmin = (req, res, next) => {
   passport.authenticate("google-admin", {
